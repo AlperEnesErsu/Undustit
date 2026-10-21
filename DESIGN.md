@@ -1,6 +1,18 @@
 # Undustit tasarım notları
 
-İki sayfa tek bir temayı paylaşır: `index.html` (kısa sürüm) ve `kucuk-fikirler/` (hikâye sürümü).
+Undustit bir platform: üretim fazlalarına ve sorunlara yaratıcı fikirler gelir, ürün sahibinin
+dikkatini çeken fikir ortaklığa dönüşür. Cıvata yalnız ilk vaka.
+
+- `index.html`: platform sayfası. Yöntem çizimi (fazla → fikir → ortaklık), nasıl işliyor,
+  vakalar (Vaka 01 + kesikli çerçeveli "örnek vaka türü" kartları), iki taraf, "Vakanı aç"
+  föyü, SSS. Form ya da fikir listesi burada yok.
+- `vaka-01/`: ilk vaka sayfası (eski `kucuk-fikirler/`). Hikâye, fikir formu, liste, hesap,
+  teknik föy burada. `kucuk-fikirler/` yalnız buraya yönlendirir.
+- Örnek vaka kartları gerçek firma ya da açık vaka gibi gösterilmez; etiketleri ve alttaki
+  not bunu açıkça söyler. Gerçek bir Vaka 02 gelince kart onunla değiştirilir.
+- "Vakanı aç" föyü şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
+
+Sayfalar tek bir temayı paylaşır: `index.html` ve `vaka-01/`.
 Her sayfa tek dosyalık bir artifact olduğu için token'lar iki dosyanın `:root` bloğunda birebir
 aynı tutulur. Birinde renk, font, radius veya süre değişirse diğerinde de değişmeli.
 

@@ -1,0 +1,1224 @@
+<!doctype html>
+<html lang="tr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Undustit · Vaka 01: Bir milyon cıvata</title>
+<meta name="description" content="Tek bir fazla cıvatadan bütün bir depoya: Undustit, üretim fazlalarına yaratıcı fikirler getirir ve ürün sahibiyle ortaklığa dönüştürür. Vaka 01: bir milyon cıvata.">
+<meta name="theme-color" content="#0B0C0D">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Undustit">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="Vaka 01: Bir milyon cıvata · Undustit">
+<meta property="og:description" content="Tek bir fazla cıvatadan bütün bir depoya: Undustit, üretim fazlalarına yaratıcı fikirler getirir ve ürün sahibiyle ortaklığa dönüştürür. Vaka 01: bir milyon cıvata.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vaka 01: Bir milyon cıvata · Undustit">
+<meta name="twitter:description" content="Tek bir fazla cıvatadan bütün bir depoya: Undustit, üretim fazlalarına yaratıcı fikirler getirir ve ürün sahibiyle ortaklığa dönüştürür. Vaka 01: bir milyon cıvata.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230B0C0D%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23FF6A2B%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a precision atelier. A pinned drawing sheet zooms from one bolt to a whole building, lit like a product shot.
+   After it the page alternates its structure: full-bleed numbers band, wide head + offset index, form + board,
+   stacked ledger, drawing + datasheet, two-column questions, and a closing shot that reuses the building drawing. */
+:root{
+  color-scheme:dark;
+  --bg:#0B0C0D; --bg-2:#111315; --bg-3:#171A1C; --line:#22262A; --line-2:#30353A;
+  --ink:#EEECE7; --ink-2:#BFBDB6; --muted:#8F928E;
+  --accent:#FF6A2B; --accent-hover:#FF8550; --accent-active:#E85A1E; --accent-ink:#170A04;
+  --sky:#7FA3BD;
+  --ok:#86D4A6;
+  --f-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --f-body:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
+  --dur-fast:100ms; --dur-base:200ms; --dur-mod:300ms; --dur-slow:500ms;
+  --ease-out:cubic-bezier(0,0,.2,1); --ease-in:cubic-bezier(.4,0,1,1); --ease-io:cubic-bezier(.4,0,.2,1);
+  --r-sm:6px; --r-md:12px; --r-lg:20px;
+  --gut:clamp(16px,4vw,56px);
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-weight:400;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-family:var(--f-serif);font-weight:400;line-height:1;letter-spacing:-.02em;text-wrap:balance}
+h3{font-family:var(--f-body);font-weight:500;letter-spacing:-.01em;line-height:1.25}
+em{font-style:italic}
+p{margin:0}
+a{color:inherit}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- buttons: default / hover / focus / active / disabled / loading */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 22px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;letter-spacing:-.005em;text-decoration:none;transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.btn svg{width:18px;height:18px;transition:transform var(--dur-base) var(--ease-out)}
+.btn:hover{background:#FFFFFF;border-color:#FFFFFF}
+.btn:hover svg{transform:translateX(3px)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.primary:active{background:var(--accent-active);border-color:var(--accent-active)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn.ghost:hover{border-color:var(--ink-2);background:var(--bg-3)}
+.btn.sm{min-height:38px;padding:0 16px;font-size:14px}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn[aria-busy="true"]{pointer-events:none}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin 800ms linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- nav */
+.nav{position:fixed;inset:0 0 auto 0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 16px) var(--gut) 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(var(--bg) 20%,rgba(11,12,13,0));pointer-events:none;transition:background-color var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
+/* past the pinned story the bar gets a solid surface so headings and tables never run under it */
+.nav.solid::before{background:rgba(11,12,13,.86);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--line)}
+.brand{display:inline-flex;align-items:baseline;text-decoration:none}
+.brand b{font-family:var(--f-serif);font-weight:400;font-size:25px;letter-spacing:-.01em;line-height:1}
+.brand b i{color:var(--accent)}
+.nav-r{display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;gap:2px;margin-inline-end:8px}
+.nav-links a{font-size:14px;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:999px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.nav-links a:hover{color:var(--ink);background:var(--bg-3)}
+.lang{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px;background:rgba(17,19,21,.7)}
+.lang button{min-width:40px;min-height:30px;border:0;background:transparent;border-radius:999px;font-family:var(--f-mono);font-size:12px;color:var(--muted);transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.lang button:hover{color:var(--ink)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* ---------- story */
+.story{position:relative;height:560vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--bg)}
+.light{position:absolute;inset:0;pointer-events:none;background:radial-gradient(55% 60% at 70% 46%,rgba(255,236,214,.07),rgba(255,236,214,0) 70%),radial-gradient(90% 70% at 70% 120%,rgba(127,163,189,.07),rgba(127,163,189,0) 70%)}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(238,236,231,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(238,236,231,.035) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(60% 60% at 70% 46%,#000,transparent)}
+.cam{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--bg) 0%,rgba(11,12,13,.92) 30%,rgba(11,12,13,0) 52%),linear-gradient(0deg,var(--bg) 0%,rgba(11,12,13,0) 24%)}
+.caps{position:absolute;z-index:2;left:var(--gut);bottom:clamp(88px,15vh,150px);width:min(620px,calc(100% - 2*var(--gut)))}
+/* captions share one spot: the old one leaves fast, the new one waits for it, so two texts never overlap */
+.cap{position:absolute;left:0;bottom:0;width:100%;display:grid;gap:18px;opacity:0;transform:translateY(-6px);transition:opacity var(--dur-fast) var(--ease-in),transform var(--dur-fast) var(--ease-in);pointer-events:none}
+.cap.on{opacity:1;transform:none;transition:opacity var(--dur-mod) var(--ease-out) var(--dur-fast),transform var(--dur-mod) var(--ease-out) var(--dur-fast)}
+.cap h2{font-size:clamp(40px,5vw,72px)}
+.cap h2 em{color:var(--ink-2)}
+.cap .xl{font-size:clamp(56px,10.5vw,160px);line-height:.92;letter-spacing:-.03em}
+.cap .xl em{color:var(--accent)}
+.cap p{color:var(--ink-2);font-size:clamp(16px,1.35vw,18px);max-width:44ch;font-weight:300}
+.cap p b{color:var(--ink);font-weight:500}
+.hint{display:inline-flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.hint i{display:block;width:1px;height:28px;background:linear-gradient(var(--muted),transparent);transform-origin:top}
+@media (prefers-reduced-motion:no-preference){
+  .hint i{animation:drip 1.8s var(--ease-io) infinite}
+  @keyframes drip{0%{transform:scaleY(.2)}60%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+  .intro .cap[data-i="0"] > *{animation:rise 700ms var(--ease-out) both}
+  .intro .cap[data-i="0"] > :nth-child(2){animation-delay:80ms}
+  .intro .cap[data-i="0"] > :nth-child(3){animation-delay:160ms}
+  .intro .cap[data-i="0"] > :nth-child(4){animation-delay:240ms}
+  @keyframes rise{from{opacity:.001;transform:translateY(14px)}to{opacity:1;transform:none}}
+}
+.rail{position:absolute;z-index:2;left:var(--gut);top:96px;display:flex;gap:28px;list-style:none;margin:0;padding:0}
+.rail li{display:grid;gap:10px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted);transition:color var(--dur-base) var(--ease-out)}
+.rail li::before{content:"";width:32px;height:1px;background:var(--line-2);transform-origin:left;transition:background-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.rail li.on{color:var(--ink)}
+.rail li.on::before{background:var(--ink);transform:scaleX(1.6)}
+.tblock{position:absolute;z-index:2;right:var(--gut);bottom:28px;display:grid;grid-template-columns:auto auto auto;border:1px solid var(--line-2);font-family:var(--f-mono);font-size:11px;background:rgba(11,12,13,.72)}
+.tblock div{padding:7px 12px;border-right:1px solid var(--line-2);display:grid;gap:2px}
+.tblock div:last-child{border-right:0}
+.tblock span{color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-size:9.5px}
+.tblock b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* svg drawing classes (world units, hairline strokes, materials from gradients) */
+.st{fill:url(#gSteel);stroke:var(--ink-2);stroke-width:.75}
+.sw{fill:url(#gWeb);stroke:var(--ink-2);stroke-width:.75}
+.tb{fill:url(#gTimber);stroke:var(--ink-2);stroke-width:.75}
+.rl{fill:none;stroke:rgba(214,170,120,.22);stroke-width:.75}
+.bz{fill:url(#gZinc);stroke:var(--ink);stroke-width:.75}
+.act .bz{fill:url(#gAct);stroke:var(--accent)}
+.bl{fill:none;stroke:rgba(238,236,231,.55);stroke-width:.6}
+.hid{fill:none;stroke:var(--ink-2);stroke-width:.6;stroke-dasharray:4 3}
+.cl{fill:none;stroke:var(--muted);stroke-width:.5;stroke-dasharray:14 3 2 3}
+.ld{fill:none;stroke:var(--muted);stroke-width:.6}
+.dm{fill:none;stroke:var(--ink-2);stroke-width:.6}
+.lt{fill:var(--ink-2);font-family:var(--f-mono);font-size:calc(var(--fs,9) * var(--ts,1) * 1px)}
+.lt.k{fill:var(--accent)}
+.lt.big{fill:var(--ink);font-family:var(--f-serif);letter-spacing:-.02em}
+.box{fill:rgba(11,12,13,.86);stroke:var(--line-2);stroke-width:.6}
+.glass{fill:url(#gGlass);stroke:var(--sky);stroke-width:1.25}
+.clad{fill:url(#gClad);stroke:var(--line-2);stroke-width:.6}
+.gl{fill:none;stroke:rgba(143,146,142,.55);stroke-width:.6}
+.gnd{fill:none;stroke:var(--ink-2);stroke-width:1}
+.gh{fill:none;stroke:rgba(143,146,142,.45);stroke-width:.6}
+.glow{fill:url(#gGlow)}
+.ringc{fill:none;stroke:var(--accent);stroke-width:1.5}
+.ringd{fill:var(--accent)}
+.man{fill:var(--muted)}
+.d{opacity:var(--d,1)} .a1{opacity:var(--a1,0)} .a2{opacity:var(--a2,0)} .a3{opacity:var(--a3,0)}
+.b{opacity:var(--b,1)} .rg{opacity:var(--ring,0)} .ins{opacity:var(--ins,1)} .opt{opacity:var(--opt,1)}
+.mv{transform:translateX(calc((var(--ins,1) - 1) * 130px))}
+.nt{opacity:var(--nut,1);transform:translateX(calc((1 - var(--nut,1)) * 40px))}
+
+/* static story (reduced motion): the same section becomes a printed sheet, nothing is hidden */
+.story.static{height:auto}
+.story.static .stage{position:relative;height:auto;overflow:visible;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;padding:120px var(--gut) 64px;max-width:1280px;margin:0 auto}
+.story.static .stage::after{display:none}
+.story.static .caps{display:contents}
+.story.static .cap{position:relative;opacity:1;transform:none;pointer-events:auto;order:2;align-content:start}
+.story.static .cap[data-i="0"]{grid-column:1/-1;order:0}
+.story.static .cam{position:relative;inset:auto;height:auto;aspect-ratio:16/9;grid-column:1/-1;order:1;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2)}
+.story.static .rail{position:relative;top:auto;left:auto;grid-column:1/-1;order:3;flex-wrap:wrap}
+.story.static .tblock{position:relative;right:auto;bottom:auto;order:4;justify-self:start;grid-column:1/-1}
+.story.static .cap .xl{font-size:clamp(48px,9vw,128px)}
+.story.static .cap h2{font-size:clamp(28px,3vw,40px)}
+.story.static .cap[data-i="3"] .xl{font-size:clamp(40px,4.4vw,60px)}
+.frame-fig{display:none}
+.story.static .frame-fig{display:block;margin:0;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--bg-2)}
+.frame-fig svg{width:100%;height:auto;aspect-ratio:16/10;display:block}
+@media (max-width:820px){.story.static .stage{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- sections */
+.wrap{max-width:1280px;margin:0 auto;padding-inline:var(--gut)}
+.sec{padding-block:clamp(96px,13vw,176px)}
+.sec.ruled{border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:18px;max-width:min(100%,760px)}
+.sec-head h2{font-size:clamp(44px,6vw,88px)}
+.sec-head h2 em{color:var(--ink-2)}
+.sec-head p{color:var(--ink-2);max-width:54ch;font-size:18px;font-weight:300}
+
+/* numbers: full-bleed band, asymmetric, one lead figure */
+.band{background:var(--bg-2);border-block:1px solid var(--line)}
+.nums{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(40px,7vw,120px);align-items:end}
+.lead-num{display:grid;gap:14px}
+.lead-num .n{font-family:var(--f-serif);font-size:clamp(96px,17vw,260px);line-height:.82;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.lead-num .l{font-size:clamp(19px,1.8vw,24px);color:var(--ink-2);max-width:30ch;font-weight:300}
+.facts{list-style:none;margin:0;padding:0;display:grid}
+.facts li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:18px;border-bottom:1px solid var(--line)}
+.facts li:first-child{border-top:1px solid var(--line)}
+.facts span{color:var(--ink-2);font-weight:300}
+.facts b{font-family:var(--f-mono);font-weight:400;font-variant-numeric:tabular-nums;white-space:nowrap}
+.foot-note{margin-top:40px;font-size:13px;color:var(--muted);max-width:70ch}
+
+/* steps: wide head, offset index */
+.steps-wrap{display:grid;gap:64px}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;margin-inline-start:auto;width:min(100%,820px)}
+.steps li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:24px;padding-block:32px;border-top:1px solid var(--line);counter-increment:s}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.steps li::before{content:counter(s);font-family:var(--f-serif);font-size:64px;line-height:.9;color:var(--muted)}
+.steps h3{font-size:clamp(22px,2.2vw,28px)}
+.steps p{color:var(--ink-2);margin-top:10px;max-width:58ch;font-weight:300}
+
+/* ideas: form + board */
+.ideas{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,4vw,64px);align-items:start;margin-top:64px}
+form.idea{background:linear-gradient(180deg,var(--bg-3),var(--bg-2));border:1px solid var(--line-2);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,32px);display:grid;gap:20px;position:sticky;top:100px;box-shadow:inset 0 1px 0 rgba(238,236,231,.05),0 40px 90px -50px rgba(24,12,4,.75)}
+.fld{display:grid;gap:8px;min-width:0}
+.fld label{font-weight:500;font-size:15px}
+.fld .help{font-size:13px;color:var(--muted)}
+textarea,input[type=text],input[type=number]{inline-size:100%;min-inline-size:0;background:var(--bg);border:1px solid var(--line-2);border-radius:var(--r-md);padding:13px 15px;transition:border-color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+textarea{resize:vertical;min-height:132px;font-size:17px;line-height:1.5}
+textarea:hover,input:hover{border-color:var(--muted)}
+textarea:focus,input:focus{outline:none;border-color:var(--accent);background:var(--bg-2)}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
+.starters{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--ink-2);font-size:13.5px;transition:border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.chip:hover{border-color:var(--ink-2);color:var(--ink);background:var(--bg-3)}
+.chip:active{transform:scale(.97)}
+.extra{border:1px solid var(--line-2);border-radius:var(--r-md);padding:4px 6px}
+.extra-t{display:flex;align-items:center;gap:8px;width:100%;min-height:42px;padding:0 8px;border:0;border-radius:var(--r-sm);background:transparent;text-align:start;font-weight:500;font-size:15px;transition:background-color var(--dur-fast) var(--ease-out)}
+.extra-t:hover{background:var(--bg-3)}
+.extra-t svg{width:16px;height:16px;flex:none;transition:transform var(--dur-base) var(--ease-io)}
+.extra-t[aria-expanded="true"] svg{transform:rotate(90deg)}
+.extra-t span span{font-weight:300;color:var(--muted);font-size:13.5px}
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:6px 8px 12px}
+.slots label{font-size:13.5px}
+.slots small{font-family:var(--f-mono);color:var(--muted);margin-inline-start:6px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.status{font-size:14px;color:var(--muted);min-width:0;flex:1 1 220px}
+.status.bad{color:var(--accent)}
+.status.good{color:var(--ok)}
+.board{display:grid;gap:18px;min-width:0}
+.board-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.board-head h3{font-size:20px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
+.seg button{min-height:32px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13.5px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.card{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);padding:20px;display:grid;gap:14px;min-width:0}
+.card.lead{border-radius:var(--r-lg);padding:clamp(22px,2.6vw,32px);background:linear-gradient(160deg,var(--bg-3),var(--bg-2) 60%);box-shadow:inset 0 1px 0 rgba(238,236,231,.04),0 18px 40px -28px rgba(24,12,4,.55)}
+.card .txt{font-size:17px;overflow-wrap:anywhere;font-weight:300}
+.card.lead .txt{font-family:var(--f-serif);font-size:clamp(26px,2.6vw,36px);line-height:1.15;letter-spacing:-.01em}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;padding:3px 8px;border-radius:var(--r-sm);color:var(--ink-2);border:1px solid var(--line-2)}
+.tag.k{color:var(--accent);border-color:rgba(255,106,43,.35)}
+.by{font-size:13px;color:var(--muted)}
+.cfoot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px}
+.demand{font-size:14px;color:var(--ink-2)}
+.demand strong{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.buy{display:flex;gap:6px;align-items:center}
+.buy input{inline-size:92px;padding:8px 10px;font-family:var(--f-mono);font-size:14px}
+.mine{font-size:14px;color:var(--ok);font-weight:500}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.cards .card.lead{grid-column:1/-1}
+.empty{border:1px dashed var(--line-2);border-radius:var(--r-md);padding:32px 24px;display:grid;gap:8px;justify-items:start}
+.empty b{font-family:var(--f-serif);font-weight:400;font-size:30px;letter-spacing:-.01em}
+.empty p{color:var(--ink-2);max-width:46ch;font-weight:300}
+.ex-label{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.card.new{animation:rise var(--dur-mod) var(--ease-out)}}
+
+/* ledger: stacked, bars encode the split */
+.ledger-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:end}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:48px;max-width:720px}
+.calc input{font-family:var(--f-mono)}
+.over{display:grid;gap:6px;justify-items:end;text-align:end}
+.over b{font-family:var(--f-serif);font-weight:400;font-size:clamp(64px,8vw,128px);line-height:.9;letter-spacing:-.03em}
+.tbl{overflow-x:auto;margin-top:40px;border-top:1px solid var(--line-2)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:start;padding:16px 16px 16px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+td.n,th.n{text-align:end;font-family:var(--f-mono);font-variant-numeric:tabular-nums;padding-inline-end:0;white-space:nowrap}
+td small{display:block;color:var(--muted);font-size:13px}
+.bar{width:34%;min-width:120px}
+.bar i{display:block;height:6px;border-radius:3px;background:var(--line-2)}
+tr.you .bar i{background:var(--accent)}
+tr.you td:first-child{color:var(--ink);font-weight:500}
+
+/* spec: drawing + datasheet */
+.spec{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:clamp(32px,6vw,96px);align-items:start;margin-top:64px}
+.spec-fig{margin:0;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(70% 70% at 50% 45%,rgba(255,236,214,.05),transparent 70%),var(--bg-2);padding:clamp(16px,2vw,28px);display:grid;gap:12px;position:sticky;top:100px}
+.spec-fig svg{width:100%;height:auto;display:block}
+.spec-fig figcaption{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--f-mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em;border-top:1px solid var(--line);padding-top:12px}
+dl.sheet{margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto}
+dl.sheet dt,dl.sheet dd{padding-block:16px;border-bottom:1px solid var(--line);margin:0}
+dl.sheet dt{color:var(--ink-2);font-weight:300}
+dl.sheet dt small{display:block;color:var(--muted);font-size:13px}
+dl.sheet dd{font-family:var(--f-mono);text-align:end;font-variant-numeric:tabular-nums;padding-inline-start:16px}
+dl.sheet dd.k{color:var(--accent)}
+
+/* faq */
+.faq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(24px,5vw,80px);margin-top:56px}
+.faq div{padding-block:24px;border-top:1px solid var(--line);display:grid;gap:8px}
+.faq b{font-size:17px;font-weight:500}
+.faq p{color:var(--ink-2);font-weight:300}
+
+/* end: closing shot */
+.end{position:relative;overflow:hidden;border-top:1px solid var(--line)}
+.end svg.back{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+.end::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 6%,rgba(11,12,13,.25) 55%,var(--bg) 100%);pointer-events:none}
+.end-in{position:relative;z-index:1;padding-block:clamp(140px,20vw,260px) clamp(80px,10vw,140px);display:grid;gap:36px;justify-items:start}
+.end h2{font-size:clamp(56px,10vw,168px);line-height:.9;letter-spacing:-.03em}
+.end h2 em{color:var(--accent)}
+footer{border-top:1px solid var(--line);padding-block:20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+footer a{color:var(--ink-2);text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-out)}
+footer a:hover{color:var(--accent)}
+
+@media (max-width:960px){
+  .nums,.ideas,.spec,.ledger-top{grid-template-columns:minmax(0,1fr)}
+  form.idea,.spec-fig{position:static}
+  .over{justify-items:start;text-align:start}
+}
+@media (max-width:640px){
+  .cards,.slots,.calc,.faq{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .caps{bottom:100px}
+  .tblock{left:var(--gut);right:auto;bottom:22px}
+  .stage::after{background:linear-gradient(0deg,var(--bg) 0%,rgba(11,12,13,.88) 40%,rgba(11,12,13,0) 62%)}
+  .steps li{grid-template-columns:52px minmax(0,1fr);gap:14px}
+  .steps li::before{font-size:44px}
+  .bar{display:none}
+  th:nth-child(4),td:nth-child(4){display:none}
+  dl.sheet{grid-template-columns:minmax(0,1fr)}
+  dl.sheet dt{border-bottom:0;padding-block:16px 2px}
+  dl.sheet dd{text-align:start;padding-inline-start:0;padding-block:0 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}
+}
+
+/* menu: inline on wide screens, a drop panel under the bar below 1040px (links + language) */
+.nav-menu{display:flex;align-items:center;gap:8px}
+.menu-t{display:none;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--line-2);border-radius:999px;background:transparent;color:var(--ink);transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out)}
+.menu-t:hover{background:var(--bg-3);border-color:var(--ink-2)}
+.menu-t svg{width:20px;height:20px}
+.menu-t .i-close,.nav.open .menu-t .i-open{display:none}
+.nav.open .menu-t .i-close{display:block}
+@media (max-width:1040px){
+  .menu-t{display:inline-flex}
+  .nav-menu{position:absolute;top:100%;left:0;right:0;display:none;flex-direction:column;align-items:stretch;gap:16px;padding:12px var(--gut) 20px;background:var(--bg);box-shadow:0 30px 60px -20px rgba(0,0,0,.8);border-bottom:1px solid var(--line)}
+  .nav.open .nav-menu{display:flex}
+  .nav-menu .nav-links{display:flex;flex-direction:column;gap:0;margin:0}
+  .nav-menu .nav-links a{font-size:17px;padding:12px 0;border-radius:0;border-bottom:1px solid var(--line);color:var(--ink)}
+  .nav-menu .nav-links a:hover{background:transparent;color:var(--accent)}
+  .nav-menu .lang{align-self:flex-start}
+  .nav.open::before{background:var(--bg)}
+}
+
+/* skip link, stronger hover and focus feedback, 44px tap areas */
+.skip{position:absolute;left:var(--gut);top:-80px;z-index:60;min-height:44px;display:inline-flex;align-items:center;padding:0 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:500;text-decoration:none;transition:top var(--dur-base) var(--ease-out)}
+.skip:focus{top:12px}
+.brand b i{display:inline-block;transition:transform var(--dur-base) var(--ease-out)}
+.brand:hover b i{transform:translateX(2px) rotate(-6deg)}
+.btn:hover svg{transform:translateX(5px)}
+.btn.sig:hover,.btn.primary:hover{box-shadow:0 0 0 4px rgba(255,106,43,.18)}
+.lang button:not([aria-pressed="true"]):hover,.seg button:not([aria-pressed="true"]):hover,.sorts button:not([aria-pressed="true"]):hover{background:var(--bg-3);color:var(--ink)}
+.chip:hover,.starters button:hover{background:rgba(255,106,43,.12);border-color:var(--accent);color:var(--ink)}
+textarea:focus,input:focus{box-shadow:0 0 0 3px rgba(255,106,43,.28)}
+footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px;text-decoration-color:rgba(255,106,43,.5)}
+footer a:hover{text-decoration-color:var(--accent)}
+
+/* page change: the bar and logo stay put while the sheet underneath swaps */
+@view-transition{navigation:auto}
+.brand{view-transition-name:brand}
+.nav-r{view-transition-name:nav-r}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+
+/* the board follows the long form so the right column is never left empty */
+.board{position:sticky;top:100px}
+@media (max-width:960px){.board{position:static}}
+.lang button[aria-pressed="true"]:hover,.seg button[aria-pressed="true"]:hover,.sorts button[aria-pressed="true"]:hover{background:#FFFFFF;color:var(--bg)}
+textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.end-cta{display:flex;flex-wrap:wrap;gap:10px}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs id="defs"></defs></svg>
+
+<a class="skip" href="#main" data-t="skip">İçeriğe geç</a>
+<header class="nav" id="nav">
+  <a class="brand" href="../" data-ta="home_aria" aria-label="Undustit ana sayfa"><b>Undust<i>it</i></b></a>
+  <div class="nav-r">
+    <div class="nav-menu" id="nav-menu">
+      <nav class="nav-links" data-ta="nav_aria" aria-label="Sayfa">
+        <a href="#hikaye" data-t="nav_story">Hikâye</a>
+        <a href="#fikir" data-t="nav_ideas">Fikirler</a>
+        <a href="#hesap" data-t="nav_money">Hesap</a>
+        <a href="#foy" data-t="nav_spec">Teknik föy</a>
+        <a href="../#vakalar" data-t="nav_all">Tüm vakalar</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Dil / Language">
+        <button type="button" id="lang-tr" aria-pressed="true">TR</button>
+        <button type="button" id="lang-en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+    <a class="btn primary sm" href="#fikir" data-t="nav_cta">Fikrini gönder</a>
+    <button type="button" class="menu-t" id="menu-t" aria-expanded="false" aria-controls="nav-menu" data-ta="nav_menu" aria-label="Menü"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="story" id="hikaye" data-ta="story_aria" aria-label="Bir cıvatanın hikâyesi">
+    <div class="stage">
+      <div class="light" aria-hidden="true"></div>
+      <div class="grid-bg" aria-hidden="true"></div>
+      <svg class="cam" id="cam" aria-hidden="true" focusable="false"><use id="cam-use" href="#world"/></svg>
+
+      <div class="caps">
+        <div class="cap on" data-i="0">
+          <span class="eyebrow" data-t="c0_e">Undustit · Vaka 01</span>
+          <h1 class="xl" data-th="c0_h">Küçük fikirler,</h1>
+          <p data-th="c0_p">Satılmayan stoklara yeni bir iş buluyoruz. Depoda <b>bir milyon cıvata</b> bekliyor. Kaydır, birinin nereye gidebileceğini gör.</p>
+          <span class="hint"><i aria-hidden="true"></i><span data-t="c0_hint">Kaydır</span></span>
+        </div>
+        <div class="cap" data-i="1">
+          <span class="eyebrow" data-t="c1_e">Detay A · aşık bağlantısı</span>
+          <h2 data-th="c1_h">Bir cıvata, bir bağlantı olur.</h2>
+          <p data-th="c1_p">Çelik aşık bayrağını ahşap aşığa bağlar.</p>
+        </div>
+        <div class="cap" data-i="2">
+          <figure class="frame-fig"><svg aria-hidden="true" focusable="false"><use href="#world"/></svg></figure>
+          <span class="eyebrow" data-t="c2_e">Aks 3 · portal çerçeve</span>
+          <h2 data-th="c2_h">Bağlantılar bir çerçeve kurar.</h2>
+          <p data-th="c2_p">24 m açıklıklı bir çerçevede 18 aşık var.</p>
+        </div>
+        <div class="cap" data-i="3">
+          <figure class="frame-fig"><svg aria-hidden="true" focusable="false"><use href="#world"/></svg></figure>
+          <span class="eyebrow" data-t="c3_e">Genel görünüş · 42 m depo</span>
+          <h2 class="xl" data-th="c3_h"><em>büyük etkiler.</em></h2>
+          <p data-th="c3_p">Bu depo yalnız aşık bağlantıları için 288 cıvata ister.</p>
+        </div>
+      </div>
+
+      <ol class="rail" data-ta="rail_aria" aria-label="Aşamalar">
+        <li class="on" data-t="r0">Cıvata</li>
+        <li data-t="r1">Bağlantı</li>
+        <li data-t="r2">Çerçeve</li>
+        <li data-t="r3">Yapı</li>
+      </ol>
+
+      <div class="tblock" aria-hidden="true">
+        <div><span data-t="tb_sheet">Pafta</span><b id="tb-sheet">01 / 04</b></div>
+        <div><span data-t="tb_scale">Ölçek</span><b id="tb-scale">1:1</b></div>
+        <div><span data-t="tb_by">Çizen</span><b data-t="tb_you">sen</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="rakamlar">
+    <div class="wrap sec">
+      <div class="nums">
+        <div class="lead-num">
+          <span class="eyebrow" data-t="n_e">Bir milyon küçük parça</span>
+          <span class="n" id="n-roofs">3.472</span>
+          <span class="l" data-t="n_l">depo çatısına yetecek kadar cıvata. Hepsi şu an bir rafta bekliyor.</span>
+        </div>
+        <ul class="facts">
+          <li><span data-t="f1">Takım (cıvata + flanşlı somun)</span><b data-t="f1v">1.000.000</b></li>
+          <li><span data-t="f2">Tek bir 42 m'lik depoda</span><b data-t="f2v">288 cıvata</b></li>
+          <li><span data-t="f3">Toplam çelik, yaklaşık</span><b data-t="f3v">80 ton</b></li>
+          <li><span data-t="f4">Taban fiyat, takım başına</span><b data-t="f4v">0,20 $</b></li>
+        </ul>
+      </div>
+      <p class="foot-note" data-t="n_note">Tahmini değerler.</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="sec">
+      <div class="steps-wrap">
+        <div class="sec-head">
+          <span class="eyebrow" data-t="s_e">Nasıl işliyor</span>
+          <h2 data-th="s_h">Fikirden sahaya üç adım.</h2>
+        </div>
+        <ol class="steps">
+          <li><div><h3 data-t="s1h">Fikrini yaz</h3><p data-t="s1p">Bir cümle yeter.</p></div></li>
+          <li><div><h3 data-t="s2h">İnsanlar "alırdım" der</h3><p data-t="s2p">Talebi ölçer.</p></div></li>
+          <li><div><h3 data-t="s3h">En çok isteneni sahaya çıkarırız</h3><p data-t="s3p">1.000 adetle denenir.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="sec ruled" id="fikir" aria-labelledby="ideas-h">
+      <div class="sec-head">
+        <span class="eyebrow" data-t="i_e">Senin sıran</span>
+        <h2 id="ideas-h" data-th="i_h">Bu cıvata başka nerede çalışır?</h2>
+        <p data-t="i_p">Fikrini yaz, beğenenler ne ödeyeceğini söylesin.</p>
+      </div>
+      <div class="ideas">
+        <form class="idea" id="idea-form" novalidate>
+          <div class="fld">
+            <label for="f-text" data-t="f_label">Fikrin</label>
+            <textarea id="f-text" maxlength="600" aria-describedby="f-text-help" data-tp="f_ph" placeholder="Bu cıvata … içinde kullanılabilir, çünkü …"></textarea>
+            <span class="help" id="f-text-help" data-t="f_help">En az 8 karakter.</span>
+            <div class="starters" id="starters"></div>
+          </div>
+          <div class="extra">
+            <button type="button" class="extra-t" id="extra-t" aria-expanded="false" aria-controls="slots">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              <span data-th="f_extra">Detay ekle</span>
+            </button>
+            <div class="slots" id="slots" hidden>
+              <div class="fld"><label for="s-name"><span data-t="sl_name">Ürünün adı</span><small>%3</small></label><input type="text" id="s-name" maxlength="60" data-tp="sl_name_ph" placeholder="Örn. Pergole Kiti"></div>
+              <div class="fld"><label for="s-look"><span data-t="sl_look">Görünüm / kaplama</span><small>%3</small></label><input type="text" id="s-look" maxlength="80" data-tp="sl_look_ph" placeholder="Örn. sıcak daldırma galvaniz"></div>
+              <div class="fld"><label for="s-pack"><span data-t="sl_pack">Ambalaj</span><small>%2</small></label><input type="text" id="s-pack" maxlength="80" data-tp="sl_pack_ph" placeholder="Örn. 20'li kutu"></div>
+              <div class="fld"><label for="s-chan"><span data-t="sl_chan">Nerede satılır</span><small>%2</small></label><input type="text" id="s-chan" maxlength="80" data-tp="sl_chan_ph" placeholder="Örn. yapı marketleri"></div>
+            </div>
+          </div>
+          <div class="fld">
+            <label for="f-handle" data-t="f_handle">Fikrin yanında görünecek isim</label>
+            <input type="text" id="f-handle" maxlength="30" data-tp="f_handle_ph" placeholder="Boş bırakırsan &quot;İsimsiz&quot; yazar">
+          </div>
+          <div class="row">
+            <span class="status" id="f-status" role="status"></span>
+            <button class="btn primary" type="submit" id="f-send" disabled>
+              <span data-t="f_send">Fikri gönder</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+          </div>
+        </form>
+
+        <div class="board">
+          <div class="board-head">
+            <h3 data-t="b_h">Gelen fikirler</h3>
+            <div class="seg" role="group" data-ta="sort_aria" aria-label="Sıralama">
+              <button type="button" id="sort-top" aria-pressed="true" data-t="sort_top">En çok istenen</button>
+              <button type="button" id="sort-new" aria-pressed="false" data-t="sort_new">En yeni</button>
+            </div>
+          </div>
+          <div id="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec ruled" id="hesap" aria-labelledby="money-h">
+      <div class="ledger-top">
+        <div class="sec-head">
+          <span class="eyebrow" data-t="m_e">Açık hesap</span>
+          <h2 id="money-h" data-th="m_h">Satarsa kim ne alır?</h2>
+          <p data-t="m_p">Kalan kâr tablodaki gibi bölünür.</p>
+        </div>
+        <div class="over"><span class="eyebrow" data-t="c_over">Adet başına bölünen kâr</span><b id="r-over"></b></div>
+      </div>
+      <div class="calc">
+        <div class="fld"><label for="c-price" data-t="c_price">Satış fiyatı ($)</label><input type="number" id="c-price" inputmode="decimal" min="0" step="0.05" value="1.50"></div>
+        <div class="fld"><label for="c-mod" data-t="c_mod">Masraf ($/adet)</label><input type="number" id="c-mod" inputmode="decimal" min="0" step="0.05" value="0.30"></div>
+        <div class="fld"><label for="c-units" data-t="c_units">Satılan adet</label><input type="number" id="c-units" inputmode="numeric" min="0" step="100" value="1000"></div>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th data-t="th_who">Kim</th><th class="bar"><span class="sr" data-t="th_bar">Pay grafiği</span></th><th class="n" data-t="th_share">Pay</th><th class="n" data-t="th_unit">Adet başı</th><th class="n" id="r-units-h"></th></tr></thead>
+          <tbody id="r-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sec ruled" id="foy" aria-labelledby="spec-h">
+      <div class="sec-head">
+        <span class="eyebrow" data-t="t_e">Mühendisler için</span>
+        <h2 id="spec-h" data-th="t_h">Teknik föy.</h2>
+        <p data-t="t_p">Değerler EN 1993-1-8 Tablo 3.4'e göre hesaplandı.</p>
+      </div>
+      <div class="spec">
+        <figure class="spec-fig">
+          <svg id="spec-svg" viewBox="-34 -46 160 100" aria-hidden="true" focusable="false"></svg>
+          <figcaption><span data-t="sf_l">Görünüş · ölçek 2:1</span><span>M10 × 90 · 8.8</span></figcaption>
+        </figure>
+        <dl class="sheet">
+          <dt data-t="t1">Tip</dt><dd data-t="t1v">Flanşlı cıvata + flanşlı somun</dd>
+          <dt data-t="t2">Nominal çap × boy</dt><dd>M10 × 90 mm</dd>
+          <dt data-th="t3">Dayanım sınıfı</dt><dd>8.8</dd>
+          <dt data-th="t4">Gerilme alanı</dt><dd>58 mm²</dd>
+          <dt data-th="t5">Kesme dayanımı</dt><dd class="k" data-t="t5v">22,3 kN</dd>
+          <dt data-th="t6">Çekme dayanımı</dt><dd data-t="t6v">33,4 kN</dd>
+          <dt data-th="t7">Ahşapta pul</dt><dd>30 × 3 mm</dd>
+          <dt data-t="t8">Stok</dt><dd data-t="t8v">1.000.000 takım</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="sec ruled" aria-labelledby="faq-h">
+      <div class="sec-head"><h2 id="faq-h" data-th="q_h">Sık sorulanlar.</h2></div>
+      <div class="faq">
+        <div><b data-t="q1">Para ödemem gerekiyor mu?</b><p data-t="a1">Hayır.</p></div>
+        <div><b data-t="q2">"Alırdım" dersem satın almış olur muyum?</b><p data-t="a2">Hayır.</p></div>
+        <div><b data-t="q3">Fikrimi kim görür?</b><p data-t="a3">Bu sayfayı açan herkes.</p></div>
+        <div><b data-t="q4">Bu gerçek bir satış mı?</b><p data-t="a4">Bu sayfa bir prototip.</p></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="end">
+    <svg class="back" id="end-svg" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg>
+    <div class="wrap end-in">
+      <span class="eyebrow" data-t="end_e">Senin fikrin hangi cıvata?</span>
+      <h2 data-th="end_h">Küçük fikirler,<br><em>büyük etkiler.</em></h2>
+      <div class="end-cta"><a class="btn primary" href="#fikir"><span data-t="end_cta">Fikrini gönder</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a><a class="btn ghost" href="../#vakalar" data-t="end_all">Diğer vakalar</a></div>
+    </div>
+  </section>
+  <div class="wrap"><footer><span data-t="foot_l">Undustit · prototip</span><a href="../#vakalar" data-t="foot_link">Tüm vakalar</a><span data-t="foot_r">Taban fiyat herkese açık · paylar sabit</span></footer></div>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  const FLOOR = 0.20;
+
+  // =========================================================== copy
+  const T = {
+    tr: {
+      nav_aria:'Sayfa', nav_money:'Hesap', nav_menu:'Menü', skip:'İçeriğe geç', nav_story:'Hikâye', nav_nums:'Rakamlar', nav_ideas:'Fikirler', nav_spec:'Teknik föy', nav_cta:'Fikrini gönder',
+      story_aria:'Bir cıvatanın hikâyesi', rail_aria:'Aşamalar', r0:'Cıvata', r1:'Bağlantı', r2:'Çerçeve', r3:'Yapı',
+      tb_sheet:'Pafta', tb_scale:'Ölçek', tb_by:'Çizen', tb_you:'sen',
+      c0_e:'Undustit · Vaka 01', c0_h:'Küçük fikirler,', c0_p:'Undustit, üretim fazlalarına ve sorunlara farklı bakan fikirleri ürün sahipleriyle buluşturur. İlk vaka: depoda bekleyen <b>bir milyon cıvata</b>. Kaydır, tek bir cıvatanın nereye gidebileceğini gör.', c0_hint:'Kaydır',
+      c1_e:'Detay A · aşık bağlantısı', c1_h:'Bir cıvata, <em>bir bağlantı olur.</em>', c1_p:'Çelik aşık bayrağını ahşap aşığa bağlar. Cıvatanın kendi kesme dayanımı <b>22,3 kN</b>. Bağlantının dayanımını ise ahşap belirler.',
+      c2_e:'Aks 3 · portal çerçeve', c2_h:'Bağlantılar <em>bir çerçeve kurar.</em>', c2_p:'24 m açıklıklı bir portal çerçevede 18 aşık var. Her biri iki cıvatayla tutuluyor. <b>Seninki turuncu noktada.</b>',
+      c3_e:'Genel görünüş · 42 m depo', c3_h:'<em>büyük etkiler.</em>', c3_p:"Bu 42 m'lik depo yalnız aşık bağlantıları için <b>288 cıvata</b> ister. Bir milyon cıvata, böyle 3.472 çatı eder. Ve çatıda yine güneş panelleri var.",
+      sv_cleat:'Aşık bayrağı · t = 8 mm', sv_timber:'Ahşap aşık · 63×200 · C24', sv_bolt:'M10×90 · 8.8 · flanşlı', sv_washer:'30×3 pul · EN 1995-1-1',
+      sv_rafter:'IPE 450 · çatı kirişi', sv_fv:'Fv,Rd = 22,3 kN', sv_fv2:'tek kesme, diş bölgesinde', sv_fv3:'EN 1993-1-8 · Tablo 3.4',
+      sv_frame:'Portal çerçeve · eğim 5°', sv_yours:'senin cıvatan', sv_b1:'42 m depo · 8 çerçeve', sv_b2:'8 × 36 = 288 cıvata', sv_pv:'güneş panelleri',
+      n_e:'Bir milyon küçük parça', n_l:'depo çatısına yetecek kadar cıvata. Hepsi şu an bir rafta bekliyor.',
+      f1:'Takım (cıvata + flanşlı somun)', f1v:'1.000.000', f2:"Tek bir 42 m'lik depoda", f2v:'288 cıvata', f3:'Toplam çelik, yaklaşık', f3v:'80 ton', f4:'Taban fiyat, takım başına', f4v:'0,20 $',
+      n_note:'Tahmini değerler. 6 m aks aralığı, 8 çerçeve, her aşık için 2 cıvata varsayıldı. Kütle, flanşlı cıvata ve somun takımı için yaklaşık 80 g alındı.',
+      s_e:'Nasıl işliyor', s_h:'Fazladan ortaklığa <em>üç adım.</em>',
+      s1h:'Fazla ya da sorun açılır', s1p:'Bir üretici elinde kalan stoğu ya da çözemediği bir sorunu paylaşır. Bu vakada: bir milyon M10 cıvata, takımı 0,20 $ taban fiyatla.',
+      s2h:'Farklı açılardan fikir gelir', s2p:'Herkes kendi gözüyle bakar: bir yapı elemanı, bir ürün, bambaşka bir pazar. Beğenenler "alırdım" der ve ne ödeyeceğini yazar; bu talebi ölçer.',
+      s3h:'Dikkat çeken fikir ortaklığa dönüşür', s3p:'Ürün sahibinin ilgisini çeken fikir 1.000 adetle denenir ve ortaklık kurulur. Satarsa taban fiyatın üstündeki kârın %40\'ı fikir sahibine gider.',
+      i_e:'Vaka 01 · senin sıran', i_h:'Bu cıvata başka <em>nerede çalışır?</em>', i_p:'Bir bina, bir köprü korkuluğu, bir sahne iskelesi ya da kimsenin düşünmediği bir ürün. Fikrini yaz, beğenenler ne ödeyeceğini söylesin.',
+      f_label:'Fikrin', f_ph:'Bu cıvata … içinde kullanılabilir, çünkü …', f_help:'En az 8 karakter. Nerede kullanılacağını ve kimin alacağını yaz.',
+      f_extra:'Detay ekle <span>(isteğe bağlı, kazananlar ayrıca pay alır)</span>',
+      sl_name:'Ürünün adı', sl_name_ph:'Örn. Pergole Kiti', sl_look:'Görünüm / kaplama', sl_look_ph:'Örn. sıcak daldırma galvaniz', sl_pack:'Ambalaj', sl_pack_ph:"Örn. 20'li kutu", sl_chan:'Nerede satılır', sl_chan_ph:'Örn. yapı marketleri',
+      f_handle:'Fikrin yanında görünecek isim', f_handle_ph:'Boş bırakırsan "İsimsiz" yazar', f_send:'Fikri gönder',
+      b_h:'Gelen fikirler', sort_aria:'Sıralama', sort_top:'En çok istenen', sort_new:'En yeni',
+      m_e:'Ortaklık modeli', m_h:'Ortaklık <em>nasıl paylaşılır?</em>', m_p:'Vaka 01 üzerinden örnek: önce ürün sahibinin 0,20 $ taban fiyatı düşülür. Sonra ürünü dönüştürme masrafı, masrafı yapana geri ödenir. Kalan kâr tablodaki gibi bölünür.',
+      c_price:'Satış fiyatı ($)', c_mod:'Masraf ($/adet)', c_units:'Satılan adet', c_over:'Adet başına bölünen kâr',
+      th_who:'Kim', th_bar:'Pay grafiği', th_share:'Pay', th_unit:'Adet başı', th_units:n=>n+' adette',
+      t_e:'Mühendisler için', t_h:'Teknik <em>föy.</em>', t_p:"Değerler EN 1993-1-8 Tablo 3.4'e göre hesaplandı. Kendi projende kendi kontrolünü yap.",
+      sf_l:'Görünüş · ölçek 2:1',
+      t1:'Tip', t1v:'Flanşlı cıvata + flanşlı somun', t2:'Nominal çap × boy',
+      t3:'Dayanım sınıfı <small>f<sub>ub</sub> 800 · f<sub>yb</sub> 640 N/mm²</small>', t4:'Gerilme alanı A<sub>s</sub>',
+      t5:'Kesme dayanımı F<sub>v,Rd</sub> <small>diş bölgesinde, α<sub>v</sub> 0,6, γ<sub>M2</sub> 1,25</small>', t5v:'22,3 kN',
+      t6:'Çekme dayanımı F<sub>t,Rd</sub> <small>k<sub>2</sub> 0,9, γ<sub>M2</sub> 1,25</small>', t6v:'33,4 kN',
+      t7:'Ahşapta pul <small>EN 1995-1-1: çap ≥ 3d, kalınlık ≥ 0,3d</small>', t8:'Stok', t8v:'1.000.000 takım',
+      q_h:'Sık <em>sorulanlar.</em>', q1:'Para ödemem gerekiyor mu?', a1:'Hayır. Fikir göndermek de "alırdım" demek de ücretsiz.',
+      q2:'"Alırdım" dersem satın almış olur muyum?', a2:'Hayır. Sadece talebi ölçer. Kimse bir şey almak zorunda değil.',
+      q3:'Fikrimi kim görür?', a3:'Bu sayfayı açan herkes. Fikrin yanında yalnız senin yazdığın isim görünür.',
+      q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip ve şimdilik tek vaka var. Fikirleri ve talebi gerçekten toplar ama henüz satış ya da ödeme yok.',
+      end_e:'Her fazla bir başlangıç', end_h:'Küçük fikirler,<br><em>büyük etkiler.</em>', end_cta:'Fikrini gönder', foot_l:'Undustit · prototip', foot_link:'Tüm vakalar', nav_all:'Tüm vakalar', home_aria:'Undustit ana sayfa', end_all:'Diğer vakalar', foot_r:'Taban fiyat herkese açık · paylar sabit',
+      starters:[['Yapıda kullanalım','Bu cıvata şu yapı elemanında çalışır: '],['Ürüne dönüştürelim','Bu cıvatadan şu ürün yapılır: '],['Bir sektöre satalım','Bu cıvatayı şu sektör alır: '],['Atölyede işleyelim','Kesip, büküp ya da kaynaklayıp şuna dönüştürürüz: ']],
+      shares:[['Fikir sahibi','ana fikir'],['Ad önerisini kazanan','ürünün adı'],['Görünüm önerisini kazanan','renk, kaplama'],['Ambalaj önerisini kazanan','kutu, paket'],['Satış yeri önerisini kazanan','nerede, kime'],['Undustit','üretim, satış, sevkiyat']],
+      slot_tags:{name:'ad',look:'görünüm',pack:'ambalaj',chan:'satış'},
+      ex_label:'Örnek fikir. Gerçek fikirler geldikçe yerini alır.', ex_tag:'ÖRNEK', ex_text:'Ahşap pergole ve sundurmalarda kiriş ile dikmeyi bağlayan kit. 90 mm boy, iki adet 45 mm kalasta tam yetiyor.', ex_chan:'satış: yapı marketleri',
+      ex_demand:'<strong>31 kişi</strong> alırdım dedi · ortalama <strong>0,85 $</strong>',
+      st_free:'Fikir göndermek ücretsiz. E-posta ya da ödeme istemiyoruz.', st_sending:'Gönderiliyor', st_ok:'Fikrin listeye eklendi. Linki paylaş, "alırdım" desinler.',
+      st_ro:'Bu sayfada yalnız görüntüleme iznin var. Fikir eklemek için sayfayı paylaşan kişiden "Katkıda bulunan" (Contributor) erişimi iste.',
+      st_rate:'Çok hızlı gönderdin. Bir dakika bekleyip tekrar dene.', st_quota:'Fikir listesi doldu. Sayfa sahibine haber ver.', st_fail:'Kaydedilemedi. Bağlantını kontrol edip tekrar dene.', st_load:'Fikirler yüklenemedi. Sayfayı yenile.',
+      st_open:'Fikir göndermek için bu sayfayı claude.ai üzerinden aç.', st_signin:'Fikir göndermek için claude.ai hesabınla giriş yap.',
+      e_none_b:'İlk fikir senden gelsin', e_none_p:'Henüz kimse yazmadı. Formu doldurduğunda fikrin burada en üstte görünür.',
+      mine:'SENİN', anon:'İsimsiz', people:n=>n+' kişi', said:' alırdım dedi · ortalama ', nobody:'Henüz kimse "alırdım" demedi',
+      you:'Sen: ', undo:'Geri al', buy:'Alırdım', buy_aria:'Bu ürüne ödeyeceğin fiyat, dolar', price_q:'fiyat?'
+    },
+    en: {
+      nav_aria:'Page', nav_money:'The split', nav_menu:'Menu', skip:'Skip to content', nav_story:'Story', nav_nums:'Numbers', nav_ideas:'Ideas', nav_spec:'Spec sheet', nav_cta:'Send your idea',
+      story_aria:'The story of one bolt', rail_aria:'Stages', r0:'Bolt', r1:'Connection', r2:'Frame', r3:'Building',
+      tb_sheet:'Sheet', tb_scale:'Scale', tb_by:'Drawn by', tb_you:'you',
+      c0_e:'Undustit · Case 01', c0_h:'Small ideas,', c0_p:'Undustit connects ideas that see production surplus and problems differently with the people who own them. Case 01: <b>a million bolts</b> waiting in a warehouse. Scroll to see where just one of them could go.', c0_hint:'Scroll',
+      c1_e:'Detail A · purlin connection', c1_h:'One bolt <em>becomes a connection.</em>', c1_p:'It ties a steel cleat to a timber purlin. The bolt alone resists <b>22.3 kN</b> in shear. The timber decides what the connection carries.',
+      c2_e:'Grid 3 · portal frame', c2_h:'Connections <em>build a frame.</em>', c2_p:'A 24 m portal frame carries 18 purlins, each held by two bolts. <b>Yours is the orange dot.</b>',
+      c3_e:'General view · 42 m warehouse', c3_h:'<em>big impact.</em>', c3_p:'This 42 m warehouse needs <b>288 bolts</b> for its purlin connections alone. A million bolts is enough for 3,472 roofs like it. And the roof still carries solar panels.',
+      sv_cleat:'Purlin cleat · t = 8 mm', sv_timber:'Timber purlin · 63×200 · C24', sv_bolt:'M10×90 · 8.8 · flange', sv_washer:'30×3 washer · EN 1995-1-1',
+      sv_rafter:'IPE 450 · rafter', sv_fv:'Fv,Rd = 22.3 kN', sv_fv2:'single shear, through thread', sv_fv3:'EN 1993-1-8 · Table 3.4',
+      sv_frame:'Portal frame · 5° pitch', sv_yours:'your bolt', sv_b1:'42 m warehouse · 8 frames', sv_b2:'8 × 36 = 288 bolts', sv_pv:'solar panels',
+      n_e:'A million small parts', n_l:'warehouse roofs worth of bolts. All of them waiting on a shelf right now.',
+      f1:'Sets (bolt + flange nut)', f1v:'1,000,000', f2:'In one 42 m warehouse', f2v:'288 bolts', f3:'Total steel, roughly', f3v:'80 t', f4:'Floor price per set', f4v:'$0.20',
+      n_note:'Estimates. Assumes 6 m bays, 8 frames and 2 bolts per purlin. Mass taken as about 80 g per flange bolt and nut set.',
+      s_e:'How it works', s_h:'From surplus to partnership <em>in three steps.</em>',
+      s1h:'A surplus or a problem goes up', s1p:'A maker shares the stock it is stuck with or a problem it can’t crack. In this case: a million M10 bolts at a $0.20 floor price per set.',
+      s2h:'Ideas arrive from every angle', s2p:'Everyone looks with their own eyes: a structural part, a product, a whole other market. People who like an idea say "I’d buy" and name a price, which measures demand.',
+      s3h:'The idea that stands out becomes a partnership', s3p:'The idea that catches the owner’s interest gets a 1,000 unit test run and a partnership. If it sells, the inventor gets 40% of the profit above the floor price.',
+      i_e:'Case 01 · your turn', i_h:'Where else <em>could this bolt work?</em>', i_p:'A building, a bridge railing, stage scaffolding or a product nobody has thought of. Write your idea and let people say what they would pay.',
+      f_label:'Your idea', f_ph:'This bolt could be used in … because …', f_help:'At least 8 characters. Say where it is used and who would buy it.',
+      f_extra:'Add details <span>(optional, winners get an extra share)</span>',
+      sl_name:'Product name', sl_name_ph:'e.g. Pergola Kit', sl_look:'Look / finish', sl_look_ph:'e.g. hot-dip galvanized', sl_pack:'Packaging', sl_pack_ph:'e.g. box of 20', sl_chan:'Where it sells', sl_chan_ph:'e.g. DIY stores',
+      f_handle:'Name shown next to your idea', f_handle_ph:'Leave blank to show "Anonymous"', f_send:'Send idea',
+      b_h:'Incoming ideas', sort_aria:'Sort', sort_top:'Most wanted', sort_new:'Newest',
+      m_e:'Partnership model', m_h:'How the partnership <em>splits.</em>', m_p:'Case 01 as the example: first the owner’s $0.20 floor price comes off. Then the cost of changing the product goes back to whoever paid it. The profit left is split as the table shows.',
+      c_price:'Sale price ($)', c_mod:'Cost ($/unit)', c_units:'Units sold', c_over:'Profit split per unit',
+      th_who:'Who', th_bar:'Share chart', th_share:'Share', th_unit:'Per unit', th_units:n=>'For '+n+' units',
+      t_e:'For engineers', t_h:'Spec <em>sheet.</em>', t_p:'Values follow EN 1993-1-8 Table 3.4. Run your own checks for your own project.',
+      sf_l:'Elevation · scale 2:1',
+      t1:'Type', t1v:'Flange bolt + flange nut', t2:'Nominal size × length',
+      t3:'Property class <small>f<sub>ub</sub> 800 · f<sub>yb</sub> 640 N/mm²</small>', t4:'Tensile stress area A<sub>s</sub>',
+      t5:'Shear resistance F<sub>v,Rd</sub> <small>through thread, α<sub>v</sub> 0.6, γ<sub>M2</sub> 1.25</small>', t5v:'22.3 kN',
+      t6:'Tension resistance F<sub>t,Rd</sub> <small>k<sub>2</sub> 0.9, γ<sub>M2</sub> 1.25</small>', t6v:'33.4 kN',
+      t7:'Washer in timber <small>EN 1995-1-1: diameter ≥ 3d, thickness ≥ 0.3d</small>', t8:'Stock', t8v:'1,000,000 sets',
+      q_h:'Common <em>questions.</em>', q1:'Do I have to pay?', a1:'No. Sending ideas and saying "I’d buy" are both free.',
+      q2:'If I say "I’d buy", did I buy it?', a2:'No. It only measures demand. Nobody has to buy anything.',
+      q3:'Who can see my idea?', a3:'Everyone who opens this page. Only the name you typed shows next to it.',
+      q4:'Is this a real sale?', a4:'This page is a prototype with one case so far. It really collects ideas and demand, but there are no sales or payments yet.',
+      end_e:'Every surplus is a starting point', end_h:'Small ideas,<br><em>big impact.</em>', end_cta:'Send your idea', foot_l:'Undustit · prototype', foot_link:'All cases', nav_all:'All cases', home_aria:'Undustit home', end_all:'Other cases', foot_r:'Floor price public · shares fixed',
+      starters:[['Use it in a structure','This bolt works in this structural part: '],['Turn it into a product','From this bolt we can make: '],['Sell it to an industry','This industry would buy it: '],['Rework it in a shop','Cut, bent or welded, it becomes: ']],
+      shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['Undustit','making, selling, shipping']],
+      slot_tags:{name:'name',look:'look',pack:'pack',chan:'sold at'},
+      ex_label:'Example idea. Real ideas take its place as they come in.', ex_tag:'EXAMPLE', ex_text:'A kit that joins beam to post in timber pergolas and porches. At 90 mm, it fits two 45 mm boards exactly.', ex_chan:'sold at: DIY stores',
+      ex_demand:'<strong>31 people</strong> said "I’d buy" · avg <strong>$0.85</strong>',
+      st_free:'Free to send. No email, no payment.', st_sending:'Sending', st_ok:'Your idea is on the board. Share the link so people can say "I’d buy".',
+      st_ro:'You can only view this page. To add ideas, ask the person who shared it for Contributor access.',
+      st_rate:'That was fast. Wait a minute, then try again.', st_quota:'The idea board is full. Let the page owner know.', st_fail:'Could not save. Check your connection and try again.', st_load:'Ideas could not load. Refresh the page.',
+      st_open:'Open this page on claude.ai to send ideas.', st_signin:'Sign in to claude.ai to send ideas.',
+      e_none_b:'The first idea could be yours', e_none_p:'Nobody has written one yet. Fill in the form and your idea shows up here, at the top.',
+      mine:'YOURS', anon:'Anonymous', people:n=>n+(n===1?' person':' people'), said:' said "I’d buy" · avg ', nobody:'No one has said "I’d buy" yet',
+      you:'You: ', undo:'Undo', buy:'I’d buy', buy_aria:'The price you would pay, in dollars', price_q:'price?'
+    }
+  };
+  const SHARE_PCT = [0.40,0.03,0.03,0.02,0.02,0.50];
+
+  let lang = 'tr';
+  try { const s = localStorage.getItem('kfbe-lang'); if (s==='tr'||s==='en') lang = s; else if (!/^tr/i.test(navigator.language||'tr')) lang = 'en'; } catch(e){}
+  if (location.hash === '#en') lang = 'en';
+  const t = k => T[lang][k];
+  const $ = id => document.getElementById(id);
+  const el = (tag, props={}, kids=[]) => { const n=document.createElement(tag); Object.assign(n, props); kids.forEach(k=>k!=null&&n.append(k)); return n; };
+  const loc = () => lang==='tr' ? 'tr-TR' : 'en-US';
+  const usd = v => { const s=v.toLocaleString(loc(),{minimumFractionDigits:2,maximumFractionDigits:2}); return lang==='tr' ? s+' $' : '$'+s; };
+  const int = v => Math.round(v).toLocaleString(loc());
+  const pct = p => lang==='tr' ? '%'+p : p+'%';
+  const reduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches:false };
+
+  // =========================================================== drawing (units: mm)
+  const VE = 'vector-effect="non-scaling-stroke"';
+  const PITCH = 5, RAD = Math.PI/180;
+  const L = 12000/Math.cos(PITCH*RAD);
+  const PX = 3200;                    // active purlin (3rd from eaves)
+  const PL = { x: 3240, y: -140 };    // active bolt, rafter-local
+  const purlinX = i => 300 + i*1450;
+  const lt = (x,y,fs,key,cls,extra,txt) => `<text x="${x}" y="${y}" class="lt ${cls||''}" style="--fs:${fs}" ${extra||''} ${key?`data-t="${key}"`:''}>${txt||''}</text>`;
+
+  function gradients(p){
+    return `<linearGradient id="${p}Zinc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6A737A"/><stop offset=".38" stop-color="#3A4147"/><stop offset=".52" stop-color="#22272B"/><stop offset="1" stop-color="#4C555C"/></linearGradient>`+
+      `<linearGradient id="${p}Act" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB48E"/><stop offset=".38" stop-color="#D2622F"/><stop offset=".55" stop-color="#6E2C12"/><stop offset="1" stop-color="#C0582A"/></linearGradient>`+
+      `<linearGradient id="${p}Steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2E353A"/><stop offset="1" stop-color="#181C1F"/></linearGradient>`+
+      `<linearGradient id="${p}Web" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A1E21"/><stop offset="1" stop-color="#121517"/></linearGradient>`+
+      `<linearGradient id="${p}Timber" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5A4430"/><stop offset=".55" stop-color="#3B2C1F"/><stop offset="1" stop-color="#2A1F16"/></linearGradient>`+
+      `<linearGradient id="${p}Glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1D3346"/><stop offset=".5" stop-color="#2F5470"/><stop offset="1" stop-color="#1D3346"/></linearGradient>`+
+      `<linearGradient id="${p}Clad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEECE7" stop-opacity=".07"/><stop offset="1" stop-color="#EEECE7" stop-opacity=".015"/></linearGradient>`+
+      `<radialGradient id="${p}Glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FF6A2B" stop-opacity=".45"/><stop offset="1" stop-color="#FF6A2B" stop-opacity="0"/></radialGradient>`+
+      `<linearGradient id="${p}Horizon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FA3BD" stop-opacity=".12"/><stop offset="1" stop-color="#7FA3BD" stop-opacity="0"/></linearGradient>`;
+  }
+  function rings(){ let s=''; for (let r=60; r<=200; r+=14) s += `<circle cx="31.5" cy="252" r="${r}" class="rl" ${VE}/>`; return s; }
+  function nutSide(x0){ // washer + flange nut, nut side, from timber face x0 = 71
+    return `<rect x="${x0}" y="-15" width="3" height="30" class="bz" ${VE}/>`+
+      `<rect x="${x0+3}" y="-10.9" width="2" height="21.8" class="bz" ${VE}/>`+
+      `<rect x="${x0+5}" y="-8.5" width="8" height="17" class="bz" ${VE}/>`+
+      `<path d="M${x0+5} -4.25h8M${x0+5} 4.25h8" class="bl" ${VE}/>`;
+  }
+  function headSide(){
+    return `<rect x="-8.4" y="-8.5" width="6.4" height="17" class="bz" ${VE}/>`+
+      `<rect x="-2" y="-10.9" width="2" height="21.8" class="bz" ${VE}/>`+
+      `<path d="M-8.4 -4.25h6.4M-8.4 4.25h6.4" class="bl" ${VE}/>`;
+  }
+  function boltStatic(x,y){
+    return `<g transform="translate(${x} ${y})">`+ headSide()+
+      `<path d="M0 -5H71M0 5H71" class="hid d" ${VE}/>`+ nutSide(71)+
+      `<rect x="84" y="-5" width="6" height="10" class="bz" ${VE}/>`+
+      `<path d="M-16 0H98" class="cl d" ${VE}/>`+
+    `</g>`;
+  }
+  function purlin(i, skipTop){
+    const x = purlinX(i);
+    return `<rect x="${x}" y="-180" width="8" height="180" class="st" ${VE}/>`+
+      `<path d="M${x} 0h-6l6-6z" class="st d" ${VE}/>`+
+      `<g transform="translate(${x+8} -200)"><rect width="63" height="200" class="tb" ${VE}/><g clip-path="url(#tclip)" class="d">${rings()}</g></g>`+
+      boltStatic(x,-60) + (skipTop ? '' : boltStatic(x,-140));
+  }
+  function panels(){
+    let s=''; for (let k=0;k<7;k++){ const x=250+k*1660; s += `<rect x="${x}" y="-250" width="1620" height="42" class="glass b" ${VE}/>`; }
+    return s;
+  }
+  function activeBolt(){
+    return `<g class="act" transform="translate(${PX} -140)">`+
+      `<circle cx="40" r="70" class="glow ins"/>`+
+      `<g clip-path="url(#aclip)"><g class="mv">`+ headSide()+
+        `<rect x="0" y="-5" width="90" height="10" class="bz" ${VE}/>`+
+        `<path d="M64 -4.2H90M64 4.2H90" class="bl" ${VE}/>`+
+      `</g></g>`+
+      `<path d="M0 -5H71M0 5H71" class="hid ins" ${VE}/>`+
+      `<g class="nt">${nutSide(71)}</g>`+
+      `<path d="M-150 0H104" class="cl" ${VE}/>`+
+    `</g>`;
+  }
+  function annoA1(){
+    return `<g class="a1">`+
+      `<path d="M3204 -172L3180 -224H3020" class="ld opt" ${VE}/>`+ lt(3020,-228,8.5,'sv_cleat','opt')+
+      `<path d="M3250 -186L3282 -224H3440" class="ld" ${VE}/>`+ lt(3286,-228,8.5,'sv_timber')+
+      `<path d="M3291 -140H3328" class="ld" ${VE}/>`+ lt(3332,-137,8.5,'sv_bolt','k')+
+      `<path d="M3274 -50L3300 -26H3332" class="ld opt" ${VE}/>`+ lt(3332,-23,8.5,'sv_washer','opt')+
+      lt(3332,44,8.5,'sv_rafter','opt')+
+      `<path d="M3172 -180V-60M3166 -180h12M3166 -140h12M3166 -60h12" class="dm" ${VE}/>`+
+      lt(3162,-157,8,'','','text-anchor="end"','40')+ lt(3162,-97,8,'','','text-anchor="end"','80')+
+      `<g class="opt"><rect x="2960" y="-140" width="178" height="56" rx="3" class="box" ${VE}/>`+
+      lt(2970,-120,12,'sv_fv','k')+ lt(2970,-105,7.5,'sv_fv2')+ lt(2970,-93,7.5,'sv_fv3')+`</g>`+
+    `</g>`;
+  }
+  function toWorld(lx,ly){ const a=-PITCH*RAD, c=Math.cos(a), s=Math.sin(a); return { x:c*lx - s*ly, y:s*lx + c*ly - 6000 }; }
+  const P = toWorld(PL.x, PL.y);
+
+  function buildDefs(){
+    const shell = `<rect x="0" y="0" width="${L.toFixed(1)}" height="450" class="sw" ${VE}/>`+
+      `<rect x="0" y="0" width="${L.toFixed(1)}" height="15" class="st" ${VE}/>`+
+      `<rect x="0" y="435" width="${L.toFixed(1)}" height="15" class="st" ${VE}/>`;
+    let rafter = shell, rafterActive = shell;
+    for (let i=0;i<9;i++){ rafter += purlin(i,false); rafterActive += purlin(i, i===2); }
+    rafter += panels(); rafterActive += panels();
+
+    const col = x => `<rect x="${x-225}" y="-6000" width="450" height="6000" class="sw" ${VE}/>`+
+      `<rect x="${x-225}" y="-6000" width="15" height="6000" class="st" ${VE}/><rect x="${x+210}" y="-6000" width="15" height="6000" class="st" ${VE}/>`+
+      `<rect x="${x-340}" y="-30" width="680" height="30" class="st" ${VE}/>`;
+
+    let liteR = `<rect x="0" y="0" width="${L.toFixed(1)}" height="450" class="gl" ${VE}/>`;
+    for (let i=0;i<9;i++) liteR += `<rect x="${purlinX(i)+8}" y="-200" width="63" height="200" class="gl" ${VE}/>`;
+
+    let ghosts = '';
+    for (let i=7;i>=1;i--) ghosts += `<g style="opacity:calc(var(--g,1) * ${(0.9 - i*0.09).toFixed(2)})" transform="translate(${i*820} ${-i*300})"><use href="#frameLite"/></g>`;
+    let runs = '';
+    [0,4,8].forEach(i=>{ [false,true].forEach(r=>{
+      const w0 = toWorld(purlinX(i)+40,-200); const x0 = r ? 24000-w0.x : w0.x;
+      runs += `<path d="M${x0.toFixed(0)} ${w0.y.toFixed(0)}l${7*820} ${-7*300}" class="gl" style="opacity:var(--g,1)" ${VE}/>`;
+    }); });
+
+    let hatch = '';
+    for (let x=-9000; x<=37000; x+=600) hatch += `M${x} 0l-300 300`;
+
+    const man = `<circle cx="27200" cy="-1630" r="120" class="man b"/>`+
+      `<path d="M27080 -1480h240l40 700h-90l-30 780h-80l-20 -560l-20 560h-80l-30 -780h-90z" class="man b"/>`;
+
+    $('defs').innerHTML = gradients('g')+
+      `<clipPath id="tclip"><rect width="63" height="200"/></clipPath>`+
+      `<clipPath id="aclip"><rect x="-400" y="-40" width="400" height="80"/><rect x="71" y="-40" width="300" height="80"/></clipPath>`+
+      `<g id="rafterBase">${rafter}</g>`+
+      `<g id="frameLite">`+
+        `<rect x="-225" y="-6000" width="450" height="6000" class="gl" ${VE}/><rect x="23775" y="-6000" width="450" height="6000" class="gl" ${VE}/>`+
+        `<g transform="translate(0 -6000) rotate(-${PITCH})">${liteR}</g>`+
+        `<g transform="translate(24000 -6000) scale(-1 1) rotate(-${PITCH})">${liteR}</g>`+
+      `</g>`+
+      `<g id="world">`+
+        `<g class="b"><rect x="-9000" y="0" width="46000" height="2600" fill="url(#gHorizon)"/><path d="M-9000 0H37000" class="gnd" ${VE}/><path d="${hatch}" class="gh" ${VE}/></g>`+
+        `<g class="b">${ghosts}${runs}</g>`+
+        `<polygon points="-260,0 -260,-6060 12000,-7110 24260,-6060 24260,0" class="clad b" ${VE}/>`+
+        col(0) + col(24000)+
+        `<g transform="translate(0 -6000) rotate(-${PITCH})">${rafterActive}${activeBolt()}${annoA1()}</g>`+
+        `<g transform="translate(24000 -6000) scale(-1 1) rotate(-${PITCH})"><use href="#rafterBase"/></g>`+
+        man+
+        `<g class="a2"><path d="M0 900H24000M-150 1050l300 -300M23850 1050l300 -300M0 700v400M24000 700v400" class="dm" ${VE}/>`+
+          lt(12000,1600,420,'','','text-anchor="middle"','24 m')+
+          lt(12000,-8000,420,'sv_frame','','text-anchor="middle"')+`</g>`+
+        `<g class="rg"><circle cx="${P.x.toFixed(1)}" cy="${P.y.toFixed(1)}" r="900" class="glow"/><circle cx="${P.x.toFixed(1)}" cy="${P.y.toFixed(1)}" r="110" class="ringd"/><circle cx="${P.x.toFixed(1)}" cy="${P.y.toFixed(1)}" r="420" class="ringc" ${VE}/>`+
+          lt((P.x+560).toFixed(1),(P.y-520).toFixed(1),380,'sv_yours','k')+`</g>`+
+        `<g class="a3">`+ lt(-5600,-10900,1100,'sv_b1','big opt') + lt(-5600,-9700,640,'sv_b2','k opt') +
+          `<path d="M17000 -7600L18400 -6700" class="ld" ${VE}/>`+ lt(15400,-7800,420,'sv_pv') +`</g>`+
+      `</g>`;
+  }
+
+  // spec sheet: side view of the bolt, 1 unit = 1 mm
+  function buildSpec(){
+    let thr = ''; for (let x=65.5; x<90; x+=1.5) thr += `M${x} -5l.75 10`;
+    const body =
+      `<rect x="-8.4" y="-8.5" width="6.4" height="17" fill="url(#sZinc)" stroke="#EEECE7" stroke-width=".4"/>`+
+      `<rect x="-2" y="-11.15" width="2" height="22.3" fill="url(#sZinc)" stroke="#EEECE7" stroke-width=".4"/>`+
+      `<path d="M-8.4 -4.25h6.4M-8.4 4.25h6.4" stroke="rgba(238,236,231,.55)" stroke-width=".3"/>`+
+      `<rect x="0" y="-5" width="90" height="10" fill="url(#sZinc)" stroke="#EEECE7" stroke-width=".4"/>`+
+      `<path d="${thr}" stroke="rgba(238,236,231,.35)" stroke-width=".25"/>`;
+    const dims =
+      `<path d="M-20 0H100" stroke="#8F928E" stroke-width=".25" stroke-dasharray="6 1.5 1 1.5"/>`+
+      `<path d="M0 14v18M90 9v23M0 28H90M64 -9v-24M90 -9v-24M64 -28H90M106 -5h-10M106 5h-10M102 -5V5" stroke="#BFBDB6" stroke-width=".3" fill="none"/>`+
+      `<path d="M0 28l3 -1.2v2.4zM90 28l-3 -1.2v2.4zM64 -28l3 -1.2v2.4zM90 -28l-3 -1.2v2.4z" fill="#BFBDB6"/>`+
+      `<text x="45" y="38" fill="#EEECE7" font-family="Geist Mono, monospace" font-size="4.6" text-anchor="middle">l = 90</text>`+
+      `<text x="77" y="-32" fill="#BFBDB6" font-family="Geist Mono, monospace" font-size="4.2" text-anchor="middle">b = 26</text>`+
+      `<text x="108" y="1.6" fill="#FF6A2B" font-family="Geist Mono, monospace" font-size="4.6">M10</text>`+
+      `<text x="-5.2" y="-16" fill="#BFBDB6" font-family="Geist Mono, monospace" font-size="4.2" text-anchor="middle">8.8</text>`;
+    $('spec-svg').innerHTML = `<defs>${gradients('s')}</defs>${body}${dims}`;
+  }
+
+  // =========================================================== camera
+  const fromLocal = (x,y) => ({ x: P.x + (x - PL.x), y: P.y + (y - PL.y) });
+  const K = [
+    { c: fromLocal(3178,-140), w: 280,   h: 120,   r: PITCH },
+    { c: fromLocal(3205,-95),  w: 540,   h: 320,   r: PITCH },
+    { c: { x:12000, y:-3300 }, w: 27500, h: 10600, r: 0 },
+    { c: { x:14200, y:-4600 }, w: 40500, h: 16000, r: 0 }
+  ];
+  const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+  const seg = (p,a,b) => clamp((p-a)/(b-a), 0, 1);
+  const ease = x => x<.5 ? 4*x*x*x : 1 - Math.pow(-2*x+2,3)/2;
+  function mix(a,b,t){
+    if (t<=0) return a; if (t>=1) return b;
+    const w = Math.exp(Math.log(a.w) + (Math.log(b.w)-Math.log(a.w))*t);
+    const h = Math.exp(Math.log(a.h) + (Math.log(b.h)-Math.log(a.h))*t);
+    const s = (w - a.w)/(b.w - a.w);
+    return { c:{ x:a.c.x + (b.c.x-a.c.x)*s, y:a.c.y + (b.c.y-a.c.y)*s }, w, h, r:a.r + (b.r-a.r)*t };
+  }
+  // Phones get a tighter general view: the receding frames and the side labels are dropped there.
+  const K3_NARROW = { c: { x:12600, y:-4000 }, w: 28500, h: 11000, r: 0 };
+  function camAt(p, narrow){
+    const K3 = narrow ? K3_NARROW : K[3];
+    if (p >= .92) return K3;
+    if (p >= .76) return mix(K[2], K3, ease(seg(p,.76,.92)));
+    if (p < .24) return K[0];
+    if (p < .40) return mix(K[0],K[1], ease(seg(p,.24,.40)));
+    if (p < .50) return K[1];
+    if (p < .70) return mix(K[1],K[2], ease(seg(p,.50,.70)));
+    return K[2];
+  }
+  function lodAt(p){
+    return {
+      '--ins': seg(p,.06,.20), '--nut': seg(p,.16,.24),
+      '--d': 1 - seg(p,.52,.62),
+      '--a1': seg(p,.28,.36) * (1 - seg(p,.48,.54)),
+      '--a2': seg(p,.62,.70) * (1 - seg(p,.78,.84)),
+      '--ring': seg(p,.60,.68),
+      '--b': seg(p,.72,.86), '--g': seg(p,.80,.92), '--a3': seg(p,.86,.94)
+    };
+  }
+  function applyCam(svg, use, cam, lod, W, H, bias){
+    // bias keeps the drawing clear of the captions: wide screens give it the right 56%
+    // of the width, tall screens the top 58% of the height.
+    const A = W/H;
+    let vw, vh, cx = cam.c.x, cy = cam.c.y;
+    if (bias && A > 1.2){ vw = Math.max(cam.w/0.56, cam.h*A/0.8); vh = vw/A; cx -= vw*0.19; }
+    else if (bias){ vh = Math.max(cam.h/0.58, cam.w/(A*0.94)); vw = vh*A; cy += vh*0.17; }
+    else { vw = Math.max(cam.w, cam.h*A)*1.04; vh = vw/A; }
+    svg.setAttribute('viewBox', `${(cx-vw/2).toFixed(2)} ${(cy-vh/2).toFixed(2)} ${vw.toFixed(2)} ${vh.toFixed(2)}`);
+    use.setAttribute('transform', `rotate(${cam.r.toFixed(3)} ${P.x.toFixed(2)} ${P.y.toFixed(2)})`);
+    for (const k in lod) use.style.setProperty(k, lod[k].toFixed(3));
+    return vw / W;
+  }
+  const SCALES = [1,2,5,10,20,50,100,200,500,1000];
+  function scaleLabel(mmPerPx){
+    const ratio = mmPerPx / (25.4/96);
+    let best = SCALES[0]; for (const s of SCALES) if (Math.abs(Math.log(s/ratio)) < Math.abs(Math.log(best/ratio))) best = s;
+    return '1:'+best;
+  }
+
+  // =========================================================== story
+  const story = $('hikaye'), cam = $('cam'), camUse = $('cam-use');
+  const caps = [...document.querySelectorAll('.cap')], rail = [...document.querySelectorAll('.rail li')];
+  let lastIdx = -1, ticking = false;
+  function frame(){
+    ticking = false;
+    const rect = story.getBoundingClientRect();
+    const total = story.offsetHeight - window.innerHeight;
+    const p = total > 0 ? clamp(-rect.top/total, 0, 1) : 0;
+    const W = cam.clientWidth || window.innerWidth, H = cam.clientHeight || window.innerHeight;
+    const lod = lodAt(p);
+    const narrow = W < 640;
+    lod['--ts'] = narrow ? 1.45 : 1; lod['--opt'] = narrow ? 0 : 1;
+    if (narrow) lod['--g'] *= .45;
+    const mmpx = applyCam(cam, camUse, camAt(p, narrow), lod, W, H, true);
+    $('tb-scale').textContent = scaleLabel(mmpx);
+    const idx = p < .24 ? 0 : p < .50 ? 1 : p < .76 ? 2 : 3;
+    if (idx !== lastIdx){
+      caps.forEach((c,i)=>c.classList.toggle('on', i===idx));
+      rail.forEach((r,i)=>r.classList.toggle('on', i===idx));
+      $('tb-sheet').textContent = '0'+(idx+1)+' / 04';
+      lastIdx = idx;
+    }
+  }
+  const onScroll = () => { if (!ticking){ ticking = true; requestAnimationFrame(frame); } };
+  // nav: see-through over the pinned drawing, solid once the page content scrolls under it
+  const nav = document.querySelector('.nav');
+  const paintNav = () => nav.classList.toggle('solid', reduce.matches ? window.scrollY > 8 : story.getBoundingClientRect().bottom < nav.offsetHeight + 8);
+  window.addEventListener('scroll', paintNav, { passive:true }); window.addEventListener('resize', paintNav);
+
+  function buildStatic(){
+    const lod1 = lodAt(.44); lod1['--ins'] = 1; lod1['--nut'] = 1; lod1['--a1'] = 1;
+    caps.forEach(c=>c.classList.add('on'));
+    rail.forEach(r=>r.classList.add('on'));
+    $('tb-scale').textContent = '1:2'; $('tb-sheet').textContent = '01 / 04';
+    applyCam(cam, camUse, K[1], lod1, 16, 9, false);
+    [[2, K[2], .73], [3, K[3], 1]].forEach(([ci,k,p])=>{
+      const svg = caps[ci].querySelector('.frame-fig svg'), use = svg.querySelector('use');
+      const lod = lodAt(p); lod['--ins'] = 1; lod['--nut'] = 1;
+      applyCam(svg, use, k, lod, 16, 10, false);
+    });
+  }
+  function setMode(){
+    const staticMode = reduce.matches;
+    story.classList.toggle('static', staticMode);
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', onScroll);
+    if (staticMode){ buildStatic(); }
+    else {
+      rail.forEach(r=>r.classList.remove('on')); lastIdx = -1;
+      window.addEventListener('scroll', onScroll, { passive:true }); window.addEventListener('resize', onScroll); frame();
+    }
+  }
+  function buildEnd(){
+    const svg = $('end-svg'), use = svg.querySelector('use');
+    const lod = lodAt(1); lod['--a3'] = 0; lod['--ring'] = 0;
+    applyCam(svg, use, { c:{x:13000,y:-6200}, w:30000, h:9000, r:0 }, lod, 16, 7, false);
+  }
+
+  // =========================================================== language
+  let statusKey = 'st_free', statusCls = '';
+  function setStatus(k, cls){ statusKey = k; statusCls = cls||''; paintStatus(); }
+  function paintStatus(){ const s=$('f-status'); s.textContent = t(statusKey); s.className = 'status'+(statusCls?' '+statusCls:''); }
+
+  function applyLang(){
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-t]').forEach(n=>{ const v=t(n.dataset.t); if (typeof v==='string') n.textContent = v; });
+    document.querySelectorAll('[data-th]').forEach(n=>{ n.innerHTML = t(n.dataset.th); });
+    document.querySelectorAll('[data-tp]').forEach(n=>{ n.placeholder = t(n.dataset.tp); });
+    document.querySelectorAll('[data-ta]').forEach(n=>{ n.setAttribute('aria-label', t(n.dataset.ta)); });
+    document.querySelectorAll('.slots small').forEach(n=>{ n.textContent = pct(n.textContent.replace(/\D/g,'')); });
+    $('n-roofs').textContent = int(3472);
+    $('lang-tr').setAttribute('aria-pressed', lang==='tr'); $('lang-en').setAttribute('aria-pressed', lang==='en');
+    renderStarters(); calc(); paintStatus(); render();
+    if (lastIdx >= 0) $('tb-sheet').textContent = '0'+(lastIdx+1)+' / 04';
+  }
+  function setLang(l){ lang = l; try{ localStorage.setItem('kfbe-lang', l); }catch(e){} applyLang(); }
+  $('lang-tr').onclick = ()=>setLang('tr');
+  $('lang-en').onclick = ()=>setLang('en');
+
+  // =========================================================== calculator
+  function calc(){
+    const price = Math.max(0, parseFloat($('c-price').value)||0);
+    const mod = Math.max(0, parseFloat($('c-mod').value)||0);
+    const units = Math.max(0, parseInt($('c-units').value)||0);
+    const over = Math.max(0, price - FLOOR - mod);
+    $('r-over').textContent = usd(over);
+    $('r-units-h').textContent = t('th_units')(int(units));
+    const body = $('r-rows'); body.replaceChildren();
+    t('shares').forEach(([who,what],i)=>{
+      const sp = SHARE_PCT[i];
+      const bar = el('i'); bar.style.width = Math.max(2, sp*200)+'%';
+      body.append(el('tr',{className:i===0?'you':''},[
+        el('td',{},[document.createTextNode(who), el('small',{textContent:what})]),
+        el('td',{className:'bar'},[bar]),
+        el('td',{className:'n',textContent:pct(Math.round(sp*100))}),
+        el('td',{className:'n',textContent:usd(over*sp)}),
+        el('td',{className:'n',textContent:usd(over*sp*units)})
+      ]));
+    });
+  }
+  ['c-price','c-mod','c-units'].forEach(id=>$(id).addEventListener('input',calc));
+
+  // =========================================================== ideas
+  const ta = $('f-text'), send = $('f-send');
+  const slotIds = { name:'s-name', look:'s-look', pack:'s-pack', chan:'s-chan' };
+  function renderStarters(){
+    const host = $('starters'); host.replaceChildren();
+    t('starters').forEach(([l,s])=>{
+      const b = el('button',{type:'button',className:'chip',textContent:l});
+      b.onclick = ()=>{ ta.value = s; ta.focus(); ta.setSelectionRange(s.length,s.length); refresh(); };
+      host.append(b);
+    });
+  }
+  $('extra-t').onclick = ()=>{
+    const open = $('extra-t').getAttribute('aria-expanded') !== 'true';
+    $('extra-t').setAttribute('aria-expanded', open); $('slots').hidden = !open;
+    if (open) $('s-name').focus();
+  };
+  let canWrite = true, ready = false, sending = false;
+  function refresh(){ send.disabled = !(ready && canWrite && !sending && ta.value.trim().length >= 8); }
+  ta.addEventListener('input', refresh);
+
+  let db = null, uid = null, connected = false;
+  let ideaDocs = {}, voteDocs = {}, sort = 'top';
+  let chain = Promise.resolve();
+  const seen = new Set(); let firstPaint = true;
+  const queue = fn => (chain = chain.then(fn, fn));
+  const myItems = () => (ideaDocs[uid]||[]).slice();
+  const myBuys = () => Object.assign({}, (voteDocs[uid]||{}).buy||{});
+
+  function allIdeas(){
+    const out = [];
+    for (const [owner, items] of Object.entries(ideaDocs)){
+      (Array.isArray(items)?items:[]).forEach(it=>{ if (it && typeof it.text==='string' && it.k) out.push({ key: owner+':'+it.k, owner, ...it }); });
+    }
+    const demand = {};
+    for (const v of Object.values(voteDocs)){
+      const buy = (v && v.buy) || {};
+      for (const [k,pv] of Object.entries(buy)){ const n = Number(pv); if (n>0 && n<=1000) (demand[k] = demand[k]||[]).push(n); }
+    }
+    out.forEach(i=>{ const d = demand[i.key]||[]; i.count = d.length; i.avg = d.length ? d.reduce((a,b)=>a+b,0)/d.length : 0; });
+    out.sort(sort==='top'
+      ? (a,b)=> b.count-a.count || b.avg-a.avg || String(b.at).localeCompare(String(a.at))
+      : (a,b)=> String(b.at).localeCompare(String(a.at)));
+    return out;
+  }
+  function fmtDate(s){ const d = new Date(s); return isNaN(d) ? '' : d.toLocaleDateString(loc(),{day:'numeric',month:'long'}); }
+  function exampleCard(){
+    const meta = el('div',{className:'meta'},[ el('span',{className:'tag k',textContent:t('ex_tag')}), el('span',{className:'tag',textContent:t('ex_chan')}) ]);
+    const dem = el('span',{className:'demand'}); dem.innerHTML = t('ex_demand');
+    return el('article',{className:'card lead'},[ meta, el('p',{className:'txt',textContent:t('ex_text')}), el('div',{className:'cfoot'},[dem]) ]);
+  }
+  function render(){
+    const host = $('list'); host.replaceChildren();
+    const ideas = connected ? allIdeas() : [];
+    if (!ideas.length){
+      host.append(el('div',{className:'cards'},[ exampleCard() ]));
+      host.append(el('p',{className:'ex-label',textContent:t('ex_label')}));
+      if (connected) host.append(el('div',{className:'empty',style:'margin-top:16px'},[ el('b',{textContent:t('e_none_b')}), el('p',{textContent:t('e_none_p')}) ]));
+      return;
+    }
+    const mine = myBuys(), tags = t('slot_tags');
+    const grid = el('div',{className:'cards'});
+    ideas.forEach((i,ix)=>{
+      const isNew = !firstPaint && !seen.has(i.key); seen.add(i.key);
+      const meta = el('div',{className:'meta'});
+      if (i.owner===uid) meta.append(el('span',{className:'tag k',textContent:t('mine')}));
+      const slots = (i.slots && typeof i.slots==='object') ? i.slots : {};
+      Object.entries(tags).forEach(([k,l])=>{ const v = slots[k]; if (typeof v==='string' && v.trim()) meta.append(el('span',{className:'tag',textContent:l+': '+v.slice(0,80)})); });
+      const demand = el('span',{className:'demand'});
+      if (i.count){ demand.append(el('strong',{textContent:t('people')(i.count)}), document.createTextNode(t('said')), el('strong',{textContent:usd(i.avg)})); }
+      else demand.textContent = t('nobody');
+      const buy = el('div',{className:'buy'});
+      if (mine[i.key]){
+        buy.append(el('span',{className:'mine',textContent:t('you')+usd(Number(mine[i.key]))}),
+          el('button',{type:'button',className:'btn ghost sm',textContent:t('undo'),disabled:!canWrite,onclick:()=>setBuy(i.key,null)}));
+      } else {
+        const inp = el('input',{type:'number',min:'0.2',max:'1000',step:'0.05',placeholder:'$',inputMode:'decimal',id:'buy-'+i.key.replace(/[^\w-]/g,'_')});
+        inp.setAttribute('aria-label', t('buy_aria'));
+        const go = el('button',{type:'button',className:'btn sm',textContent:t('buy'),disabled:!canWrite});
+        go.onclick = ()=>{ const n = parseFloat(inp.value); if (!(n>0) || n>1000){ inp.focus(); inp.placeholder=t('price_q'); return; } setBuy(i.key, Math.round(n*100)/100); };
+        buy.append(inp, go);
+      }
+      grid.append(el('article',{className:'card'+(ix===0?' lead':'')+(isNew?' new':'')},[
+        meta.childNodes.length ? meta : null,
+        el('p',{className:'txt',textContent:i.text}),
+        el('span',{className:'by',textContent:(i.handle||t('anon'))+' · '+fmtDate(i.at)}),
+        el('div',{className:'cfoot'},[demand, buy])
+      ]));
+    });
+    host.append(grid);
+    firstPaint = false;
+  }
+  function readOnly(){ canWrite = false; refresh(); setStatus('st_ro','bad'); render(); }
+  function onWriteError(err){
+    if (err && err.code==='invalid_argument') return readOnly();
+    if (err && err.code==='resource_exhausted') return setStatus('st_rate','bad');
+    if (err && err.code==='quota_exceeded') return setStatus('st_quota','bad');
+    setStatus('st_fail','bad');
+  }
+  function setBuy(key, price){
+    const buys = myBuys();
+    if (price==null) delete buys[key]; else buys[key] = price;
+    queue(()=>db.doc('votes/'+uid).set({ buy: buys })).catch(onWriteError);
+  }
+  function setSort(s){ sort = s; $('sort-top').setAttribute('aria-pressed', s==='top'); $('sort-new').setAttribute('aria-pressed', s==='new'); render(); }
+  $('sort-top').onclick = ()=>setSort('top');
+  $('sort-new').onclick = ()=>setSort('new');
+
+  const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+  function setBusy(on){
+    sending = on;
+    send.setAttribute('aria-busy', on ? 'true' : 'false');
+    const icon = send.querySelector('svg, .spin');
+    if (on){ const sp = el('span',{className:'spin'}); sp.setAttribute('aria-hidden','true'); icon.replaceWith(sp); }
+    else if (icon && icon.classList && icon.classList.contains('spin')) icon.outerHTML = ARROW;
+  }
+  $('idea-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    if (send.disabled || !db) return;
+    const slots = {}; Object.entries(slotIds).forEach(([k,id])=>{ const v=$(id).value.trim(); if (v) slots[k]=v; });
+    const item = { k: Date.now().toString(36)+Math.random().toString(36).slice(2,6), text: ta.value.trim().slice(0,600), slots, handle: $('f-handle').value.trim().slice(0,30), lang, at: new Date().toISOString() };
+    const items = myItems().concat([item]).slice(-30);
+    setBusy(true); setStatus('st_sending');
+    queue(()=>db.doc('ideas/'+uid).set({ items })).then(()=>{
+      ta.value=''; Object.values(slotIds).forEach(id=>$(id).value='');
+      setBusy(false); setStatus('st_ok','good'); refresh(); setSort('new');
+    }).catch(err=>{ setBusy(false); refresh(); onWriteError(err); });
+  });
+
+  // =========================================================== boot
+  buildDefs();
+  buildSpec();
+  applyLang();
+  setMode();
+  buildEnd();
+  // The lead figure counts up once, the first time its band scrolls into view.
+  // At rest (no observer, reduced motion, thumbnails) it shows the final value.
+  if (!reduce.matches && 'IntersectionObserver' in window){
+    const nEl = $('n-roofs'); let done = false;
+    const io = new IntersectionObserver(es=>{
+      if (done || !es.some(e=>e.isIntersecting)) return;
+      done = true; io.disconnect();
+      const t0 = performance.now(), D = 1200;
+      const step = now => { const k = Math.min(1,(now-t0)/D), v = 1 - Math.pow(1-k,3); nEl.textContent = int(3472*v); if (k<1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }, { threshold: .4 });
+    io.observe(nEl);
+  }
+  if (!reduce.matches){ document.body.classList.add('intro'); setTimeout(()=>document.body.classList.remove('intro'), 1400); }
+  if (reduce.addEventListener) reduce.addEventListener('change', setMode);
+
+  (async ()=>{
+    if (!window.claude || !window.claude.use){ setStatus('st_open','bad'); return; }
+    const [dbNs, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    uid = user ? await user.id() : null;
+    if (!dbNs || !uid){ setStatus('st_signin','bad'); return; }
+    db = dbNs; connected = true; ready = true;
+    const w = user.can ? await user.can('data.write') : null;
+    if (w === false) readOnly(); else { refresh(); render(); }
+    db.collection('ideas').onSnapshot(snap=>{
+      const next = {}; snap.docs.forEach(d=>{ const v=d.data(); next[d.id] = v && Array.isArray(v.items) ? v.items : []; });
+      ideaDocs = next; render();
+    }, ()=>setStatus('st_load','bad'));
+    db.collection('votes').onSnapshot(snap=>{
+      const next = {}; snap.docs.forEach(d=>{ next[d.id] = d.data()||{}; });
+      voteDocs = next; render();
+    }, ()=>{});
+  })();
+})();
+
+  // ---------- mobile menu
+  (function(){
+    const nav = document.getElementById('nav'), btn = document.getElementById('menu-t'), menu = document.getElementById('nav-menu');
+    const set = (open) => { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); };
+    btn.addEventListener('click', () => set(!nav.classList.contains('open')));
+    menu.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')){ set(false); btn.focus(); } });
+    window.matchMedia('(min-width:1041px)').addEventListener('change', (m) => { if (m.matches) set(false); });
+  })();
+</script>

@@ -3,24 +3,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Undustit · Fazlaya fikir, fikre ortak</title>
-<meta name="description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün. Vaka 01: depoda bekleyen bir milyon cıvata.">
+<meta name="description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün. Her vaka farklı bir fazla; ilk vaka bir milyon cıvata.">
 <meta name="theme-color" content="#0B0C0D">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Undustit">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:title" content="Birinin fazlası, birinin fikri. · Undustit">
-<meta property="og:description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün. Vaka 01: depoda bekleyen bir milyon cıvata.">
+<meta property="og:description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün.">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Birinin fazlası, birinin fikri. · Undustit">
-<meta name="twitter:description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün. Vaka 01: depoda bekleyen bir milyon cıvata.">
+<meta name="twitter:description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230B0C0D%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23FF6A2B%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: the short version of the Undustit case, on the same atelier theme as /kucuk-fikirler.
-   Asymmetric hero with the bolt drawing, offset step index, example + form split, idea board,
-   ledger, two-column questions. Tokens below are shared 1:1 with /kucuk-fikirler (see DESIGN.md). */
+/* Layout: the platform page. Asymmetric hero with the method drawn as a sheet (surplus → idea → partnership),
+   offset step index, a bento of cases (Case 01 live, example case types marked as examples), the two sides
+   of the deal, an owner's case sheet, two-column questions. Cases themselves live on their own pages (vaka-01/).
+   Tokens are shared 1:1 with vaka-01/ (see DESIGN.md). */
 :root{
   color-scheme:dark;
   --bg:#0B0C0D; --bg-2:#111315; --bg-3:#171A1C; --line:#22262A; --line-2:#30353A;
@@ -44,8 +45,7 @@ h3{font-family:var(--f-body);font-weight:500;letter-spacing:-.01em;line-height:1
 em{font-style:italic}
 p{margin:0}
 a{color:inherit}
-button,input,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
+button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
 .eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .wrap{max-width:1280px;margin:0 auto;padding-inline:var(--gut)}
@@ -55,62 +55,78 @@ button{cursor:pointer}
 .sec-head h2{font-size:clamp(44px,6vw,88px)}
 .sec-head h2 em{color:var(--ink-2)}
 .sec-head p{color:var(--ink-2);max-width:54ch;font-size:18px;font-weight:300}
+main{counter-reset:pafta}
+.sec-head > .eyebrow::before{counter-increment:pafta;content:counter(pafta,decimal-leading-zero) " / 05 · ";color:var(--accent)}
 
-/* ---------- buttons: default / hover / focus / active / disabled */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 22px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;letter-spacing:-.005em;text-decoration:none;transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+/* ---------- buttons: default / hover / focus / active */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 22px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;letter-spacing:-.005em;text-decoration:none;transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out)}
 .btn svg{width:18px;height:18px;transition:transform var(--dur-base) var(--ease-out)}
 .btn:hover{background:#FFFFFF;border-color:#FFFFFF}
-.btn:hover svg{transform:translateX(3px)}
+.btn:hover svg{transform:translateX(5px)}
 .btn:active{transform:scale(.97)}
 .btn.sig{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.sig:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.sig:hover{background:var(--accent-hover);border-color:var(--accent-hover);box-shadow:0 0 0 4px rgba(255,106,43,.18)}
 .btn.sig:active{background:var(--accent-active);border-color:var(--accent-active)}
 .btn.alt{background:transparent;color:var(--ink);border-color:var(--line-2)}
-.btn.alt:hover{border-color:var(--ink-2);background:var(--bg-3)}
+.btn.alt:hover{border-color:var(--ink);background:var(--ink);color:var(--bg)}
 .btn.sm{min-height:38px;padding:0 16px;font-size:14px}
-.btn:disabled{opacity:.5;pointer-events:none}
+.skip{position:absolute;left:var(--gut);top:-80px;z-index:60;min-height:44px;display:inline-flex;align-items:center;padding:0 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:500;text-decoration:none;transition:top var(--dur-base) var(--ease-out)}
+.skip:focus{top:12px}
 
-/* ---------- nav */
+/* ---------- nav: inline on wide screens, a drop panel below 1040px */
 .nav{position:sticky;top:0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 14px) var(--gut) 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(11,12,13,.86);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--line)}
-.brand{display:inline-flex;align-items:baseline;text-decoration:none}
+.brand{display:inline-flex;align-items:baseline;text-decoration:none;view-transition-name:brand}
 .brand b{font-family:var(--f-serif);font-weight:400;font-size:25px;letter-spacing:-.01em;line-height:1}
-.brand b i{color:var(--accent)}
-.nav-r{display:flex;align-items:center;gap:8px}
+.brand b i{color:var(--accent);display:inline-block;transition:transform var(--dur-base) var(--ease-out)}
+.brand:hover b i{transform:translateX(2px) rotate(-6deg)}
+.nav-r{display:flex;align-items:center;gap:8px;view-transition-name:nav-r}
+.nav-menu{display:flex;align-items:center;gap:8px}
 .nav-links{display:flex;gap:2px;margin-inline-end:8px}
 .nav-links a{font-size:14px;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:999px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
 .nav-links a:hover{color:var(--ink);background:var(--bg-3)}
 .lang{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px;background:rgba(17,19,21,.7)}
 .lang button{min-width:40px;min-height:30px;border:0;background:transparent;border-radius:999px;font-family:var(--f-mono);font-size:12px;color:var(--muted);transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
-.lang button:hover{color:var(--ink)}
+.lang button:hover{color:var(--ink);background:var(--bg-3)}
 .lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.lang button[aria-pressed="true"]:hover{background:#FFFFFF}
+.menu-t{display:none;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--line-2);border-radius:999px;background:transparent;color:var(--ink);transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out)}
+.menu-t:hover{background:var(--bg-3);border-color:var(--ink-2)}
+.menu-t svg{width:20px;height:20px}
+.menu-t .i-close,.nav.open .menu-t .i-open{display:none}
+.nav.open .menu-t .i-close{display:block}
+@media (max-width:1040px){
+  .menu-t{display:inline-flex}
+  .nav-menu{position:absolute;top:100%;left:0;right:0;display:none;flex-direction:column;align-items:stretch;gap:16px;padding:12px var(--gut) 20px;background:var(--bg);box-shadow:0 30px 60px -20px rgba(0,0,0,.8);border-bottom:1px solid var(--line)}
+  .nav.open .nav-menu{display:flex}
+  .nav-menu .nav-links{flex-direction:column;gap:0;margin:0}
+  .nav-menu .nav-links a{font-size:17px;padding:12px 0;border-radius:0;border-bottom:1px solid var(--line);color:var(--ink)}
+  .nav-menu .nav-links a:hover{background:transparent;color:var(--accent)}
+  .nav-menu .lang{align-self:flex-start}
+}
 
-/* ---------- hero: asymmetric 7/5, headline holds to three lines */
-.hero{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,80px);align-items:center;padding-block:clamp(56px,8vw,112px) clamp(72px,9vw,128px);position:relative}
+/* ---------- hero: text left, the method drawn as one sheet right */
+.hero{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:clamp(32px,5vw,72px);align-items:center;padding-block:clamp(56px,8vw,112px) clamp(72px,9vw,128px);position:relative}
 .hero::before{content:"";position:absolute;inset:0 calc(-1 * var(--gut));z-index:-1;pointer-events:none;background:radial-gradient(45% 60% at 78% 50%,rgba(255,236,214,.06),rgba(255,236,214,0) 70%)}
 .hero-txt{display:grid;gap:24px;min-width:0;justify-items:start}
-.status-chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--ok);border:1px solid rgba(134,212,166,.3);border-radius:999px;padding:5px 12px 5px 10px}
-.status-chip i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
 .hero h1{font-size:clamp(52px,7.4vw,108px);line-height:.95;letter-spacing:-.03em;max-width:12ch}
 .hero h1 em{color:var(--accent)}
-html[lang="en"] .hero h1{font-size:clamp(46px,6vw,88px);max-width:14ch}
+html[lang="en"] .hero h1{font-size:clamp(46px,6.4vw,92px);max-width:13ch}
 .lead{color:var(--ink-2);font-size:clamp(17px,1.4vw,19px);font-weight:300;max-width:50ch}
 .cta{display:flex;gap:10px;flex-wrap:wrap}
-.drawing{margin:0;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(70% 70% at 50% 40%,rgba(255,236,214,.05),transparent 70%),var(--bg-2);padding:clamp(18px,2vw,28px);display:grid;gap:18px;min-width:0}
-.drawing svg{width:100%;height:auto;display:block}
-.drawing svg .stroke{stroke:var(--ink-2)}
-.drawing svg .dim{stroke:var(--muted)}
-.drawing svg .fill{fill:var(--bg-3)}
-.drawing svg .thread{stroke:var(--muted)}
-.drawing svg .arrow{fill:var(--muted)}
-.drawing svg text{fill:var(--muted);font-family:var(--f-mono);font-size:12px}
-.drawing svg text.k{fill:var(--accent);font-weight:500}
-.specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border-top:1px solid var(--line)}
-.specs div{padding:14px 12px 0 0;display:grid;gap:4px;min-width:0}
-.specs div + div{padding-inline-start:12px;border-inline-start:1px solid var(--line)}
-.specs dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.specs dd{margin:0;font-weight:500;font-size:15px;font-variant-numeric:tabular-nums;text-wrap:balance}
-.drawing .cap{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
-.drawing .cap b{color:var(--ink-2);font-weight:500}
+.sheet{margin:0;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(70% 70% at 50% 40%,rgba(255,236,214,.05),transparent 70%),var(--bg-2);padding:clamp(18px,2vw,28px);display:grid;gap:14px;min-width:0}
+.sheet svg{width:100%;height:auto;display:block;overflow:visible}
+.sheet figcaption{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.dw .s{fill:var(--bg-3);stroke:var(--ink-2);stroke-width:1.25}
+.dw .l{fill:none;stroke:var(--ink-2);stroke-width:1.25}
+.dw .m{fill:none;stroke:var(--muted);stroke-width:1}
+.dw .h{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3}
+.dw .k{fill:none;stroke:var(--accent);stroke-width:1.5}
+.dw .kf{fill:var(--accent)}
+.dw .ov{fill:rgba(255,106,43,.22)}
+.dw .ar{fill:var(--muted)}
+.dw text{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
+.dw text.n{fill:var(--ink);font-size:12px;letter-spacing:.08em}
+.dw text.kt{fill:var(--accent)}
 
 /* ---------- steps: wide head, offset index */
 .steps-wrap{display:grid;gap:56px}
@@ -122,165 +138,33 @@ html[lang="en"] .hero h1{font-size:clamp(46px,6vw,88px);max-width:14ch}
 .steps b{font-size:clamp(22px,2.2vw,28px);font-weight:500;letter-spacing:-.01em;line-height:1.25}
 .steps p{color:var(--ink-2);max-width:58ch;font-weight:300}
 
-/* ---------- ideas: example + form */
-.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,5vw,80px);align-items:start}
-.example{display:grid;gap:28px;position:sticky;top:110px}
-.card{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);padding:20px;display:grid;gap:14px;min-width:0}
-.example .card{border-radius:var(--r-lg);padding:clamp(22px,2.6vw,32px);background:linear-gradient(160deg,var(--bg-3),var(--bg-2) 60%)}
-.example .card .txt{font-family:var(--f-serif);font-size:clamp(24px,2.3vw,32px);line-height:1.15;letter-spacing:-.01em;font-weight:400}
-.card .txt{font-size:17px;overflow-wrap:anywhere;font-weight:300}
-.card .meta{display:flex;flex-wrap:wrap;gap:6px}
-.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;padding:3px 8px;border-radius:var(--r-sm);color:var(--ink-2);border:1px solid var(--line-2)}
-.tag.ex{color:var(--accent);border-color:rgba(255,106,43,.35)}
-.card .by{font-size:13px;color:var(--muted)}
-.card .foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px}
-.demand{font-size:14px;color:var(--ink-2)}
-.demand strong{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
-.note{font-size:13px;color:var(--muted)}
+/* ---------- cases: bento, the live case large, example case types small and labelled */
+.cases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(220px,auto);gap:16px;margin-top:56px}
+.case{position:relative;display:grid;gap:14px;align-content:start;padding:clamp(20px,2.2vw,28px);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2);text-decoration:none;color:inherit;min-width:0;transition:border-color var(--dur-base) var(--ease-out),background-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.case h3{font-family:var(--f-serif);font-weight:400;font-size:clamp(26px,2.4vw,34px);line-height:1.05;letter-spacing:-.01em}
+.case p{color:var(--ink-2);font-weight:300;font-size:15px}
+.case .ic{width:72px;height:44px;display:block}
+.case .tag{justify-self:start;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted)}
+.case .tag.live{color:var(--ok);border-color:rgba(134,212,166,.35);display:inline-flex;align-items:center;gap:7px}
+.case .tag.live i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.case.ex{border-style:dashed;background:transparent}
+.case.lead{grid-column:span 2;grid-row:span 2;background:radial-gradient(70% 70% at 60% 40%,rgba(255,236,214,.05),transparent 70%),var(--bg-2);border-color:var(--line-2);gap:20px}
+.case.lead h3{font-size:clamp(36px,4vw,60px);line-height:.98}
+.case.lead svg.bolt{width:100%;height:auto;max-height:200px;view-transition-name:bolt}
+.case.lead dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border-top:1px solid var(--line)}
+.case.lead dl div{padding:12px 12px 0 0;display:grid;gap:3px}
+.case.lead dl div + div{padding-inline-start:12px;border-inline-start:1px solid var(--line)}
+.case.lead dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.case.lead dd{margin:0;font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.case .go{display:inline-flex;align-items:center;gap:8px;font-weight:500;font-size:15px;color:var(--accent)}
+.case .go svg{width:18px;height:18px;transition:transform var(--dur-base) var(--ease-out)}
+a.case:hover{border-color:var(--accent);transform:translateY(-2px)}
+a.case:hover .go svg{transform:translateX(5px)}
+a.case:active{transform:scale(.99)}
+.case.yours{border:1px solid rgba(255,106,43,.35);background:linear-gradient(160deg,rgba(255,106,43,.10),var(--bg-2) 60%)}
+.cases-note{margin-top:20px;font-size:13px;color:var(--muted);max-width:70ch}
 
-form.idea{background:linear-gradient(180deg,var(--bg-3),var(--bg-2));border:1px solid var(--line-2);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,32px);display:grid;gap:20px;box-shadow:inset 0 1px 0 rgba(238,236,231,.05),0 40px 90px -50px rgba(24,12,4,.75)}
-.fld{display:grid;gap:8px;min-width:0}
-.fld label{font-weight:500;font-size:15px}
-textarea,input[type=text],input[type=number]{inline-size:100%;min-inline-size:0;background:var(--bg);border:1px solid var(--line-2);border-radius:var(--r-md);padding:13px 15px;transition:border-color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
-textarea{resize:vertical;min-height:132px;font-size:17px;line-height:1.5}
-textarea:hover,input:hover{border-color:var(--muted)}
-textarea:focus,input:focus{outline:none;border-color:var(--accent);background:var(--bg-2)}
-input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
-.starters{display:flex;flex-wrap:wrap;gap:8px}
-.starters button{min-height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--ink-2);font-size:13.5px;transition:border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
-.starters button:hover{border-color:var(--ink-2);color:var(--ink);background:var(--bg-3)}
-.starters button:active{transform:scale(.97)}
-details.extra{border:1px solid var(--line-2);border-radius:var(--r-md);padding:4px 6px}
-details.extra summary{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 8px;border-radius:var(--r-sm);cursor:pointer;font-weight:500;font-size:15px;list-style:none;transition:background-color var(--dur-fast) var(--ease-out)}
-details.extra summary::-webkit-details-marker{display:none}
-details.extra summary::before{content:"";flex:none;width:7px;height:7px;margin-inline:4px 6px;border:solid currentColor;border-width:0 1.75px 1.75px 0;transform:rotate(-45deg);transition:transform var(--dur-base) var(--ease-io)}
-details.extra[open] summary::before{transform:rotate(45deg)}
-details.extra summary:hover{background:var(--bg-3)}
-details.extra summary span{font-weight:300;color:var(--muted);font-size:13.5px}
-.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:6px 8px 12px}
-.slots label{font-size:13.5px}
-.slots label small{font-family:var(--f-mono);color:var(--muted);margin-inline-start:6px}
-.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-.status{font-size:14px;color:var(--muted);min-width:0;flex:1 1 220px}
-.status.bad{color:var(--accent)}
-.status.good{color:var(--ok)}
-
-/* ---------- board */
-.list-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
-.sorts{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
-.sorts button{min-height:32px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13.5px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
-.sorts button:hover{color:var(--ink)}
-.sorts button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
-#list{margin-top:48px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-items:start}
-.buy{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.buy input{inline-size:92px;padding:8px 10px;font-family:var(--f-mono);font-size:14px}
-.buy button{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-size:13.5px;font-weight:500;transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
-.buy button:hover{background:#FFFFFF;border-color:#FFFFFF}
-.buy button:active{transform:scale(.97)}
-.buy button:disabled{opacity:.5;pointer-events:none}
-.buy button.undo{background:transparent;color:var(--ink);border-color:var(--line-2)}
-.buy button.undo:hover{background:var(--bg-3);border-color:var(--ink-2)}
-.buy .mine{font-size:14px;color:var(--ok);font-weight:500}
-.empty{border:1px dashed var(--line-2);border-radius:var(--r-md);padding:32px 24px;display:grid;gap:10px;justify-items:start}
-.empty b{font-family:var(--f-serif);font-weight:400;font-size:30px;letter-spacing:-.01em;line-height:1.1}
-.empty p{color:var(--ink-2);max-width:46ch;font-weight:300;font-size:15px}
-.empty .btn{margin-top:6px}
-@media (prefers-reduced-motion:no-preference){
-  .card.new{animation:rise var(--dur-mod) var(--ease-out)}
-  @keyframes rise{from{opacity:.001;transform:translateY(10px)}to{opacity:1;transform:none}}
-}
-
-/* ---------- money: head + calc left, ledger right */
-.money{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,5vw,80px);align-items:start}
-.money-l{display:grid;gap:40px}
-.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.calc label{font-size:13.5px}
-.calc input{font-family:var(--f-mono)}
-.over{display:grid;gap:8px}
-.over .big{font-family:var(--f-serif);font-size:clamp(64px,8vw,120px);line-height:.9;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.tbl-wrap{overflow-x:auto;border-top:1px solid var(--line-2)}
-table{border-collapse:collapse;width:100%;font-size:15px}
-th,td{text-align:start;padding:16px 16px 16px 0;border-bottom:1px solid var(--line);vertical-align:middle}
-th{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
-td.n,th.n{text-align:end;font-family:var(--f-mono);font-variant-numeric:tabular-nums;padding-inline-end:0;white-space:nowrap}
-td small{display:block;color:var(--muted);font-size:13px}
-tr.you td{color:var(--ink);font-weight:500}
-tr.you td:first-child{color:var(--accent)}
-
-/* ---------- faq */
-.faq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(24px,5vw,80px);margin-top:56px}
-.faq div{padding-block:24px;border-top:1px solid var(--line);display:grid;gap:8px}
-.faq b{font-size:17px;font-weight:500}
-.faq p{color:var(--ink-2);font-weight:300}
-
-footer{border-top:1px solid var(--line);padding-block:20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
-footer a{color:var(--ink-2);text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-out)}
-footer a:hover{color:var(--accent)}
-
-@media (max-width:960px){
-  .hero,.split,.money{grid-template-columns:minmax(0,1fr)}
-  .example{position:static}
-}
-@media (max-width:640px){
-  .slots,.calc,.faq{grid-template-columns:minmax(0,1fr)}
-  .specs{grid-template-columns:minmax(0,1fr)}
-  .specs div + div{padding-inline-start:0;border-inline-start:0;border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
-  .steps li{grid-template-columns:52px minmax(0,1fr);column-gap:14px}
-  .steps li::before{font-size:44px}
-  th:nth-child(4),td:nth-child(4){display:none}
-}
-@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}
-}
-
-/* menu: inline on wide screens, a drop panel under the bar below 1040px (links + language) */
-.nav-menu{display:flex;align-items:center;gap:8px}
-.menu-t{display:none;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--line-2);border-radius:999px;background:transparent;color:var(--ink);transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out)}
-.menu-t:hover{background:var(--bg-3);border-color:var(--ink-2)}
-.menu-t svg{width:20px;height:20px}
-.menu-t .i-close,.nav.open .menu-t .i-open{display:none}
-.nav.open .menu-t .i-close{display:block}
-@media (max-width:1040px){
-  .menu-t{display:inline-flex}
-  .nav-menu{position:absolute;top:100%;left:0;right:0;display:none;flex-direction:column;align-items:stretch;gap:16px;padding:12px var(--gut) 20px;background:var(--bg);box-shadow:0 30px 60px -20px rgba(0,0,0,.8);border-bottom:1px solid var(--line)}
-  .nav.open .nav-menu{display:flex}
-  .nav-menu .nav-links{display:flex;flex-direction:column;gap:0;margin:0}
-  .nav-menu .nav-links a{font-size:17px;padding:12px 0;border-radius:0;border-bottom:1px solid var(--line);color:var(--ink)}
-  .nav-menu .nav-links a:hover{background:transparent;color:var(--accent)}
-  .nav-menu .lang{align-self:flex-start}
-  .nav.open::before{background:var(--bg)}
-}
-
-/* skip link, stronger hover and focus feedback, 44px tap areas */
-.skip{position:absolute;left:var(--gut);top:-80px;z-index:60;min-height:44px;display:inline-flex;align-items:center;padding:0 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:500;text-decoration:none;transition:top var(--dur-base) var(--ease-out)}
-.skip:focus{top:12px}
-.brand b i{display:inline-block;transition:transform var(--dur-base) var(--ease-out)}
-.brand:hover b i{transform:translateX(2px) rotate(-6deg)}
-.btn:hover svg{transform:translateX(5px)}
-.btn.sig:hover,.btn.primary:hover{box-shadow:0 0 0 4px rgba(255,106,43,.18)}
-.lang button:not([aria-pressed="true"]):hover,.seg button:not([aria-pressed="true"]):hover,.sorts button:not([aria-pressed="true"]):hover{background:var(--bg-3);color:var(--ink)}
-.chip:hover,.starters button:hover{background:rgba(255,106,43,.12);border-color:var(--accent);color:var(--ink)}
-textarea:focus,input:focus{box-shadow:0 0 0 3px rgba(255,106,43,.28)}
-footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px;text-decoration-color:rgba(255,106,43,.5)}
-footer a:hover{text-decoration-color:var(--accent)}
-
-/* page change: the bar and logo stay put while the sheet underneath swaps */
-@view-transition{navigation:auto}
-.brand{view-transition-name:brand}
-.nav-r{view-transition-name:nav-r}
-@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
-
-/* sections are numbered like sheets of the drawing set on /kucuk-fikirler */
-main{counter-reset:pafta}
-.sec-head > .eyebrow::before{counter-increment:pafta;content:counter(pafta,decimal-leading-zero) " / 05 · ";color:var(--accent)}
-.lang button[aria-pressed="true"]:hover,.seg button[aria-pressed="true"]:hover,.sorts button[aria-pressed="true"]:hover{background:#FFFFFF;color:var(--bg)}
-textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-
-/* platform framing: the open case labelled on the drawing, and the two sides of the deal */
-.case-h{display:grid;gap:4px;padding-bottom:14px;border-bottom:1px solid var(--line)}
-.case-h b{font-family:var(--f-serif);font-weight:400;font-size:clamp(22px,2vw,28px);line-height:1.1;letter-spacing:-.01em}
+/* ---------- two sides of the deal */
 .sides-grid{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:clamp(16px,2.4vw,32px);align-items:stretch;margin-top:56px}
 .side{display:grid;gap:18px;align-content:start;padding:clamp(22px,3vw,40px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2)}
 .side.hot{background:linear-gradient(160deg,rgba(255,106,43,.10),var(--bg-2) 55%);border-color:rgba(255,106,43,.35)}
@@ -291,8 +175,53 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
 .side.hot li svg{color:var(--accent)}
 .side .btn{justify-self:start;margin-top:6px}
 .side-x{align-self:center;font-family:var(--f-serif);font-size:clamp(48px,5vw,80px);line-height:1;color:var(--muted)}
-.hero h1{max-width:13ch}
+
+/* ---------- owner's case sheet: head left, a blank datasheet right */
+.open-case{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,6vw,96px);align-items:start}
+.open-case .sec-head{position:sticky;top:110px}
+.form-sheet{border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2);overflow:hidden}
+.form-sheet header{display:flex;justify-content:space-between;gap:12px;padding:16px clamp(18px,2vw,28px);border-bottom:1px solid var(--line-2);font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.form-sheet dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+.form-sheet dt,.form-sheet dd{margin:0;padding:16px clamp(18px,2vw,28px);border-bottom:1px solid var(--line)}
+.form-sheet dt{font-weight:500}
+.form-sheet dt small{display:block;color:var(--muted);font-weight:300;font-size:13px}
+.form-sheet dd{font-family:var(--f-mono);font-size:13.5px;color:var(--muted);border-inline-start:1px dashed var(--line-2)}
+.form-sheet dd b{color:var(--ink-2);font-weight:400}
+.form-sheet footer{border:0;padding:18px clamp(18px,2vw,28px);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-size:14px;color:var(--ink-2)}
+
+/* ---------- faq */
+.faq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(24px,5vw,80px);margin-top:56px}
+.faq div{padding-block:24px;border-top:1px solid var(--line);display:grid;gap:8px}
+.faq b{font-size:17px;font-weight:500}
+.faq p{color:var(--ink-2);font-weight:300}
+
+.page-foot{border-top:1px solid var(--line);padding-block:20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.page-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px;color:var(--ink-2);text-underline-offset:3px;text-decoration-color:rgba(255,106,43,.5);transition:color var(--dur-fast) var(--ease-out)}
+.page-foot a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+@view-transition{navigation:auto}
+@media (max-width:960px){
+  .hero,.open-case{grid-template-columns:minmax(0,1fr)}
+  .open-case .sec-head{position:static}
+  .cases{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media (max-width:820px){.sides-grid{grid-template-columns:minmax(0,1fr)}.side-x{justify-self:center;font-size:40px}}
+@media (max-width:640px){
+  .cases{grid-template-columns:minmax(0,1fr);grid-auto-rows:auto}
+  .case.lead{grid-column:auto;grid-row:auto}
+  .case.lead dl{grid-template-columns:minmax(0,1fr)}
+  .case.lead dl div + div{padding-inline-start:0;border-inline-start:0;border-top:1px solid var(--line)}
+  .faq,.form-sheet dl{grid-template-columns:minmax(0,1fr)}
+  .form-sheet dt{border-bottom:0;padding-bottom:2px}
+  .form-sheet dd{border-inline-start:0}
+  .steps li{grid-template-columns:52px minmax(0,1fr);column-gap:14px}
+  .steps li::before{font-size:44px}
+}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+}
 </style>
 
 <a class="skip" href="#main" data-t="skip">İçeriğe geç</a>
@@ -301,78 +230,73 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
   <div class="nav-r">
     <div class="nav-menu" id="nav-menu">
       <nav class="nav-links" data-ta="nav_aria" aria-label="Sayfa">
-        <a href="kucuk-fikirler/" data-t="nav_story">Hikâye</a>
-        <a href="#fikirler" data-t="nav_ideas">Fikirler</a>
-        <a href="#hesap" data-t="nav_money">Hesap</a>
-        <a href="kucuk-fikirler/#foy" data-t="nav_spec">Teknik föy</a>
+        <a href="#nasil" data-t="nav_how">Nasıl işliyor</a>
+        <a href="#vakalar" data-t="nav_cases">Vakalar</a>
+        <a href="#taraflar" data-t="nav_sides">İki taraf</a>
+        <a href="#vakani-ac" data-t="nav_open">Vakanı aç</a>
       </nav>
       <div class="lang" role="group" aria-label="Dil / Language">
         <button type="button" id="lang-tr" aria-pressed="true">TR</button>
         <button type="button" id="lang-en" aria-pressed="false">EN</button>
       </div>
     </div>
-    <a class="btn sig sm" href="#fikir" data-t="nav_cta">Fikrini gönder</a>
+    <a class="btn sig sm" href="vaka-01/#fikir" data-t="nav_cta">Vaka 01'e fikir yaz</a>
     <button type="button" class="menu-t" id="menu-t" aria-expanded="false" aria-controls="nav-menu" data-ta="nav_menu" aria-label="Menü"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
 </header>
 
 <main class="wrap" id="main">
-
   <section class="hero" aria-labelledby="hero-h">
     <div class="hero-txt">
-      <span class="status-chip"><i aria-hidden="true"></i><span data-t="pill_open">Vaka 01 · fikirlere açık</span></span>
-      <span class="eyebrow" data-t="hero_eyebrow">Satılamayan stoklara yeni bir hayat</span>
-      <h1 id="hero-h" data-th="hero_h">Depoda 1 milyon cıvata bekliyor. <em>Ne olsun?</em></h1>
-      <p class="lead" data-t="hero_lead">Bu cıvatalar güneş paneli kurulumu için üretildi ama fazla geldi. Bunları başka ne olarak satabiliriz, fikrini yaz. Fikrin seçilip satarsa, taban fiyatın üstündeki kârın %40'ını sen alırsın.</p>
+      <span class="eyebrow" data-t="hero_eyebrow">Üretim fazlası × yaratıcı fikir</span>
+      <h1 id="hero-h" data-th="hero_h">Birinin fazlası, <em>birinin fikri.</em></h1>
+      <p class="lead" data-t="hero_lead">Undustit, satılamayan üretim fazlalarını ve çözülmemiş sorunları açığa çıkarır.</p>
       <div class="cta">
-        <a class="btn sig" href="#fikir"><span data-t="cta_write">Fikrimi yazayım</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
-        <a class="btn alt" href="#nasil" data-t="cta_how">Nasıl işliyor?</a>
+        <a class="btn sig" href="#vakalar"><span data-t="cta_cases">Vakaları gör</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="btn alt" href="#vakani-ac" data-t="cta_open">Fazlan mı var?</a>
       </div>
     </div>
 
-    <figure class="drawing">
-      <div class="case-h"><span class="eyebrow" data-t="case_e">Vaka 01 · şu an açık</span><b data-t="case_t">Depoda bekleyen bir milyon cıvata</b></div>
-      <svg viewBox="0 0 440 210" role="img" aria-labelledby="bolt-t">
-        <title id="bolt-t" data-t="svg_title">Flanşlı cıvata ve somunun teknik çizimi: M10 diş, 90 mm boy</title>
-        <rect class="fill stroke" x="40" y="62" width="26" height="66" rx="2" stroke-width="2"/>
-        <rect class="fill stroke" x="66" y="52" width="9" height="86" rx="2" stroke-width="2"/>
-        <rect class="fill stroke" x="75" y="78" width="300" height="34" stroke-width="2"/>
-        <g class="thread" stroke-width="1.2">
-          <line x1="225" y1="78" x2="219" y2="112"/><line x1="237" y1="78" x2="231" y2="112"/><line x1="249" y1="78" x2="243" y2="112"/>
-          <line x1="261" y1="78" x2="255" y2="112"/><line x1="273" y1="78" x2="267" y2="112"/><line x1="285" y1="78" x2="279" y2="112"/>
-          <line x1="297" y1="78" x2="291" y2="112"/><line x1="309" y1="78" x2="303" y2="112"/><line x1="321" y1="78" x2="315" y2="112"/>
-          <line x1="333" y1="78" x2="327" y2="112"/><line x1="345" y1="78" x2="339" y2="112"/><line x1="357" y1="78" x2="351" y2="112"/>
-          <line x1="369" y1="78" x2="363" y2="112"/>
-        </g>
-        <rect class="fill stroke" x="300" y="58" width="22" height="74" rx="2" stroke-width="2"/>
-        <rect class="fill stroke" x="322" y="66" width="20" height="58" rx="2" stroke-width="2"/>
-        <g class="dim" stroke-width="1">
-          <line x1="66" y1="150" x2="66" y2="176"/><line x1="375" y1="118" x2="375" y2="176"/>
-          <line x1="66" y1="168" x2="375" y2="168"/>
-        </g>
-        <path class="arrow" d="M66 168 l8 -4 v8 z M375 168 l-8 -4 v8 z"/>
-        <text x="220" y="194" text-anchor="middle">90 mm</text>
-        <g class="dim" stroke-width="1">
-          <line x1="385" y1="78" x2="410" y2="78"/><line x1="385" y1="112" x2="410" y2="112"/>
-          <line x1="402" y1="78" x2="402" y2="112"/>
-        </g>
-        <text x="412" y="99" class="k">M10</text>
-        <text x="40" y="40" data-t="svg_head">flanşlı baş</text>
-        <text x="296" y="40" data-t="svg_nut">flanşlı somun</text>
-        <text x="160" y="70" data-t="svg_steel">8.8 sınıf çelik</text>
+    <figure class="sheet">
+      <svg class="dw" viewBox="0 0 520 290" role="img" aria-labelledby="method-t">
+        <title id="method-t" data-t="m_title">Yöntem çizimi: bir fazla, bir fikirle ortaklığa dönüşür</title>
+        <text class="n" x="20" y="34" data-t="m_1">01 FAZLA</text>
+        <text class="n" x="208" y="34" data-t="m_2">02 FİKİR</text>
+        <text class="n" x="372" y="34" data-t="m_3">03 ORTAKLIK</text>
+        <line class="h" x1="20" y1="48" x2="500" y2="48"/>
+        <!-- surplus: crates, a roll, a stray part -->
+        <rect class="s" x="22" y="176" width="54" height="42" rx="2"/><line class="m" x1="22" y1="190" x2="76" y2="190"/>
+        <rect class="s" x="80" y="176" width="54" height="42" rx="2"/><line class="m" x1="80" y1="190" x2="134" y2="190"/>
+        <rect class="s" x="50" y="132" width="54" height="42" rx="2"/><line class="m" x1="50" y1="146" x2="104" y2="146"/>
+        <ellipse class="s" cx="128" cy="150" rx="10" ry="20"/><path class="l" d="M128 130h28M128 170h28"/><ellipse class="l" cx="156" cy="150" rx="10" ry="20"/>
+        <path class="s" d="M30 228h30v6H30z"/><path class="l" d="M60 231h22"/>
+        <text x="20" y="262" data-t="m_1s">stok · artık · sorun</text>
+        <!-- arrow -->
+        <line class="m" x1="174" y1="178" x2="204" y2="178"/><path class="ar" d="M204 178l-7-4v8z"/>
+        <!-- idea: a fresh sheet with a sketched curve -->
+        <path class="s" d="M214 104h80l16 16v110h-96z"/><path class="l" d="M294 104v16h16"/>
+        <path class="k" d="M226 206c14-34 30-50 46-44s20-34 30-44"/>
+        <circle class="kf" cx="272" cy="162" r="3.5"/>
+        <line class="h" x1="226" y1="216" x2="300" y2="216"/>
+        <text x="208" y="262" data-t="m_2s">farklı bir bakış</text>
+        <!-- arrow -->
+        <line class="m" x1="320" y1="178" x2="350" y2="178"/><path class="ar" d="M350 178l-7-4v8z"/>
+        <!-- partnership: two circles, the overlap is the deal -->
+        <defs><clipPath id="clipA"><circle cx="404" cy="168" r="46"/></clipPath></defs>
+        <circle class="ov" cx="456" cy="168" r="46" clip-path="url(#clipA)"/>
+        <circle class="l" cx="404" cy="168" r="46"/>
+        <circle class="k" cx="456" cy="168" r="46"/>
+        <text x="380" y="236" text-anchor="middle" data-t="m_owner">ürün sahibi</text>
+        <text class="kt" x="478" y="236" text-anchor="middle" data-t="m_inventor">fikir sahibi</text>
+        <text x="372" y="262" data-t="m_3s">iki taraf da kazanır</text>
       </svg>
-      <dl class="specs">
-        <div><dt data-t="spec_qty">Adet</dt><dd data-t="spec_qty_v">1.000.000 takım</dd></div>
-        <div><dt data-t="spec_floor">Taban fiyat</dt><dd data-t="spec_floor_v">0,20 $ / takım</dd></div>
-        <div><dt data-t="spec_test">Deneme satışı</dt><dd data-t="spec_test_v">1.000 adet</dd></div>
-      </dl>
-      <figcaption class="cap" data-th="spec_cap">Bir takım = 1 cıvata + 1 somun. <b>Taban fiyat</b>, satıcının bir takım için kabul ettiği en düşük fiyattır.</figcaption>
+      <figcaption><span data-t="m_cap_l">Pafta 00 · yöntem</span><span data-t="m_cap_r">Her vaka bu üç adımla ilerler</span></figcaption>
     </figure>
   </section>
 
   <section id="nasil" class="sec ruled steps-wrap" aria-labelledby="how-h">
     <div class="sec-head">
-      <span class="eyebrow" data-t="how_eyebrow">Üç adımda</span>
+      <span class="eyebrow" data-t="how_eyebrow">Dört adımda</span>
       <h2 id="how-h" data-t="how_h">Nasıl işliyor?</h2>
     </div>
     <ol class="steps">
@@ -383,7 +307,74 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
     </ol>
   </section>
 
-  <section id="taraflar" class="sec ruled sides" aria-labelledby="sides-h">
+  <section id="vakalar" class="sec ruled" aria-labelledby="cases-h">
+    <div class="sec-head">
+      <span class="eyebrow" data-t="cases_eyebrow">Vakalar</span>
+      <h2 id="cases-h" data-th="cases_h">Her vaka <em>başka bir fazla.</em></h2>
+      <p data-t="cases_p"></p>
+    </div>
+    <div class="cases">
+      <a class="case lead" href="vaka-01/">
+        <span class="tag live"><i aria-hidden="true"></i><span data-t="c1_tag">Vaka 01 · fikirlere açık</span></span>
+        <h3 data-t="c1_h">Depoda bekleyen bir milyon cıvata</h3>
+        <svg class="bolt dw" viewBox="0 0 440 150" aria-hidden="true" focusable="false">
+          <rect class="s" x="40" y="32" width="26" height="66" rx="2"/>
+          <rect class="s" x="66" y="22" width="9" height="86" rx="2"/>
+          <rect class="s" x="75" y="48" width="300" height="34"/>
+          <path class="m" d="M225 48l-6 34M237 48l-6 34M249 48l-6 34M261 48l-6 34M273 48l-6 34M285 48l-6 34M297 48l-6 34M309 48l-6 34M321 48l-6 34M333 48l-6 34M345 48l-6 34M357 48l-6 34M369 48l-6 34"/>
+          <rect class="s" x="300" y="28" width="22" height="74" rx="2"/>
+          <rect class="s" x="322" y="36" width="20" height="58" rx="2"/>
+          <path class="m" d="M66 118v22M375 88v52M66 132h309"/><path class="ar" d="M66 132l8-4v8zM375 132l-8-4v8z"/>
+          <text x="220" y="148" text-anchor="middle">M10 × 90 · 8.8</text>
+        </svg>
+        <p data-t="c1_p"></p>
+        <dl>
+          <div><dt data-t="c1_q">Adet</dt><dd data-t="c1_qv">1.000.000 takım</dd></div>
+          <div><dt data-t="c1_f">Taban fiyat</dt><dd data-t="c1_fv">0,20 $ / takım</dd></div>
+          <div><dt data-t="c1_t">Deneme</dt><dd data-t="c1_tv">1.000 adet</dd></div>
+        </dl>
+        <span class="go"><span data-t="c1_go">Vakayı aç, fikrini yaz</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+      </a>
+
+      <article class="case ex">
+        <svg class="ic dw" viewBox="0 0 72 44" aria-hidden="true" focusable="false"><ellipse class="s" cx="14" cy="22" rx="8" ry="16"/><path class="l" d="M14 6h40M14 38h40"/><ellipse class="l" cx="54" cy="22" rx="8" ry="16"/><path class="h" d="M54 30l14 10"/></svg>
+        <span class="tag" data-t="x_tag1">Örnek vaka türü · tekstil</span>
+        <h3 data-t="x1_h">Kesimden artan kumaş topları</h3>
+        <p data-t="x1_p"></p>
+      </article>
+
+      <article class="case ex">
+        <svg class="ic dw" viewBox="0 0 72 44" aria-hidden="true" focusable="false"><path class="s" d="M10 16h52v26H10z"/><path class="l" d="M10 16l8-12h36l8 12M36 4v12"/><path class="k" d="M20 28l10 6M30 28l-10 6"/></svg>
+        <span class="tag" data-t="x_tag2">Örnek vaka türü · ambalaj</span>
+        <h3 data-t="x2_h">Baskısı hatalı koliler</h3>
+        <p data-t="x2_p"></p>
+      </article>
+
+      <article class="case ex">
+        <svg class="ic dw" viewBox="0 0 72 44" aria-hidden="true" focusable="false"><path class="s" d="M14 4h20v18H14zM36 4h20v18H36zM14 24h20v18H14zM36 24h20v18H36z"/><path class="k" d="M40 24l6 8-4 4 6 6"/></svg>
+        <span class="tag" data-t="x_tag3">Örnek vaka türü · seramik</span>
+        <h3 data-t="x3_h">İkinci kalite karolar</h3>
+        <p data-t="x3_p"></p>
+      </article>
+
+      <article class="case ex">
+        <svg class="ic dw" viewBox="0 0 72 44" aria-hidden="true" focusable="false"><path class="l" d="M8 34c6-16 14-16 18-6s12 10 16-4 12-14 16-2"/><path class="k" d="M58 22c3 6 2 12-4 14"/><path class="h" d="M4 40h64"/></svg>
+        <span class="tag" data-t="x_tag4">Örnek vaka türü · sorun</span>
+        <h3 data-t="x4_h">Üretimde çıkan metal talaşı</h3>
+        <p data-t="x4_p"></p>
+      </article>
+
+      <a class="case yours" href="#vakani-ac">
+        <svg class="ic dw" viewBox="0 0 72 44" aria-hidden="true" focusable="false"><rect class="h" x="14" y="2" width="44" height="40" rx="4"/><path class="k" d="M36 12v20M26 22h20"/></svg>
+        <span class="tag" data-t="x_tag5">Vaka 02 · sıradaki</span>
+        <h3 data-t="x5_h">Senin fazlan burada olabilir</h3>
+        <span class="go"><span data-t="x5_go">Vakanı aç</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+      </a>
+    </div>
+    <p class="cases-note" data-t="cases_note">Kesikli çerçeveli kartlar örnek vaka türleridir, gerçek bir firma ya da açık bir vaka değildir.</p>
+  </section>
+
+  <section id="taraflar" class="sec ruled" aria-labelledby="sides-h">
     <div class="sec-head">
       <span class="eyebrow" data-t="sides_eyebrow">Kazan-kazan</span>
       <h2 id="sides-h" data-th="sides_h">İki taraf da <em>kazanır.</em></h2>
@@ -397,6 +388,7 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="own_2"></span></li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="own_3"></span></li>
         </ul>
+        <a class="btn alt" href="#vakani-ac" data-t="x5_go">Vakanı aç</a>
       </article>
       <span class="side-x" aria-hidden="true">×</span>
       <article class="side hot">
@@ -407,434 +399,170 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="idea_2"></span></li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="idea_3"></span></li>
         </ul>
-        <a class="btn sig" href="#fikir"><span data-t="cta_write">Vaka 01'e fikir yaz</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="btn sig" href="vaka-01/#fikir"><span data-t="nav_cta">Vaka 01'e fikir yaz</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
       </article>
     </div>
   </section>
 
-  <section id="fikir" class="sec ruled split" aria-labelledby="form-h">
-    <div class="example">
-      <div class="sec-head">
-        <span class="eyebrow" data-t="form_eyebrow">Senin sıran</span>
-        <h2 id="form-h" data-th="form_h">Bu cıvata başka ne olabilir?</h2>
-        <p data-t="form_p">Nasıl bir fikir beklediğimizi görmek için örneğe bak. Kısa ve somut olsun, kime satılacağı belli olsun.</p>
-      </div>
-      <article class="card">
-        <div class="meta"><span class="tag ex" data-t="ex_tag">ÖRNEK</span><span class="tag" data-t="ex_name">ad: Somunluk</span><span class="tag" data-t="ex_chan">satış: hediyelik eşya</span></div>
-        <p class="txt" data-t="ex_text">Cıvatayı somunla birlikte pirinç renge boyayıp ağır bir kitap ayracı yapalım. Kitapçılarda kasa önünde satılır.</p>
-        <div class="foot"><span class="demand" data-th="ex_demand"><strong>24 kişi</strong> alırdım dedi · ortalama <strong>3,00 $</strong></span></div>
-      </article>
-      <p class="note" data-t="ex_note">Bu örnek hayalî. Gerçek fikirler aşağıdaki listede görünür.</p>
+  <section id="vakani-ac" class="sec ruled open-case" aria-labelledby="open-h">
+    <div class="sec-head">
+      <span class="eyebrow" data-t="open_eyebrow">Ürün sahipleri için</span>
+      <h2 id="open-h" data-th="open_h">Fazlanı <em>vaka yap.</em></h2>
+      <p data-t="open_p"></p>
     </div>
-
-    <form class="idea" id="idea-form" novalidate>
-      <div class="fld">
-        <label for="f-text" data-t="f_label">Fikrin</label>
-        <textarea id="f-text" maxlength="600" data-tp="f_ph" placeholder="Bu cıvata … olarak satılabilir, çünkü …"></textarea>
-        <div class="starters" id="starters"></div>
-      </div>
-      <details class="extra">
-        <summary data-th="f_extra">Detay ekle <span>(isteğe bağlı, kazananlar ayrıca pay alır)</span></summary>
-        <div class="slots">
-          <div class="fld"><label for="s-name"><span data-t="sl_name">Ürünün adı</span> <small>%3</small></label><input type="text" id="s-name" maxlength="60" data-tp="sl_name_ph" placeholder="Örn. Somunluk"></div>
-          <div class="fld"><label for="s-look"><span data-t="sl_look">Görünüm / renk</span> <small>%3</small></label><input type="text" id="s-look" maxlength="80" data-tp="sl_look_ph" placeholder="Örn. mat siyah"></div>
-          <div class="fld"><label for="s-pack"><span data-t="sl_pack">Ambalaj</span> <small>%2</small></label><input type="text" id="s-pack" maxlength="80" data-tp="sl_pack_ph" placeholder="Örn. kraft kutu"></div>
-          <div class="fld"><label for="s-chan"><span data-t="sl_chan">Nerede satılır</span> <small>%2</small></label><input type="text" id="s-chan" maxlength="80" data-tp="sl_chan_ph" placeholder="Örn. hobi mağazaları"></div>
-        </div>
-      </details>
-      <div class="fld">
-        <label for="f-handle" data-t="f_handle">Fikrin yanında görünecek isim</label>
-        <input type="text" id="f-handle" maxlength="30" data-tp="f_handle_ph" placeholder="Boş bırakırsan &quot;İsimsiz&quot; yazar">
-      </div>
-      <div class="row">
-        <span class="status" id="f-status" role="status"></span>
-        <button class="btn sig" type="submit" id="f-send" disabled data-t="f_send">Fikri gönder</button>
-      </div>
-    </form>
-  </section>
-
-  <section id="fikirler" class="sec ruled" aria-labelledby="list-h">
-    <div class="list-head">
-      <div class="sec-head">
-        <span class="eyebrow" data-t="list_eyebrow">Gelen fikirler</span>
-        <h2 id="list-h" data-t="list_h">Fikirler</h2>
-        <p data-t="list_p">Beğendiğin fikre ne kadar ödeyeceğini yaz ve "Alırdım"a bas. En çok istenen fikir deneme satışına çıkar.</p>
-      </div>
-      <div class="sorts" role="group" data-ta="sort_aria" aria-label="Sıralama">
-        <button type="button" id="sort-top" aria-pressed="true" data-t="sort_top">En çok istenen</button>
-        <button type="button" id="sort-new" aria-pressed="false" data-t="sort_new">En yeni</button>
-      </div>
-    </div>
-    <div id="list"></div>
-  </section>
-
-  <section id="hesap" class="sec ruled money" aria-labelledby="money-h">
-    <div class="money-l">
-      <div class="sec-head">
-        <span class="eyebrow" data-t="money_eyebrow">Şeffaf hesap</span>
-        <h2 id="money-h" data-th="money_h">Satarsa kim ne kazanır?</h2>
-        <p data-t="money_p">Satış fiyatından önce 0,20 $ taban fiyat düşülür, sonra ürünü dönüştürme masrafı (boya, kutu gibi) masrafı yapana geri ödenir. Kalan kâr tabloya göre paylaşılır.</p>
-      </div>
-      <div class="calc">
-        <div class="fld"><label for="c-price" data-t="c_price">Satış fiyatı ($)</label><input type="number" id="c-price" inputmode="decimal" min="0" step="0.05" value="1.50"></div>
-        <div class="fld"><label for="c-mod" data-t="c_mod">Masraf ($/adet)</label><input type="number" id="c-mod" inputmode="decimal" min="0" step="0.05" value="0.30"></div>
-        <div class="fld"><label for="c-units" data-t="c_units">Satılan adet</label><input type="number" id="c-units" inputmode="numeric" min="0" step="100" value="1000"></div>
-      </div>
-      <div class="over"><span class="eyebrow" data-t="c_over">Adet başına paylaşılan kâr</span><span class="big" id="r-over"></span></div>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th data-t="th_who">Kim</th><th class="n" data-t="th_share">Pay</th><th class="n" data-t="th_unit">Adet başı</th><th class="n" id="r-units-h"></th></tr></thead>
-        <tbody id="r-rows"></tbody>
-      </table>
+    <div class="form-sheet">
+      <header><span data-t="fs_l">Vaka föyü · boş</span><span data-t="fs_r">Pafta 02 / ?</span></header>
+      <dl>
+        <dt data-th="fs_1">Ne elinde kalıyor?</dt><dd data-th="fs_1v"></dd>
+        <dt data-th="fs_2">Ne kadar?</dt><dd data-th="fs_2v"></dd>
+        <dt data-th="fs_3">Taban fiyat</dt><dd data-th="fs_3v"></dd>
+        <dt data-th="fs_4">Nerede duruyor?</dt><dd data-th="fs_4v"></dd>
+        <dt data-th="fs_5">Çözülecek soru</dt><dd data-th="fs_5v"></dd>
+      </dl>
+      <footer><span data-t="fs_note">Başvurular prototip aşamasında. Şimdilik yöntem Vaka 01 üzerinde deneniyor.</span><a class="btn alt sm" href="vaka-01/" data-t="fs_cta">Vaka 01'i incele</a></footer>
     </div>
   </section>
 
-  <section class="sec ruled" aria-labelledby="faq-h">
-    <div class="sec-head"><h2 id="faq-h" data-t="faq_h">Sık sorulanlar</h2></div>
+  <section id="sss" class="sec ruled" aria-labelledby="faq-h">
+    <div class="sec-head"><span class="eyebrow" data-t="faq_eyebrow">Sorular</span><h2 id="faq-h" data-t="faq_h">Sık sorulanlar</h2></div>
     <div class="faq">
-      <div><b data-t="q1">Para ödemem gerekiyor mu?</b><p data-t="a1">Hayır. Fikir göndermek de "alırdım" demek de ücretsiz.</p></div>
-      <div><b data-t="q2">"Alırdım" dersem satın almış olur muyum?</b><p data-t="a2">Hayır. Bu sadece talebi ölçmek için. Kimse bir şey almak zorunda değil.</p></div>
-      <div><b data-t="q3">Fikrimi kim görür?</b><p data-t="a3">Bu sayfayı açan herkes. Fikrin yanında sadece senin yazdığın isim görünür.</p></div>
-      <div><b data-t="q4">Bu gerçek bir satış mı?</b><p data-t="a4">Bu sayfa bir prototip. Fikirleri ve talebi gerçekten toplar, ama henüz satış ya da ödeme yapılmıyor.</p></div>
+      <div><b data-t="q1"></b><p data-t="a1"></p></div>
+      <div><b data-t="q2"></b><p data-t="a2"></p></div>
+      <div><b data-t="q3"></b><p data-t="a3"></p></div>
+      <div><b data-t="q4"></b><p data-t="a4"></p></div>
       <div><b data-t="q5"></b><p data-t="a5"></p></div>
       <div><b data-t="q6"></b><p data-t="a6"></p></div>
     </div>
   </section>
 
-  <footer><span data-t="foot_l">Undustit · prototip</span><a href="kucuk-fikirler/" data-t="foot_link">Hikâyenin uzun hâli</a><span data-t="foot_r">Taban fiyat herkese açık · paylar sabit</span></footer>
+  <footer class="page-foot"><span data-t="foot_l">Undustit · prototip</span><a href="vaka-01/" data-t="foot_link">Vaka 01 · Bir milyon cıvata</a><span data-t="foot_r">Paylar sabit · taban fiyat herkese açık</span></footer>
 </main>
 
 <script>
 (function(){
-  const FLOOR = 0.20;
-
-  // ---------- copy
   const T = {
     tr: {
-      pill_open:'Vaka 01 · fikirlere açık', pill_proto:'Prototip',
-      nav_aria:'Sayfa', nav_spec:'Teknik föy', nav_menu:'Menü', skip:'İçeriğe geç', nav_how:'Nasıl işliyor', nav_ideas:'Fikirler', nav_money:'Hesap', nav_story:'Hikâye', nav_cta:'Fikrini gönder', foot_link:'Hikâyenin uzun hâli',
+      skip:'İçeriğe geç', nav_aria:'Sayfa', nav_menu:'Menü', nav_how:'Nasıl işliyor', nav_cases:'Vakalar', nav_sides:'İki taraf', nav_open:'Vakanı aç', nav_cta:"Vaka 01'e fikir yaz",
       hero_eyebrow:'Üretim fazlası × yaratıcı fikir',
       hero_h:'Birinin fazlası, <em>birinin fikri.</em>',
       hero_lead:'Undustit, satılamayan üretim fazlalarını ve çözülmemiş sorunları açığa çıkarır. Sen farklı bir açıdan bakıp çözüm fikrini yazarsın. Fikrin ürün sahibinin dikkatini çekerse ortaklık kurulur ve iki taraf da kazanır.',
-      cta_write:'Vaka 01\'e fikir yaz', cta_how:'Nasıl işliyor?',
-      svg_title:'Flanşlı cıvata ve somunun teknik çizimi: M10 diş, 90 mm boy', svg_head:'flanşlı baş', svg_nut:'flanşlı somun', svg_steel:'8.8 sınıf çelik',
-      spec_qty:'Adet', spec_qty_v:'1.000.000 takım', spec_floor:'Taban fiyat', spec_floor_v:'0,20 $ / takım', spec_test:'Deneme satışı', spec_test_v:'1.000 adet',
-      spec_cap:'Bir takım = 1 cıvata + 1 somun. <b>Taban fiyat</b>, satıcının bir takım için kabul ettiği en düşük fiyattır.',
+      cta_cases:'Vakaları gör', cta_open:'Fazlan mı var?',
+      m_title:'Yöntem çizimi: bir fazla, bir fikirle ortaklığa dönüşür', m_1:'01 FAZLA', m_2:'02 FİKİR', m_3:'03 ORTAKLIK',
+      m_1s:'stok · artık · sorun', m_2s:'farklı bir bakış', m_3s:'iki taraf da kazanır', m_owner:'ürün sahibi', m_inventor:'fikir sahibi',
+      m_cap_l:'Pafta 00 · yöntem', m_cap_r:'Her vaka bu üç adımla ilerler',
       how_eyebrow:'Dört adımda', how_h:'Nasıl işliyor?',
       s1_b:'Bir fazla ya da sorun açılır', s1_p:'Bir üretici elinde kalan stoğu ya da çözemediği bir sorunu paylaşır: ne olduğunu, ne kadar olduğunu ve taban fiyatını.',
       s2_b:'Farklı açılardan fikir gelir', s2_p:'Herkes kendi gözüyle bakar: başka bir ürün, başka bir pazar, başka bir kullanım. Bir cümle yeter.',
       s3_b:'Talep fikri sınar', s3_p:'İnsanlar beğendikleri fikre "alırdım" der ve ne ödeyeceğini yazar. Bu kimseyi bir şey almak zorunda bırakmaz.',
-      form_eyebrow:'Vaka 01 · senin sıran', form_h:'Bir milyon cıvata. <em>Sen ne görüyorsun?</em>',
-      form_p:'İlk vakamız: güneş paneli kurulumu için üretilip fazla gelen bir milyon cıvata. Kısa ve somut yaz: ne olur, kime satılır?',
-      ex_tag:'ÖRNEK', ex_name:'ad: Somunluk', ex_chan:'satış: hediyelik eşya',
-      ex_text:'Cıvatayı somunla birlikte pirinç renge boyayıp ağır bir kitap ayracı yapalım. Kitapçılarda kasa önünde satılır.',
-      ex_demand:'<strong>24 kişi</strong> alırdım dedi · ortalama <strong>3,00 $</strong>',
-      ex_note:'Bu örnek hayalî. Gerçek fikirler aşağıdaki listede görünür.',
-      f_label:'Fikrin', f_ph:'Bu cıvata … olarak satılabilir, çünkü …',
-      f_extra:'Detay ekle <span>(isteğe bağlı, kazananlar ayrıca pay alır)</span>',
-      sl_name:'Ürünün adı', sl_name_ph:'Örn. Somunluk', sl_look:'Görünüm / renk', sl_look_ph:'Örn. mat siyah',
-      sl_pack:'Ambalaj', sl_pack_ph:'Örn. kraft kutu', sl_chan:'Nerede satılır', sl_chan_ph:'Örn. hobi mağazaları',
-      f_handle:'Fikrin yanında görünecek isim', f_handle_ph:'Boş bırakırsan "İsimsiz" yazar', f_send:'Fikri gönder',
-      list_eyebrow:'Vaka 01 · gelen fikirler', list_h:'Fikirler',
-      list_p:'Beğendiğin fikre ne kadar ödeyeceğini yaz ve "Alırdım"a bas. En çok istenen fikir ürün sahibinin önüne gider.',
-      sort_aria:'Sıralama', sort_top:'En çok istenen', sort_new:'En yeni',
-      money_eyebrow:'Ortaklık modeli', money_h:'Ortaklık nasıl <em>paylaşılır?</em>',
-      money_p:'Vaka 01 üzerinden örnek: satış fiyatından önce ürün sahibinin 0,20 $ taban fiyatı düşülür, sonra dönüştürme masrafı (boya, kutu gibi) masrafı yapana geri ödenir. Kalan kâr tabloya göre paylaşılır.',
-      c_price:'Satış fiyatı ($)', c_mod:'Masraf ($/adet)', c_units:'Satılan adet', c_over:'Adet başına paylaşılan kâr',
-      th_who:'Kim', th_share:'Pay', th_unit:'Adet başı', th_units: n => n+' adette',
-      faq_h:'Sık sorulanlar',
+      s4_b:'Dikkat çeken fikir ortaklığa dönüşür', s4_p:"Ürün sahibinin ilgisini çeken fikir için ortaklık kurulur. Fazla gelire döner, fikir sahibi taban fiyatın üstündeki kârın %40'ını alır.",
+      cases_eyebrow:'Vakalar', cases_h:'Her vaka <em>başka bir fazla.</em>',
+      cases_p:'Bir vaka; bir üreticinin elinde kalan stok, artık ya da çözemediği bir sorundur. Yöntem aynı kalır, malzeme değişir.',
+      c1_tag:'Vaka 01 · fikirlere açık', c1_h:'Depoda bekleyen bir milyon cıvata',
+      c1_p:'Güneş paneli kurulumu için üretilip fazla gelen flanşlı M10 cıvatalar. Bir yapı elemanı mı, bir ürün mü, bambaşka bir pazar mı?',
+      c1_q:'Adet', c1_qv:'1.000.000 takım', c1_f:'Taban fiyat', c1_fv:'0,20 $ / takım', c1_t:'Deneme', c1_tv:'1.000 adet', c1_go:'Vakayı aç, fikrini yaz',
+      x_tag1:'Örnek vaka türü · tekstil', x1_h:'Kesimden artan kumaş topları', x1_p:'Kalıp kesiminden sonra kalan, rengi ve dokusu iyi ama boyu kısa kumaşlar.',
+      x_tag2:'Örnek vaka türü · ambalaj', x2_h:'Baskısı hatalı koliler', x2_p:'Sağlam ama logosu kaymış binlerce koli. Atılmak yerine başka bir işe yarayabilir.',
+      x_tag3:'Örnek vaka türü · seramik', x3_h:'İkinci kalite karolar', x3_p:'Küçük renk ya da ölçü sapmasıyla birinci kaliteden ayrılan, sağlam karolar.',
+      x_tag4:'Örnek vaka türü · sorun', x4_h:'Üretimde çıkan metal talaşı', x4_p:'Her gün çıkan ve hurdaya giden talaş. Bu bir stok değil, çözülmeyi bekleyen bir sorun.',
+      x_tag5:'Vaka 02 · sıradaki', x5_h:'Senin fazlan burada olabilir', x5_go:'Vakanı aç',
+      cases_note:'Kesikli çerçeveli kartlar örnek vaka türleridir, gerçek bir firma ya da açık bir vaka değildir.',
+      sides_eyebrow:'Kazan-kazan', sides_h:'İki taraf da <em>kazanır.</em>',
+      own_e:'Ürün sahibi için', own_h:'Fazlan mı var?',
+      own_1:'Depoda bekleyen stok, yeni bir ürün olarak gelire döner.', own_2:'Fikir sana talebi ve fiyatı önceden görünmüş olarak gelir.', own_3:'Taban fiyatın her satışta önce sana ödenir.',
+      idea_e:'Fikir sahibi için', idea_h:'Fikrin mi var?',
+      idea_1:'Üretim ya da sermaye gerekmez, iyi bir fikir yeter.', idea_2:"Fikrin satarsa taban fiyatın üstündeki kârın %40'ı senin.", idea_3:'Ad, görünüm, ambalaj ve satış yeri önerileri de ayrıca pay alır.',
+      open_eyebrow:'Ürün sahipleri için', open_h:'Fazlanı <em>vaka yap.</em>',
+      open_p:'Bir vaka açmak için beş soruya cevap yeterli. Gerisini fikir sahipleri ve talep yapar; sen yalnız seni ikna eden fikri seçersin.',
+      fs_l:'Vaka föyü · boş', fs_r:'Pafta 02 / ?',
+      fs_1:'Ne elinde kalıyor?<small>malzeme, ürün ya da yan ürün</small>', fs_1v:'örn. <b>flanşlı M10 cıvata</b>',
+      fs_2:'Ne kadar?<small>adet, ton, metre</small>', fs_2v:'örn. <b>1.000.000 takım</b>',
+      fs_3:'Taban fiyat<small>kabul edeceğin en düşük fiyat</small>', fs_3v:'örn. <b>0,20 $ / takım</b>',
+      fs_4:'Nerede duruyor?<small>şehir, depo, sevk koşulu</small>', fs_4v:'örn. <b>depoda, paletli</b>',
+      fs_5:'Çözülecek soru<small>fikirlerin cevap vereceği</small>', fs_5v:'örn. <b>"Bu cıvata başka ne olabilir?"</b>',
+      fs_note:'Başvurular prototip aşamasında. Şimdilik yöntem Vaka 01 üzerinde deneniyor.', fs_cta:"Vaka 01'i incele",
+      faq_eyebrow:'Sorular', faq_h:'Sık sorulanlar',
       q1:'Para ödemem gerekiyor mu?', a1:'Hayır. Fikir göndermek de "alırdım" demek de ücretsiz.',
-      q2:'"Alırdım" dersem satın almış olur muyum?', a2:'Hayır. Bu sadece talebi ölçmek için. Kimse bir şey almak zorunda değil.',
-      q3:'Fikrimi kim görür?', a3:'Bu sayfayı açan herkes. Fikrin yanında sadece senin yazdığın isim görünür.',
-      q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip ve şimdilik tek vaka var. Fikirleri ve talebi gerçekten toplar, ama henüz satış ya da ödeme yapılmıyor.',
-      s4_b:'Dikkat çeken fikir ortaklığa dönüşür', s4_p:'Ürün sahibinin ilgisini çeken fikir için ortaklık kurulur. Fazla gelire döner, fikir sahibi taban fiyatın üstündeki kârın %40\'ını alır.', case_e:'Vaka 01 · şu an açık', case_t:'Depoda bekleyen bir milyon cıvata', sides_eyebrow:'Kazan-kazan', sides_h:'İki taraf da <em>kazanır.</em>', own_e:'Ürün sahibi için', own_h:'Fazlan mı var?', own_1:'Depoda bekleyen stok, yeni bir ürün olarak gelire döner.', own_2:'Fikir sana talebi ve fiyatı önceden görünmüş olarak gelir.', own_3:'Taban fiyatın her satışta önce sana ödenir.', idea_e:'Fikir sahibi için', idea_h:'Fikrin mi var?', idea_1:'Üretim ya da sermaye gerekmez, iyi bir fikir yeter.', idea_2:'Fikrin satarsa taban fiyatın üstündeki kârın %40\'ı senin.', idea_3:'Ad, görünüm, ambalaj ve satış yeri önerileri de ayrıca pay alır.', q5:'Neden bir cıvatayla başladınız?', a5:'Çünkü küçük ve sıradan. Bir cıvataya bile farklı bakılabiliyorsa, her fazlaya bakılabilir.', q6:'Ürün sahibi fikrimi seçerse ne olur?', a6:'Ortaklık kurulur ve paylar sabittir: taban fiyatın üstündeki kârın %40\'ı fikir sahibinin.',
-      foot_l:'Undustit · prototip', foot_r:'Taban fiyat herkese açık · paylar sabit',
-      // dynamic
-      starters:[['Hediye olsun','Bu cıvata şöyle bir hediye olabilir: '],['Masada dursun','Masada bu cıvata şuna dönüşebilir: '],['Bir topluluğa satalım','Bu cıvatayı şu insanlar alır: '],['Sanat olsun','Kaynakla ya da üst üste dizerek şu yapılabilir: ']],
-      shares:[['Fikir sahibi','ana fikir'],['Ad önerisini kazanan','ürünün adı'],['Görünüm önerisini kazanan','renk, kaplama'],['Ambalaj önerisini kazanan','kutu, paket'],['Satış yeri önerisini kazanan','nerede, kime'],['Undustit','üretim, satış, kargo']],
-      slot_tags:{ name:'ad', look:'görünüm', pack:'ambalaj', chan:'satış' },
-      st_free:'Fikir göndermek ücretsizdir. E-posta ya da ödeme istemiyoruz.',
-      st_sending:'Gönderiliyor…', st_ok:'Fikrin listeye eklendi. Arkadaşlarına linki gönder, "alırdım" desinler.',
-      st_ro:'Bu sayfada sadece görüntüleme iznin var. Fikir eklemek için sayfayı paylaşan kişiden "Katkıda bulunan" (Contributor) erişimi iste.',
-      st_rate:'Çok hızlı gönderdin. Bir dakika bekleyip tekrar dene.', st_quota:'Fikir listesi doldu. Sayfa sahibine haber ver.',
-      st_fail:'Kaydedilemedi. Bağlantını kontrol edip tekrar dene.', st_load:'Fikirler yüklenemedi. Sayfayı yenile.',
-      st_open:'Fikir göndermek için bu sayfayı claude.ai üzerinden aç.', st_signin:'Fikir göndermek için claude.ai hesabınla giriş yap.',
-      e_signin_b:'Fikirler burada görünecek', e_signin_p:'Fikirleri görmek ve göndermek için claude.ai hesabınla giriş yapman gerekiyor.',
-      e_none_b:'Henüz fikir yok', e_none_p:'İlk fikri sen yaz. Yukarıdaki formu doldurduğunda fikrin burada görünür.', e_none_a:'İlk fikri yaz',
-      mine:'SENİN', anon:'İsimsiz', people: n => n+' kişi', said:' alırdım dedi · ortalama ', nobody:'Henüz kimse "alırdım" demedi',
-      you:'Sen: ', undo:'Geri al', buy:'Alırdım', price_q:'fiyat?', buy_aria:'Bu ürüne ödeyeceğin fiyat, dolar'
+      q2:'Hangi fazlalar vaka olabilir?', a2:'Satılamayan stok, üretim artığı, ikinci kalite ürün ya da çözemediğin bir üretim sorunu. Miktarı ve taban fiyatı belli olduğu sürece her biri.',
+      q3:'Fikrimi kim görür?', a3:'Vaka sayfasını açan herkes. Fikrin yanında yalnız senin yazdığın isim görünür.',
+      q4:'Bu gerçek bir satış mı?', a4:'Bu site bir prototip ve şimdilik tek vaka açık. Fikirleri ve talebi gerçekten topluyor, ama henüz satış ya da ödeme yapılmıyor.',
+      q5:'Neden bir cıvatayla başladınız?', a5:'Çünkü küçük ve sıradan. Bir cıvataya bile farklı bakılabiliyorsa, her fazlaya bakılabilir.',
+      q6:'Ürün sahibi fikrimi seçerse ne olur?', a6:"Ortaklık kurulur ve paylar sabittir: taban fiyatın üstündeki kârın %40'ı fikir sahibinin.",
+      foot_l:'Undustit · prototip', foot_link:'Vaka 01 · Bir milyon cıvata', foot_r:'Paylar sabit · taban fiyat herkese açık'
     },
     en: {
-      pill_open:'Case 01 · open for ideas', pill_proto:'Prototype',
-      nav_aria:'Page', nav_spec:'Spec sheet', nav_menu:'Menu', skip:'Skip to content', nav_how:'How it works', nav_ideas:'Ideas', nav_money:'The split', nav_story:'Story', nav_cta:'Send your idea', foot_link:'The long version',
+      skip:'Skip to content', nav_aria:'Page', nav_menu:'Menu', nav_how:'How it works', nav_cases:'Cases', nav_sides:'Both sides', nav_open:'Open a case', nav_cta:'Pitch for Case 01',
       hero_eyebrow:'Surplus × creative ideas',
       hero_h:'One side’s surplus, <em>another’s idea.</em>',
       hero_lead:'Undustit brings unsold production surplus and unsolved problems into the open. You look at them from a different angle and pitch a fix. If your idea catches the owner’s eye, a partnership forms and both sides win.',
-      cta_write:'Pitch an idea for Case 01', cta_how:'How does it work?',
-      svg_title:'Technical drawing of a flange bolt and nut: M10 thread, 90 mm long', svg_head:'flange head', svg_nut:'flange nut', svg_steel:'grade 8.8 steel',
-      spec_qty:'Quantity', spec_qty_v:'1,000,000 sets', spec_floor:'Floor price', spec_floor_v:'$0.20 / set', spec_test:'Test run', spec_test_v:'1,000 units',
-      spec_cap:'One set = 1 bolt + 1 nut. The <b>floor price</b> is the lowest price the seller takes for one set.',
+      cta_cases:'See the cases', cta_open:'Stuck with surplus?',
+      m_title:'Method drawing: a surplus becomes a partnership through an idea', m_1:'01 SURPLUS', m_2:'02 IDEA', m_3:'03 PARTNERSHIP',
+      m_1s:'stock · offcuts · problems', m_2s:'a different angle', m_3s:'both sides win', m_owner:'owner', m_inventor:'inventor',
+      m_cap_l:'Sheet 00 · method', m_cap_r:'Every case follows these three steps',
       how_eyebrow:'Four steps', how_h:'How it works',
       s1_b:'A surplus or a problem goes up', s1_p:'A maker shares the stock it is stuck with or a problem it can’t crack: what it is, how much, and the floor price.',
       s2_b:'Ideas arrive from every angle', s2_p:'Everyone looks with their own eyes: another product, another market, another use. One line will do.',
       s3_b:'Demand tests the idea', s3_p:'People say “I’d buy” to ideas they like and name their price. Nobody has to buy anything.',
-      form_eyebrow:'Case 01 · your turn', form_h:'A million bolts. <em>What do you see?</em>',
-      form_p:'Our first case: a million bolts made for solar panel mounts, more than were needed. Keep it short and concrete: what it becomes, who buys it.',
-      ex_tag:'EXAMPLE', ex_name:'name: Nutmark', ex_chan:'sold at: gift shops',
-      ex_text:'Paint the bolt and nut brass and sell it as a heavy bookmark at bookshop checkouts.',
-      ex_demand:'<strong>24 people</strong> said “I’d buy” · avg <strong>$3.00</strong>',
-      ex_note:'This example is made up. Real ideas show up in the list below.',
-      f_label:'Your idea', f_ph:'This bolt could be sold as … because …',
-      f_extra:'Add details <span>(optional, winners get an extra share)</span>',
-      sl_name:'Product name', sl_name_ph:'e.g. Nutmark', sl_look:'Look / color', sl_look_ph:'e.g. matte black',
-      sl_pack:'Packaging', sl_pack_ph:'e.g. kraft box', sl_chan:'Where it sells', sl_chan_ph:'e.g. hobby stores',
-      f_handle:'Name shown next to your idea', f_handle_ph:'Leave it blank to show "Anonymous"', f_send:'Send idea',
-      list_eyebrow:'Case 01 · incoming ideas', list_h:'Ideas',
-      list_p:'See one you like? Type your price and press “I’d buy”. The most wanted idea goes to the owner.',
-      sort_aria:'Sort', sort_top:'Most wanted', sort_new:'Newest',
-      money_eyebrow:'Partnership model', money_h:'How the partnership <em>splits.</em>',
-      money_p:'Case 01 as the example: first the owner’s $0.20 floor price comes off the sale price. Then the cost of changing the product (paint, a box) goes back to whoever paid it. The profit left over is split as shown.',
-      c_price:'Sale price ($)', c_mod:'Cost ($/unit)', c_units:'Units sold', c_over:'Profit shared per unit',
-      th_who:'Who', th_share:'Share', th_unit:'Per unit', th_units: n => 'For '+n+' units',
-      faq_h:'Questions',
+      s4_b:'The idea that stands out becomes a partnership', s4_p:'When an idea catches the owner’s interest, a partnership forms. The surplus turns into revenue and the inventor gets 40% of the profit above the floor price.',
+      cases_eyebrow:'Cases', cases_h:'Every case is <em>a different surplus.</em>',
+      cases_p:'A case is stock, offcuts or a problem a maker is stuck with. The method stays the same; the material changes.',
+      c1_tag:'Case 01 · open for ideas', c1_h:'A million bolts waiting in a warehouse',
+      c1_p:'Flange M10 bolts made for solar panel mounts, more than were needed. A structural part, a product, or a whole other market?',
+      c1_q:'Quantity', c1_qv:'1,000,000 sets', c1_f:'Floor price', c1_fv:'$0.20 / set', c1_t:'Test run', c1_tv:'1,000 units', c1_go:'Open the case, pitch an idea',
+      x_tag1:'Example case type · textiles', x1_h:'Fabric rolls left after cutting', x1_p:'Good color, good weave, just too short once the pattern is cut.',
+      x_tag2:'Example case type · packaging', x2_h:'Boxes with a misprint', x2_p:'Thousands of sound boxes with a shifted logo. They could do another job instead of the bin.',
+      x_tag3:'Example case type · ceramics', x3_h:'Second-grade tiles', x3_p:'Sound tiles that missed first grade by a small color or size shift.',
+      x_tag4:'Example case type · problem', x4_h:'Metal shavings from production', x4_p:'Swarf that goes to scrap every day. Not stock, but a problem waiting for a fix.',
+      x_tag5:'Case 02 · next', x5_h:'Your surplus could be here', x5_go:'Open a case',
+      cases_note:'Dashed cards are example case types, not real companies or open cases.',
+      sides_eyebrow:'Win-win', sides_h:'Both sides <em>win.</em>',
+      own_e:'For the owner', own_h:'Stuck with surplus?',
+      own_1:'Stock sitting in a warehouse turns into revenue as a new product.', own_2:'Ideas reach you with demand and price already visible.', own_3:'Your floor price is paid to you first on every sale.',
+      idea_e:'For the inventor', idea_h:'Got an idea?',
+      idea_1:'No factory, no capital. A good idea is enough.', idea_2:'If your idea sells, 40% of the profit above the floor price is yours.', idea_3:'Name, look, packaging and channel suggestions get their own share too.',
+      open_eyebrow:'For owners', open_h:'Turn your surplus <em>into a case.</em>',
+      open_p:'Five answers are enough to open a case. Inventors and demand do the rest; you only pick the idea that convinces you.',
+      fs_l:'Case sheet · blank', fs_r:'Sheet 02 / ?',
+      fs_1:'What are you stuck with?<small>material, product or by-product</small>', fs_1v:'e.g. <b>flange M10 bolts</b>',
+      fs_2:'How much?<small>units, tonnes, meters</small>', fs_2v:'e.g. <b>1,000,000 sets</b>',
+      fs_3:'Floor price<small>the lowest price you would take</small>', fs_3v:'e.g. <b>$0.20 / set</b>',
+      fs_4:'Where is it?<small>city, warehouse, shipping terms</small>', fs_4v:'e.g. <b>warehouse, on pallets</b>',
+      fs_5:'The question to solve<small>what ideas will answer</small>', fs_5v:'e.g. <b>"What else could this bolt be?"</b>',
+      fs_note:'Applications are in the prototype stage. For now the method is being tried on Case 01.', fs_cta:'See Case 01',
+      faq_eyebrow:'Questions', faq_h:'Questions',
       q1:'Do I have to pay?', a1:'No. Sending ideas and saying “I’d buy” are both free.',
-      q2:'If I say “I’d buy”, did I buy it?', a2:'No. It only measures demand. Nobody has to buy anything.',
-      q3:'Who can see my idea?', a3:'Everyone who opens this page. Only the name you typed shows next to it.',
-      q4:'Is this a real sale?', a4:'This page is a prototype with one case so far. It really collects ideas and demand, but no sales or payments happen yet.',
-      s4_b:'The idea that stands out becomes a partnership', s4_p:'When an idea catches the owner’s interest, a partnership forms. The surplus turns into revenue and the inventor gets 40% of the profit above the floor price.', case_e:'Case 01 · open now', case_t:'A million bolts waiting in a warehouse', sides_eyebrow:'Win-win', sides_h:'Both sides <em>win.</em>', own_e:'For the owner', own_h:'Stuck with surplus?', own_1:'Stock sitting in a warehouse turns into revenue as a new product.', own_2:'Ideas reach you with demand and price already visible.', own_3:'Your floor price is paid to you first on every sale.', idea_e:'For the inventor', idea_h:'Got an idea?', idea_1:'No factory, no capital. A good idea is enough.', idea_2:'If your idea sells, 40% of the profit above the floor price is yours.', idea_3:'Name, look, packaging and channel suggestions get their own share too.', q5:'Why start with a bolt?', a5:'Because it is small and ordinary. If people can see something new in a bolt, they can in any surplus.', q6:'What if the owner picks my idea?', a6:'A partnership forms and the shares are fixed: 40% of the profit above the floor price goes to the inventor.',
-      foot_l:'Undustit · prototype', foot_r:'Floor price public · shares fixed',
-      starters:[['Make it a gift','It could be a gift for: '],['Put it on a desk','On a desk, this bolt could be: '],['Sell it to a crowd','These people would buy it: '],['Make it art','Welded or stacked, it could become: ']],
-      shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['Undustit','making, selling, shipping']],
-      slot_tags:{ name:'name', look:'look', pack:'pack', chan:'sold at' },
-      st_free:'Free to send. No email, no fee.',
-      st_sending:'Sending…', st_ok:'Your idea is on the list. Send the link to friends so they can say “I’d buy”.',
-      st_ro:'You can only view this page. To add ideas, ask the person who shared it for Contributor access.',
-      st_rate:'That was fast. Wait a minute, then try again.', st_quota:'The idea list is full. Let the page owner know.',
-      st_fail:'Could not save. Check your connection and try again.', st_load:'Ideas could not load. Refresh the page.',
-      st_open:'Open this page on claude.ai to send ideas.', st_signin:'Sign in to claude.ai to send ideas.',
-      e_signin_b:'Ideas will show up here', e_signin_p:'Sign in to claude.ai to see and send ideas.',
-      e_none_b:'No ideas yet, the list is bare', e_none_p:'Write the first one and it shows up right there.', e_none_a:'Write the first idea',
-      mine:'YOURS', anon:'Anonymous', people: n => n+(n===1?' person':' people'), said:' said “I’d buy” · avg ', nobody:'No one has said “I’d buy” yet',
-      you:'You: ', undo:'Undo', buy:'I’d buy', price_q:'price?', buy_aria:'The price you would pay, in dollars'
+      q2:'What surplus can become a case?', a2:'Unsold stock, production offcuts, second-grade goods or a production problem you can’t crack. Anything with a known amount and floor price.',
+      q3:'Who can see my idea?', a3:'Everyone who opens the case page. Only the name you typed shows next to it.',
+      q4:'Is this a real sale?', a4:'This site is a prototype with one open case. It really collects ideas and demand, but no sales or payments happen yet.',
+      q5:'Why start with a bolt?', a5:'Because it is small and ordinary. If people can see something new in a bolt, they can in any surplus.',
+      q6:'What if the owner picks my idea?', a6:'A partnership forms and the shares are fixed: 40% of the profit above the floor price goes to the inventor.',
+      foot_l:'Undustit · prototype', foot_link:'Case 01 · A million bolts', foot_r:'Shares fixed · floor price public'
     }
   };
-  const SHARE_PCT = [0.40, 0.03, 0.03, 0.02, 0.02, 0.50];
 
   let lang = 'tr';
   try { const s = localStorage.getItem('ikinci-tur-lang'); if (s==='tr'||s==='en') lang = s; else if (!/^tr/i.test(navigator.language||'tr')) lang = 'en'; } catch(e){}
   if (location.hash === '#en') lang = 'en';
   const t = k => T[lang][k];
-
   const $ = id => document.getElementById(id);
-  const el = (tag, props={}, kids=[]) => { const n=document.createElement(tag); Object.assign(n, props); kids.forEach(k=>k!=null&&n.append(k)); return n; };
-  const loc = () => lang==='tr' ? 'tr-TR' : 'en-US';
-  const usd = v => { const s = v.toLocaleString(loc(),{minimumFractionDigits:2,maximumFractionDigits:2}); return lang==='tr' ? s+' $' : '$'+s; };
-  const int = v => Math.round(v).toLocaleString(loc());
-  const pctTxt = p => lang==='tr' ? '%'+p : p+'%';
-
-  // status keeps a key so it re-translates on language switch
-  let statusKey = 'st_free', statusCls = '';
-  function setStatus(k, cls){ statusKey = k; statusCls = cls||''; paintStatus(); }
-  function paintStatus(){ const s=$('f-status'); s.textContent = t(statusKey); s.className = 'status'+(statusCls?' '+statusCls:''); }
 
   function applyLang(){
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-t]').forEach(n=>{ n.textContent = t(n.dataset.t); });
     document.querySelectorAll('[data-th]').forEach(n=>{ n.innerHTML = t(n.dataset.th); });
-    document.querySelectorAll('[data-tp]').forEach(n=>{ n.placeholder = t(n.dataset.tp); });
     document.querySelectorAll('[data-ta]').forEach(n=>{ n.setAttribute('aria-label', t(n.dataset.ta)); });
-    document.querySelectorAll('.slots small').forEach(n=>{ n.textContent = pctTxt(n.textContent.replace(/\D/g,'')); });
     $('lang-tr').setAttribute('aria-pressed', lang==='tr'); $('lang-en').setAttribute('aria-pressed', lang==='en');
-    renderStarters(); calc(); paintStatus(); render();
   }
   function setLang(l){ lang = l; try{ localStorage.setItem('ikinci-tur-lang', l); }catch(e){} applyLang(); }
   $('lang-tr').onclick = ()=>setLang('tr');
   $('lang-en').onclick = ()=>setLang('en');
-
-  // ---------- calculator
-  function calc(){
-    const price = Math.max(0, parseFloat($('c-price').value)||0);
-    const mod = Math.max(0, parseFloat($('c-mod').value)||0);
-    const units = Math.max(0, parseInt($('c-units').value)||0);
-    const over = Math.max(0, price - FLOOR - mod);
-    $('r-over').textContent = usd(over);
-    $('r-units-h').textContent = t('th_units')(int(units));
-    const body = $('r-rows'); body.replaceChildren();
-    t('shares').forEach(([who, what], i)=>{
-      const pct = SHARE_PCT[i];
-      body.append(el('tr',{className: i===0?'you':''},[
-        el('td',{},[document.createTextNode(who), el('small',{textContent:what})]),
-        el('td',{className:'n',textContent:pctTxt(Math.round(pct*100))}),
-        el('td',{className:'n',textContent:usd(over*pct)}),
-        el('td',{className:'n',textContent:usd(over*pct*units)})
-      ]));
-    });
-  }
-  ['c-price','c-mod','c-units'].forEach(id=>$(id).addEventListener('input',calc));
-
-  // ---------- form basics
-  const ta = $('f-text'), send = $('f-send');
-  const slotIds = { name:'s-name', look:'s-look', pack:'s-pack', chan:'s-chan' };
-  function renderStarters(){
-    const host = $('starters'); host.replaceChildren();
-    t('starters').forEach(([l,s])=>{
-      const b = el('button',{type:'button',textContent:l});
-      b.onclick = ()=>{ ta.value = s; ta.focus(); ta.setSelectionRange(s.length,s.length); refresh(); };
-      host.append(b);
-    });
-  }
-  let canWrite = true, ready = false;
-  function refresh(){ send.disabled = !(ready && canWrite && ta.value.trim().length >= 8); }
-  ta.addEventListener('input', refresh);
-
-  // ---------- shared state
-  let db = null, uid = null, connected = false;
-  let ideaDocs = {};   // uid -> items[]
-  let voteDocs = {};   // uid -> {buy:{key:price}}
-  let sort = 'top';
-  let chain = Promise.resolve();
-  const seen = new Set(); let firstPaint = true;
-  const queue = fn => (chain = chain.then(fn, fn));
-
-  function myItems(){ return (ideaDocs[uid]||[]).slice(); }
-  function myBuys(){ return Object.assign({}, (voteDocs[uid]||{}).buy||{}); }
-
-  function allIdeas(){
-    const out = [];
-    for (const [owner, items] of Object.entries(ideaDocs)){
-      (Array.isArray(items)?items:[]).forEach(it=>{
-        if (!it || typeof it.text!=='string' || !it.k) return;
-        out.push({ key: owner+':'+it.k, owner, ...it });
-      });
-    }
-    const demand = {};
-    for (const v of Object.values(voteDocs)){
-      const buy = (v && v.buy) || {};
-      for (const [k,p] of Object.entries(buy)){
-        const n = Number(p); if (!(n>0) || n>1000) continue;
-        (demand[k] = demand[k] || []).push(n);
-      }
-    }
-    out.forEach(i=>{ const d = demand[i.key]||[]; i.count = d.length; i.avg = d.length ? d.reduce((a,b)=>a+b,0)/d.length : 0; });
-    out.sort(sort==='top'
-      ? (a,b)=> b.count-a.count || b.avg-a.avg || String(b.at).localeCompare(String(a.at))
-      : (a,b)=> String(b.at).localeCompare(String(a.at)));
-    return out;
-  }
-
-  function render(){
-    const host = $('list'); host.replaceChildren();
-    if (!connected){
-      host.append(el('div',{className:'empty'},[ el('b',{textContent:t('e_signin_b')}), el('p',{className:'note',textContent:t('e_signin_p')}) ]));
-      return;
-    }
-    const ideas = allIdeas();
-    if (!ideas.length){
-      host.append(el('div',{className:'empty'},[
-        el('b',{textContent:t('e_none_b')}), el('p',{className:'note',textContent:t('e_none_p')}),
-        el('a',{className:'btn alt',href:'#fikir',textContent:t('e_none_a')})
-      ]));
-      return;
-    }
-    const mine = myBuys(), tags = t('slot_tags');
-    const grid = el('div',{className:'grid'});
-    ideas.forEach(i=>{
-      const isNew = !firstPaint && !seen.has(i.key); seen.add(i.key);
-      const meta = el('div',{className:'meta'});
-      if (i.owner===uid) meta.append(el('span',{className:'tag ex',textContent:t('mine')}));
-      const slots = (i.slots && typeof i.slots==='object') ? i.slots : {};
-      Object.entries(tags).forEach(([k,l])=>{ const v = slots[k]; if (typeof v==='string' && v.trim()) meta.append(el('span',{className:'tag',textContent:l+': '+v.slice(0,80)})); });
-      const demand = el('span',{className:'demand'});
-      if (i.count){ demand.append(el('strong',{textContent:t('people')(i.count)}), document.createTextNode(t('said')), el('strong',{textContent:usd(i.avg)})); }
-      else demand.textContent = t('nobody');
-      const buy = el('div',{className:'buy'});
-      if (mine[i.key]){
-        buy.append(el('span',{className:'mine',textContent:t('you')+usd(Number(mine[i.key]))}),
-          el('button',{type:'button',className:'undo',textContent:t('undo'),disabled:!canWrite,onclick:()=>setBuy(i.key,null)}));
-      } else {
-        const inp = el('input',{type:'number',min:'0.2',max:'1000',step:'0.5',placeholder:'$',inputMode:'decimal',id:'buy-'+i.key.replace(/[^\w-]/g,'_')});
-        inp.setAttribute('aria-label',t('buy_aria'));
-        const go = el('button',{type:'button',textContent:t('buy'),disabled:!canWrite});
-        go.onclick = ()=>{
-          const n = parseFloat(inp.value);
-          if (!(n>0) || n>1000){ inp.focus(); inp.placeholder=t('price_q'); return; }
-          setBuy(i.key, Math.round(n*100)/100);
-        };
-        buy.append(inp, go);
-      }
-      grid.append(el('article',{className:'card'+(isNew?' new':'')},[
-        meta.childNodes.length ? meta : null,
-        el('p',{className:'txt',textContent:i.text}),
-        el('span',{className:'by',textContent:(i.handle||t('anon'))+' · '+fmtDate(i.at)}),
-        el('div',{className:'foot'},[demand, buy])
-      ]));
-    });
-    host.append(grid);
-    firstPaint = false;
-  }
-  function fmtDate(s){ const d = new Date(s); return isNaN(d) ? '' : d.toLocaleDateString(loc(),{day:'numeric',month:'long'}); }
-
-  function readOnly(){ canWrite = false; refresh(); setStatus('st_ro','bad'); render(); }
-  function onWriteError(err){
-    if (err && err.code==='invalid_argument') return readOnly();
-    if (err && err.code==='resource_exhausted') return setStatus('st_rate','bad');
-    if (err && err.code==='quota_exceeded') return setStatus('st_quota','bad');
-    setStatus('st_fail','bad');
-  }
-
-  function setBuy(key, price){
-    const buys = myBuys();
-    if (price==null) delete buys[key]; else buys[key] = price;
-    queue(()=>db.doc('votes/'+uid).set({ buy: buys })).catch(onWriteError);
-  }
-
-  function setSort(s){ sort = s; $('sort-top').setAttribute('aria-pressed', s==='top'); $('sort-new').setAttribute('aria-pressed', s==='new'); render(); }
-  $('sort-top').onclick = ()=>setSort('top');
-  $('sort-new').onclick = ()=>setSort('new');
-
-  $('idea-form').addEventListener('submit', e=>{
-    e.preventDefault();
-    if (send.disabled) return;
-    const slots = {}; Object.entries(slotIds).forEach(([k,id])=>{ const v=$(id).value.trim(); if (v) slots[k]=v; });
-    const item = { k: Date.now().toString(36)+Math.random().toString(36).slice(2,6), text: ta.value.trim().slice(0,600), slots, handle: $('f-handle').value.trim().slice(0,30), lang, at: new Date().toISOString() };
-    const items = myItems().concat([item]).slice(-30);
-    send.disabled = true; setStatus('st_sending');
-    queue(()=>db.doc('ideas/'+uid).set({ items })).then(()=>{
-      ta.value=''; Object.values(slotIds).forEach(id=>$(id).value='');
-      setStatus('st_ok','good'); refresh(); setSort('new');
-    }).catch(err=>{ refresh(); onWriteError(err); });
-  });
-
   applyLang();
 
-  // ---------- connect
-  (async ()=>{
-    if (!window.claude || !window.claude.use){ setStatus('st_open','bad'); return; }
-    const [dbNs, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
-    uid = user ? await user.id() : null;
-    if (!dbNs || !uid){ setStatus('st_signin','bad'); return; }
-    db = dbNs; connected = true; ready = true;
-    const w = user.can ? await user.can('data.write') : null;
-    if (w === false) readOnly(); else { refresh(); render(); }
-    db.collection('ideas').onSnapshot(snap=>{
-      const next = {}; snap.docs.forEach(d=>{ const v=d.data(); next[d.id] = v && Array.isArray(v.items) ? v.items : []; });
-      ideaDocs = next; render();
-    }, ()=>setStatus('st_load','bad'));
-    db.collection('votes').onSnapshot(snap=>{
-      const next = {}; snap.docs.forEach(d=>{ next[d.id] = d.data()||{}; });
-      voteDocs = next; render();
-    }, ()=>{});
-  })();
-})();
-
   // ---------- mobile menu
-  (function(){
-    const nav = document.getElementById('nav'), btn = document.getElementById('menu-t'), menu = document.getElementById('nav-menu');
-    const set = (open) => { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); };
-    btn.addEventListener('click', () => set(!nav.classList.contains('open')));
-    menu.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')){ set(false); btn.focus(); } });
-    window.matchMedia('(min-width:1041px)').addEventListener('change', (m) => { if (m.matches) set(false); });
-  })();
+  const nav = $('nav'), btn = $('menu-t'), menu = $('nav-menu');
+  const set = (open) => { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); };
+  btn.addEventListener('click', () => set(!nav.classList.contains('open')));
+  menu.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')){ set(false); btn.focus(); } });
+  window.matchMedia('(min-width:1041px)').addEventListener('change', (m) => { if (m.matches) set(false); });
+})();
 </script>

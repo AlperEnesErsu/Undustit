@@ -2,17 +2,17 @@
 <html lang="tr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Undustit · Küçük Fikirler</title>
-<meta name="description" content="Tek bir cıvatadan bütün bir depoya: satılmayan bir milyon cıvatanın gidebileceği yerler ve fikrini gönderebileceğin açık hesap.">
+<title>Undustit · Küçük fikirler, büyük etkiler</title>
+<meta name="description" content="Tek bir fazla cıvatadan bütün bir depoya: Undustit, üretim fazlalarına yaratıcı fikirler getirir ve ürün sahibiyle ortaklığa dönüştürür. Vaka 01: bir milyon cıvata.">
 <meta name="theme-color" content="#0B0C0D">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Undustit">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:title" content="Küçük fikirler, büyük etkiler.">
-<meta property="og:description" content="Tek bir cıvatadan bütün bir depoya: satılmayan bir milyon cıvatanın gidebileceği yerler ve fikrini gönderebileceğin açık hesap.">
+<meta property="og:description" content="Tek bir fazla cıvatadan bütün bir depoya: Undustit, üretim fazlalarına yaratıcı fikirler getirir ve ürün sahibiyle ortaklığa dönüştürür. Vaka 01: bir milyon cıvata.">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Küçük fikirler, büyük etkiler.">
-<meta name="twitter:description" content="Tek bir cıvatadan bütün bir depoya: satılmayan bir milyon cıvatanın gidebileceği yerler ve fikrini gönderebileceğin açık hesap.">
+<meta name="twitter:description" content="Tek bir fazla cıvatadan bütün bir depoya: Undustit, üretim fazlalarına yaratıcı fikirler getirir ve ürün sahibiyle ortaklığa dönüştürür. Vaka 01: bir milyon cıvata.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230B0C0D%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23FF6A2B%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -301,7 +301,7 @@ dl.sheet dd.k{color:var(--accent)}
 .end-in{position:relative;z-index:1;padding-block:clamp(140px,20vw,260px) clamp(80px,10vw,140px);display:grid;gap:36px;justify-items:start}
 .end h2{font-size:clamp(56px,10vw,168px);line-height:.9;letter-spacing:-.03em}
 .end h2 em{color:var(--accent)}
-footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:13px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding-block:20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
 footer a{color:var(--ink-2);text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-out)}
 footer a:hover{color:var(--accent)}
 
@@ -356,7 +356,8 @@ footer a:hover{color:var(--accent)}
 .lang button:not([aria-pressed="true"]):hover,.seg button:not([aria-pressed="true"]):hover,.sorts button:not([aria-pressed="true"]):hover{background:var(--bg-3);color:var(--ink)}
 .chip:hover,.starters button:hover{background:rgba(255,106,43,.12);border-color:var(--accent);color:var(--ink)}
 textarea:focus,input:focus{box-shadow:0 0 0 3px rgba(255,106,43,.28)}
-footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px}
+footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px;text-decoration-color:rgba(255,106,43,.5)}
+footer a:hover{text-decoration-color:var(--accent)}
 
 /* page change: the bar and logo stay put while the sheet underneath swaps */
 @view-transition{navigation:auto}
@@ -607,7 +608,7 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       nav_aria:'Sayfa', nav_money:'Hesap', nav_menu:'Menü', skip:'İçeriğe geç', nav_story:'Hikâye', nav_nums:'Rakamlar', nav_ideas:'Fikirler', nav_spec:'Teknik föy', nav_cta:'Fikrini gönder',
       story_aria:'Bir cıvatanın hikâyesi', rail_aria:'Aşamalar', r0:'Cıvata', r1:'Bağlantı', r2:'Çerçeve', r3:'Yapı',
       tb_sheet:'Pafta', tb_scale:'Ölçek', tb_by:'Çizen', tb_you:'sen',
-      c0_e:'Undustit · Vaka 01', c0_h:'Küçük fikirler,', c0_p:'Satılmayan stoklara yeni bir iş buluyoruz. Depoda <b>bir milyon cıvata</b> bekliyor. Kaydır, birinin nereye gidebileceğini gör.', c0_hint:'Kaydır',
+      c0_e:'Undustit · Vaka 01', c0_h:'Küçük fikirler,', c0_p:'Undustit, üretim fazlalarına ve sorunlara farklı bakan fikirleri ürün sahipleriyle buluşturur. İlk vaka: depoda bekleyen <b>bir milyon cıvata</b>. Kaydır, tek bir cıvatanın nereye gidebileceğini gör.', c0_hint:'Kaydır',
       c1_e:'Detay A · aşık bağlantısı', c1_h:'Bir cıvata, <em>bir bağlantı olur.</em>', c1_p:'Çelik aşık bayrağını ahşap aşığa bağlar. Cıvatanın kendi kesme dayanımı <b>22,3 kN</b>. Bağlantının dayanımını ise ahşap belirler.',
       c2_e:'Aks 3 · portal çerçeve', c2_h:'Bağlantılar <em>bir çerçeve kurar.</em>', c2_p:'24 m açıklıklı bir portal çerçevede 18 aşık var. Her biri iki cıvatayla tutuluyor. <b>Seninki turuncu noktada.</b>',
       c3_e:'Genel görünüş · 42 m depo', c3_h:'<em>büyük etkiler.</em>', c3_p:"Bu 42 m'lik depo yalnız aşık bağlantıları için <b>288 cıvata</b> ister. Bir milyon cıvata, böyle 3.472 çatı eder. Ve çatıda yine güneş panelleri var.",
@@ -617,17 +618,17 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       n_e:'Bir milyon küçük parça', n_l:'depo çatısına yetecek kadar cıvata. Hepsi şu an bir rafta bekliyor.',
       f1:'Takım (cıvata + flanşlı somun)', f1v:'1.000.000', f2:"Tek bir 42 m'lik depoda", f2v:'288 cıvata', f3:'Toplam çelik, yaklaşık', f3v:'80 ton', f4:'Taban fiyat, takım başına', f4v:'0,20 $',
       n_note:'Tahmini değerler. 6 m aks aralığı, 8 çerçeve, her aşık için 2 cıvata varsayıldı. Kütle, flanşlı cıvata ve somun takımı için yaklaşık 80 g alındı.',
-      s_e:'Nasıl işliyor', s_h:'Fikirden sahaya <em>üç adım.</em>',
-      s1h:'Fikrini yaz', s1p:'Bu cıvata hangi yapıda, hangi üründe çalışır? Pergole, korkuluk, raf sistemi ya da bambaşka bir şey. Bir cümle yeter.',
-      s2h:'İnsanlar "alırdım" der', s2p:'Fikri beğenen ne kadar ödeyeceğini yazar. Bu bir satın alma değil, talebi ölçer.',
-      s3h:'En çok isteneni sahaya çıkarırız', s3p:"En çok talep gören fikir 1.000 adetle denenir. Satarsa taban fiyatın üstündeki kârın %40'ı fikir sahibine gider.",
-      i_e:'Senin sıran', i_h:'Bu cıvata başka <em>nerede çalışır?</em>', i_p:'Bir bina, bir köprü korkuluğu, bir sahne iskelesi ya da kimsenin düşünmediği bir ürün. Fikrini yaz, beğenenler ne ödeyeceğini söylesin.',
+      s_e:'Nasıl işliyor', s_h:'Fazladan ortaklığa <em>üç adım.</em>',
+      s1h:'Fazla ya da sorun açılır', s1p:'Bir üretici elinde kalan stoğu ya da çözemediği bir sorunu paylaşır. Bu vakada: bir milyon M10 cıvata, takımı 0,20 $ taban fiyatla.',
+      s2h:'Farklı açılardan fikir gelir', s2p:'Herkes kendi gözüyle bakar: bir yapı elemanı, bir ürün, bambaşka bir pazar. Beğenenler "alırdım" der ve ne ödeyeceğini yazar; bu talebi ölçer.',
+      s3h:'Dikkat çeken fikir ortaklığa dönüşür', s3p:'Ürün sahibinin ilgisini çeken fikir 1.000 adetle denenir ve ortaklık kurulur. Satarsa taban fiyatın üstündeki kârın %40\'ı fikir sahibine gider.',
+      i_e:'Vaka 01 · senin sıran', i_h:'Bu cıvata başka <em>nerede çalışır?</em>', i_p:'Bir bina, bir köprü korkuluğu, bir sahne iskelesi ya da kimsenin düşünmediği bir ürün. Fikrini yaz, beğenenler ne ödeyeceğini söylesin.',
       f_label:'Fikrin', f_ph:'Bu cıvata … içinde kullanılabilir, çünkü …', f_help:'En az 8 karakter. Nerede kullanılacağını ve kimin alacağını yaz.',
       f_extra:'Detay ekle <span>(isteğe bağlı, kazananlar ayrıca pay alır)</span>',
       sl_name:'Ürünün adı', sl_name_ph:'Örn. Pergole Kiti', sl_look:'Görünüm / kaplama', sl_look_ph:'Örn. sıcak daldırma galvaniz', sl_pack:'Ambalaj', sl_pack_ph:"Örn. 20'li kutu", sl_chan:'Nerede satılır', sl_chan_ph:'Örn. yapı marketleri',
       f_handle:'Fikrin yanında görünecek isim', f_handle_ph:'Boş bırakırsan "İsimsiz" yazar', f_send:'Fikri gönder',
       b_h:'Gelen fikirler', sort_aria:'Sıralama', sort_top:'En çok istenen', sort_new:'En yeni',
-      m_e:'Açık hesap', m_h:'Satarsa <em>kim ne alır?</em>', m_p:'Önce 0,20 $ taban fiyat düşülür. Sonra ürünü dönüştürme masrafı, masrafı yapana geri ödenir. Kalan kâr tablodaki gibi bölünür.',
+      m_e:'Ortaklık modeli', m_h:'Ortaklık <em>nasıl paylaşılır?</em>', m_p:'Vaka 01 üzerinden örnek: önce ürün sahibinin 0,20 $ taban fiyatı düşülür. Sonra ürünü dönüştürme masrafı, masrafı yapana geri ödenir. Kalan kâr tablodaki gibi bölünür.',
       c_price:'Satış fiyatı ($)', c_mod:'Masraf ($/adet)', c_units:'Satılan adet', c_over:'Adet başına bölünen kâr',
       th_who:'Kim', th_bar:'Pay grafiği', th_share:'Pay', th_unit:'Adet başı', th_units:n=>n+' adette',
       t_e:'Mühendisler için', t_h:'Teknik <em>föy.</em>', t_p:"Değerler EN 1993-1-8 Tablo 3.4'e göre hesaplandı. Kendi projende kendi kontrolünü yap.",
@@ -640,8 +641,8 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       q_h:'Sık <em>sorulanlar.</em>', q1:'Para ödemem gerekiyor mu?', a1:'Hayır. Fikir göndermek de "alırdım" demek de ücretsiz.',
       q2:'"Alırdım" dersem satın almış olur muyum?', a2:'Hayır. Sadece talebi ölçer. Kimse bir şey almak zorunda değil.',
       q3:'Fikrimi kim görür?', a3:'Bu sayfayı açan herkes. Fikrin yanında yalnız senin yazdığın isim görünür.',
-      q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip. Fikirleri ve talebi gerçekten toplar ama henüz satış ya da ödeme yok.',
-      end_e:'Senin fikrin hangi cıvata?', end_h:'Küçük fikirler,<br><em>büyük etkiler.</em>', end_cta:'Fikrini gönder', foot_l:'Undustit · prototip', foot_link:'Kısa sürümü aç', foot_r:'Taban fiyat herkese açık · paylar sabit',
+      q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip ve şimdilik tek vaka var. Fikirleri ve talebi gerçekten toplar ama henüz satış ya da ödeme yok.',
+      end_e:'Her fazla bir başlangıç', end_h:'Küçük fikirler,<br><em>büyük etkiler.</em>', end_cta:'Fikrini gönder', foot_l:'Undustit · prototip', foot_link:'Kısa sürümü aç', foot_r:'Taban fiyat herkese açık · paylar sabit',
       starters:[['Yapıda kullanalım','Bu cıvata şu yapı elemanında çalışır: '],['Ürüne dönüştürelim','Bu cıvatadan şu ürün yapılır: '],['Bir sektöre satalım','Bu cıvatayı şu sektör alır: '],['Atölyede işleyelim','Kesip, büküp ya da kaynaklayıp şuna dönüştürürüz: ']],
       shares:[['Fikir sahibi','ana fikir'],['Ad önerisini kazanan','ürünün adı'],['Görünüm önerisini kazanan','renk, kaplama'],['Ambalaj önerisini kazanan','kutu, paket'],['Satış yeri önerisini kazanan','nerede, kime'],['Undustit','üretim, satış, sevkiyat']],
       slot_tags:{name:'ad',look:'görünüm',pack:'ambalaj',chan:'satış'},
@@ -659,7 +660,7 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       nav_aria:'Page', nav_money:'The split', nav_menu:'Menu', skip:'Skip to content', nav_story:'Story', nav_nums:'Numbers', nav_ideas:'Ideas', nav_spec:'Spec sheet', nav_cta:'Send your idea',
       story_aria:'The story of one bolt', rail_aria:'Stages', r0:'Bolt', r1:'Connection', r2:'Frame', r3:'Building',
       tb_sheet:'Sheet', tb_scale:'Scale', tb_by:'Drawn by', tb_you:'you',
-      c0_e:'Undustit · Case 01', c0_h:'Small ideas,', c0_p:'We find new jobs for stock nobody bought. <b>A million bolts</b> are waiting in a warehouse. Scroll to see where one of them could go.', c0_hint:'Scroll',
+      c0_e:'Undustit · Case 01', c0_h:'Small ideas,', c0_p:'Undustit connects ideas that see production surplus and problems differently with the people who own them. Case 01: <b>a million bolts</b> waiting in a warehouse. Scroll to see where just one of them could go.', c0_hint:'Scroll',
       c1_e:'Detail A · purlin connection', c1_h:'One bolt <em>becomes a connection.</em>', c1_p:'It ties a steel cleat to a timber purlin. The bolt alone resists <b>22.3 kN</b> in shear. The timber decides what the connection carries.',
       c2_e:'Grid 3 · portal frame', c2_h:'Connections <em>build a frame.</em>', c2_p:'A 24 m portal frame carries 18 purlins, each held by two bolts. <b>Yours is the orange dot.</b>',
       c3_e:'General view · 42 m warehouse', c3_h:'<em>big impact.</em>', c3_p:'This 42 m warehouse needs <b>288 bolts</b> for its purlin connections alone. A million bolts is enough for 3,472 roofs like it. And the roof still carries solar panels.',
@@ -669,17 +670,17 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       n_e:'A million small parts', n_l:'warehouse roofs worth of bolts. All of them waiting on a shelf right now.',
       f1:'Sets (bolt + flange nut)', f1v:'1,000,000', f2:'In one 42 m warehouse', f2v:'288 bolts', f3:'Total steel, roughly', f3v:'80 t', f4:'Floor price per set', f4v:'$0.20',
       n_note:'Estimates. Assumes 6 m bays, 8 frames and 2 bolts per purlin. Mass taken as about 80 g per flange bolt and nut set.',
-      s_e:'How it works', s_h:'From idea to site <em>in three steps.</em>',
-      s1h:'Write your idea', s1p:'Which structure or product could use this bolt? A pergola, a guardrail, a shelving system or something new. One sentence is enough.',
-      s2h:'People say "I’d buy"', s2p:'Anyone who likes it types what they would pay. It is not a purchase. It measures demand.',
-      s3h:'The top idea goes to site', s3p:'The most wanted idea gets a 1,000 unit test run. If it sells, the inventor gets 40% of the profit above the floor price.',
-      i_e:'Your turn', i_h:'Where else <em>could this bolt work?</em>', i_p:'A building, a bridge railing, stage scaffolding or a product nobody has thought of. Write your idea and let people say what they would pay.',
+      s_e:'How it works', s_h:'From surplus to partnership <em>in three steps.</em>',
+      s1h:'A surplus or a problem goes up', s1p:'A maker shares the stock it is stuck with or a problem it can’t crack. In this case: a million M10 bolts at a $0.20 floor price per set.',
+      s2h:'Ideas arrive from every angle', s2p:'Everyone looks with their own eyes: a structural part, a product, a whole other market. People who like an idea say "I’d buy" and name a price, which measures demand.',
+      s3h:'The idea that stands out becomes a partnership', s3p:'The idea that catches the owner’s interest gets a 1,000 unit test run and a partnership. If it sells, the inventor gets 40% of the profit above the floor price.',
+      i_e:'Case 01 · your turn', i_h:'Where else <em>could this bolt work?</em>', i_p:'A building, a bridge railing, stage scaffolding or a product nobody has thought of. Write your idea and let people say what they would pay.',
       f_label:'Your idea', f_ph:'This bolt could be used in … because …', f_help:'At least 8 characters. Say where it is used and who would buy it.',
       f_extra:'Add details <span>(optional, winners get an extra share)</span>',
       sl_name:'Product name', sl_name_ph:'e.g. Pergola Kit', sl_look:'Look / finish', sl_look_ph:'e.g. hot-dip galvanized', sl_pack:'Packaging', sl_pack_ph:'e.g. box of 20', sl_chan:'Where it sells', sl_chan_ph:'e.g. DIY stores',
       f_handle:'Name shown next to your idea', f_handle_ph:'Leave blank to show "Anonymous"', f_send:'Send idea',
       b_h:'Incoming ideas', sort_aria:'Sort', sort_top:'Most wanted', sort_new:'Newest',
-      m_e:'Open math', m_h:'If it sells, <em>who gets what?</em>', m_p:'First the $0.20 floor price comes off. Then the cost of changing the product goes back to whoever paid it. The profit left is split as the table shows.',
+      m_e:'Partnership model', m_h:'How the partnership <em>splits.</em>', m_p:'Case 01 as the example: first the owner’s $0.20 floor price comes off. Then the cost of changing the product goes back to whoever paid it. The profit left is split as the table shows.',
       c_price:'Sale price ($)', c_mod:'Cost ($/unit)', c_units:'Units sold', c_over:'Profit split per unit',
       th_who:'Who', th_bar:'Share chart', th_share:'Share', th_unit:'Per unit', th_units:n=>'For '+n+' units',
       t_e:'For engineers', t_h:'Spec <em>sheet.</em>', t_p:'Values follow EN 1993-1-8 Table 3.4. Run your own checks for your own project.',
@@ -692,8 +693,8 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       q_h:'Common <em>questions.</em>', q1:'Do I have to pay?', a1:'No. Sending ideas and saying "I’d buy" are both free.',
       q2:'If I say "I’d buy", did I buy it?', a2:'No. It only measures demand. Nobody has to buy anything.',
       q3:'Who can see my idea?', a3:'Everyone who opens this page. Only the name you typed shows next to it.',
-      q4:'Is this a real sale?', a4:'This page is a prototype. It really collects ideas and demand, but there are no sales or payments yet.',
-      end_e:'Which bolt is your idea?', end_h:'Small ideas,<br><em>big impact.</em>', end_cta:'Send your idea', foot_l:'Undustit · prototype', foot_link:'Open the short version', foot_r:'Floor price public · shares fixed',
+      q4:'Is this a real sale?', a4:'This page is a prototype with one case so far. It really collects ideas and demand, but there are no sales or payments yet.',
+      end_e:'Every surplus is a starting point', end_h:'Small ideas,<br><em>big impact.</em>', end_cta:'Send your idea', foot_l:'Undustit · prototype', foot_link:'Open the short version', foot_r:'Floor price public · shares fixed',
       starters:[['Use it in a structure','This bolt works in this structural part: '],['Turn it into a product','From this bolt we can make: '],['Sell it to an industry','This industry would buy it: '],['Rework it in a shop','Cut, bent or welded, it becomes: ']],
       shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['Undustit','making, selling, shipping']],
       slot_tags:{name:'name',look:'look',pack:'pack',chan:'sold at'},

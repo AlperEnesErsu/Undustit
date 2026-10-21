@@ -2,17 +2,17 @@
 <html lang="tr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Undustit · Bu cıvata ne olsun?</title>
-<meta name="description" content="Depoda bir milyon cıvata bekliyor. Onlara yeni bir iş bul: fikrin seçilip satarsa taban fiyatın üstündeki kârın %40'ı senin.">
+<title>Undustit · Fazlaya fikir, fikre ortak</title>
+<meta name="description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün. Vaka 01: depoda bekleyen bir milyon cıvata.">
 <meta name="theme-color" content="#0B0C0D">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Undustit">
 <meta property="og:locale" content="tr_TR">
-<meta property="og:title" content="Depoda 1 milyon cıvata bekliyor. Ne olsun?">
-<meta property="og:description" content="Depoda bir milyon cıvata bekliyor. Onlara yeni bir iş bul: fikrin seçilip satarsa taban fiyatın üstündeki kârın %40'ı senin.">
+<meta property="og:title" content="Birinin fazlası, birinin fikri. · Undustit">
+<meta property="og:description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün. Vaka 01: depoda bekleyen bir milyon cıvata.">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Depoda 1 milyon cıvata bekliyor. Ne olsun?">
-<meta name="twitter:description" content="Depoda bir milyon cıvata bekliyor. Onlara yeni bir iş bul: fikrin seçilip satarsa taban fiyatın üstündeki kârın %40'ı senin.">
+<meta name="twitter:title" content="Birinin fazlası, birinin fikri. · Undustit">
+<meta name="twitter:description" content="Üretim fazlalarına ve sorunlara yaratıcı çözüm fikirleri gelsin, ürün sahibinin dikkatini çeken fikir ortaklığa dönüşsün. Vaka 01: depoda bekleyen bir milyon cıvata.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230B0C0D%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23FF6A2B%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -214,7 +214,7 @@ tr.you td:first-child{color:var(--accent)}
 .faq b{font-size:17px;font-weight:500}
 .faq p{color:var(--ink-2);font-weight:300}
 
-footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:13px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding-block:20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
 footer a{color:var(--ink-2);text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-out)}
 footer a:hover{color:var(--accent)}
 
@@ -263,7 +263,8 @@ footer a:hover{color:var(--accent)}
 .lang button:not([aria-pressed="true"]):hover,.seg button:not([aria-pressed="true"]):hover,.sorts button:not([aria-pressed="true"]):hover{background:var(--bg-3);color:var(--ink)}
 .chip:hover,.starters button:hover{background:rgba(255,106,43,.12);border-color:var(--accent);color:var(--ink)}
 textarea:focus,input:focus{box-shadow:0 0 0 3px rgba(255,106,43,.28)}
-footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px}
+footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px;text-decoration-color:rgba(255,106,43,.5)}
+footer a:hover{text-decoration-color:var(--accent)}
 
 /* page change: the bar and logo stay put while the sheet underneath swaps */
 @view-transition{navigation:auto}
@@ -273,9 +274,25 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4
 
 /* sections are numbered like sheets of the drawing set on /kucuk-fikirler */
 main{counter-reset:pafta}
-.sec-head > .eyebrow::before{counter-increment:pafta;content:counter(pafta,decimal-leading-zero) " / 04 · ";color:var(--accent)}
+.sec-head > .eyebrow::before{counter-increment:pafta;content:counter(pafta,decimal-leading-zero) " / 05 · ";color:var(--accent)}
 .lang button[aria-pressed="true"]:hover,.seg button[aria-pressed="true"]:hover,.sorts button[aria-pressed="true"]:hover{background:#FFFFFF;color:var(--bg)}
 textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* platform framing: the open case labelled on the drawing, and the two sides of the deal */
+.case-h{display:grid;gap:4px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.case-h b{font-family:var(--f-serif);font-weight:400;font-size:clamp(22px,2vw,28px);line-height:1.1;letter-spacing:-.01em}
+.sides-grid{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:clamp(16px,2.4vw,32px);align-items:stretch;margin-top:56px}
+.side{display:grid;gap:18px;align-content:start;padding:clamp(22px,3vw,40px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2)}
+.side.hot{background:linear-gradient(160deg,rgba(255,106,43,.10),var(--bg-2) 55%);border-color:rgba(255,106,43,.35)}
+.side h3{font-family:var(--f-serif);font-weight:400;font-size:clamp(34px,3.6vw,52px);line-height:1;letter-spacing:-.02em}
+.side ul{list-style:none;margin:0;padding:0;display:grid}
+.side li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;align-items:start;padding-block:14px;border-top:1px solid var(--line);color:var(--ink-2);font-weight:300}
+.side li svg{width:18px;height:18px;margin-top:3px;color:var(--ok)}
+.side.hot li svg{color:var(--accent)}
+.side .btn{justify-self:start;margin-top:6px}
+.side-x{align-self:center;font-family:var(--f-serif);font-size:clamp(48px,5vw,80px);line-height:1;color:var(--muted)}
+.hero h1{max-width:13ch}
+@media (max-width:820px){.sides-grid{grid-template-columns:minmax(0,1fr)}.side-x{justify-self:center;font-size:40px}}
 </style>
 
 <a class="skip" href="#main" data-t="skip">İçeriğe geç</a>
@@ -314,6 +331,7 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
     </div>
 
     <figure class="drawing">
+      <div class="case-h"><span class="eyebrow" data-t="case_e">Vaka 01 · şu an açık</span><b data-t="case_t">Depoda bekleyen bir milyon cıvata</b></div>
       <svg viewBox="0 0 440 210" role="img" aria-labelledby="bolt-t">
         <title id="bolt-t" data-t="svg_title">Flanşlı cıvata ve somunun teknik çizimi: M10 diş, 90 mm boy</title>
         <rect class="fill stroke" x="40" y="62" width="26" height="66" rx="2" stroke-width="2"/>
@@ -358,17 +376,47 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       <h2 id="how-h" data-t="how_h">Nasıl işliyor?</h2>
     </div>
     <ol class="steps">
-      <li><b data-t="s1_b">Fikrini yaz</b><p data-t="s1_p">Bu cıvata ne olarak satılabilir? Anahtarlık mı, masa objesi mi, bir hobi grubu için parça mı? Bir cümle yeter.</p></li>
-      <li><b data-t="s2_b">İnsanlar "alırdım" der</b><p data-t="s2_p">Fikri beğenen, ne kadar ödeyeceğini yazar. Bunu yazmak kimseyi bir şey almak zorunda bırakmaz.</p></li>
-      <li><b data-t="s3_b">En çok isteneni deneriz</b><p data-t="s3_p">En çok talep gören fikir 1.000 adetle satışa çıkar. Satarsa, taban fiyatın üstündeki kârın %40'ı fikir sahibine gider.</p></li>
+      <li><b data-t="s1_b">Bir fazla ya da sorun açılır</b><p data-t="s1_p"></p></li>
+      <li><b data-t="s2_b">Farklı açılardan fikir gelir</b><p data-t="s2_p"></p></li>
+      <li><b data-t="s3_b">Talep fikri sınar</b><p data-t="s3_p"></p></li>
+      <li><b data-t="s4_b">Dikkat çeken fikir ortaklığa dönüşür</b><p data-t="s4_p"></p></li>
     </ol>
+  </section>
+
+  <section id="taraflar" class="sec ruled sides" aria-labelledby="sides-h">
+    <div class="sec-head">
+      <span class="eyebrow" data-t="sides_eyebrow">Kazan-kazan</span>
+      <h2 id="sides-h" data-th="sides_h">İki taraf da <em>kazanır.</em></h2>
+    </div>
+    <div class="sides-grid">
+      <article class="side">
+        <span class="eyebrow" data-t="own_e">Ürün sahibi için</span>
+        <h3 data-t="own_h">Fazlan mı var?</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="own_1"></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="own_2"></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="own_3"></span></li>
+        </ul>
+      </article>
+      <span class="side-x" aria-hidden="true">×</span>
+      <article class="side hot">
+        <span class="eyebrow" data-t="idea_e">Fikir sahibi için</span>
+        <h3 data-t="idea_h">Fikrin mi var?</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="idea_1"></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="idea_2"></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-t="idea_3"></span></li>
+        </ul>
+        <a class="btn sig" href="#fikir"><span data-t="cta_write">Vaka 01'e fikir yaz</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      </article>
+    </div>
   </section>
 
   <section id="fikir" class="sec ruled split" aria-labelledby="form-h">
     <div class="example">
       <div class="sec-head">
         <span class="eyebrow" data-t="form_eyebrow">Senin sıran</span>
-        <h2 id="form-h" data-t="form_h">Bu cıvata başka ne olabilir?</h2>
+        <h2 id="form-h" data-th="form_h">Bu cıvata başka ne olabilir?</h2>
         <p data-t="form_p">Nasıl bir fikir beklediğimizi görmek için örneğe bak. Kısa ve somut olsun, kime satılacağı belli olsun.</p>
       </div>
       <article class="card">
@@ -424,12 +472,12 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
     <div class="money-l">
       <div class="sec-head">
         <span class="eyebrow" data-t="money_eyebrow">Şeffaf hesap</span>
-        <h2 id="money-h" data-t="money_h">Satarsa kim ne kazanır?</h2>
+        <h2 id="money-h" data-th="money_h">Satarsa kim ne kazanır?</h2>
         <p data-t="money_p">Satış fiyatından önce 0,20 $ taban fiyat düşülür, sonra ürünü dönüştürme masrafı (boya, kutu gibi) masrafı yapana geri ödenir. Kalan kâr tabloya göre paylaşılır.</p>
       </div>
       <div class="calc">
-        <div class="fld"><label for="c-price" data-t="c_price">Satış fiyatı ($)</label><input type="number" id="c-price" inputmode="decimal" min="0" step="0.05" value="2.00"></div>
-        <div class="fld"><label for="c-mod" data-t="c_mod">Masraf ($/adet)</label><input type="number" id="c-mod" inputmode="decimal" min="0" step="0.05" value="0.50"></div>
+        <div class="fld"><label for="c-price" data-t="c_price">Satış fiyatı ($)</label><input type="number" id="c-price" inputmode="decimal" min="0" step="0.05" value="1.50"></div>
+        <div class="fld"><label for="c-mod" data-t="c_mod">Masraf ($/adet)</label><input type="number" id="c-mod" inputmode="decimal" min="0" step="0.05" value="0.30"></div>
         <div class="fld"><label for="c-units" data-t="c_units">Satılan adet</label><input type="number" id="c-units" inputmode="numeric" min="0" step="100" value="1000"></div>
       </div>
       <div class="over"><span class="eyebrow" data-t="c_over">Adet başına paylaşılan kâr</span><span class="big" id="r-over"></span></div>
@@ -449,6 +497,8 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       <div><b data-t="q2">"Alırdım" dersem satın almış olur muyum?</b><p data-t="a2">Hayır. Bu sadece talebi ölçmek için. Kimse bir şey almak zorunda değil.</p></div>
       <div><b data-t="q3">Fikrimi kim görür?</b><p data-t="a3">Bu sayfayı açan herkes. Fikrin yanında sadece senin yazdığın isim görünür.</p></div>
       <div><b data-t="q4">Bu gerçek bir satış mı?</b><p data-t="a4">Bu sayfa bir prototip. Fikirleri ve talebi gerçekten toplar, ama henüz satış ya da ödeme yapılmıyor.</p></div>
+      <div><b data-t="q5"></b><p data-t="a5"></p></div>
+      <div><b data-t="q6"></b><p data-t="a6"></p></div>
     </div>
   </section>
 
@@ -464,19 +514,19 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
     tr: {
       pill_open:'Vaka 01 · fikirlere açık', pill_proto:'Prototip',
       nav_aria:'Sayfa', nav_spec:'Teknik föy', nav_menu:'Menü', skip:'İçeriğe geç', nav_how:'Nasıl işliyor', nav_ideas:'Fikirler', nav_money:'Hesap', nav_story:'Hikâye', nav_cta:'Fikrini gönder', foot_link:'Hikâyenin uzun hâli',
-      hero_eyebrow:'Satılamayan stoklara yeni bir hayat',
-      hero_h:'Depoda 1 milyon cıvata bekliyor. <em>Ne olsun?</em>',
-      hero_lead:"Bu cıvatalar güneş paneli kurulumu için üretildi ama fazla geldi. Bunları başka ne olarak satabiliriz, fikrini yaz. Fikrin seçilip satarsa, taban fiyatın üstündeki kârın %40'ını sen alırsın.",
-      cta_write:'Fikrimi yazayım', cta_how:'Nasıl işliyor?',
+      hero_eyebrow:'Üretim fazlası × yaratıcı fikir',
+      hero_h:'Birinin fazlası, <em>birinin fikri.</em>',
+      hero_lead:'Undustit, satılamayan üretim fazlalarını ve çözülmemiş sorunları açığa çıkarır. Sen farklı bir açıdan bakıp çözüm fikrini yazarsın. Fikrin ürün sahibinin dikkatini çekerse ortaklık kurulur ve iki taraf da kazanır.',
+      cta_write:'Vaka 01\'e fikir yaz', cta_how:'Nasıl işliyor?',
       svg_title:'Flanşlı cıvata ve somunun teknik çizimi: M10 diş, 90 mm boy', svg_head:'flanşlı baş', svg_nut:'flanşlı somun', svg_steel:'8.8 sınıf çelik',
       spec_qty:'Adet', spec_qty_v:'1.000.000 takım', spec_floor:'Taban fiyat', spec_floor_v:'0,20 $ / takım', spec_test:'Deneme satışı', spec_test_v:'1.000 adet',
       spec_cap:'Bir takım = 1 cıvata + 1 somun. <b>Taban fiyat</b>, satıcının bir takım için kabul ettiği en düşük fiyattır.',
-      how_eyebrow:'Üç adımda', how_h:'Nasıl işliyor?',
-      s1_b:'Fikrini yaz', s1_p:'Bu cıvata ne olarak satılabilir? Anahtarlık mı, masa objesi mi, bir hobi grubu için parça mı? Bir cümle yeter.',
-      s2_b:'İnsanlar "alırdım" der', s2_p:'Fikri beğenen, ne kadar ödeyeceğini yazar. Bunu yazmak kimseyi bir şey almak zorunda bırakmaz.',
-      s3_b:'En çok isteneni deneriz', s3_p:"En çok talep gören fikir 1.000 adetle satışa çıkar. Satarsa, taban fiyatın üstündeki kârın %40'ı fikir sahibine gider.",
-      form_eyebrow:'Senin sıran', form_h:'Bu cıvata başka ne olabilir?',
-      form_p:'Nasıl bir fikir beklediğimizi görmek için örneğe bak. Kısa ve somut olsun, kime satılacağı belli olsun.',
+      how_eyebrow:'Dört adımda', how_h:'Nasıl işliyor?',
+      s1_b:'Bir fazla ya da sorun açılır', s1_p:'Bir üretici elinde kalan stoğu ya da çözemediği bir sorunu paylaşır: ne olduğunu, ne kadar olduğunu ve taban fiyatını.',
+      s2_b:'Farklı açılardan fikir gelir', s2_p:'Herkes kendi gözüyle bakar: başka bir ürün, başka bir pazar, başka bir kullanım. Bir cümle yeter.',
+      s3_b:'Talep fikri sınar', s3_p:'İnsanlar beğendikleri fikre "alırdım" der ve ne ödeyeceğini yazar. Bu kimseyi bir şey almak zorunda bırakmaz.',
+      form_eyebrow:'Vaka 01 · senin sıran', form_h:'Bir milyon cıvata. <em>Sen ne görüyorsun?</em>',
+      form_p:'İlk vakamız: güneş paneli kurulumu için üretilip fazla gelen bir milyon cıvata. Kısa ve somut yaz: ne olur, kime satılır?',
       ex_tag:'ÖRNEK', ex_name:'ad: Somunluk', ex_chan:'satış: hediyelik eşya',
       ex_text:'Cıvatayı somunla birlikte pirinç renge boyayıp ağır bir kitap ayracı yapalım. Kitapçılarda kasa önünde satılır.',
       ex_demand:'<strong>24 kişi</strong> alırdım dedi · ortalama <strong>3,00 $</strong>',
@@ -486,18 +536,19 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       sl_name:'Ürünün adı', sl_name_ph:'Örn. Somunluk', sl_look:'Görünüm / renk', sl_look_ph:'Örn. mat siyah',
       sl_pack:'Ambalaj', sl_pack_ph:'Örn. kraft kutu', sl_chan:'Nerede satılır', sl_chan_ph:'Örn. hobi mağazaları',
       f_handle:'Fikrin yanında görünecek isim', f_handle_ph:'Boş bırakırsan "İsimsiz" yazar', f_send:'Fikri gönder',
-      list_eyebrow:'Gelen fikirler', list_h:'Fikirler',
-      list_p:'Beğendiğin fikre ne kadar ödeyeceğini yaz ve "Alırdım"a bas. En çok istenen fikir deneme satışına çıkar.',
+      list_eyebrow:'Vaka 01 · gelen fikirler', list_h:'Fikirler',
+      list_p:'Beğendiğin fikre ne kadar ödeyeceğini yaz ve "Alırdım"a bas. En çok istenen fikir ürün sahibinin önüne gider.',
       sort_aria:'Sıralama', sort_top:'En çok istenen', sort_new:'En yeni',
-      money_eyebrow:'Şeffaf hesap', money_h:'Satarsa kim ne kazanır?',
-      money_p:'Satış fiyatından önce 0,20 $ taban fiyat düşülür, sonra ürünü dönüştürme masrafı (boya, kutu gibi) masrafı yapana geri ödenir. Kalan kâr tabloya göre paylaşılır.',
+      money_eyebrow:'Ortaklık modeli', money_h:'Ortaklık nasıl <em>paylaşılır?</em>',
+      money_p:'Vaka 01 üzerinden örnek: satış fiyatından önce ürün sahibinin 0,20 $ taban fiyatı düşülür, sonra dönüştürme masrafı (boya, kutu gibi) masrafı yapana geri ödenir. Kalan kâr tabloya göre paylaşılır.',
       c_price:'Satış fiyatı ($)', c_mod:'Masraf ($/adet)', c_units:'Satılan adet', c_over:'Adet başına paylaşılan kâr',
       th_who:'Kim', th_share:'Pay', th_unit:'Adet başı', th_units: n => n+' adette',
       faq_h:'Sık sorulanlar',
       q1:'Para ödemem gerekiyor mu?', a1:'Hayır. Fikir göndermek de "alırdım" demek de ücretsiz.',
       q2:'"Alırdım" dersem satın almış olur muyum?', a2:'Hayır. Bu sadece talebi ölçmek için. Kimse bir şey almak zorunda değil.',
       q3:'Fikrimi kim görür?', a3:'Bu sayfayı açan herkes. Fikrin yanında sadece senin yazdığın isim görünür.',
-      q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip. Fikirleri ve talebi gerçekten toplar, ama henüz satış ya da ödeme yapılmıyor.',
+      q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip ve şimdilik tek vaka var. Fikirleri ve talebi gerçekten toplar, ama henüz satış ya da ödeme yapılmıyor.',
+      s4_b:'Dikkat çeken fikir ortaklığa dönüşür', s4_p:'Ürün sahibinin ilgisini çeken fikir için ortaklık kurulur. Fazla gelire döner, fikir sahibi taban fiyatın üstündeki kârın %40\'ını alır.', case_e:'Vaka 01 · şu an açık', case_t:'Depoda bekleyen bir milyon cıvata', sides_eyebrow:'Kazan-kazan', sides_h:'İki taraf da <em>kazanır.</em>', own_e:'Ürün sahibi için', own_h:'Fazlan mı var?', own_1:'Depoda bekleyen stok, yeni bir ürün olarak gelire döner.', own_2:'Fikir sana talebi ve fiyatı önceden görünmüş olarak gelir.', own_3:'Taban fiyatın her satışta önce sana ödenir.', idea_e:'Fikir sahibi için', idea_h:'Fikrin mi var?', idea_1:'Üretim ya da sermaye gerekmez, iyi bir fikir yeter.', idea_2:'Fikrin satarsa taban fiyatın üstündeki kârın %40\'ı senin.', idea_3:'Ad, görünüm, ambalaj ve satış yeri önerileri de ayrıca pay alır.', q5:'Neden bir cıvatayla başladınız?', a5:'Çünkü küçük ve sıradan. Bir cıvataya bile farklı bakılabiliyorsa, her fazlaya bakılabilir.', q6:'Ürün sahibi fikrimi seçerse ne olur?', a6:'Ortaklık kurulur ve paylar sabittir: taban fiyatın üstündeki kârın %40\'ı fikir sahibinin.',
       foot_l:'Undustit · prototip', foot_r:'Taban fiyat herkese açık · paylar sabit',
       // dynamic
       starters:[['Hediye olsun','Bu cıvata şöyle bir hediye olabilir: '],['Masada dursun','Masada bu cıvata şuna dönüşebilir: '],['Bir topluluğa satalım','Bu cıvatayı şu insanlar alır: '],['Sanat olsun','Kaynakla ya da üst üste dizerek şu yapılabilir: ']],
@@ -517,19 +568,19 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
     en: {
       pill_open:'Case 01 · open for ideas', pill_proto:'Prototype',
       nav_aria:'Page', nav_spec:'Spec sheet', nav_menu:'Menu', skip:'Skip to content', nav_how:'How it works', nav_ideas:'Ideas', nav_money:'The split', nav_story:'Story', nav_cta:'Send your idea', foot_link:'The long version',
-      hero_eyebrow:'Unsold stock, second shot',
-      hero_h:'A million bolts are waiting. <em>What should they be?</em>',
-      hero_lead:'They were made for solar panels, but too many were made. Find them a new use, and if it sells, you get paid: 40% of the profit above the floor price.',
-      cta_write:'Pitch my idea', cta_how:'How does it work?',
+      hero_eyebrow:'Surplus × creative ideas',
+      hero_h:'One side’s surplus, <em>another’s idea.</em>',
+      hero_lead:'Undustit brings unsold production surplus and unsolved problems into the open. You look at them from a different angle and pitch a fix. If your idea catches the owner’s eye, a partnership forms and both sides win.',
+      cta_write:'Pitch an idea for Case 01', cta_how:'How does it work?',
       svg_title:'Technical drawing of a flange bolt and nut: M10 thread, 90 mm long', svg_head:'flange head', svg_nut:'flange nut', svg_steel:'grade 8.8 steel',
       spec_qty:'Quantity', spec_qty_v:'1,000,000 sets', spec_floor:'Floor price', spec_floor_v:'$0.20 / set', spec_test:'Test run', spec_test_v:'1,000 units',
       spec_cap:'One set = 1 bolt + 1 nut. The <b>floor price</b> is the lowest price the seller takes for one set.',
-      how_eyebrow:'Three steps, that’s all', how_h:'How it works',
-      s1_b:'Write it', s1_p:'A keyring, a desk toy, a part for a hobby crew? What could this bolt turn into? One line will do.',
-      s2_b:'People say “I’d buy”', s2_p:'Like an idea? Name your price. It’s free to say, and no one has to pay.',
-      s3_b:'The top idea gets a try', s3_p:'The most wanted idea goes on sale with 1,000 units. If it sells, the inventor gets 40% of the profit above the floor.',
-      form_eyebrow:'Your turn', form_h:'What else could this bolt be?',
-      form_p:'Keep it short, keep it clear: say what it is and who would buy it. The example shows the kind of idea we mean here.',
+      how_eyebrow:'Four steps', how_h:'How it works',
+      s1_b:'A surplus or a problem goes up', s1_p:'A maker shares the stock it is stuck with or a problem it can’t crack: what it is, how much, and the floor price.',
+      s2_b:'Ideas arrive from every angle', s2_p:'Everyone looks with their own eyes: another product, another market, another use. One line will do.',
+      s3_b:'Demand tests the idea', s3_p:'People say “I’d buy” to ideas they like and name their price. Nobody has to buy anything.',
+      form_eyebrow:'Case 01 · your turn', form_h:'A million bolts. <em>What do you see?</em>',
+      form_p:'Our first case: a million bolts made for solar panel mounts, more than were needed. Keep it short and concrete: what it becomes, who buys it.',
       ex_tag:'EXAMPLE', ex_name:'name: Nutmark', ex_chan:'sold at: gift shops',
       ex_text:'Paint the bolt and nut brass and sell it as a heavy bookmark at bookshop checkouts.',
       ex_demand:'<strong>24 people</strong> said “I’d buy” · avg <strong>$3.00</strong>',
@@ -539,18 +590,19 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       sl_name:'Product name', sl_name_ph:'e.g. Nutmark', sl_look:'Look / color', sl_look_ph:'e.g. matte black',
       sl_pack:'Packaging', sl_pack_ph:'e.g. kraft box', sl_chan:'Where it sells', sl_chan_ph:'e.g. hobby stores',
       f_handle:'Name shown next to your idea', f_handle_ph:'Leave it blank to show "Anonymous"', f_send:'Send idea',
-      list_eyebrow:'Incoming ideas', list_h:'Ideas',
-      list_p:'See one you like? Type your price and press “I’d buy”. The most wanted idea gets a try.',
+      list_eyebrow:'Case 01 · incoming ideas', list_h:'Ideas',
+      list_p:'See one you like? Type your price and press “I’d buy”. The most wanted idea goes to the owner.',
       sort_aria:'Sort', sort_top:'Most wanted', sort_new:'Newest',
-      money_eyebrow:'Open math', money_h:'If it sells, who gets what?',
-      money_p:'First the $0.20 floor price comes off. Then the cost of changing the product (paint, a box) goes back to whoever paid it. The profit left over is split as shown.',
+      money_eyebrow:'Partnership model', money_h:'How the partnership <em>splits.</em>',
+      money_p:'Case 01 as the example: first the owner’s $0.20 floor price comes off the sale price. Then the cost of changing the product (paint, a box) goes back to whoever paid it. The profit left over is split as shown.',
       c_price:'Sale price ($)', c_mod:'Cost ($/unit)', c_units:'Units sold', c_over:'Profit shared per unit',
       th_who:'Who', th_share:'Share', th_unit:'Per unit', th_units: n => 'For '+n+' units',
       faq_h:'Questions',
       q1:'Do I have to pay?', a1:'No. Sending ideas and saying “I’d buy” are both free.',
       q2:'If I say “I’d buy”, did I buy it?', a2:'No. It only measures demand. Nobody has to buy anything.',
       q3:'Who can see my idea?', a3:'Everyone who opens this page. Only the name you typed shows next to it.',
-      q4:'Is this a real sale?', a4:'This page is a prototype. It really collects ideas and demand, but no sales or payments happen yet.',
+      q4:'Is this a real sale?', a4:'This page is a prototype with one case so far. It really collects ideas and demand, but no sales or payments happen yet.',
+      s4_b:'The idea that stands out becomes a partnership', s4_p:'When an idea catches the owner’s interest, a partnership forms. The surplus turns into revenue and the inventor gets 40% of the profit above the floor price.', case_e:'Case 01 · open now', case_t:'A million bolts waiting in a warehouse', sides_eyebrow:'Win-win', sides_h:'Both sides <em>win.</em>', own_e:'For the owner', own_h:'Stuck with surplus?', own_1:'Stock sitting in a warehouse turns into revenue as a new product.', own_2:'Ideas reach you with demand and price already visible.', own_3:'Your floor price is paid to you first on every sale.', idea_e:'For the inventor', idea_h:'Got an idea?', idea_1:'No factory, no capital. A good idea is enough.', idea_2:'If your idea sells, 40% of the profit above the floor price is yours.', idea_3:'Name, look, packaging and channel suggestions get their own share too.', q5:'Why start with a bolt?', a5:'Because it is small and ordinary. If people can see something new in a bolt, they can in any surplus.', q6:'What if the owner picks my idea?', a6:'A partnership forms and the shares are fixed: 40% of the profit above the floor price goes to the inventor.',
       foot_l:'Undustit · prototype', foot_r:'Floor price public · shares fixed',
       starters:[['Make it a gift','It could be a gift for: '],['Put it on a desk','On a desk, this bolt could be: '],['Sell it to a crowd','These people would buy it: '],['Make it art','Welded or stacked, it could become: ']],
       shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['Undustit','making, selling, shipping']],

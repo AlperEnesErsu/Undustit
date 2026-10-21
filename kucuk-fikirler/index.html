@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Küçük Fikirler Büyük Etkiler</title>
+<title>Undustit · Küçük Fikirler</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
@@ -56,7 +56,9 @@ button{cursor:pointer}
 
 /* ---------- nav */
 .nav{position:fixed;inset:0 0 auto 0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 16px) var(--gut) 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.nav::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(var(--bg) 20%,rgba(11,12,13,0));pointer-events:none}
+.nav::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(var(--bg) 20%,rgba(11,12,13,0));pointer-events:none;transition:background-color var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
+/* past the pinned story the bar gets a solid surface so headings and tables never run under it */
+.nav.solid::before{background:rgba(11,12,13,.86);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;align-items:baseline;text-decoration:none}
 .brand b{font-family:var(--f-serif);font-weight:400;font-size:25px;letter-spacing:-.01em;line-height:1}
 .brand b i{color:var(--accent)}
@@ -77,8 +79,9 @@ button{cursor:pointer}
 .cam{position:absolute;inset:0;width:100%;height:100%;display:block}
 .stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--bg) 0%,rgba(11,12,13,.92) 30%,rgba(11,12,13,0) 52%),linear-gradient(0deg,var(--bg) 0%,rgba(11,12,13,0) 24%)}
 .caps{position:absolute;z-index:2;left:var(--gut);bottom:clamp(88px,15vh,150px);width:min(620px,calc(100% - 2*var(--gut)))}
-.cap{position:absolute;left:0;bottom:0;width:100%;display:grid;gap:18px;opacity:0;transform:translateY(10px);transition:opacity var(--dur-mod) var(--ease-out),transform var(--dur-mod) var(--ease-out);pointer-events:none}
-.cap.on{opacity:1;transform:none}
+/* captions share one spot: the old one leaves fast, the new one waits for it, so two texts never overlap */
+.cap{position:absolute;left:0;bottom:0;width:100%;display:grid;gap:18px;opacity:0;transform:translateY(-6px);transition:opacity var(--dur-fast) var(--ease-in),transform var(--dur-fast) var(--ease-in);pointer-events:none}
+.cap.on{opacity:1;transform:none;transition:opacity var(--dur-mod) var(--ease-out) var(--dur-fast),transform var(--dur-mod) var(--ease-out) var(--dur-fast)}
 .cap h2{font-size:clamp(40px,5vw,72px)}
 .cap h2 em{color:var(--ink-2)}
 .cap .xl{font-size:clamp(56px,10.5vw,160px);line-height:.92;letter-spacing:-.03em}
@@ -286,6 +289,8 @@ dl.sheet dd.k{color:var(--accent)}
 .end h2{font-size:clamp(56px,10vw,168px);line-height:.9;letter-spacing:-.03em}
 .end h2 em{color:var(--accent)}
 footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:13px;color:var(--muted)}
+footer a{color:var(--ink-2);text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-out)}
+footer a:hover{color:var(--accent)}
 
 @media (max-width:1040px){ .nav-links{display:none} }
 @media (max-width:960px){
@@ -316,7 +321,7 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs id="defs"></defs></svg>
 
 <header class="nav">
-  <a class="brand" href="#top"><b>İkinci <i>Tur</i></b></a>
+  <a class="brand" href="#top"><b>Undust<i>it</i></b></a>
   <div class="nav-r">
     <nav class="nav-links" data-ta="nav_aria" aria-label="Sayfa">
       <a href="#hikaye" data-t="nav_story">Hikâye</a>
@@ -341,7 +346,7 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
 
       <div class="caps">
         <div class="cap on" data-i="0">
-          <span class="eyebrow" data-t="c0_e">İkinci Tur · Vaka 01</span>
+          <span class="eyebrow" data-t="c0_e">Undustit · Vaka 01</span>
           <h1 class="xl" data-th="c0_h">Küçük fikirler,</h1>
           <p data-th="c0_p">Satılmayan stoklara yeni bir iş buluyoruz. Depoda <b>bir milyon cıvata</b> bekliyor. Kaydır, birinin nereye gidebileceğini gör.</p>
           <span class="hint"><i aria-hidden="true"></i><span data-t="c0_hint">Kaydır</span></span>
@@ -531,7 +536,7 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
       <a class="btn primary" href="#fikir"><span data-t="end_cta">Fikrini gönder</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
     </div>
   </section>
-  <div class="wrap"><footer><span data-t="foot_l">İkinci Tur · prototip</span><span data-t="foot_r">Taban fiyat herkese açık · paylar sabit</span></footer></div>
+  <div class="wrap"><footer><span data-t="foot_l">Undustit · prototip</span><a href="../" data-t="foot_link">Kısa sürümü aç</a><span data-t="foot_r">Taban fiyat herkese açık · paylar sabit</span></footer></div>
 </main>
 
 <script>
@@ -545,7 +550,7 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
       nav_aria:'Sayfa', nav_story:'Hikâye', nav_nums:'Rakamlar', nav_ideas:'Fikirler', nav_spec:'Teknik föy', nav_cta:'Fikrini gönder',
       story_aria:'Bir cıvatanın hikâyesi', rail_aria:'Aşamalar', r0:'Cıvata', r1:'Bağlantı', r2:'Çerçeve', r3:'Yapı',
       tb_sheet:'Pafta', tb_scale:'Ölçek', tb_by:'Çizen', tb_you:'sen',
-      c0_e:'İkinci Tur · Vaka 01', c0_h:'Küçük fikirler,', c0_p:'Satılmayan stoklara yeni bir iş buluyoruz. Depoda <b>bir milyon cıvata</b> bekliyor. Kaydır, birinin nereye gidebileceğini gör.', c0_hint:'Kaydır',
+      c0_e:'Undustit · Vaka 01', c0_h:'Küçük fikirler,', c0_p:'Satılmayan stoklara yeni bir iş buluyoruz. Depoda <b>bir milyon cıvata</b> bekliyor. Kaydır, birinin nereye gidebileceğini gör.', c0_hint:'Kaydır',
       c1_e:'Detay A · aşık bağlantısı', c1_h:'Bir cıvata, <em>bir bağlantı olur.</em>', c1_p:'Çelik aşık bayrağını ahşap aşığa bağlar. Cıvatanın kendi kesme dayanımı <b>22,3 kN</b>. Bağlantının dayanımını ise ahşap belirler.',
       c2_e:'Aks 3 · portal çerçeve', c2_h:'Bağlantılar <em>bir çerçeve kurar.</em>', c2_p:'24 m açıklıklı bir portal çerçevede 18 aşık var. Her biri iki cıvatayla tutuluyor. <b>Seninki turuncu noktada.</b>',
       c3_e:'Genel görünüş · 42 m depo', c3_h:'<em>büyük etkiler.</em>', c3_p:"Bu 42 m'lik depo yalnız aşık bağlantıları için <b>288 cıvata</b> ister. Bir milyon cıvata, böyle 3.472 çatı eder. Ve çatıda yine güneş panelleri var.",
@@ -579,9 +584,9 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
       q2:'"Alırdım" dersem satın almış olur muyum?', a2:'Hayır. Sadece talebi ölçer. Kimse bir şey almak zorunda değil.',
       q3:'Fikrimi kim görür?', a3:'Bu sayfayı açan herkes. Fikrin yanında yalnız senin yazdığın isim görünür.',
       q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip. Fikirleri ve talebi gerçekten toplar ama henüz satış ya da ödeme yok.',
-      end_e:'Senin fikrin hangi cıvata?', end_h:'Küçük fikirler,<br><em>büyük etkiler.</em>', end_cta:'Fikrini gönder', foot_l:'İkinci Tur · prototip', foot_r:'Taban fiyat herkese açık · paylar sabit',
+      end_e:'Senin fikrin hangi cıvata?', end_h:'Küçük fikirler,<br><em>büyük etkiler.</em>', end_cta:'Fikrini gönder', foot_l:'Undustit · prototip', foot_link:'Kısa sürümü aç', foot_r:'Taban fiyat herkese açık · paylar sabit',
       starters:[['Yapıda kullanalım','Bu cıvata şu yapı elemanında çalışır: '],['Ürüne dönüştürelim','Bu cıvatadan şu ürün yapılır: '],['Bir sektöre satalım','Bu cıvatayı şu sektör alır: '],['Atölyede işleyelim','Kesip, büküp ya da kaynaklayıp şuna dönüştürürüz: ']],
-      shares:[['Fikir sahibi','ana fikir'],['Ad önerisini kazanan','ürünün adı'],['Görünüm önerisini kazanan','renk, kaplama'],['Ambalaj önerisini kazanan','kutu, paket'],['Satış yeri önerisini kazanan','nerede, kime'],['İkinci Tur','üretim, satış, sevkiyat']],
+      shares:[['Fikir sahibi','ana fikir'],['Ad önerisini kazanan','ürünün adı'],['Görünüm önerisini kazanan','renk, kaplama'],['Ambalaj önerisini kazanan','kutu, paket'],['Satış yeri önerisini kazanan','nerede, kime'],['Undustit','üretim, satış, sevkiyat']],
       slot_tags:{name:'ad',look:'görünüm',pack:'ambalaj',chan:'satış'},
       ex_label:'Örnek fikir. Gerçek fikirler geldikçe yerini alır.', ex_tag:'ÖRNEK', ex_text:'Ahşap pergole ve sundurmalarda kiriş ile dikmeyi bağlayan kit. 90 mm boy, iki adet 45 mm kalasta tam yetiyor.', ex_chan:'satış: yapı marketleri',
       ex_demand:'<strong>31 kişi</strong> alırdım dedi · ortalama <strong>0,85 $</strong>',
@@ -597,7 +602,7 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
       nav_aria:'Page', nav_story:'Story', nav_nums:'Numbers', nav_ideas:'Ideas', nav_spec:'Spec sheet', nav_cta:'Send your idea',
       story_aria:'The story of one bolt', rail_aria:'Stages', r0:'Bolt', r1:'Connection', r2:'Frame', r3:'Building',
       tb_sheet:'Sheet', tb_scale:'Scale', tb_by:'Drawn by', tb_you:'you',
-      c0_e:'İkinci Tur · Case 01', c0_h:'Small ideas,', c0_p:'We find new jobs for stock nobody bought. <b>A million bolts</b> are waiting in a warehouse. Scroll to see where one of them could go.', c0_hint:'Scroll',
+      c0_e:'Undustit · Case 01', c0_h:'Small ideas,', c0_p:'We find new jobs for stock nobody bought. <b>A million bolts</b> are waiting in a warehouse. Scroll to see where one of them could go.', c0_hint:'Scroll',
       c1_e:'Detail A · purlin connection', c1_h:'One bolt <em>becomes a connection.</em>', c1_p:'It ties a steel cleat to a timber purlin. The bolt alone resists <b>22.3 kN</b> in shear. The timber decides what the connection carries.',
       c2_e:'Grid 3 · portal frame', c2_h:'Connections <em>build a frame.</em>', c2_p:'A 24 m portal frame carries 18 purlins, each held by two bolts. <b>Yours is the orange dot.</b>',
       c3_e:'General view · 42 m warehouse', c3_h:'<em>big impact.</em>', c3_p:'This 42 m warehouse needs <b>288 bolts</b> for its purlin connections alone. A million bolts is enough for 3,472 roofs like it. And the roof still carries solar panels.',
@@ -631,9 +636,9 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
       q2:'If I say "I’d buy", did I buy it?', a2:'No. It only measures demand. Nobody has to buy anything.',
       q3:'Who can see my idea?', a3:'Everyone who opens this page. Only the name you typed shows next to it.',
       q4:'Is this a real sale?', a4:'This page is a prototype. It really collects ideas and demand, but there are no sales or payments yet.',
-      end_e:'Which bolt is your idea?', end_h:'Small ideas,<br><em>big impact.</em>', end_cta:'Send your idea', foot_l:'İkinci Tur · prototype', foot_r:'Floor price public · shares fixed',
+      end_e:'Which bolt is your idea?', end_h:'Small ideas,<br><em>big impact.</em>', end_cta:'Send your idea', foot_l:'Undustit · prototype', foot_link:'Open the short version', foot_r:'Floor price public · shares fixed',
       starters:[['Use it in a structure','This bolt works in this structural part: '],['Turn it into a product','From this bolt we can make: '],['Sell it to an industry','This industry would buy it: '],['Rework it in a shop','Cut, bent or welded, it becomes: ']],
-      shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['İkinci Tur','making, selling, shipping']],
+      shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['Undustit','making, selling, shipping']],
       slot_tags:{name:'name',look:'look',pack:'pack',chan:'sold at'},
       ex_label:'Example idea. Real ideas take its place as they come in.', ex_tag:'EXAMPLE', ex_text:'A kit that joins beam to post in timber pergolas and porches. At 90 mm, it fits two 45 mm boards exactly.', ex_chan:'sold at: DIY stores',
       ex_demand:'<strong>31 people</strong> said "I’d buy" · avg <strong>$0.85</strong>',
@@ -899,6 +904,10 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
     }
   }
   const onScroll = () => { if (!ticking){ ticking = true; requestAnimationFrame(frame); } };
+  // nav: see-through over the pinned drawing, solid once the page content scrolls under it
+  const nav = document.querySelector('.nav');
+  const paintNav = () => nav.classList.toggle('solid', reduce.matches ? window.scrollY > 8 : story.getBoundingClientRect().bottom < nav.offsetHeight + 8);
+  window.addEventListener('scroll', paintNav, { passive:true }); window.addEventListener('resize', paintNav);
 
   function buildStatic(){
     const lod1 = lodAt(.44); lod1['--ins'] = 1; lod1['--nut'] = 1; lod1['--a1'] = 1;

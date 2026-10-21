@@ -1,194 +1,257 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>İkinci Tur</title>
+<title>Undustit · Bu cıvata ne olsun?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a technical spec sheet. The product drawing sits beside the headline, then a strict top-to-bottom story: what it is, how it works, an example, then the idea form and the live list. */
+/* Layout: the short version of the Undustit case, on the same atelier theme as /kucuk-fikirler.
+   Asymmetric hero with the bolt drawing, offset step index, example + form split, idea board,
+   ledger, two-column questions. Tokens below are shared 1:1 with /kucuk-fikirler (see DESIGN.md). */
 :root{
-  --steel:#EEF0F1; --sheet:#FFFFFF; --ink:#16191C; --muted:#5C646B; --line:#CDD2D6; --soft:#E3E6E8;
-  --signal:#E8590C; --signal-ink:#FFFFFF; --signal-soft:#FDE8DC; --ok:#2F7A4F;
-  --f-display:"Archivo", "Arial Narrow", Impact, sans-serif;
-  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:dark;
+  --bg:#0B0C0D; --bg-2:#111315; --bg-3:#171A1C; --line:#22262A; --line-2:#30353A;
+  --ink:#EEECE7; --ink-2:#BFBDB6; --muted:#8F928E;
+  --accent:#FF6A2B; --accent-hover:#FF8550; --accent-active:#E85A1E; --accent-ink:#170A04;
+  --sky:#7FA3BD;
+  --ok:#86D4A6;
+  --f-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --f-body:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
+  --dur-fast:100ms; --dur-base:200ms; --dur-mod:300ms; --dur-slow:500ms;
+  --ease-out:cubic-bezier(0,0,.2,1); --ease-in:cubic-bezier(.4,0,1,1); --ease-io:cubic-bezier(.4,0,.2,1);
+  --r-sm:6px; --r-md:12px; --r-lg:20px;
+  --gut:clamp(16px,4vw,56px);
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --steel:#111417; --sheet:#1A1E22; --ink:#E8EBED; --muted:#9AA3AA; --line:#2E343A; --soft:#242A2F;
-  --signal:#FF7A33; --signal-ink:#140B05; --signal-soft:#3A2214; --ok:#6FCB95; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --steel:#111417; --sheet:#1A1E22; --ink:#E8EBED; --muted:#9AA3AA; --line:#2E343A; --soft:#242A2F;
-  --signal:#FF7A33; --signal-ink:#140B05; --signal-soft:#3A2214; --ok:#6FCB95; color-scheme:dark}
-
 *{box-sizing:border-box}
-body{background:var(--steel);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-inline:16px}
-.wrap{max-width:1040px;margin:0 auto;padding-block:16px 56px;display:grid;gap:56px}
-h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.02}
+html{background:var(--bg);scroll-padding-top:88px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-weight:400;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-family:var(--f-serif);font-weight:400;line-height:1;letter-spacing:-.02em;text-wrap:balance}
+h3{font-family:var(--f-body);font-weight:500;letter-spacing:-.01em;line-height:1.25}
+em{font-style:italic}
 p{margin:0}
+a{color:inherit}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
-:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
-.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.lead{color:var(--muted);font-size:18px;max-width:52ch}
-.sec-head{display:grid;gap:8px;max-width:62ch}
-.sec-head h2{font-size:clamp(28px,4.4vw,40px);font-weight:800;font-stretch:112%}
-.sec-head p{color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:var(--gut)}
+.sec{padding-block:clamp(88px,11vw,152px)}
+.sec.ruled{border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:18px;max-width:min(100%,760px)}
+.sec-head h2{font-size:clamp(44px,6vw,88px)}
+.sec-head h2 em{color:var(--ink-2)}
+.sec-head p{color:var(--ink-2);max-width:54ch;font-size:18px;font-weight:300}
 
-/* top bar */
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px}
-.brand{font-family:var(--f-display);font-weight:900;font-stretch:125%;font-size:20px;letter-spacing:-.01em}
-.brand b{color:var(--signal)}
-.top-r{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.pill{font-family:var(--f-mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted);background:var(--sheet)}
-.pill.on{border-color:var(--ok);color:var(--ok)}
-.lang{display:inline-flex;border:1px solid var(--ink);border-radius:999px;padding:2px;background:var(--sheet)}
-.lang button{border:0;background:transparent;border-radius:999px;padding:3px 11px;font-family:var(--f-mono);font-size:12.5px;font-weight:600;color:var(--muted)}
-.lang button[aria-pressed="true"]{background:var(--ink);color:var(--steel)}
+/* ---------- buttons: default / hover / focus / active / disabled */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 22px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;letter-spacing:-.005em;text-decoration:none;transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.btn svg{width:18px;height:18px;transition:transform var(--dur-base) var(--ease-out)}
+.btn:hover{background:#FFFFFF;border-color:#FFFFFF}
+.btn:hover svg{transform:translateX(3px)}
+.btn:active{transform:scale(.97)}
+.btn.sig{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.sig:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.sig:active{background:var(--accent-active);border-color:var(--accent-active)}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn.alt:hover{border-color:var(--ink-2);background:var(--bg-3)}
+.btn.sm{min-height:38px;padding:0 16px;font-size:14px}
+.btn:disabled{opacity:.5;pointer-events:none}
 
-/* hero */
-.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:32px;align-items:center}
-.hero-txt{display:grid;gap:18px;min-width:0}
-.hero h1{font-size:clamp(40px,6.6vw,72px);font-weight:900;font-stretch:118%;letter-spacing:-.02em}
-.hero h1 em{font-style:normal;color:var(--signal)}
-html[lang="en"] .hero h1{font-size:clamp(36px,5.2vw,58px)}
+/* ---------- nav */
+.nav{position:sticky;top:0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 14px) var(--gut) 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(11,12,13,.86);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--line)}
+.brand{display:inline-flex;align-items:baseline;text-decoration:none}
+.brand b{font-family:var(--f-serif);font-weight:400;font-size:25px;letter-spacing:-.01em;line-height:1}
+.brand b i{color:var(--accent)}
+.nav-r{display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;gap:2px;margin-inline-end:8px}
+.nav-links a{font-size:14px;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:999px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.nav-links a:hover{color:var(--ink);background:var(--bg-3)}
+.lang{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px;background:rgba(17,19,21,.7)}
+.lang button{min-width:40px;min-height:30px;border:0;background:transparent;border-radius:999px;font-family:var(--f-mono);font-size:12px;color:var(--muted);transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.lang button:hover{color:var(--ink)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* ---------- hero: asymmetric 7/5, headline holds to three lines */
+.hero{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,80px);align-items:center;padding-block:clamp(56px,8vw,112px) clamp(72px,9vw,128px);position:relative}
+.hero::before{content:"";position:absolute;inset:0 calc(-1 * var(--gut));z-index:-1;pointer-events:none;background:radial-gradient(45% 60% at 78% 50%,rgba(255,236,214,.06),rgba(255,236,214,0) 70%)}
+.hero-txt{display:grid;gap:24px;min-width:0;justify-items:start}
+.status-chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--ok);border:1px solid rgba(134,212,166,.3);border-radius:999px;padding:5px 12px 5px 10px}
+.status-chip i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.hero h1{font-size:clamp(52px,7.4vw,108px);line-height:.95;letter-spacing:-.03em;max-width:12ch}
+.hero h1 em{color:var(--accent)}
+html[lang="en"] .hero h1{font-size:clamp(46px,6vw,88px);max-width:14ch}
+.lead{color:var(--ink-2);font-size:clamp(17px,1.4vw,19px);font-weight:300;max-width:50ch}
 .cta{display:flex;gap:10px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--ink);background:var(--ink);color:var(--steel);border-radius:10px;padding:11px 18px;font-weight:700;text-decoration:none;font-size:15.5px}
-.btn.alt{background:transparent;color:var(--ink)}
-.btn.sig{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.drawing{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px;min-width:0;margin:0}
+.drawing{margin:0;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(70% 70% at 50% 40%,rgba(255,236,214,.05),transparent 70%),var(--bg-2);padding:clamp(18px,2vw,28px);display:grid;gap:18px;min-width:0}
 .drawing svg{width:100%;height:auto;display:block}
-.drawing svg .stroke{stroke:var(--ink)}
+.drawing svg .stroke{stroke:var(--ink-2)}
 .drawing svg .dim{stroke:var(--muted)}
-.drawing svg .fill{fill:var(--soft)}
+.drawing svg .fill{fill:var(--bg-3)}
 .drawing svg .thread{stroke:var(--muted)}
 .drawing svg .arrow{fill:var(--muted)}
 .drawing svg text{fill:var(--muted);font-family:var(--f-mono);font-size:12px}
-.drawing svg text.k{fill:var(--signal);font-weight:600}
-.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0}
-.specs div{background:var(--sheet);padding:10px 12px;display:grid;gap:2px;min-width:0}
-.specs dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.specs dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
-.drawing .cap{font-size:13.5px;color:var(--muted)}
+.drawing svg text.k{fill:var(--accent);font-weight:500}
+.specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border-top:1px solid var(--line)}
+.specs div{padding:14px 12px 0 0;display:grid;gap:4px;min-width:0}
+.specs div + div{padding-inline-start:12px;border-inline-start:1px solid var(--line)}
+.specs dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.specs dd{margin:0;font-weight:500;font-size:15px;font-variant-numeric:tabular-nums;text-wrap:balance}
+.drawing .cap{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+.drawing .cap b{color:var(--ink-2);font-weight:500}
 
-/* steps (a real sequence) */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;list-style:none;margin:0;padding:0;counter-reset:s}
-.steps li{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:8px;align-content:start;counter-increment:s;min-width:0}
-.steps li::before{content:counter(s);font-family:var(--f-display);font-weight:900;font-stretch:125%;font-size:30px;line-height:1;color:var(--signal)}
-.steps b{font-size:17px}
-.steps p{color:var(--muted);font-size:15px}
+/* ---------- steps: wide head, offset index */
+.steps-wrap{display:grid;gap:56px}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;margin-inline-start:auto;width:min(100%,820px)}
+.steps li{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:24px;row-gap:10px;padding-block:32px;border-top:1px solid var(--line);counter-increment:s}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.steps li::before{content:counter(s);grid-row:1 / span 2;font-family:var(--f-serif);font-size:64px;line-height:.9;color:var(--muted)}
+.steps li > *{grid-column:2}
+.steps b{font-size:clamp(22px,2.2vw,28px);font-weight:500;letter-spacing:-.01em;line-height:1.25}
+.steps p{color:var(--ink-2);max-width:58ch;font-weight:300}
 
-/* example + forms */
-.split{display:grid;grid-template-columns:1fr 1.25fr;gap:28px;align-items:start}
-.example{display:grid;gap:10px}
-.card{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px;min-width:0}
-.card .txt{font-size:16.5px;word-break:break-word}
+/* ---------- ideas: example + form */
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,5vw,80px);align-items:start}
+.example{display:grid;gap:28px;position:sticky;top:110px}
+.card{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);padding:20px;display:grid;gap:14px;min-width:0}
+.example .card{border-radius:var(--r-lg);padding:clamp(22px,2.6vw,32px);background:linear-gradient(160deg,var(--bg-3),var(--bg-2) 60%)}
+.example .card .txt{font-family:var(--f-serif);font-size:clamp(24px,2.3vw,32px);line-height:1.15;letter-spacing:-.01em;font-weight:400}
+.card .txt{font-size:17px;overflow-wrap:anywhere;font-weight:300}
 .card .meta{display:flex;flex-wrap:wrap;gap:6px}
-.tag{font-family:var(--f-mono);font-size:11.5px;border-radius:6px;padding:2px 7px;background:var(--soft);color:var(--muted)}
-.tag.ex{background:var(--signal-soft);color:var(--signal);font-weight:600}
+.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;padding:3px 8px;border-radius:var(--r-sm);color:var(--ink-2);border:1px solid var(--line-2)}
+.tag.ex{color:var(--accent);border-color:rgba(255,106,43,.35)}
 .card .by{font-size:13px;color:var(--muted)}
-.card .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:10px}
-.demand{font-size:14px}
-.demand strong{font-variant-numeric:tabular-nums}
-.note{font-size:14px;color:var(--muted)}
+.card .foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px}
+.demand{font-size:14px;color:var(--ink-2)}
+.demand strong{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:var(--muted)}
 
-form.idea{background:var(--sheet);border:2px solid var(--ink);border-radius:16px;padding:18px;display:grid;gap:14px}
-.fld{display:grid;gap:6px;min-width:0}
-.fld label{font-weight:700}
-textarea,input[type=text],input[type=number]{width:100%;min-width:0;background:var(--steel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-textarea{resize:vertical;min-height:96px;font-size:17px}
-textarea:focus,input:focus{outline:none;border-color:var(--signal)}
-.starters{display:flex;gap:6px;flex-wrap:wrap}
-.starters button{border:1px dashed var(--muted);background:transparent;border-radius:8px;padding:5px 10px;font-size:13.5px;color:var(--muted)}
-.starters button:hover{border-style:solid;color:var(--ink);border-color:var(--ink)}
-details.extra{border:1px solid var(--line);border-radius:12px;padding:10px 14px}
-details.extra summary{cursor:pointer;font-weight:600}
-details.extra summary span{font-weight:400;color:var(--muted);font-size:14px}
-.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.slots label{font-size:14px;font-weight:600}
-.slots label small{font-family:var(--f-mono);color:var(--signal);font-weight:600;margin-left:4px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
-.status{font-size:14px;color:var(--muted)}
-.status.bad{color:var(--signal)}
+form.idea{background:linear-gradient(180deg,var(--bg-3),var(--bg-2));border:1px solid var(--line-2);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,32px);display:grid;gap:20px;box-shadow:inset 0 1px 0 rgba(238,236,231,.05),0 40px 90px -50px rgba(24,12,4,.75)}
+.fld{display:grid;gap:8px;min-width:0}
+.fld label{font-weight:500;font-size:15px}
+textarea,input[type=text],input[type=number]{inline-size:100%;min-inline-size:0;background:var(--bg);border:1px solid var(--line-2);border-radius:var(--r-md);padding:13px 15px;transition:border-color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+textarea{resize:vertical;min-height:132px;font-size:17px;line-height:1.5}
+textarea:hover,input:hover{border-color:var(--muted)}
+textarea:focus,input:focus{outline:none;border-color:var(--accent);background:var(--bg-2)}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
+.starters{display:flex;flex-wrap:wrap;gap:8px}
+.starters button{min-height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--ink-2);font-size:13.5px;transition:border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.starters button:hover{border-color:var(--ink-2);color:var(--ink);background:var(--bg-3)}
+.starters button:active{transform:scale(.97)}
+details.extra{border:1px solid var(--line-2);border-radius:var(--r-md);padding:4px 6px}
+details.extra summary{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 8px;border-radius:var(--r-sm);cursor:pointer;font-weight:500;font-size:15px;list-style:none;transition:background-color var(--dur-fast) var(--ease-out)}
+details.extra summary::-webkit-details-marker{display:none}
+details.extra summary::before{content:"";flex:none;width:7px;height:7px;margin-inline:4px 6px;border:solid currentColor;border-width:0 1.75px 1.75px 0;transform:rotate(-45deg);transition:transform var(--dur-base) var(--ease-io)}
+details.extra[open] summary::before{transform:rotate(45deg)}
+details.extra summary:hover{background:var(--bg-3)}
+details.extra summary span{font-weight:300;color:var(--muted);font-size:13.5px}
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:6px 8px 12px}
+.slots label{font-size:13.5px}
+.slots label small{font-family:var(--f-mono);color:var(--muted);margin-inline-start:6px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.status{font-size:14px;color:var(--muted);min-width:0;flex:1 1 220px}
+.status.bad{color:var(--accent)}
 .status.good{color:var(--ok)}
 
-/* ideas list */
-.list-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
-.sorts{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--sheet)}
-.sorts button{border:0;background:transparent;border-radius:999px;padding:6px 14px;font-size:14px;color:var(--muted)}
-.sorts button[aria-pressed="true"]{background:var(--ink);color:var(--steel)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;align-items:start}
+/* ---------- board */
+.list-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.sorts{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
+.sorts button{min-height:32px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13.5px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.sorts button:hover{color:var(--ink)}
+.sorts button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+#list{margin-top:48px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-items:start}
 .buy{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.buy input{width:84px;padding:6px 8px;font-family:var(--f-mono);font-size:14px}
-.buy button{border:1px solid var(--ink);background:var(--ink);color:var(--steel);border-radius:8px;padding:6px 10px;font-size:13.5px;font-weight:600}
-.buy button.undo{background:transparent;color:var(--ink)}
-.buy .mine{font-size:13.5px;color:var(--ok);font-weight:600}
-.empty{border:2px dashed var(--line);border-radius:14px;padding:28px 18px;text-align:center;display:grid;gap:6px;justify-items:center}
-.empty b{font-family:var(--f-display);font-stretch:112%;font-size:22px}
-
-/* money */
-.money{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;align-items:start}
-.calc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.calc label{font-size:13.5px;font-weight:600}
-.calc input{font-family:var(--f-mono)}
-.over{display:grid;gap:2px;margin-top:6px}
-.over .big{font-family:var(--f-display);font-weight:900;font-stretch:118%;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
-.tbl-wrap{overflow-x:auto;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:6px 16px}
-table{border-collapse:collapse;width:100%;font-size:15px}
-th,td{text-align:left;padding:10px 8px 10px 0;border-bottom:1px solid var(--line)}
-tr:last-child td{border-bottom:0}
-th{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
-td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;padding-right:0}
-td small{display:block;color:var(--muted);font-size:13px}
-tr.you td{font-weight:700}
-tr.you td:first-child{color:var(--signal)}
-
-/* faq */
-.faq{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.faq div{border-top:2px solid var(--ink);padding-top:10px;display:grid;gap:4px}
-.faq b{font-size:16.5px}
-.faq p{color:var(--muted);font-size:15px}
-footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
-.stack{display:grid;gap:18px}
-
-@media (max-width:820px){
-  .hero,.split,.money{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr}
-  .faq{grid-template-columns:1fr}
-}
-@media (max-width:520px){
-  .slots,.calc{grid-template-columns:1fr}
-  .specs{grid-template-columns:1fr}
-  .wrap{gap:44px}
-}
+.buy input{inline-size:92px;padding:8px 10px;font-family:var(--f-mono);font-size:14px}
+.buy button{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-size:13.5px;font-weight:500;transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.buy button:hover{background:#FFFFFF;border-color:#FFFFFF}
+.buy button:active{transform:scale(.97)}
+.buy button:disabled{opacity:.5;pointer-events:none}
+.buy button.undo{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.buy button.undo:hover{background:var(--bg-3);border-color:var(--ink-2)}
+.buy .mine{font-size:14px;color:var(--ok);font-weight:500}
+.empty{border:1px dashed var(--line-2);border-radius:var(--r-md);padding:32px 24px;display:grid;gap:10px;justify-items:start}
+.empty b{font-family:var(--f-serif);font-weight:400;font-size:30px;letter-spacing:-.01em;line-height:1.1}
+.empty p{color:var(--ink-2);max-width:46ch;font-weight:300;font-size:15px}
+.empty .btn{margin-top:6px}
 @media (prefers-reduced-motion:no-preference){
-  html{scroll-behavior:smooth}
-  .card.new{animation:pop .35s ease-out}
-  @keyframes pop{from{transform:translateY(6px);opacity:.5}to{transform:none;opacity:1}}
+  .card.new{animation:rise var(--dur-mod) var(--ease-out)}
+  @keyframes rise{from{opacity:.001;transform:translateY(10px)}to{opacity:1;transform:none}}
+}
+
+/* ---------- money: head + calc left, ledger right */
+.money{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,5vw,80px);align-items:start}
+.money-l{display:grid;gap:40px}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.calc label{font-size:13.5px}
+.calc input{font-family:var(--f-mono)}
+.over{display:grid;gap:8px}
+.over .big{font-family:var(--f-serif);font-size:clamp(64px,8vw,120px);line-height:.9;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tbl-wrap{overflow-x:auto;border-top:1px solid var(--line-2)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:start;padding:16px 16px 16px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+td.n,th.n{text-align:end;font-family:var(--f-mono);font-variant-numeric:tabular-nums;padding-inline-end:0;white-space:nowrap}
+td small{display:block;color:var(--muted);font-size:13px}
+tr.you td{color:var(--ink);font-weight:500}
+tr.you td:first-child{color:var(--accent)}
+
+/* ---------- faq */
+.faq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(24px,5vw,80px);margin-top:56px}
+.faq div{padding-block:24px;border-top:1px solid var(--line);display:grid;gap:8px}
+.faq b{font-size:17px;font-weight:500}
+.faq p{color:var(--ink-2);font-weight:300}
+
+footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:13px;color:var(--muted)}
+footer a{color:var(--ink-2);text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-out)}
+footer a:hover{color:var(--accent)}
+
+@media (max-width:1040px){ .nav-links{display:none} }
+@media (max-width:960px){
+  .hero,.split,.money{grid-template-columns:minmax(0,1fr)}
+  .example{position:static}
+}
+@media (max-width:640px){
+  .slots,.calc,.faq{grid-template-columns:minmax(0,1fr)}
+  .nav .btn{display:none}
+  .specs{grid-template-columns:minmax(0,1fr)}
+  .specs div + div{padding-inline-start:0;border-inline-start:0;border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .steps li{grid-template-columns:52px minmax(0,1fr);column-gap:14px}
+  .steps li::before{font-size:44px}
+  th:nth-child(4),td:nth-child(4){display:none}
+}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}
 }
 </style>
 
-<div class="wrap">
-  <header class="top">
-    <span class="brand">İkinci<b>Tur</b></span>
-    <span class="top-r">
-      <span class="pill on" data-t="pill_open">Vaka 01 · fikirlere açık</span>
-      <span class="pill" data-t="pill_proto">Prototip</span>
-      <span class="lang" role="group" aria-label="Dil / Language">
-        <button type="button" id="lang-tr" aria-pressed="true">TR</button>
-        <button type="button" id="lang-en" aria-pressed="false">EN</button>
-      </span>
-    </span>
-  </header>
+<header class="nav">
+  <a class="brand" href="#top"><b>Undust<i>it</i></b></a>
+  <div class="nav-r">
+    <nav class="nav-links" data-ta="nav_aria" aria-label="Sayfa">
+      <a href="#nasil" data-t="nav_how">Nasıl işliyor</a>
+      <a href="#fikirler" data-t="nav_ideas">Fikirler</a>
+      <a href="#hesap" data-t="nav_money">Hesap</a>
+      <a href="kucuk-fikirler/" data-t="nav_story">Hikâye</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Dil / Language">
+      <button type="button" id="lang-tr" aria-pressed="true">TR</button>
+      <button type="button" id="lang-en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn sig sm" href="#fikir" data-t="nav_cta">Fikrini gönder</a>
+  </div>
+</header>
+
+<main class="wrap" id="top">
 
   <section class="hero" aria-labelledby="hero-h">
     <div class="hero-txt">
+      <span class="status-chip"><i aria-hidden="true"></i><span data-t="pill_open">Vaka 01 · fikirlere açık</span></span>
       <span class="eyebrow" data-t="hero_eyebrow">Satılamayan stoklara yeni bir hayat</span>
       <h1 id="hero-h" data-th="hero_h">Depoda 1 milyon cıvata bekliyor. <em>Ne olsun?</em></h1>
       <p class="lead" data-t="hero_lead">Bu cıvatalar güneş paneli kurulumu için üretildi ama fazla geldi. Bunları başka ne olarak satabiliriz, fikrini yaz. Fikrin seçilip satarsa, taban fiyatın üstündeki kârın %40'ını sen alırsın.</p>
       <div class="cta">
-        <a class="btn sig" href="#fikir" data-t="cta_write">Fikrimi yazayım</a>
+        <a class="btn sig" href="#fikir"><span data-t="cta_write">Fikrimi yazayım</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
         <a class="btn alt" href="#nasil" data-t="cta_how">Nasıl işliyor?</a>
       </div>
     </div>
@@ -232,7 +295,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
     </figure>
   </section>
 
-  <section id="nasil" class="stack" aria-labelledby="how-h">
+  <section id="nasil" class="sec ruled steps-wrap" aria-labelledby="how-h">
     <div class="sec-head">
       <span class="eyebrow" data-t="how_eyebrow">Üç adımda</span>
       <h2 id="how-h" data-t="how_h">Nasıl işliyor?</h2>
@@ -244,7 +307,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
     </ol>
   </section>
 
-  <section id="fikir" class="split" aria-labelledby="form-h">
+  <section id="fikir" class="sec ruled split" aria-labelledby="form-h">
     <div class="example">
       <div class="sec-head">
         <span class="eyebrow" data-t="form_eyebrow">Senin sıran</span>
@@ -285,7 +348,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
     </form>
   </section>
 
-  <section class="stack" aria-labelledby="list-h">
+  <section id="fikirler" class="sec ruled" aria-labelledby="list-h">
     <div class="list-head">
       <div class="sec-head">
         <span class="eyebrow" data-t="list_eyebrow">Gelen fikirler</span>
@@ -300,8 +363,8 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
     <div id="list"></div>
   </section>
 
-  <section class="money" aria-labelledby="money-h">
-    <div class="stack" style="gap:16px">
+  <section id="hesap" class="sec ruled money" aria-labelledby="money-h">
+    <div class="money-l">
       <div class="sec-head">
         <span class="eyebrow" data-t="money_eyebrow">Şeffaf hesap</span>
         <h2 id="money-h" data-t="money_h">Satarsa kim ne kazanır?</h2>
@@ -322,7 +385,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
     </div>
   </section>
 
-  <section class="stack" aria-labelledby="faq-h">
+  <section class="sec ruled" aria-labelledby="faq-h">
     <div class="sec-head"><h2 id="faq-h" data-t="faq_h">Sık sorulanlar</h2></div>
     <div class="faq">
       <div><b data-t="q1">Para ödemem gerekiyor mu?</b><p data-t="a1">Hayır. Fikir göndermek de "alırdım" demek de ücretsiz.</p></div>
@@ -332,8 +395,8 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
     </div>
   </section>
 
-  <footer><span data-t="foot_l">İkinci Tur · prototip</span><span data-t="foot_r">Taban fiyat herkese açık · paylar sabit</span></footer>
-</div>
+  <footer><span data-t="foot_l">Undustit · prototip</span><a href="kucuk-fikirler/" data-t="foot_link">Hikâyenin uzun hâli</a><span data-t="foot_r">Taban fiyat herkese açık · paylar sabit</span></footer>
+</main>
 
 <script>
 (function(){
@@ -343,6 +406,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
   const T = {
     tr: {
       pill_open:'Vaka 01 · fikirlere açık', pill_proto:'Prototip',
+      nav_aria:'Sayfa', nav_how:'Nasıl işliyor', nav_ideas:'Fikirler', nav_money:'Hesap', nav_story:'Hikâye', nav_cta:'Fikrini gönder', foot_link:'Hikâyenin uzun hâli',
       hero_eyebrow:'Satılamayan stoklara yeni bir hayat',
       hero_h:'Depoda 1 milyon cıvata bekliyor. <em>Ne olsun?</em>',
       hero_lead:"Bu cıvatalar güneş paneli kurulumu için üretildi ama fazla geldi. Bunları başka ne olarak satabiliriz, fikrini yaz. Fikrin seçilip satarsa, taban fiyatın üstündeki kârın %40'ını sen alırsın.",
@@ -377,10 +441,10 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
       q2:'"Alırdım" dersem satın almış olur muyum?', a2:'Hayır. Bu sadece talebi ölçmek için. Kimse bir şey almak zorunda değil.',
       q3:'Fikrimi kim görür?', a3:'Bu sayfayı açan herkes. Fikrin yanında sadece senin yazdığın isim görünür.',
       q4:'Bu gerçek bir satış mı?', a4:'Bu sayfa bir prototip. Fikirleri ve talebi gerçekten toplar, ama henüz satış ya da ödeme yapılmıyor.',
-      foot_l:'İkinci Tur · prototip', foot_r:'Taban fiyat herkese açık · paylar sabit',
+      foot_l:'Undustit · prototip', foot_r:'Taban fiyat herkese açık · paylar sabit',
       // dynamic
       starters:[['Hediye olsun','Bu cıvata şöyle bir hediye olabilir: '],['Masada dursun','Masada bu cıvata şuna dönüşebilir: '],['Bir topluluğa satalım','Bu cıvatayı şu insanlar alır: '],['Sanat olsun','Kaynakla ya da üst üste dizerek şu yapılabilir: ']],
-      shares:[['Fikir sahibi','ana fikir'],['Ad önerisini kazanan','ürünün adı'],['Görünüm önerisini kazanan','renk, kaplama'],['Ambalaj önerisini kazanan','kutu, paket'],['Satış yeri önerisini kazanan','nerede, kime'],['İkinci Tur','üretim, satış, kargo']],
+      shares:[['Fikir sahibi','ana fikir'],['Ad önerisini kazanan','ürünün adı'],['Görünüm önerisini kazanan','renk, kaplama'],['Ambalaj önerisini kazanan','kutu, paket'],['Satış yeri önerisini kazanan','nerede, kime'],['Undustit','üretim, satış, kargo']],
       slot_tags:{ name:'ad', look:'görünüm', pack:'ambalaj', chan:'satış' },
       st_free:'Fikir göndermek ücretsizdir. E-posta ya da ödeme istemiyoruz.',
       st_sending:'Gönderiliyor…', st_ok:'Fikrin listeye eklendi. Arkadaşlarına linki gönder, "alırdım" desinler.',
@@ -395,8 +459,9 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
     },
     en: {
       pill_open:'Case 01 · open for ideas', pill_proto:'Prototype',
+      nav_aria:'Page', nav_how:'How it works', nav_ideas:'Ideas', nav_money:'The split', nav_story:'Story', nav_cta:'Send your idea', foot_link:'The long version',
       hero_eyebrow:'Unsold stock, second shot',
-      hero_h:'A million bolts with nothing to do. <em>What should they be? It’s up to you.</em>',
+      hero_h:'A million bolts are waiting. <em>What should they be?</em>',
       hero_lead:'They were made for solar panels, but too many were made. Find them a new use, and if it sells, you get paid: 40% of the profit above the floor price.',
       cta_write:'Pitch my idea', cta_how:'How does it work?',
       svg_title:'Technical drawing of a flange bolt and nut: M10 thread, 90 mm long', svg_head:'flange head', svg_nut:'flange nut', svg_steel:'grade 8.8 steel',
@@ -429,9 +494,9 @@ footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-co
       q2:'If I say “I’d buy”, did I buy it?', a2:'No. It only measures demand. Nobody has to buy anything.',
       q3:'Who can see my idea?', a3:'Everyone who opens this page. Only the name you typed shows next to it.',
       q4:'Is this a real sale?', a4:'This page is a prototype. It really collects ideas and demand, but no sales or payments happen yet.',
-      foot_l:'İkinci Tur · prototype', foot_r:'Floor price public · shares fixed',
+      foot_l:'Undustit · prototype', foot_r:'Floor price public · shares fixed',
       starters:[['Make it a gift','It could be a gift for: '],['Put it on a desk','On a desk, this bolt could be: '],['Sell it to a crowd','These people would buy it: '],['Make it art','Welded or stacked, it could become: ']],
-      shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['İkinci Tur','making, selling, shipping']],
+      shares:[['Inventor','the main idea'],['Name winner','product name'],['Look winner','color, finish'],['Packaging winner','box, wrap'],['Channel winner','where, to whom'],['Undustit','making, selling, shipping']],
       slot_tags:{ name:'name', look:'look', pack:'pack', chan:'sold at' },
       st_free:'Free to send. No email, no fee.',
       st_sending:'Sending…', st_ok:'Your idea is on the list. Send the link to friends so they can say “I’d buy”.',

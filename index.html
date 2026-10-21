@@ -49,7 +49,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
 .eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .wrap{max-width:1280px;margin:0 auto;padding-inline:var(--gut)}
-.sec{padding-block:clamp(88px,11vw,152px)}
+.sec{padding-block:clamp(64px,8vw,112px)}
 .sec.ruled{border-top:1px solid var(--line)}
 .sec-head{display:grid;gap:18px;max-width:min(100%,760px)}
 .sec-head h2{font-size:clamp(44px,6vw,88px)}
@@ -222,6 +222,16 @@ a.case:active{transform:scale(.99)}
   *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}
   ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
 }
+
+/* quick fixes after the third jury pass */
+main:focus{outline:none}
+a.case:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-color:var(--accent)}
+.lang button:not([aria-pressed="true"]):hover{background:var(--line-2)}
+/* the method drawing scales to ~60% on a phone: keep only the three stage names, set large enough to read */
+@media (max-width:640px){
+  .dw .sub,.dw .who{display:none}
+  .sheet .dw text.n{font-size:19px;letter-spacing:.04em}
+}
 </style>
 
 <a class="skip" href="#main" data-t="skip">İçeriğe geç</a>
@@ -245,7 +255,7 @@ a.case:active{transform:scale(.99)}
   </div>
 </header>
 
-<main class="wrap" id="main">
+<main class="wrap" id="main" tabindex="-1">
   <section class="hero" aria-labelledby="hero-h">
     <div class="hero-txt">
       <span class="eyebrow" data-t="hero_eyebrow">Üretim fazlası × yaratıcı fikir</span>
@@ -270,7 +280,7 @@ a.case:active{transform:scale(.99)}
         <rect class="s" x="50" y="132" width="54" height="42" rx="2"/><line class="m" x1="50" y1="146" x2="104" y2="146"/>
         <ellipse class="s" cx="128" cy="150" rx="10" ry="20"/><path class="l" d="M128 130h28M128 170h28"/><ellipse class="l" cx="156" cy="150" rx="10" ry="20"/>
         <path class="s" d="M30 228h30v6H30z"/><path class="l" d="M60 231h22"/>
-        <text x="20" y="262" data-t="m_1s">stok · artık · sorun</text>
+        <text class="sub" x="20" y="262" data-t="m_1s">stok · artık · sorun</text>
         <!-- arrow -->
         <line class="m" x1="174" y1="178" x2="204" y2="178"/><path class="ar" d="M204 178l-7-4v8z"/>
         <!-- idea: a fresh sheet with a sketched curve -->
@@ -278,7 +288,7 @@ a.case:active{transform:scale(.99)}
         <path class="k" d="M226 206c14-34 30-50 46-44s20-34 30-44"/>
         <circle class="kf" cx="272" cy="162" r="3.5"/>
         <line class="h" x1="226" y1="216" x2="300" y2="216"/>
-        <text x="208" y="262" data-t="m_2s">farklı bir bakış</text>
+        <text class="sub" x="208" y="262" data-t="m_2s">farklı bir bakış</text>
         <!-- arrow -->
         <line class="m" x1="320" y1="178" x2="350" y2="178"/><path class="ar" d="M350 178l-7-4v8z"/>
         <!-- partnership: two circles, the overlap is the deal -->
@@ -286,9 +296,9 @@ a.case:active{transform:scale(.99)}
         <circle class="ov" cx="456" cy="168" r="46" clip-path="url(#clipA)"/>
         <circle class="l" cx="404" cy="168" r="46"/>
         <circle class="k" cx="456" cy="168" r="46"/>
-        <text x="380" y="236" text-anchor="middle" data-t="m_owner">ürün sahibi</text>
-        <text class="kt" x="478" y="236" text-anchor="middle" data-t="m_inventor">fikir sahibi</text>
-        <text x="372" y="262" data-t="m_3s">iki taraf da kazanır</text>
+        <text class="who" x="380" y="236" text-anchor="middle" data-t="m_owner">ürün sahibi</text>
+        <text class="kt who" x="478" y="236" text-anchor="middle" data-t="m_inventor">fikir sahibi</text>
+        <text class="sub" x="372" y="262" data-t="m_3s">iki taraf da kazanır</text>
       </svg>
       <figcaption><span data-t="m_cap_l">Pafta 00 · yöntem</span><span data-t="m_cap_r">Her vaka bu üç adımla ilerler</span></figcaption>
     </figure>
@@ -316,7 +326,7 @@ a.case:active{transform:scale(.99)}
     <div class="cases">
       <a class="case lead" href="vaka-01/">
         <span class="tag live"><i aria-hidden="true"></i><span data-t="c1_tag">Vaka 01 · fikirlere açık</span></span>
-        <h3 data-t="c1_h">Depoda bekleyen bir milyon cıvata</h3>
+        <h3 data-t="c1_h">Bir milyon cıvata</h3>
         <svg class="bolt dw" viewBox="0 0 440 150" aria-hidden="true" focusable="false">
           <rect class="s" x="40" y="32" width="26" height="66" rx="2"/>
           <rect class="s" x="66" y="22" width="9" height="86" rx="2"/>
@@ -457,7 +467,7 @@ a.case:active{transform:scale(.99)}
       s4_b:'Dikkat çeken fikir ortaklığa dönüşür', s4_p:"Ürün sahibinin ilgisini çeken fikir için ortaklık kurulur. Fazla gelire döner, fikir sahibi taban fiyatın üstündeki kârın %40'ını alır.",
       cases_eyebrow:'Vakalar', cases_h:'Her vaka <em>başka bir fazla.</em>',
       cases_p:'Bir vaka; bir üreticinin elinde kalan stok, artık ya da çözemediği bir sorundur. Yöntem aynı kalır, malzeme değişir.',
-      c1_tag:'Vaka 01 · fikirlere açık', c1_h:'Depoda bekleyen bir milyon cıvata',
+      c1_tag:'Vaka 01 · fikirlere açık', c1_h:'Bir milyon cıvata',
       c1_p:'Güneş paneli kurulumu için üretilip fazla gelen flanşlı M10 cıvatalar. Bir yapı elemanı mı, bir ürün mü, bambaşka bir pazar mı?',
       c1_q:'Adet', c1_qv:'1.000.000 takım', c1_f:'Taban fiyat', c1_fv:'0,20 $ / takım', c1_t:'Deneme', c1_tv:'1.000 adet', c1_go:'Vakayı aç, fikrini yaz',
       x_tag1:'Örnek vaka türü · tekstil', x1_h:'Kesimden artan kumaş topları', x1_p:'Kalıp kesiminden sonra kalan, rengi ve dokusu iyi ama boyu kısa kumaşlar.',
@@ -505,7 +515,7 @@ a.case:active{transform:scale(.99)}
       s4_b:'The idea that stands out becomes a partnership', s4_p:'When an idea catches the owner’s interest, a partnership forms. The surplus turns into revenue and the inventor gets 40% of the profit above the floor price.',
       cases_eyebrow:'Cases', cases_h:'Every case is <em>a different surplus.</em>',
       cases_p:'A case is stock, offcuts or a problem a maker is stuck with. The method stays the same; the material changes.',
-      c1_tag:'Case 01 · open for ideas', c1_h:'A million bolts waiting in a warehouse',
+      c1_tag:'Case 01 · open for ideas', c1_h:'A million bolts',
       c1_p:'Flange M10 bolts made for solar panel mounts, more than were needed. A structural part, a product, or a whole other market?',
       c1_q:'Quantity', c1_qv:'1,000,000 sets', c1_f:'Floor price', c1_fv:'$0.20 / set', c1_t:'Test run', c1_tv:'1,000 units', c1_go:'Open the case, pitch an idea',
       x_tag1:'Example case type · textiles', x1_h:'Fabric rolls left after cutting', x1_p:'Good color, good weave, just too short once the pattern is cut.',

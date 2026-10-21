@@ -60,7 +60,7 @@ button{cursor:pointer}
 .btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
 .btn.primary:active{background:var(--accent-active);border-color:var(--accent-active)}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-2)}
-.btn.ghost:hover{border-color:var(--ink-2);background:var(--bg-3)}
+.btn.ghost:hover{border-color:var(--ink);background:var(--ink);color:var(--bg)}
 .btn.sm{min-height:38px;padding:0 16px;font-size:14px}
 .btn:disabled{opacity:.5;pointer-events:none}
 .btn[aria-busy="true"]{pointer-events:none}
@@ -173,7 +173,7 @@ button{cursor:pointer}
 
 /* ---------- sections */
 .wrap{max-width:1280px;margin:0 auto;padding-inline:var(--gut)}
-.sec{padding-block:clamp(96px,13vw,176px)}
+.sec{padding-block:clamp(72px,9vw,128px)}
 .sec.ruled{border-top:1px solid var(--line)}
 .sec-head{display:grid;gap:18px;max-width:min(100%,760px)}
 .sec-head h2{font-size:clamp(44px,6vw,88px)}
@@ -219,7 +219,8 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 .chip:active{transform:scale(.97)}
 .extra{border:1px solid var(--line-2);border-radius:var(--r-md);padding:4px 6px}
 .extra-t{display:flex;align-items:center;gap:8px;width:100%;min-height:42px;padding:0 8px;border:0;border-radius:var(--r-sm);background:transparent;text-align:start;font-weight:500;font-size:15px;transition:background-color var(--dur-fast) var(--ease-out)}
-.extra-t:hover{background:var(--bg-3)}
+.extra-t:hover{background:rgba(255,106,43,.08)}
+.extra-t:hover svg{color:var(--accent)}
 .extra-t svg{width:16px;height:16px;flex:none;transition:transform var(--dur-base) var(--ease-io)}
 .extra-t[aria-expanded="true"] svg{transform:rotate(90deg)}
 .extra-t span span{font-weight:300;color:var(--muted);font-size:13.5px}
@@ -372,6 +373,11 @@ footer a:hover{text-decoration-color:var(--accent)}
 textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 .end-cta{display:flex;flex-wrap:wrap;gap:10px}
+
+/* quick fixes after the third jury pass */
+.slots[hidden]{display:none}
+.lang button:not([aria-pressed="true"]):hover,.seg button:not([aria-pressed="true"]):hover{background:var(--line-2);color:var(--ink)}
+main:focus{outline:none}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs id="defs"></defs></svg>
@@ -398,7 +404,7 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
   </div>
 </header>
 
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="story" id="hikaye" data-ta="story_aria" aria-label="Bir cıvatanın hikâyesi">
     <div class="stage">
       <div class="light" aria-hidden="true"></div>
@@ -407,8 +413,8 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
 
       <div class="caps">
         <div class="cap on" data-i="0">
-          <span class="eyebrow" data-t="c0_e">Undustit · Vaka 01</span>
-          <h1 class="xl" data-th="c0_h">Küçük fikirler,</h1>
+          <h1 class="eyebrow" data-t="c0_e">Vaka 01 · Bir milyon cıvata</h1>
+          <h2 class="xl" data-th="c0_h">Küçük fikirler,</h2>
           <p data-th="c0_p">Satılmayan stoklara yeni bir iş buluyoruz. Depoda <b>bir milyon cıvata</b> bekliyor. Kaydır, birinin nereye gidebileceğini gör.</p>
           <span class="hint"><i aria-hidden="true"></i><span data-t="c0_hint">Kaydır</span></span>
         </div>
@@ -611,7 +617,7 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       nav_aria:'Sayfa', nav_money:'Hesap', nav_menu:'Menü', skip:'İçeriğe geç', nav_story:'Hikâye', nav_nums:'Rakamlar', nav_ideas:'Fikirler', nav_spec:'Teknik föy', nav_cta:'Fikrini gönder',
       story_aria:'Bir cıvatanın hikâyesi', rail_aria:'Aşamalar', r0:'Cıvata', r1:'Bağlantı', r2:'Çerçeve', r3:'Yapı',
       tb_sheet:'Pafta', tb_scale:'Ölçek', tb_by:'Çizen', tb_you:'sen',
-      c0_e:'Undustit · Vaka 01', c0_h:'Küçük fikirler,', c0_p:'Undustit, üretim fazlalarına ve sorunlara farklı bakan fikirleri ürün sahipleriyle buluşturur. İlk vaka: depoda bekleyen <b>bir milyon cıvata</b>. Kaydır, tek bir cıvatanın nereye gidebileceğini gör.', c0_hint:'Kaydır',
+      c0_e:'Vaka 01 · Bir milyon cıvata', c0_h:'Küçük fikirler,', c0_p:'Undustit, üretim fazlalarına ve sorunlara farklı bakan fikirleri ürün sahipleriyle buluşturur. İlk vaka: depoda bekleyen <b>bir milyon cıvata</b>. Kaydır, tek bir cıvatanın nereye gidebileceğini gör.', c0_hint:'Kaydır',
       c1_e:'Detay A · aşık bağlantısı', c1_h:'Bir cıvata, <em>bir bağlantı olur.</em>', c1_p:'Çelik aşık bayrağını ahşap aşığa bağlar. Cıvatanın kendi kesme dayanımı <b>22,3 kN</b>. Bağlantının dayanımını ise ahşap belirler.',
       c2_e:'Aks 3 · portal çerçeve', c2_h:'Bağlantılar <em>bir çerçeve kurar.</em>', c2_p:'24 m açıklıklı bir portal çerçevede 18 aşık var. Her biri iki cıvatayla tutuluyor. <b>Seninki turuncu noktada.</b>',
       c3_e:'Genel görünüş · 42 m depo', c3_h:'<em>büyük etkiler.</em>', c3_p:"Bu 42 m'lik depo yalnız aşık bağlantıları için <b>288 cıvata</b> ister. Bir milyon cıvata, böyle 3.472 çatı eder. Ve çatıda yine güneş panelleri var.",
@@ -663,7 +669,7 @@ textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outli
       nav_aria:'Page', nav_money:'The split', nav_menu:'Menu', skip:'Skip to content', nav_story:'Story', nav_nums:'Numbers', nav_ideas:'Ideas', nav_spec:'Spec sheet', nav_cta:'Send your idea',
       story_aria:'The story of one bolt', rail_aria:'Stages', r0:'Bolt', r1:'Connection', r2:'Frame', r3:'Building',
       tb_sheet:'Sheet', tb_scale:'Scale', tb_by:'Drawn by', tb_you:'you',
-      c0_e:'Undustit · Case 01', c0_h:'Small ideas,', c0_p:'Undustit connects ideas that see production surplus and problems differently with the people who own them. Case 01: <b>a million bolts</b> waiting in a warehouse. Scroll to see where just one of them could go.', c0_hint:'Scroll',
+      c0_e:'Case 01 · A million bolts', c0_h:'Small ideas,', c0_p:'Undustit connects ideas that see production surplus and problems differently with the people who own them. Case 01: <b>a million bolts</b> waiting in a warehouse. Scroll to see where just one of them could go.', c0_hint:'Scroll',
       c1_e:'Detail A · purlin connection', c1_h:'One bolt <em>becomes a connection.</em>', c1_p:'It ties a steel cleat to a timber purlin. The bolt alone resists <b>22.3 kN</b> in shear. The timber decides what the connection carries.',
       c2_e:'Grid 3 · portal frame', c2_h:'Connections <em>build a frame.</em>', c2_p:'A 24 m portal frame carries 18 purlins, each held by two bolts. <b>Yours is the orange dot.</b>',
       c3_e:'General view · 42 m warehouse', c3_h:'<em>big impact.</em>', c3_p:'This 42 m warehouse needs <b>288 bolts</b> for its purlin connections alone. A million bolts is enough for 3,472 roofs like it. And the roof still carries solar panels.',

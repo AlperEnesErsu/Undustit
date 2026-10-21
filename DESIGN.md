@@ -30,3 +30,10 @@ Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist
 - Hikâye sayfasında menü, sabit çizimin üstünde şeffaf; içerik altına girince opak olur.
 - Hikâye başlıkları üst üste binmez: eski başlık 100 ms'de çıkar, yenisi ondan sonra girer.
 - Her hareketin `prefers-reduced-motion` karşılığı var.
+- İki sayfa aynı menü setini kullanır: Hikâye · Fikirler · Hesap · Teknik föy. 1040 px altında
+  menü bir düğmenin açtığı panele (linkler + dil seçimi) taşınır, "Fikrini gönder" görünür kalır.
+- Ana sayfa bölümleri pafta gibi numaralanır (01 / 04 ...). Sayfalar arası geçiş
+  `@view-transition` ile; logo ve menü yerinde kalır.
+- 404 sayfası aynı temada, "boş delik" çizimiyle. Linkleri kök (`/`) varsayar; site bir alt
+  klasörde yayınlanırsa güncellenmeli.
+- `claude.ai` üzerinden çalışan fikir formu ve liste bilinçli olarak böyle; dokunulmadı.

@@ -1,6 +1,19 @@
+<!doctype html>
+<html lang="tr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Undustit · Küçük Fikirler</title>
+<meta name="description" content="Tek bir cıvatadan bütün bir depoya: satılmayan bir milyon cıvatanın gidebileceği yerler ve fikrini gönderebileceğin açık hesap.">
+<meta name="theme-color" content="#0B0C0D">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Undustit">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="Küçük fikirler, büyük etkiler.">
+<meta property="og:description" content="Tek bir cıvatadan bütün bir depoya: satılmayan bir milyon cıvatanın gidebileceği yerler ve fikrini gönderebileceğin açık hesap.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Küçük fikirler, büyük etkiler.">
+<meta name="twitter:description" content="Tek bir cıvatadan bütün bir depoya: satılmayan bir milyon cıvatanın gidebileceği yerler ve fikrini gönderebileceğin açık hesap.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230B0C0D%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23FF6A2B%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
@@ -130,7 +143,7 @@ button{cursor:pointer}
 .clad{fill:url(#gClad);stroke:var(--line-2);stroke-width:.6}
 .gl{fill:none;stroke:rgba(143,146,142,.55);stroke-width:.6}
 .gnd{fill:none;stroke:var(--ink-2);stroke-width:1}
-.gh{fill:none;stroke:var(--line-2);stroke-width:.6}
+.gh{fill:none;stroke:rgba(143,146,142,.45);stroke-width:.6}
 .glow{fill:url(#gGlow)}
 .ringc{fill:none;stroke:var(--accent);stroke-width:1.5}
 .ringd{fill:var(--accent)}
@@ -292,7 +305,6 @@ footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-
 footer a{color:var(--ink-2);text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-out)}
 footer a:hover{color:var(--accent)}
 
-@media (max-width:1040px){ .nav-links{display:none} }
 @media (max-width:960px){
   .nums,.ideas,.spec,.ledger-top{grid-template-columns:minmax(0,1fr)}
   form.idea,.spec-fig{position:static}
@@ -300,7 +312,6 @@ footer a:hover{color:var(--accent)}
 }
 @media (max-width:640px){
   .cards,.slots,.calc,.faq{grid-template-columns:minmax(0,1fr)}
-  .nav .btn{display:none}
   .rail{display:none}
   .caps{bottom:100px}
   .tblock{left:var(--gut);right:auto;bottom:22px}
@@ -316,28 +327,74 @@ footer a:hover{color:var(--accent)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}
 }
+
+/* menu: inline on wide screens, a drop panel under the bar below 1040px (links + language) */
+.nav-menu{display:flex;align-items:center;gap:8px}
+.menu-t{display:none;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--line-2);border-radius:999px;background:transparent;color:var(--ink);transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out)}
+.menu-t:hover{background:var(--bg-3);border-color:var(--ink-2)}
+.menu-t svg{width:20px;height:20px}
+.menu-t .i-close,.nav.open .menu-t .i-open{display:none}
+.nav.open .menu-t .i-close{display:block}
+@media (max-width:1040px){
+  .menu-t{display:inline-flex}
+  .nav-menu{position:absolute;top:100%;left:0;right:0;display:none;flex-direction:column;align-items:stretch;gap:16px;padding:12px var(--gut) 20px;background:var(--bg);box-shadow:0 30px 60px -20px rgba(0,0,0,.8);border-bottom:1px solid var(--line)}
+  .nav.open .nav-menu{display:flex}
+  .nav-menu .nav-links{display:flex;flex-direction:column;gap:0;margin:0}
+  .nav-menu .nav-links a{font-size:17px;padding:12px 0;border-radius:0;border-bottom:1px solid var(--line);color:var(--ink)}
+  .nav-menu .nav-links a:hover{background:transparent;color:var(--accent)}
+  .nav-menu .lang{align-self:flex-start}
+  .nav.open::before{background:var(--bg)}
+}
+
+/* skip link, stronger hover and focus feedback, 44px tap areas */
+.skip{position:absolute;left:var(--gut);top:-80px;z-index:60;min-height:44px;display:inline-flex;align-items:center;padding:0 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:500;text-decoration:none;transition:top var(--dur-base) var(--ease-out)}
+.skip:focus{top:12px}
+.brand b i{display:inline-block;transition:transform var(--dur-base) var(--ease-out)}
+.brand:hover b i{transform:translateX(2px) rotate(-6deg)}
+.btn:hover svg{transform:translateX(5px)}
+.btn.sig:hover,.btn.primary:hover{box-shadow:0 0 0 4px rgba(255,106,43,.18)}
+.lang button:not([aria-pressed="true"]):hover,.seg button:not([aria-pressed="true"]):hover,.sorts button:not([aria-pressed="true"]):hover{background:var(--bg-3);color:var(--ink)}
+.chip:hover,.starters button:hover{background:rgba(255,106,43,.12);border-color:var(--accent);color:var(--ink)}
+textarea:focus,input:focus{box-shadow:0 0 0 3px rgba(255,106,43,.28)}
+footer a{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px}
+
+/* page change: the bar and logo stay put while the sheet underneath swaps */
+@view-transition{navigation:auto}
+.brand{view-transition-name:brand}
+.nav-r{view-transition-name:nav-r}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+
+/* the board follows the long form so the right column is never left empty */
+.board{position:sticky;top:100px}
+@media (max-width:960px){.board{position:static}}
+.lang button[aria-pressed="true"]:hover,.seg button[aria-pressed="true"]:hover,.sorts button[aria-pressed="true"]:hover{background:#FFFFFF;color:var(--bg)}
+textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs id="defs"></defs></svg>
 
-<header class="nav">
-  <a class="brand" href="#top"><b>Undust<i>it</i></b></a>
+<a class="skip" href="#main" data-t="skip">İçeriğe geç</a>
+<header class="nav" id="nav">
+  <a class="brand" href="#main"><b>Undust<i>it</i></b></a>
   <div class="nav-r">
-    <nav class="nav-links" data-ta="nav_aria" aria-label="Sayfa">
-      <a href="#hikaye" data-t="nav_story">Hikâye</a>
-      <a href="#rakamlar" data-t="nav_nums">Rakamlar</a>
-      <a href="#fikir" data-t="nav_ideas">Fikirler</a>
-      <a href="#foy" data-t="nav_spec">Teknik föy</a>
-    </nav>
-    <div class="lang" role="group" aria-label="Dil / Language">
-      <button type="button" id="lang-tr" aria-pressed="true">TR</button>
-      <button type="button" id="lang-en" aria-pressed="false">EN</button>
+    <div class="nav-menu" id="nav-menu">
+      <nav class="nav-links" data-ta="nav_aria" aria-label="Sayfa">
+        <a href="#hikaye" data-t="nav_story">Hikâye</a>
+        <a href="#fikir" data-t="nav_ideas">Fikirler</a>
+        <a href="#hesap" data-t="nav_money">Hesap</a>
+        <a href="#foy" data-t="nav_spec">Teknik föy</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Dil / Language">
+        <button type="button" id="lang-tr" aria-pressed="true">TR</button>
+        <button type="button" id="lang-en" aria-pressed="false">EN</button>
+      </div>
     </div>
     <a class="btn primary sm" href="#fikir" data-t="nav_cta">Fikrini gönder</a>
+    <button type="button" class="menu-t" id="menu-t" aria-expanded="false" aria-controls="nav-menu" data-ta="nav_menu" aria-label="Menü"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
 </header>
 
-<main id="top">
+<main id="main">
   <section class="story" id="hikaye" data-ta="story_aria" aria-label="Bir cıvatanın hikâyesi">
     <div class="stage">
       <div class="light" aria-hidden="true"></div>
@@ -547,7 +604,7 @@ footer a:hover{color:var(--accent)}
   // =========================================================== copy
   const T = {
     tr: {
-      nav_aria:'Sayfa', nav_story:'Hikâye', nav_nums:'Rakamlar', nav_ideas:'Fikirler', nav_spec:'Teknik föy', nav_cta:'Fikrini gönder',
+      nav_aria:'Sayfa', nav_money:'Hesap', nav_menu:'Menü', skip:'İçeriğe geç', nav_story:'Hikâye', nav_nums:'Rakamlar', nav_ideas:'Fikirler', nav_spec:'Teknik föy', nav_cta:'Fikrini gönder',
       story_aria:'Bir cıvatanın hikâyesi', rail_aria:'Aşamalar', r0:'Cıvata', r1:'Bağlantı', r2:'Çerçeve', r3:'Yapı',
       tb_sheet:'Pafta', tb_scale:'Ölçek', tb_by:'Çizen', tb_you:'sen',
       c0_e:'Undustit · Vaka 01', c0_h:'Küçük fikirler,', c0_p:'Satılmayan stoklara yeni bir iş buluyoruz. Depoda <b>bir milyon cıvata</b> bekliyor. Kaydır, birinin nereye gidebileceğini gör.', c0_hint:'Kaydır',
@@ -599,7 +656,7 @@ footer a:hover{color:var(--accent)}
       you:'Sen: ', undo:'Geri al', buy:'Alırdım', buy_aria:'Bu ürüne ödeyeceğin fiyat, dolar', price_q:'fiyat?'
     },
     en: {
-      nav_aria:'Page', nav_story:'Story', nav_nums:'Numbers', nav_ideas:'Ideas', nav_spec:'Spec sheet', nav_cta:'Send your idea',
+      nav_aria:'Page', nav_money:'The split', nav_menu:'Menu', skip:'Skip to content', nav_story:'Story', nav_nums:'Numbers', nav_ideas:'Ideas', nav_spec:'Spec sheet', nav_cta:'Send your idea',
       story_aria:'The story of one bolt', rail_aria:'Stages', r0:'Bolt', r1:'Connection', r2:'Frame', r3:'Building',
       tb_sheet:'Sheet', tb_scale:'Scale', tb_by:'Drawn by', tb_you:'you',
       c0_e:'Undustit · Case 01', c0_h:'Small ideas,', c0_p:'We find new jobs for stock nobody bought. <b>A million bolts</b> are waiting in a warehouse. Scroll to see where one of them could go.', c0_hint:'Scroll',
@@ -1150,4 +1207,14 @@ footer a:hover{color:var(--accent)}
     }, ()=>{});
   })();
 })();
+
+  // ---------- mobile menu
+  (function(){
+    const nav = document.getElementById('nav'), btn = document.getElementById('menu-t'), menu = document.getElementById('nav-menu');
+    const set = (open) => { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); };
+    btn.addEventListener('click', () => set(!nav.classList.contains('open')));
+    menu.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')){ set(false); btn.focus(); } });
+    window.matchMedia('(min-width:1041px)').addEventListener('change', (m) => { if (m.matches) set(false); });
+  })();
 </script>

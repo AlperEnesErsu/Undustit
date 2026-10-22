@@ -44,6 +44,30 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
   çizilir, sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
 - "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
+## Stiller: aynı site, dört görünüm (22 Ekim 2026)
+
+Ürün sahibi aynı siteyi farklı tarzlarda görmek istedi. İçerik, sayfalar ve akış tek; yalnız
+görünüm değişir. Her stil ayrı bir site gibi açılır:
+
+| Stil | Bağlantı | Dosya | Özü |
+|---|---|---|---|
+| Kâğıt | `/` | (varsayılan, `ud.css`) | Sıcak kâğıt, editoryal serif, mavi yalnız eylemde |
+| Oyuncu | `/?stil=oyuncu` | `assets/stil/oyuncu.css` | Krem zemin, Bricolage Grotesque, mürekkep çerçeve + sert gölge, mor eylem, sarı işaretleyici |
+| Teknik çizim | `/?stil=teknik` | `assets/stil/teknik.css` | Mavi pafta + ızgara, IBM Plex Condensed büyük harf, mono etiketler, kesikli çizgi, sarı eylem |
+| El yapımı | `/?stil=el` | `assets/stil/el.css` | Kraft kâğıt, Caveat başlıklar, Literata gövde, defter çizgileri, bantlı not kâğıdı, kalem mavisi |
+
+- `assets/stil.js` her sayfanın `<head>`'inde çalışır: `?stil=` değerini okur, stil dosyasını
+  sayfa çizilmeden yükler ve bütün iç bağlantılara aynı `?stil=` değerini ekler. Stil tarayıcıya
+  kaydedilmez; bu yüzden dört stil ayrı sekmelerde yan yana açılabilir, birbirini etkilemez.
+- `stiller/` dördünü canlı önizlemeyle gösterir ve her birini yeni sekmede açar. Ürün sahibine
+  gönderilecek bağlantı bu. Her sayfanın alt bilgisinde de stiller arası geçiş satırı var.
+- Stil dosyaları yalnız token'ları ve bileşen görünümünü ezer; düzen ve içerik `ud.css` /
+  sayfalarda kalır. Yeni bir stil = yeni bir `assets/stil/<ad>.css` + `stil.js` içindeki listeye bir satır.
+- Kontrast her stil dosyasının başında yazılı; metin çiftleri AA'yı geçer. Oyuncu'daki turuncu
+  (`--brand`, 3.7) yalnız büyük logo harfinde ve canlı yayın noktasında kullanılır.
+- Logo `lang="en"` taşır ki büyük harf yapan stillerde "UNDUSTİT" değil "UNDUSTIT" yazsın.
+- `404.html` tek dosyalık olduğu için stil almaz; her zaman Kâğıt görünür.
+
 ## Tema: kâğıt ve fikir mavisi (22 Ekim 2026)
 
 Beyaz zemin dikkati fikri yazmaya toplar. Mavi, keşfe ve hayal gücüne dayalı görevlerle

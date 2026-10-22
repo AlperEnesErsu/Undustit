@@ -1,0 +1,89 @@
+/* El yapımı: an inventor's notebook. Kraft paper, handwritten titles, ruled lines where you write,
+   hand-drawn outlines, a taped sticky note for the open case, fountain-pen blue for actions.
+   Contrast on --bg: ink 12.6, ink-2 7.7, muted 5.1, accent 6.2 (white on accent 7.8), ok 4.8. */
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@400;700&family=Literata:opsz,wght@7..72,300..600&display=swap");
+
+:root{
+  --bg:#EFE3CF; --bg-2:#FBF6EC; --bg-3:#E6D7BE; --line:#D9C7AA; --line-2:#B9A27F;
+  --ink:#2A2017; --ink-2:#4E4232; --muted:#6A5D4B; --hint:#7A6B57;
+  --accent:#1F4FA0; --accent-hover:#193F80; --accent-active:#143366; --accent-ink:#FFFFFF;
+  --accent-soft:rgba(31,79,160,.08); --accent-line:rgba(31,79,160,.35);
+  --brand:#B3401A; --ok:#3E6E1F; --ok-soft:rgba(62,110,31,.1); --warn:#7A5200; --err:#A3271B;
+  --note:#FFF1A8;
+  --shadow:0 18px 30px -22px rgba(42,32,23,.5);
+  --f-serif:"Caveat","Segoe Print",cursive;
+  --f-body:"Literata",Georgia,serif;
+  --hand:"Kalam","Segoe Print",cursive;
+  --wob:255px 15px 225px 15px/15px 225px 15px 255px;
+  --wob-card:18px 26px 14px 30px/26px 14px 30px 18px;
+}
+html,body{background-color:var(--bg)}
+body{background-image:radial-gradient(rgba(120,90,50,.07) 1px,transparent 1.2px),radial-gradient(rgba(255,255,255,.25) 1px,transparent 1.2px);background-size:7px 7px,11px 11px;font-weight:400}
+h1,h2,h3{font-weight:700;letter-spacing:0;line-height:.95}
+h3{font-family:var(--f-body);font-weight:600}
+.hero h1{font-size:clamp(64px,8.4vw,128px)}
+.phead h1,.case-head h1{font-size:clamp(62px,8.6vw,128px)}
+.sec h2,.write h2,.cb-h{font-size:clamp(46px,5.6vw,78px)}
+h1 em,h2 em,.cb-h em,.hero h1 em{font-style:normal;color:var(--ink);text-decoration:underline wavy rgba(31,79,160,.45);text-decoration-thickness:2px;text-underline-offset:10px}
+.brand b{font-size:32px}
+.eyebrow{font-family:var(--hand);font-size:16px;letter-spacing:0;text-transform:none;color:var(--muted)}
+.eyebrow.k{color:var(--accent)}
+.lead{font-weight:300}
+
+/* buttons and chips: hand-drawn outlines */
+.btn{border-radius:var(--wob);border-width:2px;font-family:var(--hand);font-weight:700;font-size:17px;letter-spacing:0}
+.btn:hover{background:#000;border-color:#000}
+.btn.alt{background:transparent;border-color:var(--ink)}
+.btn.alt:hover{background:var(--ink);color:var(--bg-2)}
+.btn.sm{font-size:15px}
+.chip{border-radius:var(--wob);border:1.5px solid var(--ink-2);font-family:var(--hand);font-size:15.5px;color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg-2)}
+
+/* where you write: a ruled notebook page */
+.nav{background:rgba(239,227,207,.92);border-bottom:1.5px solid var(--line-2)}
+.nav-links a{font-family:var(--hand);font-size:17px}
+.iform{border-radius:var(--wob-card);border:2px solid var(--ink-2);background:var(--bg-2) repeating-linear-gradient(transparent 0 33px,rgba(31,79,160,.13) 33px 34px);box-shadow:var(--shadow)}
+.iform:focus-within{border-color:var(--accent);box-shadow:var(--shadow)}
+.if-pitch{font-size:clamp(30px,3vw,40px);color:var(--accent)}
+.if-pitch::placeholder{color:var(--hint)}
+.if-field > span{font-family:var(--hand);font-size:16px}
+.if-field textarea,.if-field input{border-radius:6px;background:rgba(255,255,255,.7)}
+.icard{border-radius:var(--wob-card);border:1.5px solid var(--ink-2);background:var(--bg-2);box-shadow:var(--shadow)}
+.icard:nth-child(odd){transform:rotate(-.35deg)}
+.icard:nth-child(even){transform:rotate(.3deg)}
+.icard:hover{transform:none;background:#fff}
+.icard .t{font-family:var(--f-body);font-weight:500}
+.icard .rank{font-size:44px}
+.vote{border-radius:var(--wob);border:1.5px solid var(--ink-2);background:#fff}
+.vote span{font-family:var(--hand);font-size:13px;text-transform:none;letter-spacing:0}
+
+/* the open case is a sticky note, taped on */
+.case-band{position:relative;border:0;border-radius:2px;background:var(--note);box-shadow:0 26px 40px -26px rgba(42,32,23,.55);transform:rotate(-.6deg)}
+.case-band::before{content:"";position:absolute;left:50%;top:-14px;width:140px;height:30px;translate:-50% 0;rotate:2deg;background:rgba(255,255,255,.55);border:1px solid rgba(42,32,23,.12)}
+.cb-tag{font-family:var(--hand);font-size:15px;text-transform:none;letter-spacing:0;border-radius:var(--wob);background:rgba(255,255,255,.6)}
+.cb-art{background-color:rgba(255,255,255,.55);border-radius:var(--wob-card)}
+.cb-l path{stroke-width:1.6}
+.cb-art figcaption{font-size:clamp(40px,4vw,56px)}
+.pc-stage{border-radius:var(--wob-card);border:2px solid var(--ink-2);background:var(--bg-2) repeating-linear-gradient(transparent 0 27px,rgba(31,79,160,.1) 27px 28px)}
+.pc-stage::before{display:none}
+.pc-card,.pc-pay{border-radius:var(--wob-card);border:1.5px solid var(--ink-2)}
+.pc-txt{color:var(--accent);font-size:clamp(24px,2.4vw,30px)}
+.pc-buy b,.pc-pay b{font-family:var(--f-serif);font-weight:700}
+.pc-pay{background:#EAF2DD}
+.pc-steps li{font-family:var(--hand);font-size:15px}
+.pc-replay{border-radius:var(--wob);font-family:var(--hand);font-size:14px}
+.thu{border-radius:var(--wob);border:1.5px solid var(--ink-2);background:var(--bg-2);font-family:var(--hand);font-size:15px}
+.round header{border-top:2px solid var(--ink-2)}
+.round header b{font-size:36px}
+.slot,.empty{border-radius:var(--wob-card);border:1.5px dashed var(--ink-2);background:rgba(255,255,255,.35)}
+.disc b{font-size:clamp(36px,3.2vw,46px)}
+.disc .go{font-family:var(--hand);font-size:16px}
+.how3 li,.open3 div,.case,.after,.arena aside div{border-radius:var(--wob-card);border:1.5px solid var(--ink-2);background:var(--bg-2)}
+.mission{border:0;background:var(--note);border-radius:2px;transform:rotate(-.4deg);box-shadow:0 26px 40px -26px rgba(42,32,23,.55)}
+dialog.idlg{border-radius:var(--wob-card);background:var(--bg-2)}
+dialog.idlg header{background:var(--bg-2)}
+.foot{border-top:1.5px dashed var(--line-2)}
+.link{text-decoration-style:wavy;text-decoration-color:var(--accent)}
+
+/* phones: a slimmer payout card so it clears the pre-sale row */
+@media (max-width:640px){.pc-pay{padding:12px 14px;gap:4px}.pc-pay b{font-size:30px}.pc-pay span{font-size:12px}}

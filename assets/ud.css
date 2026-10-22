@@ -83,6 +83,10 @@ main:focus{outline:none}
 .foot nav{display:flex;flex-wrap:wrap;gap:4px 18px}
 .foot a{color:var(--ink-2);text-decoration:none;min-height:44px;display:inline-flex;align-items:center;transition:color var(--dur-fast) var(--ease-out)}
 .foot a:hover{color:var(--accent)}
+.foot .wrap.stil-bar{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:0 18px;padding-block:0 18px;font-size:13px;color:var(--muted)}
+.stil-bar a{color:var(--ink-2);text-decoration:none;min-height:36px;display:inline-flex;align-items:center;border-bottom:1px solid transparent}
+.stil-bar a:hover{color:var(--accent)}
+.stil-bar a[aria-current]{color:var(--ink);border-bottom-color:var(--ink)}
 .mode-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted)}
 .mode-badge i{width:6px;height:6px;border-radius:50%;background:var(--warn)}
 .mode-badge.live i{background:var(--ok)}

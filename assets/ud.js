@@ -62,6 +62,9 @@ function daysLeft(at){
   return Math.max(0, Math.ceil((end - Date.now())/DAY));
 }
 const homeHref = () => ROOT || './';
+// stil.js (loaded in <head>) owns the ?stil= choice; without it every page is the default look
+const STIL = window.UD_STIL || { list:{}, current:'kagit', withStil: h => h };
+const withStil = h => STIL.withStil(h);
 
 // =========================================================== nav + footer
 function mountChrome(){
@@ -70,7 +73,7 @@ function mountChrome(){
   const host = $('[data-ud-nav]');
   if (host){
     host.className = 'nav'; host.id = 'nav';
-    host.innerHTML = `<div class="wrap"><a class="brand" href="${homeHref()}" aria-label="Undustit ana sayfa"><b>Undust<i>it</i></b></a>
+    host.innerHTML = `<div class="wrap"><a class="brand" lang="en" href="${homeHref()}" aria-label="Undustit ana sayfa"><b>Undust<i>it</i></b></a>
       <div class="nav-r"><nav class="nav-links" id="nav-links" aria-label="Ana menü">${links.map(([k,l,h])=>`<a href="${ROOT+h}"${k===cur?' aria-current="page"':''}>${l}</a>`).join('')}</nav>
       <a class="btn sig sm" href="${ROOT}fikir/">Fikrini yaz</a>
       <button type="button" class="menu-t" aria-expanded="false" aria-controls="nav-links" aria-label="Menü"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>`;
@@ -83,7 +86,8 @@ function mountChrome(){
   if (foot){
     foot.className = 'foot';
     foot.innerHTML = `<div class="wrap"><span>Undustit · prototip · <span class="mode-badge" id="mode-badge"><i></i>bağlanıyor</span></span>
-      <nav aria-label="Alt menü"><a href="${ROOT}fikir/">Fikrini yaz</a><a href="${ROOT}fikirler/">Fikirler</a><a href="${ROOT}nasil/">Nasıl işler</a><a href="${ROOT}vakalar/">Vakalar</a><a href="${ROOT}hikaye/">Hikâye</a></nav></div>`;
+      <nav aria-label="Alt menü"><a href="${ROOT}fikir/">Fikrini yaz</a><a href="${ROOT}fikirler/">Fikirler</a><a href="${ROOT}nasil/">Nasıl işler</a><a href="${ROOT}vakalar/">Vakalar</a><a href="${ROOT}hikaye/">Hikâye</a></nav></div>
+      <div class="wrap stil-bar"><span>Stil</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${location.pathname}${k === 'kagit' ? '' : '?stil=' + k}"${k === STIL.current ? ' aria-current="true"' : ''}>${l}</a>`).join('')}<a data-stil-link href="${ROOT}stiller/">Hepsi yan yana</a></div>`;
   }
 }
 
@@ -399,7 +403,7 @@ function openIdea(key, push=true){
   if (!dlg){
     dlg = el('dialog', { class:'idlg', 'aria-labelledby':'idlg-h' });
     document.body.append(dlg);
-    dlg.addEventListener('close', () => { if (location.search.includes('f=')) history.replaceState(null, '', location.pathname); });
+    dlg.addEventListener('close', () => { if (location.search.includes('f=')) history.replaceState(null, '', withStil(location.pathname)); });
     dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
   }
   const paint = () => {
@@ -433,7 +437,7 @@ function openIdea(key, push=true){
   paint();
   dlg.addEventListener('close', () => unsub(), { once:true });
   if (!dlg.open) dlg.showModal();
-  if (push) history.replaceState(null, '', '?f=' + encodeURIComponent(key));
+  if (push) history.replaceState(null, '', withStil(location.pathname + '?f=' + encodeURIComponent(key)));
   return true;
 }
 

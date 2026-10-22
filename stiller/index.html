@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="stiller">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stil örnekleri · Undustit</title>
+<meta name="description" content="Undustit'in aynı içerikle dört farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FAF9F6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/ud.css">
+<script src="../assets/stil.js"></script>
+<style>
+/* Style samples: the same site in four looks, each opened as its own site in a new tab. */
+.styles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.style{display:grid;gap:16px;align-content:start;padding:14px 14px 22px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2)}
+.thumb{aspect-ratio:16/10;border-radius:12px;border:1px solid var(--line);overflow:hidden;position:relative;background:var(--bg-3)}
+.thumb iframe{position:absolute;left:0;top:0;width:1440px;height:900px;border:0;transform-origin:0 0;pointer-events:none}
+.style .in{display:grid;gap:10px;padding-inline:8px}
+.style h2{font-size:clamp(30px,3vw,42px)}
+.style p{color:var(--ink-2);font-weight:300;font-size:15px;max-width:52ch}
+.style .acts{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.style code{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+@media (max-width:900px){.styles{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="wrap">
+  <div class="phead">
+    <span class="eyebrow">Stil örnekleri</span>
+    <h1>Aynı site, <em>dört stil.</em></h1>
+    <p class="lead">İçerik, sayfalar ve akış dördünde de aynı. Her biri ayrı bir site olarak açılır; içinde gezinirken stil değişmez, dördünü ayrı sekmelerde yan yana açabilirsin.</p>
+  </div>
+  <div class="styles" id="styles"></div>
+</main>
+<footer data-ud-foot></footer>
+<script src="../assets/ud.js"></script>
+<script>
+const STYLES = [
+  ['kagit','Kâğıt','Sıcak kâğıt beyazı, editoryal serif başlıklar. Mavi yalnız eylemlerde, yeşil ilerlemede. Sakin ve premium.'],
+  ['oyuncu','Oyuncu','Quirky havası: krem zemin, kalın grotesk başlıklar, mürekkep çerçeveli kartlar ve sert gölgeler, sarı işaretleyici, zıplayan düğmeler.'],
+  ['teknik','Teknik çizim','Mavi pafta kâğıdı ve ızgara, dar büyük harfli başlıklar, mono etiketler, kesikli çizgiler. Mühendislik ve üretim hissi.'],
+  ['el','El yapımı','Mucit defteri: kraft kâğıt, el yazısı başlıklar, defter çizgili yazma alanı, bantlı not kâğıdı gibi vaka kartı.']
+];
+const host = document.getElementById('styles');
+STYLES.forEach(([k, name, about]) => {
+  const href = '../' + (k === 'kagit' ? '' : '?stil=' + k);
+  const abs = new URL(href, location.href).href;
+  host.insertAdjacentHTML('beforeend', `<article class="style">
+    <div class="thumb"><iframe src="${href}" title="${name} önizleme" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+    <div class="in"><h2>${name}</h2><p>${about}</p>
+      <div class="acts"><a class="btn sig" data-stil-link href="${href}" target="_blank" rel="noopener">${name} sitesini aç ${UD.ICON.arrow}</a><code>${abs}</code></div></div>
+  </article>`);
+});
+// scale the live 1440-wide previews into their cards
+const fit = () => document.querySelectorAll('.thumb').forEach(t => { t.querySelector('iframe').style.transform = `scale(${t.clientWidth/1440})`; });
+fit(); window.addEventListener('resize', fit);
+</script>
+</body>
+</html>

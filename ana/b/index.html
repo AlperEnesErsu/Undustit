@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="tr" data-root="../../" data-home="ana/b/" data-page="home">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Undustit · Her perşembe bir fikir sahnede</title>
+<meta name="description" content="Fikrini tek cümleyle yaz, topluluk oylasın. En çok oyu alanlar her perşembe canlı yayında değerlendirilir; seçilen fikir topluluğun katkısıyla ürüne dönüşür.">
+<meta name="theme-color" content="#08090A">
+<meta property="og:title" content="Undustit · Her perşembe bir fikir sahnede">
+<meta property="og:description" content="Tek cümlelik fikirden raftaki ürüne: oyla, geliştir, payını al.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230B0C0D%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23FF6A2B%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/ud.css">
+<style>
+/* B · Sahne: the Thursday show is the page. Ideas line up like contestants, the composer is docked and always one tap away. */
+:root{--bg:#08090A}
+body{padding-bottom:140px}
+.spot{position:relative;isolation:isolate}
+.spot::before{content:"";position:absolute;inset:-80px 0 auto;height:820px;z-index:-1;pointer-events:none;background:radial-gradient(38% 52% at 50% 0%,rgba(255,236,214,.13),transparent 72%),radial-gradient(22% 40% at 18% 0%,rgba(255,106,43,.10),transparent 70%),radial-gradient(22% 40% at 82% 0%,rgba(255,106,43,.08),transparent 70%)}
+.show{display:grid;justify-items:center;text-align:center;gap:22px;padding-block:clamp(48px,7vw,104px) clamp(40px,5vw,72px)}
+.show h1{font-size:clamp(52px,8vw,128px);line-height:.92;letter-spacing:-.035em;max-width:13ch}
+.show h1 em{color:var(--accent)}
+.show .lead{max-width:54ch}
+.stage{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,4vw,56px);align-items:start}
+.lineup{display:grid;gap:16px}
+.lineup-h{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}
+.lineup-h h2{font-size:clamp(34px,3.6vw,52px)}
+.lineup .icard{padding-block:20px}
+.lineup .icard:first-child{border-color:var(--accent-line);background:linear-gradient(110deg,rgba(255,106,43,.12),var(--bg-2) 55%)}
+.lineup .icard:first-child .t{font-size:20px}
+.lineup .icard .rank{font-size:40px}
+.cut{display:flex;align-items:center;gap:12px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cut::before,.cut::after{content:"";flex:1;border-top:1px dashed var(--line-2)}
+.side{display:grid;gap:18px;position:sticky;top:92px}
+.judges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.judges div{padding:16px;display:grid;gap:4px}
+.judges div + div{border-inline-start:1px solid var(--line)}
+.judges b{font-family:var(--f-serif);font-weight:400;font-size:24px;line-height:1}
+.judges span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.dock{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));translate:-50% 0;width:min(860px,100% - 20px);z-index:25;filter:drop-shadow(0 30px 50px rgba(0,0,0,.75))}
+.dock .iform{background:rgba(17,19,21,.94);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);max-height:calc(100dvh - 110px);overflow:auto;overscroll-behavior:contain}
+.dock .if-top{padding:12px 12px 12px 20px}
+.dock .if-pitch{font-size:clamp(20px,2vw,26px)}
+@media (max-width:640px){.dock .if-top{grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:10px 10px 10px 16px}.dock .if-top label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.dock .if-top .btn{min-height:42px;padding:0 16px}body{padding-bottom:110px}}
+@media (max-width:980px){.stage{grid-template-columns:minmax(0,1fr)}.side{position:static}}
+@media (max-width:560px){.judges{grid-template-columns:minmax(0,1fr)}.judges div + div{border-inline-start:0;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="spot">
+  <section class="wrap show" aria-labelledby="h">
+    <span class="thu" id="thu"></span>
+    <h1 id="h">Her perşembe bir fikir <em>sahneye çıkar.</em></h1>
+    <p class="lead">Fikrini aşağıya tek cümleyle yaz. Topluluk 30 gün oylar, en iyileri canlı yayında tartışılır, seçilen fikri birlikte ürüne çeviririz.</p>
+  </section>
+
+  <section class="wrap stage" aria-label="Bu haftanın sahnesi">
+    <div class="lineup">
+      <div class="lineup-h"><div style="display:grid;gap:10px"><span class="eyebrow k">Sahne sırası</span><h2>Bu perşembenin adayları</h2></div><a class="link" href="../../fikirler/">Tüm fikirler</a></div>
+      <div id="board"></div>
+      <p class="cut">İlk 5 sahneye çıkar</p>
+    </div>
+    <aside class="side" aria-label="Süreç">
+      <div id="proc"></div>
+      <div class="judges" aria-label="Değerlendirme ölçütleri">
+        <div><b>Tasarım</b><span>Kullanışlı ve güzel mi?</span></div>
+        <div><b>Pazar</b><span>Kim, kaça alır?</span></div>
+        <div><b>Uygulanabilirlik</b><span>Üretilebilir mi?</span></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="sec" aria-label="Daha fazlası" style="margin-top:clamp(56px,7vw,104px)">
+    <div class="wrap disc">
+      <a href="../../nasil/"><span class="eyebrow">01</span><b>Nasıl işler</b><p>Fikirden ön satışa yedi adım.</p><span class="go">Adımlar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+      <a href="../../nasil/#pay"><span class="eyebrow">02</span><b>Kim ne kazanır</b><p>Satışın %10–30'u katkı sahiplerine.</p><span class="go">Paylar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+      <a href="../../vakalar/"><span class="eyebrow">03</span><b>Vakalar</b><p>Fazla stoklar için açık çağrılar.</p><span class="go">Vaka 01 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+      <a href="../../hikaye/"><span class="eyebrow">04</span><b>Hikâye</b><p>Neden kurduk, neyi değiştirmek istiyoruz.</p><span class="go">Amacımız <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+    </div>
+  </section>
+</main>
+<footer data-ud-foot></footer>
+<div class="dock" id="dock"><div id="form"></div></div>
+<script src="../../assets/ud.js"></script>
+<script>
+UD.mountForm(document.getElementById('form'), { label:'Sahneye çıkacak fikrin', placeholder:'Fikrini tek cümleyle yaz…' });
+UD.mountProc(document.getElementById('proc'), { delay:400 });
+UD.mountThu(document.getElementById('thu'));
+UD.mountBoard(document.getElementById('board'), { limit:6, filter:i => i.left > 0 });
+// the docked composer folds back to one line on Escape or a tap outside, while it is still empty
+(function(){
+  const dock = document.getElementById('dock'), f = dock.querySelector('.iform');
+  const fold = () => { if (!f.classList.contains('done') && !f.querySelector('[name=problem]').value) f.classList.remove('open'); };
+  document.addEventListener('pointerdown', e => { if (!dock.contains(e.target)) fold(); });
+  dock.addEventListener('keydown', e => { if (e.key === 'Escape') fold(); });
+})();
+</script>
+</body>
+</html>

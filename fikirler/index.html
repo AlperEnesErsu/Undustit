@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="fikirler">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fikirler · Undustit</title>
+<meta name="description" content="Oylamadaki fikirler. Oy ver, tasarım, pazar ve uygulanabilirlik açısından puanla, iyileştirme öner ya da endişeni yaz.">
+<meta name="theme-color" content="#0B0C0D">
+<meta property="og:title" content="Fikirler · Undustit">
+<meta property="og:description" content="Oylamadaki fikirler: oy ver, puanla, geliştir.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230B0C0D%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23FF6A2B%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/ud.css">
+<style>
+.bar{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center;padding-block:18px;border-block:1px solid var(--line);margin-bottom:24px;position:sticky;top:68px;z-index:5;background:var(--bg)}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
+.seg button{min-height:34px;padding:0 14px;border:0;border-radius:999px;background:transparent;font-size:14px;color:var(--ink-2);transition:all var(--dur-fast) var(--ease-out)}
+.seg button:hover{color:var(--ink);background:var(--bg-3)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.cat-f{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.cat-f .chip{flex:none}
+.arena{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,3fr);gap:clamp(24px,4vw,56px);align-items:start}
+.arena aside{display:grid;gap:16px;position:sticky;top:150px;font-size:14px;color:var(--ink-2)}
+.arena aside div{padding:18px;border:1px solid var(--line);border-radius:var(--r-md);display:grid;gap:8px}
+.arena aside b{color:var(--ink);font-weight:500}
+@media (max-width:980px){.arena{grid-template-columns:minmax(0,1fr)}.arena aside{position:static}.bar{position:static}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="wrap">
+  <div class="phead">
+    <span class="thu" id="thu" style="justify-self:start"></span>
+    <h1>Yarışan <em>fikirler.</em></h1>
+    <p class="lead">Beğendiğine oy ver. Fikre girip üç ölçütte puanla, nasıl daha iyi olacağını ya da neden endişelendiğini yaz. Oy ve geliştirme ücretsiz.</p>
+  </div>
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Sıralama"><button type="button" data-s="top" aria-pressed="true">En çok oy</button><button type="button" data-s="new" aria-pressed="false">En yeni</button></div>
+    <div class="cat-f chips" role="group" aria-label="Kategori" id="cats"></div>
+  </div>
+  <div class="arena">
+    <div id="board"></div>
+    <aside aria-label="Kurallar">
+      <div><b>Oylama 30 gün sürer.</b>Kartlardaki çizgi kalan süreyi gösterir.</div>
+      <div><b>Üç ölçüt.</b>Tasarım, pazar, uygulanabilirlik. Puanlar perşembe değerlendirmesine girer.</div>
+      <div><b>Fikrin yok mu?</b><a class="btn sig sm" href="../fikir/" style="justify-self:start">Fikrini yaz</a></div>
+    </aside>
+  </div>
+</main>
+<footer data-ud-foot></footer>
+<script src="../assets/ud.js"></script>
+<script>
+let sort = 'top', cat = '';
+const board = UD.mountBoard(document.getElementById('board'), { dialog:true, sort:() => sort, filter:i => !cat || i.cat === cat });
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { sort = b.dataset.s; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); });
+const cats = document.getElementById('cats');
+['Tümü'].concat(UD.CASES.map(c => c.short), UD.CATS).forEach((c, ix) => {
+  const b = UD.el('button', { type:'button', class:'chip', 'aria-pressed': String(ix === 0), text:c });
+  b.onclick = () => { cat = ix === 0 ? '' : c; cats.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); };
+  cats.append(b);
+});
+UD.mountThu(document.getElementById('thu'));
+// a shared link (?f=<idea>) opens that idea; the live store can take a moment to arrive
+const f = new URLSearchParams(location.search).get('f');
+if (f){ let tries = 0; const t = setInterval(() => { if (UD.openIdea(f, false) || ++tries > 40) clearInterval(t); }, 250); }
+</script>
+</body>
+</html>

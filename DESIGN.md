@@ -1,5 +1,31 @@
 # Undustit tasarım notları
 
+## Quirky modeli (22 Ekim 2026 görüşmesi sonrası)
+
+İş modeli Quirky'ye yaklaştırıldı: kısa form (140 karakter + kategori + problem + çözüm + en
+çok 3 özellik), küçük gönderim ücreti, 30 gün oylama, üç ölçüt (tasarım, pazar,
+uygulanabilirlik), perşembe 20.00 canlı değerlendirme, topluluğun geliştirmeye katılması, ön satış
+eşiği (300–750), satıştan pay (perakende %10, doğrudan %30).
+
+- `ana/`: üç rakip ana sayfa. `a/` Atölye (form + animasyon yan yana), `b/` Sahne (perşembe
+  şovu, alta sabit yazma çubuğu), `c/` Kâğıt (açık tema, editoryal, üç tur kolonu).
+  `ana/index.html` üçünü canlı önizlemeyle karşılaştırır. Seçilen aday köke taşınacak.
+- `fikir/` (form, `?vaka=vaka-01` vakayı seçili açar), `fikirler/` (arena; `?f=<id>` fikri
+  açar), `nasil/` (7 adım + `#pay` tablosu), `vakalar/`, `hikaye/`.
+- Ortak parçalar `assets/ud.css` ve `assets/ud.js` içinde: menü ve alt bilgi JS ile basılır,
+  her sayfa `<html data-root>` ile köke giden yolu verir. Logo son ziyaret edilen ana sayfa
+  adayına gider (`localStorage: ud-home`).
+- Taslak ticari şartlar yalnız `ud.js` içindeki `TERMS` sabitinde (ücret, gün, paylar, eşik,
+  canlı yayın saati). Havuz bölüşüm tablosu `nasil/index.html` içinde ve "taslak" etiketli.
+- Veri: claude.ai'de `db` yeteneğiyle `ideas/<uid>`, `votes/<uid>`, `notes/<uid>` (herkes
+  kendi belgesini yazar). Başka yerde aynı yapı `localStorage`'da tutulur ve alt bilgide
+  "önizleme" rozeti görünür. Gerçek fikir yokken örnekler "örnek · oylanamaz" etiketiyle durur.
+- Süreç animasyonu kaydırmaya bağlı değil: ekrana girince yaklaşık 6,5 sn'de bir kez oynar,
+  sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
+- C adayı açık tema kullanıyor; bu "tek tema" kuralına bilinçli bir istisna. C seçilirse iç
+  sayfalar da açık temaya taşınmalı.
+- Eski `index.html` ve `vaka-01/` dokunulmadan duruyor.
+
 Undustit bir platform: üretim fazlalarına ve sorunlara yaratıcı fikirler gelir, ürün sahibinin
 dikkatini çeken fikir ortaklığa dönüşür. Cıvata yalnız ilk vaka.
 

@@ -22,9 +22,10 @@ eşiği (300–750), satıştan pay (perakende %10, doğrudan %30).
   "önizleme" rozeti görünür. Gerçek fikir yokken örnekler "örnek · oylanamaz" etiketiyle durur.
 - Süreç animasyonu kaydırmaya bağlı değil: ekrana girince yaklaşık 6,5 sn'de bir kez oynar,
   sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
-- C adayı açık tema kullanıyor; bu "tek tema" kuralına bilinçli bir istisna. C seçilirse iç
-  sayfalar da açık temaya taşınmalı.
-- Eski `index.html` ve `vaka-01/` dokunulmadan duruyor.
+- Üç aday da aynı beyaz temayı kullanır; C'yi ayıran mürekkep çizgiler ve köşesiz gazete düzeni.
+- Eski `index.html`, `vaka-01/` ve `404.html` yalnız renk olarak beyaz temaya geçirildi; içerik
+  ve düzenleri aynı. Vaka 01 çizimi koyu "ürün fotoğrafı"ndan kâğıt üzerinde teknik çizime döndü
+  (malzeme gradyanları açıldı, vurgulu cıvata mavi).
 
 Undustit bir platform: üretim fazlalarına ve sorunlara yaratıcı fikirler gelir, ürün sahibinin
 dikkatini çeken fikir ortaklığa dönüşür. Cıvata yalnız ilk vaka.
@@ -38,30 +39,39 @@ dikkatini çeken fikir ortaklığa dönüşür. Cıvata yalnız ilk vaka.
   not bunu açıkça söyler. Gerçek bir Vaka 02 gelince kart onunla değiştirilir.
 - "Vakanı aç" föyü şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
-Sayfalar tek bir temayı paylaşır: `index.html` ve `vaka-01/`.
-Her sayfa tek dosyalık bir artifact olduğu için token'lar iki dosyanın `:root` bloğunda birebir
-aynı tutulur. Birinde renk, font, radius veya süre değişirse diğerinde de değişmeli.
+Bütün sayfalar tek temayı paylaşır. Yeni sayfalar token'ları `assets/ud.css` içinden alır;
+`index.html`, `vaka-01/` ve `404.html` tek dosyalık oldukları için aynı değerleri kendi `:root`
+bloklarında tutar. Birinde renk, font, radius veya süre değişirse diğerlerinde de değişmeli.
 
-## Tema: koyu atölye
+## Tema: kâğıt ve fikir mavisi (22 Ekim 2026)
+
+Beyaz zemin dikkati fikri yazmaya toplar. Mavi, keşfe ve hayal gücüne dayalı görevlerle
+ilişkilendirildi (Mehta ve Zhu, Science 2009). Kırmızıya yakın tonlar ise temkin ve detay
+moduyla ilişkilendirildi, bu yüzden turuncu yazma alanından çekildi. Yeşil "büyüme" anlamıyla
+ilerleme durumlarında (Lichtenfeld ve ark., 2012; bulgu tekrarlarda tutarsız, yön olarak
+kullanıldı).
 
 | Rol | Token | Değer |
 |---|---|---|
-| Sayfa zemini | `--bg` | `#0B0C0D` |
-| Yüzey / kart | `--bg-2`, `--bg-3` | `#111315`, `#171A1C` |
-| Çizgi | `--line`, `--line-2` | `#22262A`, `#30353A` |
-| Metin | `--ink`, `--ink-2`, `--muted` | `#EEECE7`, `#BFBDB6`, `#8F928E` |
-| Tek vurgu | `--accent` (+ hover/active/ink) | `#FF6A2B` |
-| Olumlu durum | `--ok` | `#86D4A6` |
+| Sayfa zemini (sıcak kâğıt) | `--bg` | `#FAF9F6` |
+| Yüzey / kart | `--bg-2`, `--bg-3` | `#FFFFFF`, `#F2F0EB` |
+| Çizgi | `--line`, `--line-2` | `#E6E3DC`, `#D3CFC6` |
+| Metin | `--ink`, `--ink-2`, `--muted` | `#16181D`, `#464A52`, `#6B6F76` |
+| Ana vurgu: yazma, düğme, odak | `--accent` (+ hover/active) | `#2747D9` |
+| İlerleme: oy, ön satış, "geçti" | `--ok` | `#147A4E` |
+| Marka ve canlı sinyal: logo "it", perşembe | `--brand` | `#C2410C` |
+| Uyarı / hata | `--warn`, `--err` | `#8A5A00`, `#B42318` |
 
-Kontrast (WCAG 2.2 AA): ink/bg 16.6, muted/bg 6.2, accent/bg 6.9, accent-ink/accent 6.8.
+Kontrast (WCAG 2.2 AA, `--bg` üzerinde): ink 16.9, ink-2 8.5, muted 4.8, accent 6.7, ok 5.1,
+brand 4.9; beyaz metin accent üzerinde 7.0.
 
 Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist Mono (etiket, sayı).
 
 ## Kararlar
 
-- Ana sayfanın eski açık/koyu çelik teması (Archivo + Figtree) kaldırıldı. Tek tema kuralı
-  (UI-UX kit, `redesign`) gereği iki sayfa da koyu atölye temasını kullanır.
-- Marka adı "İkinci Tur" yerine **Undustit**. Logo: `Undust` + italik turuncu `it`.
+- Ana sayfanın eski açık/koyu çelik teması (Archivo + Figtree) kaldırıldı. Koyu atölye teması
+  22 Ekim 2026'da yerini beyaz "kâğıt ve fikir mavisi" temasına bıraktı.
+- Marka adı "İkinci Tur" yerine **Undustit**. Logo: `Undust` + italik turuncu (`--brand`) `it`.
 - Başlıklar en fazla 3 satır. Ana sayfa hero'su 7/5 asimetrik ızgara.
 - Yan yana iki bölüm aynı düzeni kullanmaz: hero split, ofsetli adım listesi, örnek + form,
   fikir panosu, hesap tablosu, iki sütunlu SSS.

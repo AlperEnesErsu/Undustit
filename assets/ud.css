@@ -2,12 +2,13 @@
    Pages that predate it (index.html, vaka-01/) keep their own inline copy of the same tokens. */
 :root{
   color-scheme:light;
-  /* White theme: warm paper, idea blue for anything you act on, growth green for progress,
-     Thursday orange only for the logo and the live signal. All text pairs pass WCAG AA on --bg. */
+  /* White theme: warm paper, idea blue only for what you act on (fields, buttons, votes, focus),
+     growth green for progress, Thursday orange only for the logo and the live signal.
+     Headlines and their italics stay in ink. All text pairs pass WCAG AA on --bg. */
   --bg:#FAF9F6; --bg-2:#FFFFFF; --bg-3:#F2F0EB; --line:#E6E3DC; --line-2:#D3CFC6;
   --ink:#16181D; --ink-2:#464A52; --muted:#6B6F76; --hint:#767A81;
-  --accent:#2747D9; --accent-hover:#1F3BC0; --accent-active:#1A33A8; --accent-ink:#FFFFFF;
-  --accent-soft:rgba(39,71,217,.07); --accent-line:rgba(39,71,217,.35);
+  --accent:#2337C6; --accent-hover:#1C2DA8; --accent-active:#172489; --accent-ink:#FFFFFF;
+  --accent-soft:rgba(35,55,198,.07); --accent-line:rgba(35,55,198,.35);
   --brand:#C2410C;
   --ok:#147A4E; --ok-soft:rgba(20,122,78,.08); --warn:#8A5A00; --err:#B42318;
   --shadow:0 24px 50px -28px rgba(22,24,29,.28);
@@ -44,7 +45,7 @@ main:focus{outline:none}
 .btn:hover svg{transform:translateX(4px)}
 .btn:active{transform:scale(.97)}
 .btn.sig{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.sig:hover{background:var(--accent-hover);border-color:var(--accent-hover);box-shadow:0 0 0 4px rgba(39,71,217,.16)}
+.btn.sig:hover{background:var(--accent-hover);border-color:var(--accent-hover);box-shadow:0 0 0 4px rgba(35,55,198,.16)}
 .btn.sig:active{background:var(--accent-active)}
 .btn.alt{background:transparent;color:var(--ink);border-color:var(--line-2)}
 .btn.alt:hover{border-color:var(--ink);background:var(--ink);color:var(--bg)}
@@ -89,14 +90,14 @@ main:focus{outline:none}
 /* ---------- page head (inner pages) */
 .phead{padding-block:clamp(56px,8vw,112px) clamp(32px,4vw,56px);display:grid;gap:20px}
 .phead h1{font-size:clamp(48px,7vw,104px);line-height:.95;letter-spacing:-.03em;max-width:14ch}
-.phead h1 em{color:var(--accent)}
+.phead h1 em{color:var(--ink)}
 .sec{padding-block:clamp(56px,7vw,104px);border-top:1px solid var(--line)}
 .sec h2{font-size:clamp(36px,4.6vw,64px);line-height:1}
-.sec h2 em{color:var(--accent)}
+.sec h2 em{color:var(--ink)}
 
 /* ---------- idea form: one line first, the rest unfolds in place */
 .iform{display:grid;gap:0;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2);overflow:clip;transition:border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
-.iform:focus-within{border-color:var(--accent-line);box-shadow:0 0 0 6px rgba(39,71,217,.08)}
+.iform:focus-within{border-color:var(--accent-line);box-shadow:0 0 0 6px rgba(35,55,198,.08)}
 .if-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;padding:18px 18px 16px 22px}
 .if-top label{grid-column:1 / -1;display:flex;justify-content:space-between;gap:12px}
 .if-pitch{width:100%;border:0;background:transparent;resize:none;font-family:var(--f-serif);font-size:clamp(24px,2.4vw,32px);line-height:1.15;letter-spacing:-.01em;color:var(--ink);padding:4px 0;min-height:1.3em;field-sizing:content;max-height:5.2em}
@@ -152,7 +153,7 @@ main:focus{outline:none}
 .icard{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 18px;align-items:center;padding:18px 20px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2);transition:border-color var(--dur-base) var(--ease-out),background-color var(--dur-base) var(--ease-out)}
 .icard:hover{border-color:var(--line-2);background:var(--bg-3)}
 .icard .rank{font-family:var(--f-serif);font-size:34px;line-height:1;color:var(--muted);width:1.4ch;text-align:center}
-.icard.top .rank{color:var(--accent)}
+.icard.top .rank{color:var(--ink)}
 .icard .t{font-size:17px;font-weight:500;line-height:1.35;letter-spacing:-.005em}
 .icard .t a{text-decoration:none}
 .icard .t a::after{content:"";position:absolute;inset:0;border-radius:inherit}
@@ -187,7 +188,7 @@ main:focus{outline:none}
 
 /* ---------- the process: one quick run, idea card to product on the shelf */
 .proc{position:relative;display:grid;gap:14px;min-width:0}
-.pc-stage{position:relative;aspect-ratio:5/4;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(60% 60% at 50% 40%,rgba(39,71,217,.05),transparent 70%),var(--bg);overflow:hidden;isolation:isolate}
+.pc-stage{position:relative;aspect-ratio:5/4;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(60% 60% at 50% 40%,rgba(35,55,198,.05),transparent 70%),var(--bg);overflow:hidden;isolation:isolate}
 .pc-stage::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px;opacity:.45;mask-image:radial-gradient(75% 75% at 50% 50%,#000,transparent)}
 .pc-card{position:absolute;left:8%;top:12%;width:58%;display:grid;gap:10px;padding:16px 16px 14px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2);box-shadow:var(--shadow);transform-origin:0 0;transition:transform var(--dur-slow) var(--ease-out),opacity var(--dur-mod) var(--ease-out),border-color var(--dur-mod) var(--ease-out)}
 .pc-card .h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em}
@@ -241,10 +242,10 @@ main:focus{outline:none}
 .proc.s5 .pc-pre .pc-bar i{width:100%}
 .pc-pre .ok{font-family:var(--f-mono);font-size:11px;color:var(--ok);opacity:0;transition:opacity var(--dur-base) linear}
 .proc.s6 .pc-pre .ok{opacity:1}
-.pc-pay{position:absolute;left:8%;top:12%;width:50%;display:grid;justify-items:start;gap:8px;padding:16px 18px;border:1px solid var(--accent-line);border-radius:var(--r-md);background:linear-gradient(160deg,rgba(39,71,217,.08),var(--bg-2) 70%);box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:opacity var(--dur-mod) var(--ease-out),transform var(--dur-slow) var(--ease-out)}
+.pc-pay{position:absolute;left:8%;top:12%;width:50%;display:grid;justify-items:start;gap:8px;padding:16px 18px;border:1px solid var(--accent-line);border-radius:var(--r-md);background:linear-gradient(160deg,rgba(35,55,198,.08),var(--bg-2) 70%);box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:opacity var(--dur-mod) var(--ease-out),transform var(--dur-slow) var(--ease-out)}
 .pc-pay .eb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 .pc-pay b{font-family:var(--f-serif);font-weight:400;font-size:clamp(30px,3.4vw,46px);line-height:.95;color:var(--ink)}
-.pc-pay b em{color:var(--accent)}
+.pc-pay b em{color:var(--ink)}
 .pc-pay span{font-size:12.5px;line-height:1.4;color:var(--ink-2)}
 .proc.s6 .pc-pay{opacity:1;transform:none}
 .proc.s6 .pc-card{opacity:0}

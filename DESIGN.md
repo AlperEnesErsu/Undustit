@@ -57,13 +57,16 @@ kullanıldı).
 | Yüzey / kart | `--bg-2`, `--bg-3` | `#FFFFFF`, `#F2F0EB` |
 | Çizgi | `--line`, `--line-2` | `#E6E3DC`, `#D3CFC6` |
 | Metin | `--ink`, `--ink-2`, `--muted` | `#16181D`, `#464A52`, `#6B6F76` |
-| Ana vurgu: yazma, düğme, odak | `--accent` (+ hover/active) | `#2747D9` |
+| Ana vurgu, yalnız eylemler: yazma alanı, düğme, oy, odak | `--accent` (+ hover/active) | `#2337C6` (koyu ultramarin) |
 | İlerleme: oy, ön satış, "geçti" | `--ok` | `#147A4E` |
 | Marka ve canlı sinyal: logo "it", perşembe | `--brand` | `#C2410C` |
 | Uyarı / hata | `--warn`, `--err` | `#8A5A00`, `#B42318` |
 
-Kontrast (WCAG 2.2 AA, `--bg` üzerinde): ink 16.9, ink-2 8.5, muted 4.8, accent 6.7, ok 5.1,
-brand 4.9; beyaz metin accent üzerinde 7.0.
+Kontrast (WCAG 2.2 AA, `--bg` üzerinde): ink 16.9, ink-2 8.5, muted 4.8, accent 8.2, ok 5.1,
+brand 4.9; beyaz metin accent üzerinde 8.6.
+
+Başlıklar ve başlık italikleri mürekkep renginde kalır; mavi yalnız kullanıcının bir şey
+yapacağı yerde görünür ki "mavi = buraya yaz / tıkla" sinyali tek anlamlı olsun.
 
 Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist Mono (etiket, sayı).
 

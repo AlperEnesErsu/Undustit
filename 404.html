@@ -17,7 +17,7 @@
   --brand:#C2410C;
   --bg:#FAF9F6; --bg-2:#FFFFFF; --bg-3:#F2F0EB; --line:#E6E3DC; --line-2:#D3CFC6;
   --ink:#16181D; --ink-2:#464A52; --muted:#6B6F76;
-  --accent:#2747D9; --accent-hover:#1F3BC0; --accent-active:#1A33A8; --accent-ink:#FFFFFF;
+  --accent:#2337C6; --accent-hover:#1C2DA8; --accent-active:#172489; --accent-ink:#FFFFFF;
   --f-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
   --f-body:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -38,14 +38,14 @@ main{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(32
 .txt{display:grid;gap:24px;justify-items:start}
 .eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 h1{margin:0;font-family:var(--f-serif);font-weight:400;font-size:clamp(52px,7vw,104px);line-height:.95;letter-spacing:-.03em;text-wrap:balance;max-width:12ch}
-h1 em{color:var(--accent)}
+h1 em{color:var(--ink)}
 p{margin:0;color:var(--ink-2);font-weight:300;font-size:18px;max-width:46ch}
 .btn{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 22px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:500;font-size:15px;text-decoration:none;transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
 .btn svg{width:18px;height:18px;transition:transform var(--dur-base) var(--ease-out)}
 .btn:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
 .btn:hover svg{transform:translateX(-5px)}
 .btn:active{transform:scale(.97);background:var(--accent-active)}
-figure{margin:0;border:1px solid var(--line);border-radius:20px;background:radial-gradient(70% 70% at 50% 45%,rgba(39,71,217,.05),transparent 70%),var(--bg-2);padding:clamp(18px,2vw,28px)}
+figure{margin:0;border:1px solid var(--line);border-radius:20px;background:radial-gradient(70% 70% at 50% 45%,rgba(35,55,198,.05),transparent 70%),var(--bg-2);padding:clamp(18px,2vw,28px)}
 figure svg{width:100%;height:auto;display:block}
 .s{fill:var(--bg-3);stroke:var(--ink-2);stroke-width:1.5}
 .h{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:5 4}

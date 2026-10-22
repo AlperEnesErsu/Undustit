@@ -324,6 +324,8 @@ function sortIdeas(list, by){
 }
 const tl = n => Math.round(n).toLocaleString('tr-TR') + ' ₺';
 // "Alırdım": one tap opens a price field in place; saving it counts as purchase intent at that price.
+// The card that was just saved gets .just once, so a style can celebrate it (Yumuşak squishes and pops).
+let justBought = null;
 function buyCtl(i){
   const box = el('div', { class:'buy' });
   const voting = i.left > 0;
@@ -335,6 +337,7 @@ function buyCtl(i){
     btn.onclick = edit;
     box.append(btn);
     if (i.mine) box.append(el('small', { class:'buy-mine', text:'Sen: ' + tl(i.myPrice) }));
+    if (justBought === i.key){ box.classList.add('just'); justBought = null; }
   };
   function edit(){
     box.replaceChildren();
@@ -347,6 +350,7 @@ function buyCtl(i){
       e.preventDefault();
       const n = Math.round(parseFloat(inp.value.replace(/\./g,'').replace(',', '.')));
       if (!(n > 0) || n > TERMS.maxPrice){ inp.focus(); inp.setAttribute('aria-invalid','true'); inp.placeholder = 'Fiyat yaz'; return; }
+      justBought = i.key;
       Store.setBuy(i.key, n).catch(()=>{});
     };
     f.append(inp, ok, no);

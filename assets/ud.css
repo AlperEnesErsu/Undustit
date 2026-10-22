@@ -103,7 +103,7 @@ main:focus{outline:none}
 .if-pitch{width:100%;border:0;background:transparent;resize:none;font-family:var(--f-serif);font-size:clamp(24px,2.4vw,32px);line-height:1.15;letter-spacing:-.01em;color:var(--ink);padding:4px 0;min-height:1.3em;field-sizing:content;max-height:5.2em}
 .if-pitch::placeholder{color:var(--hint)}
 .if-pitch:focus{outline:none}
-.if-count{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.if-count{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .if-count.near{color:var(--warn)} .if-count.over{color:var(--err)}
 .if-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-slow) var(--ease-out)}
 .iform.open .if-more{grid-template-rows:1fr}
@@ -239,7 +239,7 @@ main:focus{outline:none}
 .pc-prod .lbl rect{fill:var(--ink)}
 .pc-prod .lbl text{font-family:var(--f-mono);font-size:8.5px;letter-spacing:.06em;fill:var(--bg-2)}
 .proc.s4 .pc-prod .lbl{opacity:1}
-.pc-pre{position:absolute;left:8%;bottom:12%;width:34%;display:grid;gap:6px;opacity:0;transform:translateY(10px);transition:opacity var(--dur-mod) var(--ease-out),transform var(--dur-mod) var(--ease-out)}
+.pc-pre{position:absolute;left:8%;bottom:12%;width:29%;display:grid;gap:6px;opacity:0;transform:translateY(10px);transition:opacity var(--dur-mod) var(--ease-out),transform var(--dur-mod) var(--ease-out)}
 .proc.s3 .pc-pre{opacity:1;transform:none}
 .pc-pre .pc-row b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
 .pc-pre .pc-bar{height:6px}

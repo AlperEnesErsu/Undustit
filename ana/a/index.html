@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Undustit · Fikrini yaz, birlikte üretelim</title>
-<meta name="description" content="Fikrini tek cümleyle yaz. Topluluk 30 gün oylar, her perşembe canlı değerlendirilir, ön satış eşiği dolunca üretilir; satıştan katkı verenler pay alır.">
+<meta name="description" content="Fikrini tek cümleyle yaz. Topluluk 30 gün boyunca "alırdım" der ve fiyat yazar, en çok talep gören fikirler perşembe canlı değerlendirilir, ön satış eşiği dolunca üretilir; satıştan katkı verenler pay alır.">
 <meta name="theme-color" content="#FAF9F6">
 <meta property="og:title" content="Undustit · Fikrini yaz, birlikte üretelim">
-<meta property="og:description" content="Tek cümlelik fikirden raftaki ürüne: oyla, geliştir, payını al.">
+<meta property="og:description" content="Tek cümlelik fikirden raftaki ürüne: “alırdım” de, geliştir, payını al.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
@@ -33,19 +33,21 @@
     <div class="hero-l">
       <span class="eyebrow">Topluluk ürün atölyesi</span>
       <h1 id="h">Fikrini yaz. <em>Gerisini birlikte yapalım.</em></h1>
-      <p class="lead">Tek cümle yeter. Topluluk oylar ve geliştirir, ön satış eşiği dolunca ürün üretilir. Satıştan sen ve katkı veren herkes pay alır.</p>
+      <p class="lead">Tek cümle yeter. Topluluk “alırdım” der ve kaça alacağını yazar, ön satış eşiği dolunca ürün üretilir. Satıştan sen ve katkı veren herkes pay alır.</p>
       <div id="form"></div>
       <span class="thu" id="thu"></span>
     </div>
     <div id="proc"></div>
   </section>
 
+  <section class="wrap" aria-label="Açık vaka" style="padding-bottom:clamp(56px,7vw,96px)"><div id="case"></div></section>
+
   <section class="sec" aria-labelledby="race-h">
     <div class="wrap race">
       <div class="race-h">
         <span class="eyebrow">Bu hafta yarışanlar</span>
-        <h2 id="race-h">En çok oyu alanlar <em>perşembe sahnede.</em></h2>
-        <p class="lead" style="font-size:16px">İlk beş fikir perşembe akşamı canlı yayında tasarım, pazar ve uygulanabilirlik açısından tartışılır. Oyun sıralamayı değiştirir.</p>
+        <h2 id="race-h">En çok “alırdım” alanlar <em>perşembe sahnede.</em></h2>
+        <p class="lead" style="font-size:16px">İlk beş fikir perşembe akşamı canlı yayında tasarım, pazar ve uygulanabilirlik açısından tartışılır. Sıralamayı beğeni değil, “alırdım” diyen kişi sayısı ve verilen fiyat belirler.</p>
         <a class="btn alt" href="../../fikirler/">Tüm fikirler <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
       </div>
       <div id="board"></div>
@@ -64,7 +66,8 @@
 <footer data-ud-foot></footer>
 <script src="../../assets/ud.js"></script>
 <script>
-UD.mountForm(document.getElementById('form'), { focus:false });
+const form = UD.mountForm(document.getElementById('form'), { focus:false });
+UD.mountCase(document.getElementById('case'), { form });
 UD.mountProc(document.getElementById('proc'), { delay:500 });
 UD.mountThu(document.getElementById('thu'));
 UD.mountBoard(document.getElementById('board'), { limit:5, filter:i => i.left > 0 });

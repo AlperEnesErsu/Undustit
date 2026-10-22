@@ -31,7 +31,7 @@ const ICON = {
 // Draft business terms from the first meeting (Quirky model). Change them here only.
 const TERMS = {
   fee: { first: 99, next: 10, cur: '₺', charged: false },
-  voteDays: 30,
+  voteDays: 30, maxPrice: 100000,
   shareRetail: 10, shareDirect: 30,
   presale: [300, 750],
   liveDay: 4, liveHourUtc: 17 // Thursday 20:00 Istanbul (UTC+3, no DST)
@@ -90,6 +90,7 @@ function mountChrome(){
 
 // =========================================================== store
 // Live on claude.ai (db capability): ideas/<uid>, votes/<uid>, notes/<uid>, each person writes their own doc.
+// A vote is purchase intent, not a like: votes/<uid>.buy maps an idea to the price that person would pay.
 // Anywhere else it keeps the same shape in localStorage so the pages can be tried as a preview.
 const Store = (function(){
   const subs = new Set();
@@ -141,9 +142,9 @@ const Store = (function(){
         if (it && typeof it.title === 'string' && it.k) out.push({ ...it, key: owner + ':' + it.k, owner });
       });
     }
-    const up = {}, rates = {};
+    const buy = {}, rates = {};
     for (const [voter, v] of Object.entries(S.votes)){
-      Object.keys((v && v.up) || {}).forEach(k => { if (v.up[k]) (up[k] = up[k] || new Set()).add(voter); });
+      Object.entries((v && v.buy) || {}).forEach(([k, p]) => { const n = Number(p); if (n > 0 && n <= TERMS.maxPrice) (buy[k] = buy[k] || {})[voter] = n; });
       Object.entries((v && v.rate) || {}).forEach(([k, r]) => { (rates[k] = rates[k] || []).push(r); });
     }
     const notes = {};
@@ -151,8 +152,11 @@ const Store = (function(){
       (Array.isArray(doc.items) ? doc.items : []).forEach(n => { if (n && n.idea && typeof n.text === 'string') (notes[n.idea] = notes[n.idea] || []).push({ ...n, owner }); });
     }
     out.forEach(i => {
-      i.votes = up[i.key] ? up[i.key].size : 0;
-      i.mine = !!(up[i.key] && up[i.key].has(S.uid));
+      const bs = Object.values(buy[i.key] || {});
+      i.buyers = bs.length;
+      i.avg = bs.length ? bs.reduce((a,b)=>a+b,0)/bs.length : 0;
+      i.myPrice = (buy[i.key] || {})[S.uid] || 0;
+      i.mine = i.myPrice > 0;
       const rs = rates[i.key] || [];
       i.raters = rs.length;
       i.crit = {}; CRIT.forEach(([c]) => { const v = rs.map(r => Number(r[c])).filter(n => n >= 1 && n <= 5); i.crit[c] = v.length ? v.reduce((a,b)=>a+b,0)/v.length : 0; });
@@ -162,7 +166,7 @@ const Store = (function(){
     return out;
   }
   const myItems = col => ((S[col][S.uid] || {}).items || []).slice();
-  const myVotes = () => { const v = S.votes[S.uid] || {}; return { up: { ...(v.up || {}) }, rate: { ...(v.rate || {}) } }; };
+  const myVotes = () => { const v = S.votes[S.uid] || {}; return { buy: { ...(v.buy || {}) }, rate: { ...(v.rate || {}) } }; };
   const key = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   return {
     get mode(){ return S.mode; }, get canWrite(){ return S.canWrite; }, get uid(){ return S.uid; },
@@ -173,7 +177,7 @@ const Store = (function(){
       const it = { k:key(), ...data, at:new Date().toISOString() };
       return write('ideas', { items: myItems('ideas').concat([it]).slice(-40) }).then(() => S.uid + ':' + it.k);
     },
-    toggleVote(k){ const v = myVotes(); if (v.up[k]) delete v.up[k]; else v.up[k] = true; return write('votes', v); },
+    setBuy(k, price){ const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; return write('votes', v); },
     rate(k, c, n){ const v = myVotes(); v.rate[k] = { ...(v.rate[k] || {}), [c]: n }; return write('votes', v); },
     myRate(k){ return ((S.votes[S.uid] || {}).rate || {})[k] || {}; },
     addNote(idea, kind, text, handle){
@@ -199,7 +203,7 @@ const handleSet = v => { try { localStorage.setItem('ud-handle', v); } catch(e){
 function feeLine(){
   const f = TERMS.fee, n = Store.myCount();
   const now = n ? `${f.next} ${f.cur}` : `${f.first} ${f.cur}`;
-  return `Gönderim ücreti: ilk fikir <b>${f.first} ${f.cur}</b>, sonrakiler <b>${f.next} ${f.cur}</b> (bu fikir için ${now}). Oy vermek ve geliştirmeye katılmak ücretsiz.` + (f.charged ? '' : ' <b>Prototipte ödeme alınmıyor.</b>');
+  return `Gönderim ücreti: ilk fikir <b>${f.first} ${f.cur}</b>, sonrakiler <b>${f.next} ${f.cur}</b> (bu fikir için ${now}). “Alırdım” demek ve geliştirmeye katılmak ücretsiz.` + (f.charged ? '' : ' <b>Prototipte ödeme alınmıyor.</b>');
 }
 function mountForm(host, opts={}){
   const preCase = opts.caseId ? CASES.find(c => c.id === opts.caseId) : null;
@@ -261,9 +265,9 @@ function mountForm(host, opts={}){
     Store.addIdea({ title, cat, problem:f.problem.value.trim(), solution:f.solution.value.trim(), feats, handle }).then(k => {
       const end = new Date(Date.now() + TERMS.voteDays*DAY);
       const done = $('.if-done', f);
-      done.innerHTML = `<span class="eyebrow k">Gönderildi · oylamada</span><h3>${esc(title)}</h3>
-        <dl><div><dt>Oylama biter</dt><dd>${fmtDate(end)}</dd></div><div><dt>İlk canlı değerlendirme</dt><dd>${fmtDay(nextLive())}, 20.00</dd></div><div><dt>Ölçütler</dt><dd>Tasarım · Pazar · Uygulanabilirlik</dd></div></dl>
-        <p class="lead" style="font-size:15px">Topluluk 30 gün boyunca oy verir, iyileştirme önerir, endişesini yazar. Seçilmesen de kimin neden beğendiğini görürsün.</p>
+      done.innerHTML = `<span class="eyebrow k">Gönderildi · talep topluyor</span><h3>${esc(title)}</h3>
+        <dl><div><dt>Talep süresi biter</dt><dd>${fmtDate(end)}</dd></div><div><dt>İlk canlı değerlendirme</dt><dd>${fmtDay(nextLive())}, 20.00</dd></div><div><dt>Ölçütler</dt><dd>Tasarım · Pazar · Uygulanabilirlik</dd></div></dl>
+        <p class="lead" style="font-size:15px">Topluluk 30 gün boyunca “alırdım” der ve kaça alacağını yazar; iyileştirme önerir, endişesini söyler. Seçilmesen de kaç kişinin hangi fiyata alacağını görürsün.</p>
         <div class="acts"><a class="btn" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">Fikrini gör ${ICON.arrow}</a><button type="button" class="btn alt again">Bir fikir daha yaz</button></div>`;
       f.classList.add('done'); done.focus();
       $('.again', done).onclick = () => { f.reset(); f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
@@ -274,7 +278,37 @@ function mountForm(host, opts={}){
     });
   });
   if (opts.focus) setTimeout(() => pitch.focus({ preventScroll:true }), 50);
-  return { focus: () => pitch.focus(), open };
+  const useCase = id => {
+    const c = CASES.find(x => x.id === id); if (!c) return;
+    cat = c.short; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.textContent === cat)));
+    open(); f.scrollIntoView({ block:'center', behavior: reduce.matches ? 'auto' : 'smooth' }); pitch.focus({ preventScroll:true });
+  };
+  return { focus: () => pitch.focus(), open, useCase };
+}
+
+// =========================================================== open case card
+// The surplus-stock angle on the home pages: one open case, its numbers, and a one-tap way to write for it.
+function mountCase(host, opts={}){
+  const c = CASES[0];
+  host.classList.add('case-band');
+  host.innerHTML = `
+    <div class="cb-txt">
+      <span class="cb-tag"><i aria-hidden="true"></i>Açık vaka · ${c.name.split(' · ')[0]}</span>
+      <h2 class="cb-h">Bir milyon cıvata <em>yeni bir iş arıyor.</em></h2>
+      <p>Bir fabrikanın deposunda satılmayı bekleyen M10 × 90 flanşlı cıvata takımları. Onları kullanan bir ürün bul: malzeme hazır olduğu için üretim riski düşük, kazanan fikirle 1.000 adetlik deneme partisi yapılır.</p>
+      <dl><div><dt>Adet</dt><dd>1.000.000</dd></div><div><dt>Ölçü</dt><dd>M10 × 90 · 8.8</dd></div><div><dt>Gelen fikir</dt><dd class="cb-n">0</dd></div></dl>
+      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${c.id}" data-case="${c.id}">Bu vakaya fikir yaz ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">Vakayı gör</a><a class="link" href="${ROOT}vakalar/">Fazlan mı var? Vaka aç</a></div>
+    </div>
+    <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">
+      <g class="cb-l"><path d="M24 52h26v46H24z"/><path d="M50 60h10v30H50z"/><path d="M60 66h150v18H60z"/>
+      ${Array.from({length:12}, (_,k) => `<path class="th" d="M${120 + k*7.5} 66l4 18"/>`).join('')}
+      <path d="M176 56h16v38h-16z"/><path d="M192 60h8v30h-8z"/></g>
+      <path class="cb-c" d="M14 75H232" />
+      <g class="cb-d"><path d="M60 108v12M210 108v12M60 116H210"/><text x="135" y="132" text-anchor="middle">l = 90</text><text x="226" y="70">M10</text></g>
+    </svg><figcaption>× 1.000.000</figcaption></figure>`;
+  const a = $('[data-case]', host);
+  if (opts.form) a.addEventListener('click', e => { e.preventDefault(); opts.form.useCase(c.id); });
+  Store.sub(() => { $('.cb-n', host).textContent = String(Store.ideas().filter(i => i.cat === c.short).length); });
 }
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
@@ -282,14 +316,49 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>
 function sortIdeas(list, by){
   const c = list.slice();
   if (by === 'new') c.sort((a,b) => String(b.at).localeCompare(String(a.at)));
-  else c.sort((a,b) => b.votes - a.votes || (b.crit.d+b.crit.m+b.crit.u) - (a.crit.d+a.crit.m+a.crit.u) || String(b.at).localeCompare(String(a.at)));
+  else c.sort((a,b) => b.buyers - a.buyers || b.avg - a.avg || String(b.at).localeCompare(String(a.at)));
   return c;
+}
+const tl = n => Math.round(n).toLocaleString('tr-TR') + ' ₺';
+// "Alırdım": one tap opens a price field in place; saving it counts as purchase intent at that price.
+function buyCtl(i){
+  const box = el('div', { class:'buy' });
+  const voting = i.left > 0;
+  const paint = () => {
+    box.replaceChildren();
+    const btn = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: i.ex || !voting || !Store.canWrite,
+      'aria-label': i.ex ? 'Örnek fikir, talep toplanmıyor' : i.mine ? `Alırdım dedin, ${tl(i.myPrice)}. Değiştir` : `${i.title}: alırdım de, şu an ${i.buyers} kişi`,
+      html:`<b>${i.ex ? '–' : i.buyers}</b><span>alırdım</span>` });
+    btn.onclick = edit;
+    box.append(btn);
+    if (i.mine) box.append(el('small', { class:'buy-mine', text:'Sen: ' + tl(i.myPrice) }));
+  };
+  function edit(){
+    box.replaceChildren();
+    const f = el('form', { class:'buy-f', 'aria-label':'Kaça alırdın?' });
+    const inp = el('input', { type:'text', inputmode:'decimal', placeholder:'Kaça? ₺', 'aria-label':'Kaça alırdın, lira', value: i.myPrice ? String(i.myPrice) : '' });
+    const ok = el('button', { type:'submit', class:'btn sig sm', text:'Kaydet' });
+    const no = el('button', { type:'button', class:'buy-x', 'aria-label': i.mine ? 'Alırdım demekten vazgeç' : 'Vazgeç', text: i.mine ? 'Geri al' : 'Vazgeç' });
+    no.onclick = () => { if (i.mine) Store.setBuy(i.key, 0).catch(()=>{}); else paint(); };
+    f.onsubmit = e => {
+      e.preventDefault();
+      const n = Math.round(parseFloat(inp.value.replace(/\./g,'').replace(',', '.')));
+      if (!(n > 0) || n > TERMS.maxPrice){ inp.focus(); inp.setAttribute('aria-invalid','true'); inp.placeholder = 'Fiyat yaz'; return; }
+      Store.setBuy(i.key, n).catch(()=>{});
+    };
+    f.append(inp, ok, no);
+    box.append(f);
+    inp.focus();
+  }
+  paint();
+  return box;
 }
 function card(i, ix, opts={}){
   const voting = i.left > 0;
   const meta = el('div', { class:'m' }, [
     el('span', { class:'c', text:i.cat }),
-    i.ex ? el('span', { class:'ex', text:'örnek · oylanamaz' }) : el('span', { text: voting ? i.left + ' gün kaldı' : 'oylama bitti' }),
+    i.ex ? el('span', { class:'ex', text:'örnek · talep toplanmıyor' }) : el('span', { text: voting ? i.left + ' gün kaldı' : 'süre doldu' }),
+    !i.ex && i.buyers ? el('span', { class:'p', text:'ort. ' + tl(i.avg) }) : null,
     !i.ex && i.notes && i.notes.length ? el('span', { text: i.notes.length + ' yorum' }) : null,
     !i.ex && i.handle ? el('span', { text: i.handle }) : null
   ]);
@@ -297,9 +366,7 @@ function card(i, ix, opts={}){
   const title = el('p', { class:'t' }, href ? el('a', { href, text:i.title, onclick(e){ if (opts.dialog){ e.preventDefault(); openIdea(i.key); } } }) : document.createTextNode(i.title));
   const body = el('div', { class:'body' }, [title, meta]);
   if (!i.ex && i.at){ const bar = el('div', { class:'days', 'aria-hidden':'true' }, el('i')); bar.firstChild.style.width = (100 * (TERMS.voteDays - i.left) / TERMS.voteDays) + '%'; body.append(bar); }
-  const vote = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: i.ex || !voting || !Store.canWrite, 'aria-label': i.ex ? 'Örnek fikir, oylanamaz' : `${i.title}: oy ver, şu an ${i.votes} oy`, html:`${ICON.up}<b>${i.ex ? '–' : i.votes}</b><span>oy</span>` });
-  vote.onclick = () => { vote.classList.remove('pop'); void vote.offsetWidth; vote.classList.add('pop'); Store.toggleVote(i.key).catch(()=>{}); };
-  return el('article', { class:'icard' + (ix < 3 && !i.ex && i.votes ? ' top' : '') }, [el('span', { class:'rank', 'aria-hidden':'true', text: opts.rank === false ? '' : String(ix+1) }), body, vote]);
+  return el('article', { class:'icard' + (ix < 3 && !i.ex && i.buyers ? ' top' : '') }, [el('span', { class:'rank', 'aria-hidden':'true', text: opts.rank === false ? '' : String(ix+1) }), body, buyCtl(i)]);
 }
 function mountBoard(host, opts={}){
   const render = () => {
@@ -339,11 +406,11 @@ function openIdea(key, push=true){
   const paint = () => {
     const it = Store.ideas().find(x => x.key === key); if (!it) return;
     const mine = Store.myRate(key);
-    dlg.innerHTML = `<header><span class="eyebrow">${esc(it.cat)} · ${it.left > 0 ? it.left + ' gün oylamada' : 'oylama bitti'}</span><button type="button" class="x" aria-label="Kapat">${ICON.x}</button></header>
+    dlg.innerHTML = `<header><span class="eyebrow">${esc(it.cat)} · ${it.left > 0 ? it.left + ' gün talep topluyor' : 'süre doldu'}</span><button type="button" class="x" aria-label="Kapat">${ICON.x}</button></header>
     <div class="in">
       <div style="display:grid;gap:14px"><h2 id="idlg-h">${esc(it.title)}</h2>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><button type="button" class="vote dv" aria-pressed="${it.mine}" ${it.left > 0 && Store.canWrite ? '' : 'disabled'} aria-label="Oy ver, şu an ${it.votes} oy">${ICON.up}<b>${it.votes}</b><span>oy</span></button>
-        <span class="eyebrow">${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center"><span class="dv"></span>
+        <span class="eyebrow">${it.buyers ? 'Ortalama ' + tl(it.avg) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
       <dl><div><dt>Problem</dt><dd>${esc(it.problem || '')}</dd></div><div><dt>Çözüm</dt><dd>${esc(it.solution || '')}</dd></div>
         <div><dt>Temel özellikler</dt><dd><ul>${(it.feats || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div></dl>
       <section class="crit" aria-label="Üç ölçüt"><span class="eyebrow">Senin puanın · topluluk ortalaması (${it.raters} kişi)</span>
@@ -357,7 +424,7 @@ function openIdea(key, push=true){
       </section>
     </div>`;
     $('.x', dlg).onclick = () => dlg.close();
-    $('.dv', dlg).onclick = () => Store.toggleVote(key).catch(()=>{});
+    $('.dv', dlg).replaceWith(buyCtl(it));
     $$('.stars button', dlg).forEach(b => b.onclick = () => Store.rate(key, b.dataset.c, Number(b.dataset.n)).catch(()=>{}));
     let kind = 'yorum';
     $$('.note-form .chip', dlg).forEach(b => b.onclick = () => { kind = b.dataset.k; $$('.note-form .chip', dlg).forEach(x => x.setAttribute('aria-pressed', String(x === b))); });
@@ -372,64 +439,63 @@ function openIdea(key, push=true){
 }
 
 // =========================================================== the process run
-// One quick pass (about 6.5 s), idea card to product: write, votes, Thursday, co-design, pre-sale, payout.
+// One quick pass (about 5.5 s) in four beats: write the idea, people say "alırdım" with a price,
+// pre-sale fills while the product is drawn, then the payout. Plays once when seen, replay at the end.
 function mountProc(host, opts={}){
   const text = 'Tezgâh kenarına takılan, katlanınca rafa dönen kesme tahtası.';
-  const steps = ['Yaz','Oyla','Perşembe','Birlikte geliştir','Ön satış','Kazan'];
+  const steps = ['Yaz','Alırdım','Ön satış','Kazan'];
+  const BUYERS = 312, AVG = 240, PRE = 300;
   host.classList.add('proc');
   host.innerHTML = `
-  <div class="pc-stage" role="img" aria-label="Bir fikrin ürüne dönüşmesi: fikir yazılır, topluluk 30 gün oylar, perşembe canlı değerlendirmesinden geçer, topluluk isim, renk ve ambalaja katkı verir, ön satış eşiği dolunca üretilir, satıştan katkı sahiplerine pay ödenir.">
-    <div class="pc-dots" aria-hidden="true">${Array.from({length:14}, (_,n) => { const a = n/14*Math.PI*2; return `<i style="left:38%;top:30%;--x:${Math.round(Math.cos(a)*260)}px;--y:${Math.round(Math.sin(a)*200)}px;animation-delay:${(n%7)*60}ms"></i>`; }).join('')}</div>
+  <div class="pc-stage" role="img" aria-label="Bir fikrin ürüne dönüşmesi: fikir tek cümleyle yazılır, ${BUYERS} kişi ortalama ${AVG} liraya alırdım der, ön satış ${PRE} siparişe ulaşınca kesme tahtası üretilir, satıştan fikir sahibine ve katkı verenlere yüzde ${TERMS.shareRetail} ile ${TERMS.shareDirect} arası pay ödenir.">
+    <div class="pc-dots" aria-hidden="true">${Array.from({length:14}, (_,n) => { const a = n/14*Math.PI*2; return `<i style="left:34%;top:30%;--x:${Math.round(Math.cos(a)*260)}px;--y:${Math.round(Math.sin(a)*200)}px;animation-delay:${(n%7)*60}ms"></i>`; }).join('')}</div>
     <div class="pc-card" aria-hidden="true">
       <div class="h"><span class="tag">Mutfak</span><span class="pc-n">0 / 140</span></div>
       <p class="pc-txt"></p>
-      <div class="pc-row"><span class="pc-votes"><b>0</b> oy</span><span>30 gün</span></div>
+      <div class="pc-buy"><span><b class="pc-bn">0</b> kişi “alırdım” dedi</span><span>ort. <b class="pc-avg">0</b> ₺</span></div>
       <div class="pc-bar"><i></i></div>
-      <div class="pc-crit"><div>Tasarım<u></u></div><div>Pazar<u></u></div><div>Uygulanab.<u></u></div></div>
-      <span class="pc-stamp">Perşembe · geçti</span>
     </div>
-    <div class="pc-tags" aria-hidden="true"><span>İsim <b>Rafla</b></span><span>Renk <b>Kum beji</b></span><span>Ambalaj <b>Kraft</b></span></div>
-    <div class="pc-prod" aria-hidden="true"><svg viewBox="0 0 220 170">
-      <path class="fc" d="M30 60 L120 30 L200 58 L110 90 Z"/><path class="fc" d="M30 60 L110 90 L110 160 L30 128 Z"/>
-      <path class="ln" style="--len:420" d="M30 60 L120 30 L200 58 L110 90 Z"/>
-      <path class="ln" style="--len:420" d="M30 60 L30 128 L110 160 L200 126 L200 58"/>
-      <path class="ln" style="--len:80" d="M110 90 L110 160"/>
-      <rect class="lbl" x="38" y="103" width="64" height="17" rx="3" transform="skewY(21)" />
-      <text class="lbl" x="43" y="115" transform="skewY(21)" style="fill:var(--accent-ink)">MUCİT: SEN</text>
-      <text class="nm" x="126" y="168" transform="skewY(-20)">Rafla</text>
+    <div class="pc-prod" aria-hidden="true"><svg viewBox="0 0 240 180">
+      <path class="cnt" d="M6 128H234V160H6Z"/>
+      <path class="cnt-t" d="M6 128L24 112H234V128Z"/>
+      <path class="ghost" d="M62 126L150 126L164 114L76 114Z"/>
+      <path class="ln wood" style="--len:420" d="M70 112V42Q70 34 78 34H154Q162 34 162 42V112Z"/>
+      <path class="ln edge" style="--len:180" d="M162 42L169 37V107L162 112"/>
+      <path class="ln" style="--len:70" d="M106 44h20a5 5 0 0 1 0 10h-20a5 5 0 0 1 0 -10z"/>
+      <path class="ln grain" style="--len:300" d="M80 70C100 65 128 75 152 69M80 86C104 82 126 92 152 86M80 101C100 98 128 105 152 100"/>
+      <path class="ln" style="--len:120" d="M84 112h18v9h-18zM130 112h18v9h-18z"/>
+      <path class="arc" d="M150 120Q206 96 176 44"/><path class="arc-h" d="M170 52l6-9 5 10"/>
+      <g class="lbl"><rect x="18" y="138" width="114" height="16" rx="3"/><text x="25" y="149.5">RAFLA · MUCİT: SEN</text></g>
     </svg></div>
-    <div class="pc-pre" aria-hidden="true"><div class="pc-row"><span>Ön satış</span><b class="pc-pn">0 / 300</b></div><div class="pc-bar"><i></i></div><span class="ok">Eşik doldu · üretimde</span></div>
-    <div class="pc-pay" aria-hidden="true"><span class="eb">Satıştan pay</span><b><em>%${TERMS.shareRetail}–${TERMS.shareDirect}</em></b><span>fikir sahibine ve isim, renk, ambalaja katkı verenlere</span></div>
+    <div class="pc-pre" aria-hidden="true"><div class="pc-row"><span>Ön satış</span><b class="pc-pn">0 / ${PRE}</b></div><div class="pc-bar"><i></i></div><span class="ok">Eşik doldu · üretimde</span></div>
+    <div class="pc-pay" aria-hidden="true"><span class="eb">Satıştan pay</span><b><em>%${TERMS.shareRetail}–${TERMS.shareDirect}</em></b><span>fikir sahibine ve ürünü birlikte geliştirenlere</span></div>
     <span class="pc-ex" aria-hidden="true">Örnek akış</span>
     <button type="button" class="pc-replay">${ICON.replay}Tekrar oynat</button>
   </div>
   <ol class="pc-steps">${steps.map(s => `<li>${s}</li>`).join('')}</ol>`;
-  const txt = $('.pc-txt', host), n = $('.pc-n', host), vb = $('.pc-votes b', host), pn = $('.pc-pn', host), lis = $$('.pc-steps li', host);
+  const txt = $('.pc-txt', host), n = $('.pc-n', host), bn = $('.pc-bn', host), avg = $('.pc-avg', host), pn = $('.pc-pn', host), lis = $$('.pc-steps li', host);
   let timers = [];
   const at = (ms, fn) => timers.push(setTimeout(fn, ms));
   const count = (node, to, ms, fmt) => { const t0 = performance.now(); const f = now => { const p = Math.min(1, (now - t0)/ms); node.textContent = fmt(Math.round(to * (1 - Math.pow(1-p, 3)))); if (p < 1) timers.push(requestAnimationFrame(f)); }; requestAnimationFrame(f); };
   const step = s => lis.forEach((li, ix) => { li.classList.toggle('on', ix === s); li.classList.toggle('past', ix < s); });
-  const S = ['s1','s2','s3','s3b','s4','s5','s6','end'];
+  const S = ['s1','s2','s3','s3b','s4','end'];
   function finalState(){
-    host.classList.add(...S); txt.textContent = text; n.textContent = text.length + ' / 140'; vb.textContent = '312'; pn.textContent = '300 / 300';
-    lis.forEach(li => { li.classList.add('past'); li.classList.remove('on'); }); lis[5].classList.add('on');
+    host.classList.add(...S); txt.textContent = text; n.textContent = text.length + ' / 140';
+    bn.textContent = String(BUYERS); avg.textContent = String(AVG); pn.textContent = PRE + ' / ' + PRE; step(3);
   }
   function play(){
     timers.forEach(t => { clearTimeout(t); cancelAnimationFrame(t); }); timers = [];
-    host.classList.remove(...S); txt.textContent = ''; n.textContent = '0 / 140'; vb.textContent = '0'; pn.textContent = '0 / 300';
+    host.classList.remove(...S); txt.textContent = ''; n.textContent = '0 / 140'; bn.textContent = '0'; avg.textContent = '0'; pn.textContent = '0 / ' + PRE;
     void host.offsetWidth;
     if (reduce.matches){ finalState(); return; }
     host.classList.add('s1'); step(0);
-    const per = 1000 / text.length;
+    const per = 950 / text.length;
     for (let c = 1; c <= text.length; c++) at(c*per, () => { txt.textContent = text.slice(0, c); n.textContent = c + ' / 140'; });
-    at(1150, () => { host.classList.add('s2'); step(1); count(vb, 312, 900, v => String(v)); });
-    at(2200, () => { host.classList.add('s3'); step(2); });
-    at(2800, () => host.classList.add('s3b'));
-    at(3300, () => { host.classList.add('s4'); step(3); });
-    at(4400, () => { host.classList.add('s5'); step(4); count(pn, 300, 800, v => v + ' / 300'); });
-    at(5300, () => host.classList.add('s6'));
-    at(5400, () => step(5));
-    at(6200, () => host.classList.add('end'));
+    at(1150, () => { host.classList.add('s2'); step(1); count(bn, BUYERS, 1000, v => String(v)); count(avg, AVG, 1000, v => String(v)); });
+    at(2700, () => { host.classList.add('s3'); step(2); count(pn, PRE, 1100, v => v + ' / ' + PRE); });
+    at(3800, () => host.classList.add('s3b'));
+    at(4300, () => { host.classList.add('s4'); step(3); });
+    at(5200, () => host.classList.add('end'));
   }
   $('.pc-replay', host).onclick = play;
   if (opts.manual) return { play };
@@ -441,5 +507,5 @@ function mountProc(host, opts={}){
 
 // =========================================================== boot
 mountChrome();
-window.UD = { TERMS, CATS, CASES, CRIT, Store, mountForm, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
+window.UD = { TERMS, CATS, CASES, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
 })();

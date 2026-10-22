@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Undustit · Her perşembe bir fikir sahnede</title>
-<meta name="description" content="Fikrini tek cümleyle yaz, topluluk oylasın. En çok oyu alanlar her perşembe canlı yayında değerlendirilir; seçilen fikir topluluğun katkısıyla ürüne dönüşür.">
+<meta name="description" content="Fikrini tek cümleyle yaz, topluluk “alırdım” desin. En çok talep görenler her perşembe canlı yayında değerlendirilir; seçilen fikir topluluğun katkısıyla ürüne dönüşür.">
 <meta name="theme-color" content="#FAF9F6">
 <meta property="og:title" content="Undustit · Her perşembe bir fikir sahnede">
-<meta property="og:description" content="Tek cümlelik fikirden raftaki ürüne: oyla, geliştir, payını al.">
+<meta property="og:description" content="Tek cümlelik fikirden raftaki ürüne: “alırdım” de, geliştir, payını al.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
@@ -53,8 +53,10 @@ body{padding-bottom:140px}
   <section class="wrap show" aria-labelledby="h">
     <span class="thu" id="thu"></span>
     <h1 id="h">Her perşembe bir fikir <em>sahneye çıkar.</em></h1>
-    <p class="lead">Fikrini aşağıya tek cümleyle yaz. Topluluk 30 gün oylar, en iyileri canlı yayında tartışılır, seçilen fikri birlikte ürüne çeviririz.</p>
+    <p class="lead">Fikrini aşağıya tek cümleyle yaz. Topluluk 30 gün boyunca “alırdım” der ve fiyat yazar, en çok talep görenler canlı yayında tartışılır, seçilen fikri birlikte ürüne çeviririz.</p>
   </section>
+
+  <section class="wrap" aria-label="Açık vaka" style="padding-bottom:clamp(56px,7vw,96px)"><div id="case"></div></section>
 
   <section class="wrap stage" aria-label="Bu haftanın sahnesi">
     <div class="lineup">
@@ -85,7 +87,8 @@ body{padding-bottom:140px}
 <div class="dock" id="dock"><div id="form"></div></div>
 <script src="../../assets/ud.js"></script>
 <script>
-UD.mountForm(document.getElementById('form'), { label:'Sahneye çıkacak fikrin', placeholder:'Fikrini tek cümleyle yaz…' });
+const form = UD.mountForm(document.getElementById('form'), { label:'Sahneye çıkacak fikrin', placeholder:'Fikrini tek cümleyle yaz…' });
+UD.mountCase(document.getElementById('case'), { form });
 UD.mountProc(document.getElementById('proc'), { delay:400 });
 UD.mountThu(document.getElementById('thu'));
 UD.mountBoard(document.getElementById('board'), { limit:6, filter:i => i.left > 0 });

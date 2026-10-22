@@ -20,8 +20,15 @@ eşiği (300–750), satıştan pay (perakende %10, doğrudan %30).
 - Veri: claude.ai'de `db` yeteneğiyle `ideas/<uid>`, `votes/<uid>`, `notes/<uid>` (herkes
   kendi belgesini yazar). Başka yerde aynı yapı `localStorage`'da tutulur ve alt bilgide
   "önizleme" rozeti görünür. Gerçek fikir yokken örnekler "örnek · oylanamaz" etiketiyle durur.
-- Süreç animasyonu kaydırmaya bağlı değil: ekrana girince yaklaşık 6,5 sn'de bir kez oynar,
-  sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
+- Oy yerine "Alırdım + fiyat": `votes/<uid>.buy` her fikre o kişinin ödeyeceği fiyatı yazar.
+  Sıralama kişi sayısı, sonra ortalama fiyatla yapılır. Gerekçe: Quirky'de oy verenler alıcı
+  çıkmadı; fiyatlı talep ön satışın ilk tahminidir. Ürün adı ve ambalaj seçimlerinde "oylama"
+  sözcüğü kalır, çünkü orada gerçekten seçim yapılır.
+- Ana sayfa adaylarının üçünde de ilk ekranın altında açık vaka kartı (`mountCase`) var.
+  "Bu vakaya fikir yaz" sayfa değiştirmez; aynı sayfadaki formu vaka seçili açar.
+- Süreç animasyonu kaydırmaya bağlı değil ve dört adımdır: Yaz → Alırdım → Ön satış → Kazan.
+  Ekrana girince yaklaşık 5,5 sn'de bir kez oynar, ürün (katlanır kesme tahtası) gerçekten
+  çizilir, sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
 - Üç aday da aynı beyaz temayı kullanır; C'yi ayıran mürekkep çizgiler ve köşesiz gazete düzeni.
 - Eski `index.html`, `vaka-01/` ve `404.html` yalnız renk olarak beyaz temaya geçirildi; içerik
   ve düzenleri aynı. Vaka 01 çizimi koyu "ürün fotoğrafı"ndan kâğıt üzerinde teknik çizime döndü

@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Undustit · Bir cümle yaz, bir ürün çıksın</title>
-<meta name="description" content="Fikrini tek cümleyle yaz. Topluluk 30 gün oylar, her perşembe canlı değerlendirilir, ön satış eşiği dolunca üretilir; satıştan katkı verenler pay alır.">
+<meta name="description" content="Fikrini tek cümleyle yaz. Topluluk 30 gün boyunca “alırdım” der ve fiyat yazar, her perşembe canlı değerlendirilir, ön satış eşiği dolunca üretilir; satıştan katkı verenler pay alır.">
 <meta name="theme-color" content="#FAF9F6">
 <meta property="og:title" content="Undustit · Bir cümle yaz, bir ürün çıksın">
-<meta property="og:description" content="Tek cümlelik fikirden raftaki ürüne: oyla, geliştir, payını al.">
+<meta property="og:description" content="Tek cümlelik fikirden raftaki ürüne: “alırdım” de, geliştir, payını al.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
@@ -55,6 +55,8 @@
     <div class="mast-sub"><p class="lead" style="font-size:16px">140 karakter yeter; gerisi birkaç kısa alan. Oy vermek, yorum yazmak ve ürünü birlikte geliştirmek ücretsiz.</p><a class="link" href="../../nasil/">Ücret ve paylar nasıl işler?</a></div>
   </section>
 
+  <section class="wrap" aria-label="Açık vaka" style="padding-bottom:clamp(56px,7vw,96px)"><div id="case"></div></section>
+
   <section class="sec" aria-labelledby="p-h">
     <div class="wrap plate">
       <div id="proc"></div>
@@ -63,8 +65,8 @@
         <h2 id="p-h">Altı adım, <em>bir sezon.</em></h2>
         <ol>
           <li><span><b>Yaz.</b> Tek cümle, kategori, problem, çözüm, özellikler.</span></li>
-          <li><span><b>Oyla.</b> 30 gün boyunca topluluk oy verir, yorum ve öneri yazar.</span></li>
-          <li><span><b>Perşembe.</b> En çok oy alanlar canlı yayında değerlendirilir.</span></li>
+          <li><span><b>Alırdım.</b> 30 gün boyunca topluluk “alırdım” der ve kaça alacağını yazar.</span></li>
+          <li><span><b>Perşembe.</b> En çok talep görenler canlı yayında değerlendirilir.</span></li>
           <li><span><b>Birlikte geliştir.</b> İsim, renk, ambalaj, slogan topluluktan gelir.</span></li>
           <li><span><b>Ön satış.</b> Ürüne göre 300–750 sipariş toplanınca üretim başlar.</span></li>
           <li><span><b>Kazan.</b> Satıştan katkı sahiplerine %10–30 pay ödenir.</span></li>
@@ -77,7 +79,7 @@
     <div class="wrap">
       <div style="display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap"><h2 id="r-h">Fikirler <em>üç turda</em> yarışır.</h2><a class="link" href="../../fikirler/">Tüm fikirler</a></div>
       <div class="rounds">
-        <div class="round"><header><b>Oylamada</b><span>30 gün</span></header><div id="r1"></div></div>
+        <div class="round"><header><b>Talep topluyor</b><span>30 gün</span></header><div id="r1"></div></div>
         <div class="round"><header><b>Perşembe adayları</b><span>ilk 5</span></header><div id="r2"></div></div>
         <div class="round"><header><b>Ön satışta</b><span>300–750 eşik</span></header><div class="slot"><b>İlk ürün burada görünecek.</b>Perşembe değerlendirmesini geçen ve birlikte geliştirilen ilk fikir, ön satış sayacıyla bu sütuna taşınır.</div></div>
       </div>
@@ -96,12 +98,13 @@
 <footer data-ud-foot></footer>
 <script src="../../assets/ud.js"></script>
 <script>
-UD.mountForm(document.getElementById('form'), { label:'Fikrin · tek cümle, en çok 140 karakter', placeholder:'Örneğin: katlanınca rafa dönen kesme tahtası' });
+const form = UD.mountForm(document.getElementById('form'), { label:'Fikrin · tek cümle, en çok 140 karakter', placeholder:'Örneğin: katlanınca rafa dönen kesme tahtası' });
+UD.mountCase(document.getElementById('case'), { form });
 UD.mountProc(document.getElementById('proc'), { delay:200 });
 UD.mountThu(document.getElementById('thu'));
-// round 1: newest in voting; round 2: the five with the most votes
+// round 1: newest collecting demand; round 2: the five with the most "alırdım"
 UD.mountBoard(document.getElementById('r1'), { limit:4, sort:() => 'new', filter:i => i.left > 0, rank:false, emptyNote:'Örnekler biçimi gösterir; ilk gerçek fikir buraya düşer.' });
-UD.mountBoard(document.getElementById('r2'), { limit:5, filter:i => i.left > 0 && i.votes > 0, rank:false, examples:false, emptyNote:'En az bir oy alan fikirler burada sıralanır.' });
+UD.mountBoard(document.getElementById('r2'), { limit:5, filter:i => i.left > 0 && i.buyers > 0, rank:false, examples:false, emptyNote:'En az bir kişinin “alırdım” dediği fikirler burada sıralanır.' });
 </script>
 </body>
 </html>

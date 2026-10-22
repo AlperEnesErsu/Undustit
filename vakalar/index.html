@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="vakalar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vakalar · Undustit</title>
+<meta name="description" content="Firmaların fazla stokları için açılan fikir çağrıları. Her vakanın kendi sayfası ve paylaşılabilir bağlantısı var.">
+<meta name="theme-color" content="#FAF9F6">
+<meta property="og:title" content="Vakalar · Undustit">
+<meta property="og:description" content="Fazla stoklar için açık fikir çağrıları.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/ud.css">
+<style>
+.cases{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:16px}
+.case{display:grid;gap:18px;align-content:start;padding:clamp(22px,3vw,36px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:radial-gradient(70% 70% at 70% 30%,var(--accent-soft),transparent 70%),var(--bg-2)}
+.case h2{font-size:clamp(40px,4.6vw,68px);line-height:.95}
+.case p{color:var(--ink-2);font-weight:300;max-width:52ch}
+.case dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border-top:1px solid var(--line)}
+.case dl div{padding:12px 12px 0 0;display:grid;gap:3px}
+.case dl div + div{padding-inline-start:12px;border-inline-start:1px solid var(--line)}
+.case dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.case dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
+.case .acts{display:flex;flex-wrap:wrap;gap:10px}
+.tag{justify-self:start;display:inline-flex;align-items:center;gap:7px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;padding:3px 10px;border-radius:999px;border:1px solid rgba(20,122,78,.35);color:var(--ok)}
+.tag i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.share{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted);border:1px dashed var(--line-2);border-radius:var(--r-sm);padding:8px 8px 8px 12px;min-width:0}
+.share code{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.share button{flex:none;min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line-2);background:transparent;font-size:12.5px;color:var(--ink-2)}
+.share button:hover{border-color:var(--ink-2);color:var(--ink)}
+.open{border-style:dashed;background:transparent}
+.open ol{margin:0;padding-inline-start:20px;color:var(--ink-2);display:grid;gap:8px;font-weight:300}
+@media (max-width:900px){.cases{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.case dl{grid-template-columns:minmax(0,1fr)}.case dl div + div{padding-inline-start:0;border-inline-start:0;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="wrap">
+  <div class="phead">
+    <span class="eyebrow">Vakalar</span>
+    <h1>Fazla stok, <em>açık çağrı.</em></h1>
+    <p class="lead">Bir firma satamadığı stoğu vaka olarak açar. O stoğa yeni bir iş bulan fikirler diğer fikirlerle aynı yoldan yarışır. Her vakanın kendi sayfası ve paylaşılabilir bağlantısı vardır.</p>
+  </div>
+  <div class="cases">
+    <article class="case">
+      <span class="tag"><i aria-hidden="true"></i>Açık</span>
+      <span class="eyebrow">Vaka 01</span>
+      <h2>Bir milyon cıvata.</h2>
+      <p>M10 × 90, 8.8 sınıfı flanşlı cıvata ve somun takımı. Depoda bekliyor. Güneş paneli montajından mobilyaya, nerede yeni bir iş bulabilir?</p>
+      <dl><div><dt>Adet</dt><dd>1.000.000</dd></div><div><dt>Ölçü</dt><dd>M10 × 90 · 8.8</dd></div><div><dt>Deneme partisi</dt><dd>1.000 adet</dd></div></dl>
+      <div class="acts"><a class="btn sig" href="../fikir/?vaka=vaka-01">Bu vakaya fikir yaz <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a><a class="btn alt" href="../vaka-01/">Vaka sayfası</a></div>
+      <div class="share"><code id="link-01"></code><button type="button" data-copy="link-01">Bağlantıyı kopyala</button></div>
+    </article>
+    <article class="case open" id="vakani-ac">
+      <span class="eyebrow">Fazlan mı var?</span>
+      <h2 style="font-size:clamp(32px,3.4vw,48px)">Vakanı aç.</h2>
+      <ol>
+        <li>Stoğu, adedini ve taban fiyatını bize yaz.</li>
+        <li>Vaka sayfası ve kendi bağlantısı hazırlanır.</li>
+        <li>Topluluk fikir yazar, “alırdım” der ve fiyat yazar; en çok talep gören fikirle deneme partisi yapılır.</li>
+      </ol>
+      <p style="font-size:13.5px;color:var(--muted)">Başvuru kanalı prototip aşamasında henüz açık değil.</p>
+    </article>
+  </div>
+</main>
+<footer data-ud-foot></footer>
+<script src="../assets/ud.js"></script>
+<script>
+const url = new URL('../vaka-01/', location.href).href;
+document.getElementById('link-01').textContent = url;
+document.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => {
+  const t = document.getElementById(b.dataset.copy).textContent;
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { b.textContent = 'Kopyalandı'; setTimeout(() => b.textContent = 'Bağlantıyı kopyala', 1600); }).catch(() => { b.textContent = 'Seçip kopyala'; });
+});
+</script>
+</body>
+</html>

@@ -1,51 +1,83 @@
 # Undustit tasarım notları
 
-Undustit bir platform: üretim fazlalarına ve sorunlara yaratıcı fikirler gelir, ürün sahibinin
-dikkatini çeken fikir ortaklığa dönüşür. Cıvata yalnız ilk vaka.
+## Quirky modeli (22 Ekim 2026 görüşmesi sonrası)
 
-- `index.html`: platform sayfası. Yöntem çizimi (fazla → fikir → ortaklık), nasıl işliyor,
-  vakalar (Vaka 01 + kesikli çerçeveli "örnek vaka türü" kartları), iki taraf, "Vakanı aç"
-  föyü, SSS. Form ya da fikir listesi burada yok.
-- `vaka-01/`: ilk vaka sayfası (eski `kucuk-fikirler/`). Hikâye, fikir formu, liste, hesap,
-  teknik föy burada. `kucuk-fikirler/` yalnız buraya yönlendirir.
-- Örnek vaka kartları gerçek firma ya da açık vaka gibi gösterilmez; etiketleri ve alttaki
-  not bunu açıkça söyler. Gerçek bir Vaka 02 gelince kart onunla değiştirilir.
-- "Vakanı aç" föyü şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
+İş modeli Quirky'ye yaklaştırıldı: kısa form (140 karakter + kategori + problem + çözüm + en
+çok 3 özellik), küçük gönderim ücreti, 30 gün "Alırdım + fiyat" ile talep toplama, üç ölçüt (tasarım, pazar,
+uygulanabilirlik), perşembe 20.00 canlı değerlendirme, topluluğun geliştirmeye katılması, ön satış
+eşiği (300–750), satıştan pay (perakende %10, doğrudan %30).
 
-Sayfalar tek bir temayı paylaşır: `index.html` ve `vaka-01/`.
-Her sayfa tek dosyalık bir artifact olduğu için token'lar iki dosyanın `:root` bloğunda birebir
-aynı tutulur. Birinde renk, font, radius veya süre değişirse diğerinde de değişmeli.
+Undustit tek bir site: tek ana sayfa, tek form, tek fikir listesi, tek stil dosyası.
+Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı akışa girer.
 
-## Tema: koyu atölye
+| Sayfa | İçerik |
+|---|---|
+| `index.html` | Form ve süreç animasyonu ilk ekranda yan yana; altında açık vaka kartı, sonra üç tur kolonu (Talep topluyor · Perşembe adayları · Ön satışta), en altta iç sayfalara dört kapı. |
+| `fikir/` | Formun tek başına hali; `?vaka=vaka-01` vakayı seçili açar. |
+| `fikirler/` | Arena: "Alırdım + fiyat", üç ölçüt puanı, yorum. `?f=<id>` fikri açar. |
+| `vakalar/` | Vaka listesi, paylaşılabilir bağlantılar, "Vakanı aç". |
+| `vaka-01/` | Vaka sayfası: bilgiler, vaka seçili form, bu vakaya gelen fikirler, teknik föy, SSS. |
+| `nasil/` | Yedi adım ve `#pay` tablosu. |
+| `hikaye/` | Hikâye, misyon, ilkeler. |
+| `404.html` | Tek dosyalık; token'ları kendi `:root` bloğunda, `ud.css` ile aynı değerlerde. |
+
+- 22 Ekim 2026 sadeleştirmesi: üç ana sayfa adayından A seçildi, C'nin üç tur kolonları
+  eklendi. B, C, aday karşılaştırma sayfası (`ana/`), eski platform sayfası, eski kaydırmalı
+  Vaka 01 (kendi formu ve fikir listesiyle) ve `kucuk-fikirler/` yönlendirmesi kaldırıldı;
+  hepsi git geçmişinde duruyor. Eski Vaka 01'deki "%40 fikir sahibine" pay hesabı yeni pay
+  modeliyle çeliştiği için taşınmadı.
+- Ortak parçalar `assets/ud.css` ve `assets/ud.js` içinde: menü ve alt bilgi JS ile basılır,
+  her sayfa `<html data-root>` ile köke giden yolu verir.
+- Taslak ticari şartlar yalnız `ud.js` içindeki `TERMS` sabitinde (ücret, gün, paylar, eşik,
+  canlı yayın saati). Havuz bölüşüm tablosu `nasil/index.html` içinde ve "taslak" etiketli.
+- Veri: claude.ai'de `db` yeteneğiyle `ideas/<uid>`, `votes/<uid>`, `notes/<uid>` (herkes
+  kendi belgesini yazar). Başka yerde aynı yapı `localStorage`'da tutulur ve alt bilgide
+  "önizleme" rozeti görünür. Gerçek fikir yokken örnekler "örnek · talep toplanmıyor" etiketiyle durur.
+- Oy yerine "Alırdım + fiyat": `votes/<uid>.buy` her fikre o kişinin ödeyeceği fiyatı yazar.
+  Sıralama kişi sayısı, sonra ortalama fiyatla yapılır. Gerekçe: Quirky'de oy verenler alıcı
+  çıkmadı; fiyatlı talep ön satışın ilk tahminidir. Ürün adı ve ambalaj seçimlerinde "oylama"
+  sözcüğü kalır, çünkü orada gerçekten seçim yapılır.
+- Açık vaka kartı (`mountCase`): "Bu vakaya fikir yaz" sayfa değiştirmez; aynı sayfadaki
+  formu vaka seçili açar.
+- Süreç animasyonu kaydırmaya bağlı değil ve dört adımdır: Yaz → Alırdım → Ön satış → Kazan.
+  Ekrana girince yaklaşık 5,5 sn'de bir kez oynar, ürün (katlanır kesme tahtası) gerçekten
+  çizilir, sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
+- "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
+
+## Tema: kâğıt ve fikir mavisi (22 Ekim 2026)
+
+Beyaz zemin dikkati fikri yazmaya toplar. Mavi, keşfe ve hayal gücüne dayalı görevlerle
+ilişkilendirildi (Mehta ve Zhu, Science 2009). Kırmızıya yakın tonlar ise temkin ve detay
+moduyla ilişkilendirildi, bu yüzden turuncu yazma alanından çekildi. Yeşil "büyüme" anlamıyla
+ilerleme durumlarında (Lichtenfeld ve ark., 2012; bulgu tekrarlarda tutarsız, yön olarak
+kullanıldı).
 
 | Rol | Token | Değer |
 |---|---|---|
-| Sayfa zemini | `--bg` | `#0B0C0D` |
-| Yüzey / kart | `--bg-2`, `--bg-3` | `#111315`, `#171A1C` |
-| Çizgi | `--line`, `--line-2` | `#22262A`, `#30353A` |
-| Metin | `--ink`, `--ink-2`, `--muted` | `#EEECE7`, `#BFBDB6`, `#8F928E` |
-| Tek vurgu | `--accent` (+ hover/active/ink) | `#FF6A2B` |
-| Olumlu durum | `--ok` | `#86D4A6` |
+| Sayfa zemini (sıcak kâğıt) | `--bg` | `#FAF9F6` |
+| Yüzey / kart | `--bg-2`, `--bg-3` | `#FFFFFF`, `#F2F0EB` |
+| Çizgi | `--line`, `--line-2` | `#E6E3DC`, `#D3CFC6` |
+| Metin | `--ink`, `--ink-2`, `--muted` | `#16181D`, `#464A52`, `#6B6F76` |
+| Ana vurgu, yalnız eylemler: yazma alanı, düğme, oy, odak | `--accent` (+ hover/active) | `#2337C6` (koyu ultramarin) |
+| İlerleme: oy, ön satış, "geçti" | `--ok` | `#147A4E` |
+| Marka ve canlı sinyal: logo "it", perşembe | `--brand` | `#C2410C` |
+| Uyarı / hata | `--warn`, `--err` | `#8A5A00`, `#B42318` |
 
-Kontrast (WCAG 2.2 AA): ink/bg 16.6, muted/bg 6.2, accent/bg 6.9, accent-ink/accent 6.8.
+Kontrast (WCAG 2.2 AA, `--bg` üzerinde): ink 16.9, ink-2 8.5, muted 4.8, accent 8.2, ok 5.1,
+brand 4.9; beyaz metin accent üzerinde 8.6.
+
+Başlıklar ve başlık italikleri mürekkep renginde kalır; mavi yalnız kullanıcının bir şey
+yapacağı yerde görünür ki "mavi = buraya yaz / tıkla" sinyali tek anlamlı olsun.
 
 Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist Mono (etiket, sayı).
 
 ## Kararlar
 
-- Ana sayfanın eski açık/koyu çelik teması (Archivo + Figtree) kaldırıldı. Tek tema kuralı
-  (UI-UX kit, `redesign`) gereği iki sayfa da koyu atölye temasını kullanır.
-- Marka adı "İkinci Tur" yerine **Undustit**. Logo: `Undust` + italik turuncu `it`.
-- Başlıklar en fazla 3 satır. Ana sayfa hero'su 7/5 asimetrik ızgara.
-- Yan yana iki bölüm aynı düzeni kullanmaz: hero split, ofsetli adım listesi, örnek + form,
-  fikir panosu, hesap tablosu, iki sütunlu SSS.
-- Hikâye sayfasında menü, sabit çizimin üstünde şeffaf; içerik altına girince opak olur.
-- Hikâye başlıkları üst üste binmez: eski başlık 100 ms'de çıkar, yenisi ondan sonra girer.
-- Her hareketin `prefers-reduced-motion` karşılığı var.
-- İki sayfa aynı menü setini kullanır: Hikâye · Fikirler · Hesap · Teknik föy. 1040 px altında
-  menü bir düğmenin açtığı panele (linkler + dil seçimi) taşınır, "Fikrini gönder" görünür kalır.
-- Ana sayfa bölümleri pafta gibi numaralanır (01 / 04 ...). Sayfalar arası geçiş
-  `@view-transition` ile; logo ve menü yerinde kalır.
-- 404 sayfası aynı temada, "boş delik" çizimiyle. Linkleri kök (`/`) varsayar; site bir alt
-  klasörde yayınlanırsa güncellenmeli.
-- `claude.ai` üzerinden çalışan fikir formu ve liste bilinçli olarak böyle; dokunulmadı.
+- Ana sayfanın eski açık/koyu çelik teması (Archivo + Figtree) kaldırıldı. Koyu atölye teması
+  22 Ekim 2026'da yerini beyaz "kâğıt ve fikir mavisi" temasına bıraktı.
+- Marka adı "İkinci Tur" yerine **Undustit**. Logo: `Undust` + italik turuncu (`--brand`) `it`.
+- Menü: Fikirler · Nasıl işler · Vakalar · Hikâye + "Fikrini yaz". 900 px altında menü bir
+  düğmenin açtığı panele taşınır, "Fikrini yaz" görünür kalır.
+- Her hareketin `prefers-reduced-motion` karşılığı var. Sayfalar arası geçiş `@view-transition` ile.
+- 404 sayfası linkleri kök (`/`) varsayar; site bir alt klasörde yayınlanırsa güncellenmeli.
+- Sayfalar yalnız Türkçe; eski Vaka 01'deki TR/EN seçimi taşınmadı.

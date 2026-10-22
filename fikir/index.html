@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="fikir">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fikrini yaz · Undustit</title>
+<meta name="description" content="Fikrini 140 karakterle anlat, kategorisini seç, problemi, çözümü ve temel özelliklerini yaz. Topluluk 30 gün boyunca “alırdım” der ve fiyat yazar.">
+<meta name="theme-color" content="#FAF9F6">
+<meta property="og:title" content="Fikrini yaz · Undustit">
+<meta property="og:description" content="Tek cümlelik fikrin topluluğun oyuna çıksın.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/ud.css">
+<style>
+.compose{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(28px,5vw,72px);align-items:start;padding-block:clamp(40px,6vw,80px) 0}
+.compose-l{display:grid;gap:24px}
+.compose h1{font-size:clamp(48px,6.4vw,92px);line-height:.95;letter-spacing:-.03em}
+.compose h1 em{color:var(--ink)}
+.after{display:grid;gap:0;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2);position:sticky;top:92px}
+.after > *{padding:18px 22px}
+.after > * + *{border-top:1px solid var(--line)}
+.after ol{list-style:none;margin:0;display:grid;gap:14px;counter-reset:a}
+.after li{counter-increment:a;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;font-size:14.5px;color:var(--ink-2)}
+.after li::before{content:counter(a);font-family:var(--f-serif);font-size:24px;line-height:1;color:var(--accent)}
+.after li b{color:var(--ink);font-weight:500}
+@media (max-width:980px){.compose{grid-template-columns:minmax(0,1fr)}.after{position:static}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="wrap">
+  <div class="compose">
+    <div class="compose-l">
+      <span class="eyebrow k" id="case-line">Yeni fikir</span>
+      <h1>Kısa yaz. <em>Topluluk büyütsün.</em></h1>
+      <p class="lead">Uzun bir sunum istemiyoruz. Tek cümle, bir kategori, çözdüğü problem, çözüm ve en çok üç özellik yeter.</p>
+      <div id="form"></div>
+    </div>
+    <aside class="after" aria-label="Gönderdikten sonra">
+      <span class="eyebrow">Gönderdikten sonra</span>
+      <ol>
+        <li><span><b>30 gün talep.</b> Üyeler “alırdım” der ve kaça alacağını yazar; yorum, iyileştirme ya da endişe ekler.</span></li>
+        <li><span><b>Perşembe 20.00.</b> En çok talep görenler canlı yayında tasarım, pazar ve uygulanabilirlik açısından tartışılır.</span></li>
+        <li><span><b>Birlikte geliştirme.</b> Seçilen fikrin ismi, rengi, ambalajı ve sloganı topluluktan gelir.</span></li>
+        <li><span><b>Ön satış ve üretim.</b> 300–750 sipariş toplanınca üretilir, satıştan pay alırsın.</span></li>
+      </ol>
+      <p style="font-size:13.5px;color:var(--muted)">Seçilmesen de eli boş dönmezsin: kimin beğenip kimin beğenmediğini, üç ölçütte aldığın puanları ve yorumları görürsün. <a class="link" href="../nasil/">Ayrıntılar</a></p>
+    </aside>
+  </div>
+</main>
+<footer data-ud-foot></footer>
+<script src="../assets/ud.js"></script>
+<script>
+const q = new URLSearchParams(location.search).get('vaka');
+const c = UD.CASES.find(x => x.id === q);
+if (c) document.getElementById('case-line').textContent = 'Fikir · ' + c.name;
+UD.mountForm(document.getElementById('form'), { open:true, focus:true, caseId: c ? c.id : null });
+</script>
+</body>
+</html>

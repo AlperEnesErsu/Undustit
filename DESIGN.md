@@ -3,52 +3,46 @@
 ## Quirky modeli (22 Ekim 2026 görüşmesi sonrası)
 
 İş modeli Quirky'ye yaklaştırıldı: kısa form (140 karakter + kategori + problem + çözüm + en
-çok 3 özellik), küçük gönderim ücreti, 30 gün oylama, üç ölçüt (tasarım, pazar,
+çok 3 özellik), küçük gönderim ücreti, 30 gün "Alırdım + fiyat" ile talep toplama, üç ölçüt (tasarım, pazar,
 uygulanabilirlik), perşembe 20.00 canlı değerlendirme, topluluğun geliştirmeye katılması, ön satış
 eşiği (300–750), satıştan pay (perakende %10, doğrudan %30).
 
-- `ana/`: üç rakip ana sayfa. `a/` Atölye (form + animasyon yan yana), `b/` Sahne (perşembe
-  şovu, alta sabit yazma çubuğu), `c/` Kâğıt (açık tema, editoryal, üç tur kolonu).
-  `ana/index.html` üçünü canlı önizlemeyle karşılaştırır. Seçilen aday köke taşınacak.
-- `fikir/` (form, `?vaka=vaka-01` vakayı seçili açar), `fikirler/` (arena; `?f=<id>` fikri
-  açar), `nasil/` (7 adım + `#pay` tablosu), `vakalar/`, `hikaye/`.
+Undustit tek bir site: tek ana sayfa, tek form, tek fikir listesi, tek stil dosyası.
+Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı akışa girer.
+
+| Sayfa | İçerik |
+|---|---|
+| `index.html` | Form ve süreç animasyonu ilk ekranda yan yana; altında açık vaka kartı, sonra üç tur kolonu (Talep topluyor · Perşembe adayları · Ön satışta), en altta iç sayfalara dört kapı. |
+| `fikir/` | Formun tek başına hali; `?vaka=vaka-01` vakayı seçili açar. |
+| `fikirler/` | Arena: "Alırdım + fiyat", üç ölçüt puanı, yorum. `?f=<id>` fikri açar. |
+| `vakalar/` | Vaka listesi, paylaşılabilir bağlantılar, "Vakanı aç". |
+| `vaka-01/` | Vaka sayfası: bilgiler, vaka seçili form, bu vakaya gelen fikirler, teknik föy, SSS. |
+| `nasil/` | Yedi adım ve `#pay` tablosu. |
+| `hikaye/` | Hikâye, misyon, ilkeler. |
+| `404.html` | Tek dosyalık; token'ları kendi `:root` bloğunda, `ud.css` ile aynı değerlerde. |
+
+- 22 Ekim 2026 sadeleştirmesi: üç ana sayfa adayından A seçildi, C'nin üç tur kolonları
+  eklendi. B, C, aday karşılaştırma sayfası (`ana/`), eski platform sayfası, eski kaydırmalı
+  Vaka 01 (kendi formu ve fikir listesiyle) ve `kucuk-fikirler/` yönlendirmesi kaldırıldı;
+  hepsi git geçmişinde duruyor. Eski Vaka 01'deki "%40 fikir sahibine" pay hesabı yeni pay
+  modeliyle çeliştiği için taşınmadı.
 - Ortak parçalar `assets/ud.css` ve `assets/ud.js` içinde: menü ve alt bilgi JS ile basılır,
-  her sayfa `<html data-root>` ile köke giden yolu verir. Logo son ziyaret edilen ana sayfa
-  adayına gider (`localStorage: ud-home`).
+  her sayfa `<html data-root>` ile köke giden yolu verir.
 - Taslak ticari şartlar yalnız `ud.js` içindeki `TERMS` sabitinde (ücret, gün, paylar, eşik,
   canlı yayın saati). Havuz bölüşüm tablosu `nasil/index.html` içinde ve "taslak" etiketli.
 - Veri: claude.ai'de `db` yeteneğiyle `ideas/<uid>`, `votes/<uid>`, `notes/<uid>` (herkes
   kendi belgesini yazar). Başka yerde aynı yapı `localStorage`'da tutulur ve alt bilgide
-  "önizleme" rozeti görünür. Gerçek fikir yokken örnekler "örnek · oylanamaz" etiketiyle durur.
+  "önizleme" rozeti görünür. Gerçek fikir yokken örnekler "örnek · talep toplanmıyor" etiketiyle durur.
 - Oy yerine "Alırdım + fiyat": `votes/<uid>.buy` her fikre o kişinin ödeyeceği fiyatı yazar.
   Sıralama kişi sayısı, sonra ortalama fiyatla yapılır. Gerekçe: Quirky'de oy verenler alıcı
   çıkmadı; fiyatlı talep ön satışın ilk tahminidir. Ürün adı ve ambalaj seçimlerinde "oylama"
   sözcüğü kalır, çünkü orada gerçekten seçim yapılır.
-- Ana sayfa adaylarının üçünde de ilk ekranın altında açık vaka kartı (`mountCase`) var.
-  "Bu vakaya fikir yaz" sayfa değiştirmez; aynı sayfadaki formu vaka seçili açar.
+- Açık vaka kartı (`mountCase`): "Bu vakaya fikir yaz" sayfa değiştirmez; aynı sayfadaki
+  formu vaka seçili açar.
 - Süreç animasyonu kaydırmaya bağlı değil ve dört adımdır: Yaz → Alırdım → Ön satış → Kazan.
   Ekrana girince yaklaşık 5,5 sn'de bir kez oynar, ürün (katlanır kesme tahtası) gerçekten
   çizilir, sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
-- Üç aday da aynı beyaz temayı kullanır; C'yi ayıran mürekkep çizgiler ve köşesiz gazete düzeni.
-- Eski `index.html`, `vaka-01/` ve `404.html` yalnız renk olarak beyaz temaya geçirildi; içerik
-  ve düzenleri aynı. Vaka 01 çizimi koyu "ürün fotoğrafı"ndan kâğıt üzerinde teknik çizime döndü
-  (malzeme gradyanları açıldı, vurgulu cıvata mavi).
-
-Undustit bir platform: üretim fazlalarına ve sorunlara yaratıcı fikirler gelir, ürün sahibinin
-dikkatini çeken fikir ortaklığa dönüşür. Cıvata yalnız ilk vaka.
-
-- `index.html`: platform sayfası. Yöntem çizimi (fazla → fikir → ortaklık), nasıl işliyor,
-  vakalar (Vaka 01 + kesikli çerçeveli "örnek vaka türü" kartları), iki taraf, "Vakanı aç"
-  föyü, SSS. Form ya da fikir listesi burada yok.
-- `vaka-01/`: ilk vaka sayfası (eski `kucuk-fikirler/`). Hikâye, fikir formu, liste, hesap,
-  teknik föy burada. `kucuk-fikirler/` yalnız buraya yönlendirir.
-- Örnek vaka kartları gerçek firma ya da açık vaka gibi gösterilmez; etiketleri ve alttaki
-  not bunu açıkça söyler. Gerçek bir Vaka 02 gelince kart onunla değiştirilir.
-- "Vakanı aç" föyü şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
-
-Bütün sayfalar tek temayı paylaşır. Yeni sayfalar token'ları `assets/ud.css` içinden alır;
-`index.html`, `vaka-01/` ve `404.html` tek dosyalık oldukları için aynı değerleri kendi `:root`
-bloklarında tutar. Birinde renk, font, radius veya süre değişirse diğerlerinde de değişmeli.
+- "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
 ## Tema: kâğıt ve fikir mavisi (22 Ekim 2026)
 
@@ -82,16 +76,8 @@ Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist
 - Ana sayfanın eski açık/koyu çelik teması (Archivo + Figtree) kaldırıldı. Koyu atölye teması
   22 Ekim 2026'da yerini beyaz "kâğıt ve fikir mavisi" temasına bıraktı.
 - Marka adı "İkinci Tur" yerine **Undustit**. Logo: `Undust` + italik turuncu (`--brand`) `it`.
-- Başlıklar en fazla 3 satır. Ana sayfa hero'su 7/5 asimetrik ızgara.
-- Yan yana iki bölüm aynı düzeni kullanmaz: hero split, ofsetli adım listesi, örnek + form,
-  fikir panosu, hesap tablosu, iki sütunlu SSS.
-- Hikâye sayfasında menü, sabit çizimin üstünde şeffaf; içerik altına girince opak olur.
-- Hikâye başlıkları üst üste binmez: eski başlık 100 ms'de çıkar, yenisi ondan sonra girer.
-- Her hareketin `prefers-reduced-motion` karşılığı var.
-- İki sayfa aynı menü setini kullanır: Hikâye · Fikirler · Hesap · Teknik föy. 1040 px altında
-  menü bir düğmenin açtığı panele (linkler + dil seçimi) taşınır, "Fikrini gönder" görünür kalır.
-- Ana sayfa bölümleri pafta gibi numaralanır (01 / 04 ...). Sayfalar arası geçiş
-  `@view-transition` ile; logo ve menü yerinde kalır.
-- 404 sayfası aynı temada, "boş delik" çizimiyle. Linkleri kök (`/`) varsayar; site bir alt
-  klasörde yayınlanırsa güncellenmeli.
-- `claude.ai` üzerinden çalışan fikir formu ve liste bilinçli olarak böyle; dokunulmadı.
+- Menü: Fikirler · Nasıl işler · Vakalar · Hikâye + "Fikrini yaz". 900 px altında menü bir
+  düğmenin açtığı panele taşınır, "Fikrini yaz" görünür kalır.
+- Her hareketin `prefers-reduced-motion` karşılığı var. Sayfalar arası geçiş `@view-transition` ile.
+- 404 sayfası linkleri kök (`/`) varsayar; site bir alt klasörde yayınlanırsa güncellenmeli.
+- Sayfalar yalnız Türkçe; eski Vaka 01'deki TR/EN seçimi taşınmadı.

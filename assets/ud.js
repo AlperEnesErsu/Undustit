@@ -61,8 +61,7 @@ function daysLeft(at){
   const end = new Date(at).getTime() + TERMS.voteDays*DAY;
   return Math.max(0, Math.ceil((end - Date.now())/DAY));
 }
-const homeHref = () => { let h = 'ana/a/'; try { h = localStorage.getItem('ud-home') || h; } catch(e){} return ROOT + h; };
-if (html.dataset.home && window.self === window.top){ try { localStorage.setItem('ud-home', html.dataset.home); } catch(e){} }
+const homeHref = () => ROOT || './';
 
 // =========================================================== nav + footer
 function mountChrome(){
@@ -84,7 +83,7 @@ function mountChrome(){
   if (foot){
     foot.className = 'foot';
     foot.innerHTML = `<div class="wrap"><span>Undustit · prototip · <span class="mode-badge" id="mode-badge"><i></i>bağlanıyor</span></span>
-      <nav aria-label="Alt menü"><a href="${ROOT}fikir/">Fikrini yaz</a><a href="${ROOT}fikirler/">Fikirler</a><a href="${ROOT}nasil/">Nasıl işler</a><a href="${ROOT}vakalar/">Vakalar</a><a href="${ROOT}hikaye/">Hikâye</a><a href="${ROOT}ana/">Tasarım seçenekleri</a></nav></div>`;
+      <nav aria-label="Alt menü"><a href="${ROOT}fikir/">Fikrini yaz</a><a href="${ROOT}fikirler/">Fikirler</a><a href="${ROOT}nasil/">Nasıl işler</a><a href="${ROOT}vakalar/">Vakalar</a><a href="${ROOT}hikaye/">Hikâye</a></nav></div>`;
   }
 }
 

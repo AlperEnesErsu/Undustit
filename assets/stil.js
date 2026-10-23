@@ -3,7 +3,7 @@
    so each style opens as its own site and two tabs in two styles never affect each other. */
 (function(){
   'use strict';
-  var LIST = { kagit:'Kâğıt', oyuncu:'Oyuncu', teknik:'Teknik çizim', yumusak:'Yumuşak' };
+  var LIST = { kagit:'Kâğıt', oyuncu:'Oyuncu', teknik:'Teknik çizim', yumusak:'Yumuşak', premium:'Premium' };
   var base = document.currentScript.src.replace(/assets\/stil\.js.*$/, '');
   var q = new URLSearchParams(location.search).get('stil');
   var stil = LIST[q] ? q : 'kagit';

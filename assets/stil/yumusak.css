@@ -3,7 +3,9 @@
    coral for actions, teal for progress. The "alırdım" button squishes and pops when you commit.
    Contrast on --bg: ink 13.8, ink-2 8.2, muted 5.3, accent 5.0 (white on accent 5.1), ok 4.9.
    On the pastel fields muted stays above 4.6. */
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=block");
+@font-face{font-family:"Nunito Fallback";font-weight:100 600;src:local("Arial"),local("ArialMT");size-adjust:101.08%;ascent-override:99.92%;descent-override:34.63%;line-gap-override:0%}
+@font-face{font-family:"Nunito Fallback";font-weight:700 900;src:local("Arial Bold"),local("Arial-BoldMT");size-adjust:87.81%;ascent-override:115.02%;descent-override:39.86%;line-gap-override:0%}
 
 :root{
   --bg:#FFFBF5; --bg-2:#FFFFFF; --bg-3:#FFF1E6; --line:#F0E6DA; --line-2:#E2D5C6;
@@ -13,9 +15,9 @@
   --accent-deep:#8E2610;
   --brand:#C93A1C; --ok:#0D7C70; --ok-soft:rgba(13,124,112,.1); --warn:#8A5A00; --err:#B42318;
   --peach:#FFE9DD; --mint:#DFF5EA; --lilac:#ECE6FF;
-  --f-serif:"Nunito",system-ui,sans-serif;
-  --f-body:"Nunito",system-ui,sans-serif;
-  --f-mono:"Nunito",system-ui,sans-serif;
+  --f-serif:"Nunito","Nunito Fallback",system-ui,sans-serif;
+  --f-body:"Nunito","Nunito Fallback",system-ui,sans-serif;
+  --f-mono:"Nunito","Nunito Fallback",system-ui,sans-serif;
   --r-sm:14px; --r-md:22px; --r-lg:28px;
   --spring:cubic-bezier(.34,1.56,.64,1);
   --shadow:0 18px 40px -22px rgba(120,60,30,.35);

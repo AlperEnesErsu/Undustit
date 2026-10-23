@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Stil örnekleri · Undustit</title>
-<meta name="description" content="Undustit'in aynı içerikle dört farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır.">
+<meta name="description" content="Undustit'in aynı içerikle beş farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#FAF9F6">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Undustit">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:image" content="../assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="../assets/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="../assets/ud.css">
 <script src="../assets/stil.js"></script>
 <style>
@@ -32,8 +42,8 @@
 <main id="main" tabindex="-1" class="wrap">
   <div class="phead">
     <span class="eyebrow">Stil örnekleri</span>
-    <h1>Aynı site, <em>dört stil.</em></h1>
-    <p class="lead">İçerik, sayfalar ve akış dördünde de aynı. Her biri ayrı bir site olarak açılır; içinde gezinirken stil değişmez, dördünü ayrı sekmelerde yan yana açabilirsin.</p>
+    <h1>Aynı site, <em>beş stil.</em></h1>
+    <p class="lead">İçerik, sayfalar ve akış hepsinde aynı. Her biri ayrı bir site olarak açılır; içinde gezinirken stil değişmez, hepsini ayrı sekmelerde yan yana açabilirsin.</p>
   </div>
   <div class="styles" id="styles"></div>
 </main>
@@ -44,6 +54,7 @@ const STYLES = [
   ['kagit','Kâğıt','Sıcak kâğıt beyazı, editoryal serif başlıklar. Mavi yalnız eylemlerde, yeşil ilerlemede. Sakin ve premium.'],
   ['oyuncu','Oyuncu','Quirky havası: krem zemin, kalın grotesk başlıklar, mürekkep çerçeveli kartlar ve sert gölgeler, sarı işaretleyici, zıplayan düğmeler.'],
   ['teknik','Teknik çizim','Mavi pafta kâğıdı ve ızgara, dar büyük harfli başlıklar, mono etiketler, kesikli çizgiler. Mühendislik ve üretim hissi.'],
+  ['premium','Premium','Sessiz lüks: sıcak tonlu derin siyah, büyük ve ince başlıklar (ikinci yarısı griye döner), geniş aralıklı etiketler, tek beyaz hap düğme, yalnız küçük şampanya dokunuşlar. Gölge yok; ince çizgiler ve bol boşluk.'],
   ['yumusak','Yumuşak','Gündelik uygulama sıcaklığı: pastel bölümler, yuvarlak kalın yazı, basınca gömülen hap düğmeler. “Alırdım” deyince düğme ezilip küçük bir konfeti patlatır.']
 ];
 const host = document.getElementById('styles');

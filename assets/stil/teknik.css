@@ -1,7 +1,9 @@
 /* Teknik çizim: a blueprint sheet. Prussian blue paper with a two-level grid, condensed capitals for
    titles, mono for every label, hairline and dashed rules, square corners, a yellow marker for actions.
    Contrast on --bg: ink 11.2, ink-2 8.5, muted 5.8, accent 8.9 (bg-blue text on accent 8.9), ok 7.8. */
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,500;0,600;1,500&display=block");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@font-face{font-family:"Plex Condensed Fallback";font-weight:100 900;src:local("Arial Bold"),local("Arial-BoldMT"),local("Arial");size-adjust:88.44%;ascent-override:116.47%;descent-override:31.66%;line-gap-override:0%}
 
 :root{
   color-scheme:dark;
@@ -11,7 +13,7 @@
   --accent-soft:rgba(255,216,77,.1); --accent-line:rgba(255,216,77,.5);
   --brand:#FF8A5B; --ok:#7FE0B2; --ok-soft:rgba(127,224,178,.1); --warn:#FFD84D; --err:#FF9C9C;
   --shadow:none;
-  --f-serif:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;
+  --f-serif:"IBM Plex Sans Condensed","Plex Condensed Fallback","Arial Narrow",sans-serif;
   --f-body:"IBM Plex Sans",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,monospace;
   --r-sm:2px; --r-md:2px; --r-lg:3px;

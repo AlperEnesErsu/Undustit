@@ -331,9 +331,10 @@ function buyCtl(i){
   const voting = i.left > 0;
   const paint = () => {
     box.replaceChildren();
+    // the accessible name starts with the visible text ("3 alırdım") and adds the context after it
+    const more = i.ex ? ' (örnek fikir, talep toplanmıyor)' : i.mine ? `: ${esc(i.title)}, sen ${tl(i.myPrice)} dedin, değiştir` : `: ${esc(i.title)}`;
     const btn = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: i.ex || !voting || !Store.canWrite,
-      'aria-label': i.ex ? 'Örnek fikir, talep toplanmıyor' : i.mine ? `Alırdım dedin, ${tl(i.myPrice)}. Değiştir` : `${i.title}: alırdım de, şu an ${i.buyers} kişi`,
-      html:`<b>${i.ex ? '–' : i.buyers}</b><span>alırdım</span>` });
+      html:`<b>${i.ex ? '–' : i.buyers}</b> <span>alırdım</span><span class="sr">${more}</span>` });
     btn.onclick = edit;
     box.append(btn);
     if (i.mine) box.append(el('small', { class:'buy-mine', text:'Sen: ' + tl(i.myPrice) }));
@@ -454,7 +455,8 @@ function mountProc(host, opts={}){
   const BUYERS = 312, AVG = 240, PRE = 300;
   host.classList.add('proc');
   host.innerHTML = `
-  <div class="pc-stage" role="img" aria-label="Bir fikrin ürüne dönüşmesi: fikir tek cümleyle yazılır, ${BUYERS} kişi ortalama ${AVG} liraya alırdım der, ön satış ${PRE} siparişe ulaşınca kesme tahtası üretilir, satıştan fikir sahibine ve katkı verenlere yüzde ${TERMS.shareRetail} ile ${TERMS.shareDirect} arası pay ödenir.">
+  <p class="sr">Bir fikrin ürüne dönüşmesi: fikir tek cümleyle yazılır, ${BUYERS} kişi ortalama ${AVG} liraya alırdım der, ön satış ${PRE} siparişe ulaşınca kesme tahtası üretilir, satıştan fikir sahibine ve katkı verenlere yüzde ${TERMS.shareRetail} ile ${TERMS.shareDirect} arası pay ödenir.</p>
+  <div class="pc-stage">
     <div class="pc-dots" aria-hidden="true">${Array.from({length:14}, (_,n) => { const a = n/14*Math.PI*2; return `<i style="left:34%;top:30%;--x:${Math.round(Math.cos(a)*260)}px;--y:${Math.round(Math.sin(a)*200)}px;animation-delay:${(n%7)*60}ms"></i>`; }).join('')}</div>
     <div class="pc-card" aria-hidden="true">
       <div class="h"><span class="tag">Mutfak</span><span class="pc-n">0 / 140</span></div>

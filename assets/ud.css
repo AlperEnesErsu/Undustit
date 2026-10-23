@@ -1,3 +1,7 @@
+/* Fallbacks measured against each web font (Playwright canvas, 100px sample): while the real font loads,
+   the page is laid out on a local font sized to the same width and line box, so nothing reflows when it lands. */
+@font-face{font-family:"Instrument Serif Fallback";src:local("Georgia");size-adjust:76.73%;ascent-override:129.03%;descent-override:40.4%;line-gap-override:0%}
+@font-face{font-family:"Instrument Serif Fallback";font-style:italic;src:local("Georgia Italic"),local("Georgia");size-adjust:76.73%;ascent-override:129.03%;descent-override:40.4%;line-gap-override:0%}
 /* Undustit shared sheet: tokens, nav, buttons, the idea form, idea cards, the process animation.
    Pages that predate it (index.html, vaka-01/) keep their own inline copy of the same tokens. */
 :root{
@@ -12,7 +16,7 @@
   --brand:#C2410C;
   --ok:#147A4E; --ok-soft:rgba(20,122,78,.08); --warn:#8A5A00; --err:#B42318;
   --shadow:0 24px 50px -28px rgba(22,24,29,.28);
-  --f-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --f-serif:"Instrument Serif","Instrument Serif Fallback",Georgia,"Times New Roman",serif;
   --f-body:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
   --dur-fast:100ms; --dur-base:200ms; --dur-mod:300ms; --dur-slow:500ms;
@@ -29,7 +33,11 @@ p{margin:0} em{font-style:italic} a{color:inherit}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+/* controls get an ink ring with a gap, so focus shows on any fill, including accent buttons */
+.btn:focus-visible,.chip:focus-visible,.vote:focus-visible,.seg button:focus-visible,.nav-links a:focus-visible,.link:focus-visible,.pc-replay:focus-visible{outline:2px solid var(--ink);outline-offset:3px;box-shadow:0 0 0 3px var(--bg)}
 main:focus{outline:none}
+/* short pages still fill the screen, so the footer never starts in view and gets pushed when fonts land */
+main{min-height:calc(100svh - 64px)}
 .wrap{width:min(100% - 2*var(--gut), var(--max));margin-inline:auto}
 .eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .eyebrow.k{color:var(--accent)}
@@ -53,16 +61,18 @@ main:focus{outline:none}
 .btn:disabled,.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 .btn:disabled:hover{background:var(--accent);border-color:var(--accent)}
 .link{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent-line);text-underline-offset:4px;transition:color var(--dur-fast) var(--ease-out),text-decoration-color var(--dur-fast) var(--ease-out)}
-.link:hover{color:var(--accent);text-decoration-color:var(--accent)}
+.link:hover{color:var(--accent);text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:6px}
+/* standalone links get a 24px tap height */
+a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color var(--dur-fast) var(--ease-out),text-decoration-color var(--dur-fast) var(--ease-out),text-underline-offset var(--dur-base) var(--ease-out)}
 
 /* ---------- nav (injected by ud.js) */
 .nav{position:sticky;top:0;z-index:30;background:rgba(250,249,246,.86);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--line)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:calc(env(safe-area-inset-top,0px) + 12px) 12px}
-.brand{display:inline-flex;align-items:baseline;text-decoration:none;view-transition-name:brand}
+.brand{display:inline-flex;align-items:baseline;text-decoration:none;}
 .brand b{font-family:var(--f-serif);font-weight:400;font-size:25px;line-height:1}
 .brand b i{color:var(--brand);display:inline-block;transition:transform var(--dur-base) var(--ease-out)}
 .brand:hover b i{transform:translateX(2px) rotate(-6deg)}
-.nav-r{display:flex;align-items:center;gap:8px;view-transition-name:nav-r}
+.nav-r{display:flex;align-items:center;gap:8px}
 .nav-links{display:flex;gap:2px}
 .nav-links a{font-size:14px;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:999px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
 .nav-links a:hover{color:var(--ink);background:var(--bg-3)}
@@ -106,7 +116,8 @@ main:focus{outline:none}
 .if-top label{grid-column:1 / -1;display:flex;justify-content:space-between;gap:12px}
 .if-pitch{width:100%;border:0;background:transparent;resize:none;font-family:var(--f-serif);font-size:clamp(24px,2.4vw,32px);line-height:1.15;letter-spacing:-.01em;color:var(--ink);padding:4px 0;min-height:1.3em;field-sizing:content;max-height:5.2em}
 .if-pitch::placeholder{color:var(--hint)}
-.if-pitch:focus{outline:none}
+.if-pitch:focus:not(:focus-visible){outline:none}
+.if-pitch:focus-visible{outline:2px solid var(--accent);outline-offset:6px;border-radius:8px}
 .if-count{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .if-count.near{color:var(--warn)} .if-count.over{color:var(--err)}
 .if-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-slow) var(--ease-out)}
@@ -123,7 +134,9 @@ main:focus{outline:none}
 .if-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:36px;padding:0 14px;border:1px solid var(--line-2);border-radius:999px;background:transparent;font-size:14px;color:var(--ink-2);transition:all var(--dur-fast) var(--ease-out)}
-.chip:hover{border-color:var(--ink-2);color:var(--ink)}
+.chip:hover{border-color:var(--ink-2);color:var(--ink);transform:translateY(-1px)}
+.chip[aria-pressed="true"]:hover{background:#000;border-color:#000;color:#fff}
+.seg button[aria-pressed="true"]:hover{background:#000;color:#fff;transform:translateY(-1px)}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .chip.case[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .feats{display:grid;gap:8px}
@@ -173,7 +186,8 @@ main:focus{outline:none}
 .vote svg{width:16px;height:16px;transition:transform var(--dur-base) var(--ease-out)}
 .vote b{font-family:var(--f-mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
 .vote span{font-size:10.5px;font-family:var(--f-mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
-.vote:hover{border-color:var(--accent)}
+.vote:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft);transform:translateY(-2px)}
+.vote[aria-pressed="true"]:hover{background:var(--accent-hover)}
 .vote:hover svg{transform:translateY(-2px)}
 .vote[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .vote[aria-pressed="true"] span{color:var(--accent-ink)}
@@ -267,7 +281,7 @@ main:focus{outline:none}
 .pc-steps li.past{color:var(--ink-2)}
 .pc-replay{position:absolute;right:12px;bottom:12px;z-index:3;display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border:1px solid var(--line-2);border-radius:999px;background:rgba(255,255,255,.92);font-size:12.5px;color:var(--ink-2);opacity:0;pointer-events:none;transition:opacity var(--dur-mod) var(--ease-out),border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
 .pc-replay svg{width:14px;height:14px}
-.pc-replay:hover{border-color:var(--ink-2);color:var(--ink)}
+.pc-replay:hover{border-color:var(--ink);color:var(--ink);background:var(--bg-2);transform:translateY(-1px)}
 .proc.end .pc-replay{opacity:1;pointer-events:auto}
 .pc-ex{position:absolute;left:12px;bottom:12px;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
 @media (max-width:640px){
@@ -354,6 +368,17 @@ dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
 @media (max-width:560px){.crit-row{grid-template-columns:minmax(0,1fr) auto}.crit-row .stars{grid-column:1 / -1;grid-row:2}}
 
 @view-transition{navigation:auto}
+/* page change: the header stays put, the old page lifts away, the new one rises in */
+.nav{view-transition-name:site-nav}
+::view-transition-old(root){animation:vt-out 220ms var(--ease-io) both}
+::view-transition-new(root){animation:vt-in 420ms var(--ease-out) 80ms both}
+@keyframes vt-out{to{opacity:0;transform:translateY(-14px)}}
+@keyframes vt-in{from{opacity:0;transform:translateY(28px)}}
+/* space for parts the script fills in, so nothing below them jumps */
+#form:empty{min-height:120px}
+#proc:empty{aspect-ratio:25/22}
+.thu:empty{min-height:38px;min-width:240px}
+@media (max-width:640px){#form:empty{min-height:170px}#proc:empty{aspect-ratio:375/560}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}

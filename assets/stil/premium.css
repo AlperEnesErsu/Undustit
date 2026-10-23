@@ -1,0 +1,107 @@
+/* Premium: quiet luxury. A warm near-black stage, large light display type that turns grey for its
+   second half, wide-tracked mono labels, white pill for the one action, champagne only in small touches
+   (the logo, the live dot, the focused field). No shadows; hairlines and generous space do the work.
+   From the UI-UX kit: Bugatti's monochrome austerity and Apple's white pill.
+   Contrast on --bg: ink 17.9, ink-2 11.6, muted 7.1, hint 4.8, champagne 10.3, ok 11.5;
+   black on the white button 17.9. */
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;1,300&display=block");
+@font-face{font-family:"Inter Tight Fallback";font-weight:100 400;src:local("Arial"),local("ArialMT");size-adjust:95.33%;ascent-override:101.76%;descent-override:25.18%;line-gap-override:0%}
+@font-face{font-family:"Inter Tight Fallback";font-weight:500 900;src:local("Arial"),local("ArialMT");size-adjust:93.77%;ascent-override:103.44%;descent-override:25.59%;line-gap-override:0%}
+
+:root{
+  color-scheme:dark;
+  --bg:#0A0A0A; --bg-2:#131313; --bg-3:#1B1B1B; --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.18);
+  --ink:#F5F3EF; --ink-2:#C9C6C0; --muted:#9C9A96; --hint:#7E7C78;
+  --accent:#F5F3EF; --accent-hover:#FFFFFF; --accent-active:#DAD7D1; --accent-ink:#0A0A0A;
+  --accent-soft:rgba(245,243,239,.05); --accent-line:rgba(205,184,146,.45);
+  --brand:#CDB892; --champ:#CDB892;
+  --ok:#8FD4A8; --ok-soft:rgba(143,212,168,.07); --warn:#E6C27A; --err:#FF9C9C;
+  --shadow:none;
+  --f-serif:"Inter Tight","Inter Tight Fallback",system-ui,sans-serif;
+  --f-body:"Inter Tight","Inter Tight Fallback",system-ui,sans-serif;
+  --r-sm:12px; --r-md:18px; --r-lg:24px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --dur-base:300ms; --dur-mod:450ms;
+}
+html,body{background:var(--bg)}
+body{font-weight:300;letter-spacing:.005em}
+::selection{background:var(--champ);color:#0A0A0A}
+
+/* type: light, large, tight; the second half of every headline steps back to grey */
+h1,h2,h3{font-weight:300;letter-spacing:-.045em;line-height:.96}
+h3{font-weight:400;letter-spacing:-.015em}
+h1 em,h2 em,.cb-h em,html .hero h1 em,html .phead h1 em,html .sec h2 em,html .case-head h1 em,html .mission q em{font-style:normal;color:var(--muted)}
+.hero h1{font-size:clamp(54px,7.2vw,116px)}
+.phead h1,.case-head h1{font-size:clamp(54px,7.6vw,120px)}
+.brand b{font-family:var(--f-body);font-weight:400;font-size:22px;letter-spacing:-.02em}
+.brand b i{font-style:normal;color:var(--champ)}
+.eyebrow{font-size:11px;letter-spacing:.26em;color:var(--muted)}
+.eyebrow.k{color:var(--champ)}
+.lead{font-weight:300;color:var(--ink-2)}
+.sec{padding-block:clamp(96px,11vw,168px)}
+
+/* one action, one white pill; everything else is a hairline */
+.btn{font-weight:400;letter-spacing:.01em;border-color:var(--ink);transition:background-color var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.btn:hover{background:#fff;border-color:#fff}
+.btn.sig:hover{background:#fff;border-color:#fff;box-shadow:0 0 0 6px rgba(245,243,239,.08)}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn.alt:hover{background:rgba(245,243,239,.05);color:var(--ink);border-color:var(--ink)}
+.chip{border-color:var(--line-2);color:var(--ink-2);font-weight:400}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip[aria-pressed="true"],.chip.case[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#0A0A0A}
+.chip[aria-pressed="true"]:hover,.seg button[aria-pressed="true"]:hover{background:#fff;border-color:#fff;color:#0A0A0A}
+
+/* surfaces: one step up from the stage, a hairline, no shadow */
+.nav{background:rgba(10,10,10,.78);border-bottom:1px solid var(--line)}
+.nav-links a{font-size:13.5px;letter-spacing:.01em;color:var(--muted)}
+.nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--ink);background:transparent}
+.iform{background:var(--bg-2);border-color:var(--line-2)}
+.iform:focus-within{border-color:var(--accent-line);box-shadow:none}
+.if-pitch{font-weight:300;letter-spacing:-.025em}
+.if-pitch::placeholder{color:var(--hint)}
+.if-field textarea,.if-field input{background:var(--bg);border-color:var(--line-2)}
+.if-field textarea:focus,.if-field input:focus{border-color:var(--champ)}
+.icard{background:var(--bg-2);border-color:var(--line)}
+.icard:hover{background:var(--bg-3);border-color:var(--line-2)}
+.icard .rank{font-weight:300}
+.icard.top .rank{color:var(--champ)}
+.vote{background:transparent;border-color:var(--line-2)}
+.vote:hover:not(:disabled){background:rgba(245,243,239,.05);border-color:var(--ink)}
+.buy-f input{background:var(--bg)}
+.buy-mine{color:var(--champ)}
+.case-band,.mission{background:var(--bg-2);border-color:var(--line)}
+.cb-tag{border-color:rgba(143,212,168,.3)}
+.cb-h{font-weight:300}
+.cb-art{background-color:#0E0E0E;border:1px solid var(--line)}
+.cb-l path{fill:var(--bg-2);stroke:var(--ink)}
+.cb-art figcaption{font-weight:300;letter-spacing:-.03em}
+.pc-stage{background:#0E0E0E;border-color:var(--line)}
+.pc-stage::before{opacity:.35}
+.pc-card,.pc-pay{background:var(--bg-2);border-color:var(--line-2)}
+.pc-txt{font-weight:300;letter-spacing:-.02em}
+.pc-buy b,.pc-pay b{font-weight:300}
+.pc-pay{background:rgba(143,212,168,.06);border-color:rgba(143,212,168,.25)}
+.pc-prod .cnt{fill:var(--bg-3)}
+.pc-prod .cnt-t{fill:var(--bg-2)}
+.pc-prod .lbl rect{fill:var(--ink)}
+.pc-prod .lbl text{fill:#0A0A0A}
+.pc-replay{background:var(--bg-2)}
+.pc-steps li.on::before{background:var(--champ)}
+.thu{background:transparent;border-color:var(--line-2)}
+.thu .dot{background:var(--champ);box-shadow:0 0 0 0 rgba(205,184,146,.5)}
+.round header{border-top:1px solid var(--line-2)}
+.round header b{font-weight:300}
+.slot,.empty{border-color:var(--line-2)}
+.disc b{font-weight:300;letter-spacing:-.03em}
+.disc a:hover b,.disc a:hover .go{color:var(--champ)}
+.how3 li,.open3 div,.case,.after,.arena aside div{background:var(--bg-2);border-color:var(--line)}
+dialog.idlg{background:var(--bg-2);border-color:var(--line-2)}
+dialog.idlg header{background:var(--bg-2)}
+dialog.idlg::backdrop{background:rgba(0,0,0,.7)}
+.crit,.note{background:var(--bg)}
+.link{text-decoration-color:var(--accent-line)}
+.link:hover{color:var(--champ);text-decoration-color:var(--champ)}
+.foot{border-top-color:var(--line)}
+/* page headings set at a fixed weight elsewhere follow the light display weight here */
+.steps h3,.big2 b,.vals b,.mission q,.style h2,.case h2{font-weight:300;letter-spacing:-.03em}
+html .big2 b{color:var(--ink)}

@@ -1,7 +1,8 @@
 /* Oyuncu: Quirky's own mood. Cream paper, a heavy grotesque, ink outlines with hard offset shadows,
    violet for anything you act on, a yellow marker for emphasis, things that bounce a little.
    Contrast on --bg: ink 16.4, ink-2 10.3, muted 6.0, accent 6.0 (white on accent 6.4), ok 5.0. */
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=block");
+@font-face{font-family:"Bricolage Fallback";font-weight:100 900;src:local("Arial Bold"),local("Arial-BoldMT"),local("Arial");size-adjust:79.39%;ascent-override:117.15%;descent-override:34.01%;line-gap-override:0%}
 
 :root{
   --bg:#FFF6E9; --bg-2:#FFFFFF; --bg-3:#FFEBD1; --line:#EADCC6; --line-2:#1B1530;
@@ -10,7 +11,7 @@
   --accent-soft:rgba(91,46,255,.08); --accent-line:rgba(91,46,255,.4);
   --brand:#E8462A; --sun:#FFD23F; --pink:#FF8FC2;
   --ok:#0A7A4E; --ok-soft:rgba(10,122,78,.08); --warn:#8A5A00; --err:#B42318;
-  --f-serif:"Bricolage Grotesque","Geist",system-ui,sans-serif;
+  --f-serif:"Bricolage Grotesque","Bricolage Fallback","Geist",system-ui,sans-serif;
   --r-sm:12px; --r-md:20px; --r-lg:28px;
   --pop:cubic-bezier(.34,1.56,.64,1);
   --hard:4px 4px 0 var(--ink);

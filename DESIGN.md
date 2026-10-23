@@ -54,6 +54,7 @@ görünüm değişir. Her stil ayrı bir site gibi açılır:
 | Kâğıt | `/` | (varsayılan, `ud.css`) | Sıcak kâğıt, editoryal serif, mavi yalnız eylemde |
 | Oyuncu | `/?stil=oyuncu` | `assets/stil/oyuncu.css` | Krem zemin, Bricolage Grotesque, mürekkep çerçeve + sert gölge, mor eylem, sarı işaretleyici |
 | Teknik çizim | `/?stil=teknik` | `assets/stil/teknik.css` | Mavi pafta + ızgara, IBM Plex Condensed büyük harf, mono etiketler, kesikli çizgi, sarı eylem |
+| Premium | `/?stil=premium` | `assets/stil/premium.css` | Sessiz lüks: sıcak derin siyah `#0A0A0A`, Inter Tight 300 büyük başlıklar (ikinci yarı gri), geniş aralıklı mono etiketler, tek beyaz hap düğme, şampanya `#CDB892` yalnız logo/canlı nokta/odak; gölge yok |
 | Yumuşak | `/?stil=yumusak` | `assets/stil/yumusak.css` | Warm Soft-SaaS: sıcak beyaz + pastel bölümler, Nunito 800–900, kendi renginin koyu tonuna oturan ve basınca gömülen hap düğmeler, mercan eylem, turkuaz ilerleme |
 
 - `assets/stil.js` her sayfanın `<head>`'inde çalışır: `?stil=` değerini okur, stil dosyasını
@@ -72,6 +73,28 @@ görünüm değişir. Her stil ayrı bir site gibi açılır:
   eklendi. Duolingo'nun açık yeşili ve önerilen açık mercan kontrastı geçmediği için eylem rengi
   `#C93A1C` (beyaz yazı 5,1). Yumuşak'ın imzası: "Alırdım" kaydedilince düğme ezilir ve küçük bir
   konfeti patlar (`ud.js` kaydedilen kartı bir kez `.just` ile işaretler; diğer stiller bunu kullanmaz).
+- Jüri sonrası ortak düzeltmeler (dört stile birden):
+  - Sayfa geçişi: menü yerinde kalır, eski sayfa 220 ms'de yukarı kalkar, yenisi 420 ms'de aşağıdan
+    yükselir (`::view-transition-*`). Varsayılan çapraz geçiş görünmeyecek kadar kısaydı.
+  - Erişilebilirlik: "Alırdım" düğmesinin adı görünen metinle başlar, fikir adı ekran okuyucuya
+    gizli metinle eklenir; animasyon sahnesi artık `role="img"` değil (içinde düğme vardı), anlatımı
+    gizli bir paragrafta. Kontrollerde arada boşluklu mürekkep odak halkası; yazma alanında görünür odak.
+    Tek başına duran bağlantılar 24 px dokunma yüksekliği alır.
+  - Hover: seçili çip ve sıralama düğmeleri, "Alırdım", "Tekrar oynat", "Bağlantıyı kopyala" ve
+    bağlantılar artık yalnız renk değiştirmiyor (kalkma, dolgu, kalınlaşan alt çizgi).
+  - Kayma: başlık yazı tipleri `display=block` ve ölçülmüş yedeklerle yüklenir (`size-adjust`,
+    `ascent/descent-override`; Instrument Serif→Georgia %76,73, Bricolage→Arial Bold %79,39,
+    Plex Condensed→Arial Bold %88,44, Nunito→Arial %101,08 / Arial Bold %87,81). JS'in doldurduğu
+    form ve animasyon alanına baştan yer ayrılır; `main` en az bir ekran boyu, alt bilgi ilk ekranda
+    başlamaz. Masaüstü CLS 0,15–0,38'den 0–0,05'e indi; Oyuncu'nun Hikâye sayfası (büyük ilk harf) 0,05.
+  - Yazı tipleri: Geist 300–600'e indirildi, Yumuşak'ta Nunito 400/600 kaldırıldı.
+  - Paylaşım: `assets/og.png` (1200×630) ve `og:*`, `twitter:card` her sayfada; üç uzun açıklama
+    160 karakterin altına indi. **Alan adı belli olunca** `og:image` mutlak adrese çevrilmeli,
+    `canonical` ve `sitemap.xml` eklenmeli (şimdi göreli olduğu için bazı platformlar görseli okumaz).
+- Premium (23 Ekim 2026): ürün sahibi "sade ama ultra premium" bir seçenek istedi. UI-UX kit'ten
+  Bugatti'nin tek renkli sadeliği ve Apple'ın beyaz hap düğmesi alındı. Eylem rengi beyaz (siyah yazı
+  17,9), şampanya yalnız küçük dokunuşlarda; Inter Tight için ölçülmüş Arial yedeği (%95,33 / %93,77)
+  kaymayı önler. Henüz jüriye girmedi.
 - Logo `lang="en"` taşır ki büyük harf yapan stillerde "UNDUSTİT" değil "UNDUSTIT" yazsın.
 - `404.html` tek dosyalık olduğu için stil almaz; her zaman Kâğıt görünür.
 

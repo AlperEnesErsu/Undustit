@@ -2,7 +2,7 @@
    violet for anything you act on, a yellow marker for emphasis, things that bounce a little.
    Contrast on --bg: ink 16.4, ink-2 10.3, muted 6.0, accent 6.0 (white on accent 6.4), ok 5.0. */
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=block");
-@font-face{font-family:"Bricolage Fallback";font-weight:100 900;src:local("Arial Bold"),local("Arial-BoldMT"),local("Arial");size-adjust:79.39%;ascent-override:117.15%;descent-override:34.01%;line-gap-override:0%}
+@font-face{font-family:"Bricolage Fallback";font-weight:100 900;src:local("Arial Bold"),local("Arial-BoldMT"),local("Arial");size-adjust:91.58%;ascent-override:101.56%;descent-override:29.48%;line-gap-override:0%}
 
 :root{
   --bg:#FFF6E9; --bg-2:#FFFFFF; --bg-3:#FFEBD1; --line:#EADCC6; --line-2:#1B1530;
@@ -73,3 +73,17 @@ dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 
 /* phones: a slimmer payout card so it clears the pre-sale row */
 @media (max-width:640px){.pc-pay{padding:12px 14px;gap:4px}.pc-pay b{font-size:30px}.pc-pay span{font-size:12px}}
+
+/* motion: things drop in a little tilted and bounce into place; the highlighter is swiped across */
+:root{--in-y:34px;--in-rot:-1.6deg;--in-dur:760ms;--in-ease:cubic-bezier(.34,1.56,.64,1);--in-step:90ms}
+@media (prefers-reduced-motion:no-preference){
+  h1 em,.seen h2 em,.cb-h em{background-size:0% 100%;background-repeat:no-repeat;animation:hl-swipe 700ms cubic-bezier(.65,0,.35,1) 450ms forwards}
+  .seen h2 em,.seen .cb-h em{animation-delay:300ms}
+  .hero-l > .eyebrow,.phead > .eyebrow{animation:sticker 700ms cubic-bezier(.34,1.56,.64,1) both}
+  .hero-l > .eyebrow:hover,.phead > .eyebrow:hover{transform:rotate(3deg) scale(1.05);transition:transform 260ms var(--pop)}
+}
+@keyframes hl-swipe{to{background-size:100% 100%}}
+@keyframes sticker{from{opacity:.01;transform:translateY(-30px) rotate(-14deg) scale(1.3)}60%{transform:translateY(3px) rotate(1deg) scale(.97)}to{transform:rotate(-2deg)}}
+
+/* page titles: the 14ch cap is fixed in em, so the box is the same width before and after the font loads */
+.phead h1{max-width:8.32em}

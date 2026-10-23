@@ -84,3 +84,15 @@ dialog.idlg::backdrop{background:rgba(6,20,42,.7)}
 .crit,.note{background:var(--bg)}
 .foot{border-top-style:dashed}
 .link{text-decoration-style:dashed}
+
+/* motion: a plotter sweep. Blocks are scanned in left to right, drawings are plotted slowly */
+:root{--in-y:0px;--in-dur:900ms;--in-ease:cubic-bezier(.65,0,.35,1);--in-step:110ms;--draw-dur:2000ms}
+@keyframes plot-in{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@media (prefers-reduced-motion:no-preference){
+  .hero-l > *,.phead > *,.case-head .txt > *,.compose-l > *{animation-name:plot-in}
+  .hero #proc,.case-head .cb-art,.compose .after{animation-name:plot-in}
+  .rv{opacity:1;transform:none;filter:none;clip-path:inset(0 100% 0 0);transition:clip-path var(--in-dur) var(--in-ease) var(--d,0ms)}
+  .rv.in{clip-path:inset(0 0 0 0)}
+  .eyebrow::before{display:inline-block;animation:tick 1.6s steps(2) 3}
+}
+@keyframes tick{50%{opacity:0}}

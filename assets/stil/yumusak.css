@@ -5,7 +5,7 @@
    On the pastel fields muted stays above 4.6. */
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=block");
 @font-face{font-family:"Nunito Fallback";font-weight:100 600;src:local("Arial"),local("ArialMT");size-adjust:101.08%;ascent-override:99.92%;descent-override:34.63%;line-gap-override:0%}
-@font-face{font-family:"Nunito Fallback";font-weight:700 900;src:local("Arial Bold"),local("Arial-BoldMT");size-adjust:87.81%;ascent-override:115.02%;descent-override:39.86%;line-gap-override:0%}
+@font-face{font-family:"Nunito Fallback";font-weight:700 900;src:local("Arial Bold"),local("Arial-BoldMT");size-adjust:101.51%;ascent-override:99.5%;descent-override:34.48%;line-gap-override:0%}
 
 :root{
   --bg:#FFFBF5; --bg-2:#FFFFFF; --bg-3:#FFF1E6; --line:#F0E6DA; --line-2:#E2D5C6;
@@ -120,3 +120,14 @@ dialog.idlg{border:0;border-radius:var(--r-lg);box-shadow:0 40px 90px -30px rgba
 /* Nunito has no italic: emphasis is colour, never a faked slant; html raises it above page styles */
 html h1 em,html h2 em,html .cb-h em,html .mission q em{font-style:normal;color:var(--accent)}
 .pc-pay b em{font-style:normal;color:var(--ink)}
+
+/* motion: soft and springy. Blocks grow from slightly small and settle with a little overshoot */
+:root{--in-y:28px;--in-scale:.93;--in-dur:680ms;--in-ease:cubic-bezier(.34,1.56,.64,1);--in-step:85ms}
+@media (prefers-reduced-motion:no-preference){
+  .hero-l > .eyebrow,.phead > .eyebrow{animation:pop-in 600ms cubic-bezier(.34,1.56,.64,1) both}
+  .disc a:hover{transform:translateY(-4px) rotate(-.6deg);transition:transform 260ms var(--spring)}
+}
+@keyframes pop-in{from{opacity:.01;transform:scale(.6)}}
+
+/* page titles: the 14ch cap is fixed in em, so the box is the same width before and after the font loads */
+.phead h1{max-width:8.4em}

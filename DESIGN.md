@@ -60,8 +60,10 @@ görünüm değişir. Her stil ayrı bir site gibi açılır:
 - `assets/stil.js` her sayfanın `<head>`'inde çalışır: `?stil=` değerini okur, stil dosyasını
   sayfa çizilmeden yükler ve bütün iç bağlantılara aynı `?stil=` değerini ekler. Stil tarayıcıya
   kaydedilmez; bu yüzden dört stil ayrı sekmelerde yan yana açılabilir, birbirini etkilemez.
-- `stiller/` dördünü canlı önizlemeyle gösterir ve her birini yeni sekmede açar. Ürün sahibine
-  gönderilecek bağlantı bu. Her sayfanın alt bilgisinde de stiller arası geçiş satırı var.
+- `stiller/` stil panosu: üstte sayfa seçici (7 sayfa) ve Masaüstü/Telefon anahtarı; seçilen sayfa beş
+  stilde canlı önizlemeyle yan yana görünür. Önizlemeye tıklayınca tam boy ve kullanılabilir açılır,
+  "Yeni sekmede aç" ayrı site olarak açar. Seçim adreste durur (`?sayfa=nasil/&cihaz=telefon`), yani
+  belli bir karşılaştırma bağlantı olarak paylaşılabilir. Her sayfanın alt bilgisinde stiller arası geçiş satırı var.
 - Stil dosyaları yalnız token'ları ve bileşen görünümünü ezer; düzen ve içerik `ud.css` /
   sayfalarda kalır. Yeni bir stil = yeni bir `assets/stil/<ad>.css` + `stil.js` içindeki listeye bir satır.
 - Kontrast her stil dosyasının başında yazılı; metin çiftleri AA'yı geçer. Oyuncu'daki turuncu
@@ -83,8 +85,8 @@ görünüm değişir. Her stil ayrı bir site gibi açılır:
   - Hover: seçili çip ve sıralama düğmeleri, "Alırdım", "Tekrar oynat", "Bağlantıyı kopyala" ve
     bağlantılar artık yalnız renk değiştirmiyor (kalkma, dolgu, kalınlaşan alt çizgi).
   - Kayma: başlık yazı tipleri `display=block` ve ölçülmüş yedeklerle yüklenir (`size-adjust`,
-    `ascent/descent-override`; Instrument Serif→Georgia %76,73, Bricolage→Arial Bold %79,39,
-    Plex Condensed→Arial Bold %88,44, Nunito→Arial %101,08 / Arial Bold %87,81). JS'in doldurduğu
+    `ascent/descent-override`; Instrument Serif→Georgia %76,73, Bricolage→Arial Bold %91,58,
+    Plex Condensed→Arial Bold %88,44, Nunito→Arial %101,08 / Arial Bold %101,51; iki kalın yazı tipi ilk ölçümde %13 yanlıştı, gerçek başlıklarla yeniden ölçüldü). JS'in doldurduğu
     form ve animasyon alanına baştan yer ayrılır; `main` en az bir ekran boyu, alt bilgi ilk ekranda
     başlamaz. Masaüstü CLS 0,15–0,38'den 0–0,05'e indi; Oyuncu'nun Hikâye sayfası (büyük ilk harf) 0,05.
   - Yazı tipleri: Geist 300–600'e indirildi, Yumuşak'ta Nunito 400/600 kaldırıldı.
@@ -95,6 +97,20 @@ görünüm değişir. Her stil ayrı bir site gibi açılır:
   Bugatti'nin tek renkli sadeliği ve Apple'ın beyaz hap düğmesi alındı. Eylem rengi beyaz (siyah yazı
   17,9), şampanya yalnız küçük dokunuşlarda; Inter Tight için ölçülmüş Arial yedeği (%95,33 / %93,77)
   kaymayı önler. Henüz jüriye girmedi.
+- Hareket katmanı (23 Ekim 2026). Önceden süreç animasyonu ve hover dışında hiçbir şey oynamıyordu;
+  iç sayfalar tamamen durağandı ve Teknik'in hiç kendi hareketi yoktu.
+  - Ortak (`ud.js` `mountMotion`, `ud.css`): sayfa açılışında başlık/metin/form/görsel sırayla gelir;
+    ilk ekranın altındaki bloklar ekrana girince bir kez belirir (ızgaralarda 90 ms kademe). Teknik
+    çizimler (cıvata) ekrana girince çizilir, "× 1.000.000" sıfırdan sayar. Store'un yeniden çizdiği
+    fikir listeleri bilerek dışarıda: kartlar tekrar tekrar oynamaz. Hareketi azalt açıkken hiçbiri oynamaz,
+    çizimler tamamlanmış gelir. Yalnız transform/opacity/clip-path/filter kullanılır, kayma eklemez.
+  - Stillere göre (`--in-*` değişkenleri + imza): Kâğıt sakin yükselme; Oyuncu eğik düşüp yaylanma,
+    sarı işaretleyici soldan sağa sürülür, çıkartma etiket düşer; Teknik plotter taraması (clip-path),
+    yavaş çizim, yanıp sönen işaret; Yumuşak küçükten yaylanarak büyüme; Premium bulanıktan netleşen yavaş
+    yükselme, başlığın gri yarısı gecikmeli gelir.
+- Sayfa başlıklarının `14ch` sınırı Oyuncu (8,32em) ve Yumuşak'ta (8,4em) em'e sabitlendi: `ch` yazı
+  tipine bağlı olduğu için kutu, yazı tipi yüklenince daralıp başlığı yeniden kırıyordu.
+- Telefonda kategori çipleri tek satırda yatay kayar (ekranı doldurmuyordu).
 - Logo `lang="en"` taşır ki büyük harf yapan stillerde "UNDUSTİT" değil "UNDUSTIT" yazsın.
 - `404.html` tek dosyalık olduğu için stil almaz; her zaman Kâğıt görünür.
 

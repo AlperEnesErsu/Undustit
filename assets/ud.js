@@ -514,7 +514,46 @@ function mountProc(host, opts={}){
   return { play };
 }
 
+// =========================================================== motion
+// Blocks below the first screen rise in once as they reach the screen; technical drawings draw
+// themselves and their quantity counts up. Each style tunes how through CSS (--in-* in stil/*.css).
+// Lists that the store re-renders are left alone, so cards never replay.
+const GRIDS = '.disc,.rounds,.steps,.how3,.open3,.vals,.faq,.cases,.cands';
+function mountMotion(){
+  if (html.dataset.page === 'stiller') return;
+  if (reduce.matches || !('IntersectionObserver' in window)){ $$('.cb-art').forEach(a => a.classList.add('drawn')); return; }
+  const picked = [];
+  $$('main .sec .wrap > *, main.wrap > *:not(.phead):not(.compose), #case > .case-band').forEach(n => {
+    if (n.matches(GRIDS) || n.querySelector(':scope > .disc, :scope > .rounds')) {
+      const inner = n.matches(GRIDS) ? n : n.querySelector(':scope > .disc, :scope > .rounds');
+      if (inner !== n) picked.push(n);
+      Array.from(inner.children).forEach((c, i) => { c.style.setProperty('--d', Math.min(i, 6) * 90 + 'ms'); picked.push(c); });
+    } else picked.push(n);
+  });
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const n = e.target; io.unobserve(n);
+    n.classList.add('in', 'seen');
+    // hand the element back to its own hover and transform rules once it has arrived
+    setTimeout(() => n.classList.remove('rv', 'in'), 1600 + (parseInt(n.style.getPropertyValue('--d')) || 0));
+  }), { threshold:.12, rootMargin:'0px 0px -6% 0px' });
+  picked.forEach(n => { n.classList.add('rv'); io.observe(n); });
+  // drawings: every stroke is normalised to length 1 so CSS can draw it in; the figure counts up
+  const dio = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const a = e.target; dio.unobserve(a); a.classList.add('drawn');
+    const cap = $('figcaption', a); if (!cap) return;
+    const full = cap.textContent, n = parseInt(full.replace(/\D/g, ''), 10); if (!n) return;
+    const t0 = performance.now(), ms = 1400;
+    const f = now => { const p = Math.min(1, (now - t0) / ms), v = Math.round(n * (1 - Math.pow(1 - p, 4)));
+      cap.textContent = '× ' + v.toLocaleString('tr-TR'); if (p < 1) requestAnimationFrame(f); else cap.textContent = full; };
+    requestAnimationFrame(f);
+  }), { threshold:.35 });
+  $$('.cb-art').forEach(a => { $$('path', a).forEach(p => p.setAttribute('pathLength', '1')); a.classList.add('will-draw'); dio.observe(a); });
+}
+
 // =========================================================== boot
 mountChrome();
+document.addEventListener('DOMContentLoaded', mountMotion);
 window.UD = { TERMS, CATS, CASES, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
 })();

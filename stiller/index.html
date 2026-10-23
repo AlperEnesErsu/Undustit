@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stil örnekleri · Undustit</title>
+<title>Stil panosu · Undustit</title>
 <meta name="description" content="Undustit'in aynı içerikle beş farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#FAF9F6">
@@ -21,19 +21,45 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=block">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="../assets/ud.css">
+
 <script src="../assets/stil.js"></script>
 <style>
-/* Style samples: the same site in four looks, each opened as its own site in a new tab. */
-.styles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.style{display:grid;gap:16px;align-content:start;padding:14px 14px 22px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2)}
-.thumb{aspect-ratio:16/10;border-radius:12px;border:1px solid var(--line);overflow:hidden;position:relative;background:var(--bg-3)}
-.thumb iframe{position:absolute;left:0;top:0;width:1440px;height:900px;border:0;transform-origin:0 0;pointer-events:none}
-.style .in{display:grid;gap:10px;padding-inline:8px}
-.style h2{font-size:clamp(30px,3vw,42px)}
-.style p{color:var(--ink-2);font-weight:300;font-size:15px;max-width:52ch}
-.style .acts{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
-.style code{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
-@media (max-width:900px){.styles{grid-template-columns:minmax(0,1fr)}}
+/* Style board: one page of the site in every style at once. Pick the page and the device on top;
+   each preview is the live site, and opening one makes it full size and usable. */
+.board-bar{position:sticky;top:64px;z-index:6;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding-block:14px;margin-bottom:28px;background:var(--bg);border-block:1px solid var(--line)}
+.board-bar .grp{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.board-bar .grp > span{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
+.seg button{min-height:34px;padding:0 14px;border:0;border-radius:999px;background:transparent;font-size:14px;color:var(--ink-2);transition:all var(--dur-fast) var(--ease-out)}
+.seg button:hover{color:var(--ink);background:var(--bg-3)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.styles{display:grid;gap:20px}
+.styles.desk{grid-template-columns:repeat(2,minmax(0,1fr))}
+.styles.phone{grid-template-columns:repeat(5,minmax(200px,1fr));overflow-x:auto;padding-bottom:8px}
+.style{display:grid;gap:12px;align-content:start;padding:12px 12px 16px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2);transition:border-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.style:hover{border-color:var(--ink-2);transform:translateY(-2px)}
+.style header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-inline:6px}
+.style h2{font-size:clamp(24px,2.2vw,32px)}
+.style p{color:var(--muted);font-size:13.5px;padding-inline:6px;max-width:60ch}
+.thumb{position:relative;display:block;width:100%;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg-3);cursor:zoom-in;padding:0}
+.desk .thumb{aspect-ratio:16/10}
+.phone .thumb{aspect-ratio:390/760;border-radius:24px}
+.thumb iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none}
+.thumb::after{content:"Büyüt";position:absolute;right:10px;bottom:10px;padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font-size:12.5px;opacity:0;transform:translateY(4px);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.thumb:hover::after,.thumb:focus-visible::after{opacity:1;transform:none}
+.style .acts{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-inline:6px}
+dialog.view{width:min(1480px,100% - 24px);height:calc(100dvh - 24px);max-height:none;padding:0;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2);color:var(--ink);overflow:hidden}
+dialog.view[open]{display:grid;grid-template-rows:auto minmax(0,1fr);animation:dlg var(--dur-mod) var(--ease-out)}
+dialog.view::backdrop{background:rgba(10,10,12,.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+dialog.view header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px 10px 20px;border-bottom:1px solid var(--line)}
+dialog.view header b{font-family:var(--f-serif);font-weight:400;font-size:24px}
+dialog.view .stage{display:grid;place-items:center;overflow:auto;background:var(--bg-3)}
+dialog.view iframe{display:block;border:0;background:#fff;width:100%;height:100%}
+dialog.view.is-phone iframe{width:390px;height:min(844px,100%);border-radius:24px;box-shadow:0 30px 60px -30px rgba(0,0,0,.5)}
+.x{width:40px;height:40px;border-radius:999px;border:1px solid var(--line-2);background:transparent;display:inline-flex;align-items:center;justify-content:center}
+.x:hover{border-color:var(--ink)}
+.x svg{width:18px;height:18px}
+@media (max-width:900px){.styles.desk{grid-template-columns:minmax(0,1fr)}.board-bar{position:static}}
 </style>
 </head>
 <body>
@@ -43,33 +69,83 @@
   <div class="phead">
     <span class="eyebrow">Stil örnekleri</span>
     <h1>Aynı site, <em>beş stil.</em></h1>
-    <p class="lead">İçerik, sayfalar ve akış hepsinde aynı. Her biri ayrı bir site olarak açılır; içinde gezinirken stil değişmez, hepsini ayrı sekmelerde yan yana açabilirsin.</p>
+    <p class="lead">Bir sayfa seç, beş stilde yan yana gör. Önizlemelerin hepsi canlı site; birine tıklayınca büyür, içinde gezinip animasyonları oynatabilirsin. Her biri ayrı bir site olarak da açılır.</p>
   </div>
-  <div class="styles" id="styles"></div>
+  <div class="board-bar" role="toolbar" aria-label="Görünüm seçimi">
+    <div class="grp"><span id="pg-l">Sayfa</span><div class="seg" role="group" aria-labelledby="pg-l" id="pages"></div></div>
+    <div class="grp"><span id="dv-l">Cihaz</span><div class="seg" role="group" aria-labelledby="dv-l" id="devices"></div>
+      <button type="button" class="btn alt sm" id="replay">Hepsini yeniden oynat</button></div>
+  </div>
+  <div class="styles desk" id="styles"></div>
 </main>
 <footer data-ud-foot></footer>
+<dialog class="view" id="view" aria-labelledby="view-h">
+  <header><b id="view-h"></b><div style="display:flex;gap:10px;align-items:center"><a class="btn sm alt" id="view-open" data-stil-link target="_blank" rel="noopener">Yeni sekmede aç</a><button type="button" class="x" id="view-x" aria-label="Kapat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></header>
+  <div class="stage"><iframe id="view-f" title="Büyük önizleme"></iframe></div>
+</dialog>
 <script src="../assets/ud.js"></script>
 <script>
 const STYLES = [
-  ['kagit','Kâğıt','Sıcak kâğıt beyazı, editoryal serif başlıklar. Mavi yalnız eylemlerde, yeşil ilerlemede. Sakin ve premium.'],
-  ['oyuncu','Oyuncu','Quirky havası: krem zemin, kalın grotesk başlıklar, mürekkep çerçeveli kartlar ve sert gölgeler, sarı işaretleyici, zıplayan düğmeler.'],
-  ['teknik','Teknik çizim','Mavi pafta kâğıdı ve ızgara, dar büyük harfli başlıklar, mono etiketler, kesikli çizgiler. Mühendislik ve üretim hissi.'],
-  ['premium','Premium','Sessiz lüks: sıcak tonlu derin siyah, büyük ve ince başlıklar (ikinci yarısı griye döner), geniş aralıklı etiketler, tek beyaz hap düğme, yalnız küçük şampanya dokunuşlar. Gölge yok; ince çizgiler ve bol boşluk.'],
-  ['yumusak','Yumuşak','Gündelik uygulama sıcaklığı: pastel bölümler, yuvarlak kalın yazı, basınca gömülen hap düğmeler. “Alırdım” deyince düğme ezilip küçük bir konfeti patlatır.']
+  ['kagit','Kâğıt','Sıcak kâğıt beyazı, editoryal serif başlıklar; mavi yalnız eylemde. Sakin ve güvenilir.'],
+  ['oyuncu','Oyuncu','Quirky havası: kalın grotesk, mürekkep çerçeve ve sert gölge, sarı işaretleyici.'],
+  ['teknik','Teknik çizim','Mavi pafta ve ızgara, dar büyük harfli başlıklar, mono etiketler. Üretim hissi.'],
+  ['premium','Premium','Sessiz lüks: derin siyah, ince büyük başlıklar, tek beyaz hap düğme, şampanya dokunuşlar.'],
+  ['yumusak','Yumuşak','Gündelik uygulama sıcaklığı: pastel bölümler, yuvarlak kalın yazı, basınca gömülen düğmeler.']
 ];
+const PAGES = [['', 'Ana sayfa'], ['fikir/', 'Fikir yaz'], ['fikirler/', 'Fikirler'], ['nasil/', 'Nasıl işler'], ['vakalar/', 'Vakalar'], ['vaka-01/', 'Vaka 01'], ['hikaye/', 'Hikâye']];
+const DEVICES = [['masaustu', 'Masaüstü', 1440, 900], ['telefon', 'Telefon', 390, 760]];
+const q = new URLSearchParams(location.search);
+let page = PAGES.some(p => p[0] === q.get('sayfa')) ? q.get('sayfa') : '';
+let device = q.get('cihaz') === 'telefon' ? 'telefon' : 'masaustu';
+const urlFor = (k) => '../' + page + (k === 'kagit' ? '' : '?stil=' + k);
 const host = document.getElementById('styles');
-STYLES.forEach(([k, name, about]) => {
-  const href = '../' + (k === 'kagit' ? '' : '?stil=' + k);
-  const abs = new URL(href, location.href).href;
-  host.insertAdjacentHTML('beforeend', `<article class="style">
-    <div class="thumb"><iframe src="${href}" title="${name} önizleme" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-    <div class="in"><h2>${name}</h2><p>${about}</p>
-      <div class="acts"><a class="btn sig" data-stil-link href="${href}" target="_blank" rel="noopener">${name} sitesini aç ${UD.ICON.arrow}</a><code>${abs}</code></div></div>
-  </article>`);
-});
-// scale the live 1440-wide previews into their cards
-const fit = () => document.querySelectorAll('.thumb').forEach(t => { t.querySelector('iframe').style.transform = `scale(${t.clientWidth/1440})`; });
-fit(); window.addEventListener('resize', fit);
+
+function seg(id, items, current, set){
+  const g = document.getElementById(id); g.replaceChildren();
+  items.forEach(([k, l]) => g.append(UD.el('button', { type:'button', 'aria-pressed': String(k === current), text:l, onclick(){ set(k); } })));
+}
+function fit(){
+  const d = DEVICES.find(x => x[0] === device);
+  host.querySelectorAll('.thumb').forEach(t => { const f = t.querySelector('iframe'); f.style.width = d[2] + 'px'; f.style.height = d[3] + 'px'; f.style.transform = `scale(${t.clientWidth / d[2]})`; });
+}
+function render(){
+  seg('pages', PAGES, page, k => { page = k; sync(); });
+  seg('devices', DEVICES, device, k => { device = k; sync(); });
+  host.className = 'styles ' + (device === 'telefon' ? 'phone' : 'desk');
+  host.replaceChildren();
+  const pageName = PAGES.find(p => p[0] === page)[1];
+  STYLES.forEach(([k, name, about]) => {
+    const href = urlFor(k);
+    const card = UD.el('article', { class:'style' });
+    card.innerHTML = `<header><h2>${name}</h2><span class="eyebrow">${pageName}</span></header>
+      <button type="button" class="thumb" aria-label="${name}, ${pageName}: büyüt"><iframe src="${href}" title="${name} önizleme" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></button>
+      <p>${about}</p>
+      <div class="acts"><a class="link" data-stil-link href="${href}" target="_blank" rel="noopener">Yeni sekmede aç</a></div>`;
+    card.querySelector('.thumb').onclick = () => openView(k, name, pageName, href);
+    host.append(card);
+  });
+  fit();
+}
+function sync(){
+  const u = new URL(location.href);
+  page ? u.searchParams.set('sayfa', page) : u.searchParams.delete('sayfa');
+  device === 'telefon' ? u.searchParams.set('cihaz', 'telefon') : u.searchParams.delete('cihaz');
+  history.replaceState(null, '', u.pathname + u.search);
+  render();
+}
+const view = document.getElementById('view'), viewF = document.getElementById('view-f');
+function openView(k, name, pageName, href){
+  document.getElementById('view-h').textContent = `${name} · ${pageName}`;
+  document.getElementById('view-open').href = href;
+  view.classList.toggle('is-phone', device === 'telefon');
+  viewF.src = href; view.showModal();
+}
+document.getElementById('view-x').onclick = () => view.close();
+view.addEventListener('click', e => { if (e.target === view) view.close(); });
+view.addEventListener('close', () => { viewF.src = 'about:blank'; });
+document.getElementById('replay').onclick = () => host.querySelectorAll('iframe').forEach(f => { f.src = f.src; });
+window.addEventListener('resize', fit);
+render();
 </script>
 </body>
 </html>

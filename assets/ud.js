@@ -147,10 +147,62 @@ const Store = (function(){
   }
   const badge = () => {
     const b = $('#mode-badge'); if (!b) return;
-    b.classList.toggle('live', S.mode === 'live');
-    b.lastChild.textContent = S.mode === 'live' ? T('ud.alt.canli') : T('ud.alt.onizleme');
+    b.classList.toggle('live', S.mode !== 'local');
+    b.lastChild.textContent = S.mode !== 'local' ? T('ud.alt.canli') : T('ud.alt.onizleme');
   };
+  // ---- Supabase (assets/ayar.js has a URL): ideas, demand, scores and comments are rows in Postgres,
+  // shared by everyone. Visitors read without an account; their first write signs the browser in
+  // anonymously, so each browser is one person and RLS lets it change only its own rows. The rows are
+  // poured into the same shape as the other modes, so ideas() and every view stay as they are.
+  const AYAR = window.UD_AYAR || {};
+  let sb = null;
+  const idOf = key => key.slice(key.lastIndexOf(':') + 1);
+  function sbLib(){
+    if (window.supabase && window.supabase.createClient) return Promise.resolve(window.supabase);
+    return new Promise((ok, no) => {
+      const sc = document.createElement('script');
+      sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+      sc.onload = () => ok(window.supabase); sc.onerror = () => no(new Error('Veri servisi yüklenemedi'));
+      document.head.append(sc);
+    });
+  }
+  async function sbLoad(){
+    const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => sb.from(t).select('*').limit(5000)));
+    const bad = res.find(r => r.error); if (bad) throw bad.error;
+    const [f, t, p, y] = res.map(r => r.data || []);
+    const keyOf = {}, ideas = {}, votes = {}, notes = {};
+    const vote = u => (votes[u] = votes[u] || { buy:{}, rate:{} });
+    f.forEach(r => { keyOf[r.id] = r.sahip + ':' + r.id;
+      (ideas[r.sahip] = ideas[r.sahip] || { items:[] }).items.push({ k:r.id, title:r.baslik, cat:r.kategori, problem:r.problem, solution:r.cozum, feats:r.ozellikler, handle:r.ad, at:r.zaman }); });
+    t.forEach(r => { if (keyOf[r.fikir_id]) vote(r.uye).buy[keyOf[r.fikir_id]] = r.fiyat; });
+    p.forEach(r => { const k = keyOf[r.fikir_id]; if (k) { const v = vote(r.uye); v.rate[k] = { ...(v.rate[k] || {}), [r.olcut]: r.puan }; } });
+    y.forEach(r => { if (keyOf[r.fikir_id]) (notes[r.uye] = notes[r.uye] || { items:[] }).items.push({ k:r.id, idea:keyOf[r.fikir_id], kind:r.tur, text:r.metin, handle:r.ad, at:r.zaman }); });
+    S.ideas = ideas; S.votes = votes; S.notes = notes; emit();
+  }
+  const sbReload = () => sbLoad().catch(() => {});
+  async function sbUser(){
+    const { data } = await sb.auth.getSession();
+    if (data && data.session) return (S.uid = data.session.user.id);
+    const r = await sb.auth.signInAnonymously();
+    if (r.error) throw r.error;
+    return (S.uid = r.data.user.id);
+  }
+  // every write: make sure we are someone, do it, then read back what the database now says
+  const sbDo = async fn => { await sbUser(); const r = await fn(); if (r && r.error) { sbReload(); throw r.error; } await sbLoad(); return r; };
+
   const ready = (async () => {
+    if (AYAR.supabaseUrl){
+      const lib = await sbLib();
+      sb = lib.createClient(AYAR.supabaseUrl, AYAR.supabaseAnon);
+      S.mode = 'supabase'; S.ideas = {}; S.votes = {}; S.notes = {};
+      const { data } = await sb.auth.getSession();
+      S.uid = data && data.session ? data.session.user.id : 'anon';
+      await sbLoad();
+      // others' demand and comments arrive on a slow tick and whenever the tab comes back
+      setInterval(() => { if (document.visibilityState === 'visible') sbReload(); }, 30000);
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sbReload(); });
+      return;
+    }
     if (!(window.claude && window.claude.use)) return;
     const [d, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
     const id = user ? await user.id() : null;
@@ -174,7 +226,7 @@ const Store = (function(){
   const when = v => { const t = Date.parse(v); return isNaN(t) ? null : new Date(Math.min(t, Date.now())).toISOString(); };
   const KINDS = ['yorum','oneri','endise'];
   function clean(it, owner){
-    return { k: str(String(it.k), 24), key: owner + ':' + str(String(it.k), 24), owner, title: str(it.title, 140), cat: str(it.cat, 40),
+    return { k: str(String(it.k), 40), key: owner + ':' + str(String(it.k), 40), owner, title: str(it.title, 140), cat: str(it.cat, 40),
       problem: str(it.problem, 400), solution: str(it.solution, 400), handle: str(it.handle, 30),
       feats: (Array.isArray(it.feats) ? it.feats : []).slice(0, 3).map(x => str(x, 80)).filter(Boolean), at: when(it.at) };
   }
@@ -217,17 +269,32 @@ const Store = (function(){
     sub(fn){ subs.add(fn); fn(); return () => subs.delete(fn); },
     myCount(){ return myItems('ideas').length; },
     addIdea(data){
+      if (S.mode === 'supabase'){
+        const c = CASES.find(x => x.short === data.cat);
+        return sbDo(() => sb.from('fikirler').insert({ sahip:S.uid, vaka_id: c ? c.id : null, baslik:data.title, kategori:data.cat, problem:data.problem,
+          cozum:data.solution, ozellikler:data.feats, ad:data.handle || '' }).select('id').single()).then(r => S.uid + ':' + r.data.id);
+      }
       const it = { k:key(), ...data, at:new Date().toISOString() };
       return write('ideas', { items: myItems('ideas').concat([it]).slice(-40) }).then(() => S.uid + ':' + it.k);
     },
     removeIdea(key){
+      if (S.mode === 'supabase') return sbDo(() => sb.from('fikirler').delete().eq('id', idOf(key)));
       const k = key.slice(key.lastIndexOf(':') + 1);
       return write('ideas', { items: myItems('ideas').filter(it => it.k !== k) });
     },
-    setBuy(k, price){ const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; return write('votes', v); },
-    rate(k, c, n){ const v = myVotes(); v.rate[k] = { ...(v.rate[k] || {}), [c]: n }; return write('votes', v); },
+    setBuy(k, price){
+      if (S.mode === 'supabase'){
+        if (S.uid !== 'anon'){ const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; S.votes[S.uid] = v; emit(); }
+        return sbDo(() => price ? sb.from('talepler').upsert({ fikir_id:idOf(k), uye:S.uid, fiyat:price }, { onConflict:'fikir_id,uye' })
+          : sb.from('talepler').delete().eq('fikir_id', idOf(k)).eq('uye', S.uid));
+      }
+      const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; return write('votes', v); },
+    rate(k, c, n){
+      if (S.mode === 'supabase') return sbDo(() => sb.from('puanlar').upsert({ fikir_id:idOf(k), uye:S.uid, olcut:c, puan:n }, { onConflict:'fikir_id,uye,olcut' }));
+      const v = myVotes(); v.rate[k] = { ...(v.rate[k] || {}), [c]: n }; return write('votes', v); },
     myRate(k){ return ((S.votes[S.uid] || {}).rate || {})[k] || {}; },
     addNote(idea, kind, text, handle){
+      if (S.mode === 'supabase') return sbDo(() => sb.from('yorumlar').insert({ fikir_id:idOf(idea), uye:S.uid, tur:kind, metin:text, ad:handle || '' }));
       return write('notes', { items: myItems('notes').concat([{ k:key(), idea, kind, text, handle, at:new Date().toISOString() }]).slice(-200) });
     }
   };

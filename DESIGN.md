@@ -63,6 +63,14 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
 - **Yönetim:** `/yonetim/` (özet, vaka listesi, arama, durum filtresi), `/yonetim/vaka/` (oluştur, düzenle,
   durum geçişi notlu, fikir gizleme, kazanan seçme, geçmiş, CSV). Herkese açık, veriden beslenen vaka
   sayfası `/vaka/?id=…`.
+- **Fikirler veritabanında (24 Ekim 2026):** `assets/ayar.js` dolu olduğunda ana sitenin fikirleri,
+  "alırdım" fiyatları, puanları ve yorumları Supabase'de (`fikirler`, `talepler`, `puanlar`, `yorumlar`).
+  Ziyaretçi hesapsız okur; ilk yazışında tarayıcısı anonim oturum açar (Supabase'de "Allow anonymous
+  sign-ins" açık), her tarayıcı bir kişidir ve yalnız kendi satırlarını değiştirir. Vaka 01'e yazılan
+  fikir `vaka_id` ile vakaya bağlanır ve yönetim panelinde görünür. Tarihi sunucu yazar; kişi başı günde
+  en çok 10 fikir, 60 yorum (`supabase/2-fikirler.sql`). Başkalarının talepleri 30 sn'de ve sekmeye
+  dönünce yenilenir. Bilinen sınır: tarayıcı verisini silen biri yeniden "alırdım" diyebilir; sonraki
+  adım CAPTCHA ya da e-posta.
 - **Açık:** yerel moddaki deneme şifresi kodda görünür; yalnız o tarayıcının verisini etkiler ama gerçek
   koruma Supabase'e geçince başlar. Supabase modu henüz bir projeyle denenmedi.
 

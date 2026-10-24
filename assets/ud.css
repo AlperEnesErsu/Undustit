@@ -75,6 +75,12 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .brand:hover b i{transform:translateX(2px) rotate(-6deg)}
 .nav-r{display:flex;align-items:center;gap:8px}
 .nav-links{display:flex;gap:2px}
+/* TR / EN: two short links, the current one filled */
+.lang{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--line-2);border-radius:999px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em}
+.lang a{min-width:32px;min-height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;text-decoration:none;color:var(--muted);transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.lang a:hover{color:var(--ink);background:var(--bg-3)}
+.lang a[aria-current="true"]{background:var(--ink);color:var(--bg)}
+.lang a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .nav-links a{font-size:14px;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:999px;transition:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
 .nav-links a:hover{color:var(--ink);background:var(--bg-3)}
 .nav-links a[aria-current="page"]{color:var(--ink);background:var(--bg-3)}
@@ -532,3 +538,15 @@ dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
 [data-stil="kagit"] .foot-sig i{color:var(--brand)}
 [data-stil="kagit"] .foot{margin-top:clamp(80px,10vw,160px)}
 [data-stil="kagit"] .slot,[data-stil="kagit"] .empty{border-radius:0;background:transparent}
+
+/* ---------- type that fits two languages (24 Oct 2026)
+   <html lang> follows ?dil, so uppercase labels get the right dotted İ in Turkish and plain I in English,
+   and hyphenation uses the right dictionary. None of the faces ship a real italic for body text or bold
+   for the serif, so the browser is never allowed to fake one: emphasis inside running text is set in the
+   serif italic (Kâğıt) or as weight (Oyuncu) instead of a slanted sans. */
+body{font-synthesis:none}
+p,li,dd,figcaption,.lead{text-wrap:pretty}
+@media (max-width:600px){p,li,dd{hyphens:auto;-webkit-hyphens:auto;hyphenate-limit-chars:8 4 3}}
+p em,li em,dd em,.lead em{font-family:var(--f-serif);font-style:italic;font-size:1.1em;line-height:1;letter-spacing:0}
+dd,td,.cb-n,.icard .m,.buy-mine,output{font-variant-numeric:tabular-nums}
+q:lang(en){quotes:"“" "”"}

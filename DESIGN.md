@@ -49,6 +49,42 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
   sonradan hazır bir çizim olarak beliriyordu; fikrin ürüne dönüştüğü görünmüyordu.
 - "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
+## Metin altyapısı, İngilizce ve yazı tipi (24 Ekim 2026)
+
+**Metin altyapısı.** Sitedeki her yazı `assets/metin/tr.js` ve `assets/metin/en.js` sözlüklerinde
+(anahtar → metin). Sayfalar metnin yerini `data-t` (içerik) ve `data-ta="özellik:anahtar"` (başlık,
+açıklama, aria-label, placeholder) ile işaretler; betiklerin kurduğu metinler (menü, form, kartlar,
+animasyon) `T('ud.…')` ile aynı sözlükten okunur.
+- **Sayfada düzenleme:** herhangi bir sayfayı `?duzenle=1` ile aç (İngilizce için `&dil=en`). Metne
+  tıkla ve yaz; değişiklikler bu tarayıcıda sayfalar arasında korunur. Alttaki çubukta "Tüm metinler"
+  betik metinlerini de listeler; "İndir" sözlüğün tamamını değişikliklerle birlikte indirir.
+- **Yayına alma:** indirilen dosyayı `assets/metin/` içine koy, `python tools/metin.py yaz` çalıştır
+  (sayfa HTML'indeki Türkçe sözlükle eşitlenir; arama motorları ve JS'siz ziyaretçi bunu okur),
+  `python tools/metin.py denetle` ile eksik/fazla anahtar olmadığını gör, commit et.
+- Yeni sayfa ya da bölüm: HTML'i yaz, `python tools/metin.py etiketle` etiketleri ve Türkçeyi ekler.
+
+**İngilizce.** `?dil=en` stil gibi çalışır: tek sayfa seti, menüde TR/EN anahtarı, iç bağlantılar dili
+taşır. `<html lang>` dile göre değişir; tarih, sayı ve para biçimi (`1.000 ₺` / `₺1,000`, `%10` / `10%`)
+dile göre. Her sayfada `hreflang` tr/en/x-default; İngilizce sayfanın canonical'ı kendisi. Kategoriler
+veri olarak Türkçe saklanır, yalnız gösterilirken çevrilir. Örnek ürün İngilizcede "Shelfie".
+
+**Ses tonu: merak ve oyun.** Sitenin tek sorusu: *bu başka ne olabilir?* Kısa cümle, doğrudan hitap,
+küçük bir espri; rakamlar, oranlar ve kurallar hiç değişmedi.
+
+**Yazı tipleri amaca uygun mu?**
+- Instrument Serif (başlık): editoryal, güven veren, Kâğıt'ın premium tonu. Türkçe ve İngilizce karakter
+  seti tam (latin + latin-ext). Yalnız 400 ve italik var; kalın başlık gerekirse ikinci bir kesim alınmalı.
+- Geist (gövde, arayüz) ve Geist Mono (etiket, teknik föy): okunaklı, nötr, rakamlar tablo hizalı.
+  Mühendislere giden teknik föy için mono doğru seçim.
+- Bricolage Grotesque (Oyuncu başlıkları): kalın, oyunbaz; italiği yok.
+- Lisans: üçü de SIL Open Font License; ticari kullanım, kutu ve ambalaj baskısı serbest.
+- Uygulanan kurallar: tarayıcı sahte kalın/italik üretmiyor (`font-synthesis:none`); paragraf içi vurgu
+  Kâğıt'ta serif italik, Oyuncu'da kalınlık; paragraflarda `text-wrap:pretty` (tek kalan kelime yok);
+  telefonda dile göre heceleme; büyük harf etiketlerde Türkçede İ, İngilizcede I; fiyat ve sayaçlar
+  tablo rakamı.
+- Alınması gerekenler: ürün kutusu ve fiziksel baskı için aynı ailelerin baskı dosyaları (OFL, ücretsiz);
+  ileride Arapça/Kiril gibi bir dil eklenirse Instrument Serif ve Geist bu alfabeleri kapsamıyor.
+
 ## Canlıya çıkış: eksikler (24 Ekim 2026)
 
 **Bu turda kapatılanlar**
@@ -213,4 +249,4 @@ Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist
   düğmenin açtığı panele taşınır, "Fikrini yaz" görünür kalır.
 - Her hareketin `prefers-reduced-motion` karşılığı var. Sayfalar arası geçiş `@view-transition` ile.
 - 404 sayfası köke göre bağlanır; GitHub Pages'te (`/Undustit/`) kökü kendisi bulur.
-- Sayfalar yalnız Türkçe; eski Vaka 01'deki TR/EN seçimi taşınmadı.
+- Sayfalar Türkçe ve İngilizce (`?dil=en`); metinler `assets/metin/` sözlüklerinde.

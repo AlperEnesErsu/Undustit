@@ -2,13 +2,14 @@
 <html lang="tr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Undustit · Sayfa bulunamadı</title>
-<meta name="description" content="Aradığın sayfa yok. Undustit ana sayfasına dön.">
+<title data-t="yok.title.1">Undustit · Sayfa bulunamadı</title>
+<meta name="description" content="Aradığın sayfa yok. Undustit ana sayfasına dön." data-ta="content:yok.attr.1">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#F8F6F1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
 <script>/* the 404 is served at any depth, so links resolve from the site root: "/" locally, "/Undustit/" on GitHub Pages */document.write('<base href="'+(location.pathname.match(/^\/Undustit\//i)?'/Undustit/':'/')+'">')</script>
 <link rel="stylesheet" href="assets/fonts/base.css">
+<script src="assets/stil.js"></script>
 <style>
 /* Layout: one plate of the drawing set, with the bolt missing from its hole. Tokens match index.html (see DESIGN.md). */
 :root{
@@ -58,26 +59,33 @@ footer a:hover{color:var(--accent)!important}
 @media (max-width:820px){main{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:0ms!important}}
 </style>
-<header><a class="brand" href="./">Undust<i>it</i></a><span class="eyebrow">404</span></header>
+<header><a class="brand" href="./">Undust<i data-t="yok.i.1">it</i></a><span class="eyebrow">404</span></header>
 <main>
   <div class="txt">
-    <span class="eyebrow">Pafta yok · 404</span>
-    <h1>Bu cıvata yerini <em>bulamadı.</em></h1>
-    <p>Aradığın sayfa burada değil. Bir milyon cıvata ise hâlâ Vaka 01'de fikir bekliyor.</p>
-    <a class="btn" href="./"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Ana sayfaya dön</a>
+    <span class="eyebrow" data-t="yok.span.1">Pafta yok · 404</span>
+    <h1 data-t="yok.h1.1">Bu cıvata yerini <em>bulamadı.</em></h1>
+    <p data-t="yok.p.1">Aradığın sayfa burada değil. Bir milyon cıvata ise hâlâ Vaka 01’de yeni bir iş bekliyor.</p>
+    <a class="btn" href="./"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span data-t="yok.a.1">Ana sayfaya dön</span></a>
   </div>
   <figure>
-    <svg viewBox="0 0 320 200" role="img" aria-label="Cıvatası eksik bir bağlantı çizimi: iki levha, boş bir delik">
+    <svg viewBox="0 0 320 200" role="img" aria-label="Cıvatası eksik bir bağlantı çizimi: iki levha, boş bir delik" data-ta="aria-label:yok.attr.2">
       <rect class="s" x="40" y="40" width="240" height="40" rx="2"/>
       <rect class="s" x="40" y="80" width="240" height="40" rx="2"/>
       <rect class="h" x="148" y="30" width="24" height="100"/>
       <line class="d" x1="160" y1="16" x2="160" y2="150" stroke-dasharray="10 3 2 3"/>
       <line class="d" x1="148" y1="160" x2="172" y2="160"/>
       <line class="d" x1="148" y1="152" x2="148" y2="168"/><line class="d" x1="172" y1="152" x2="172" y2="168"/>
-      <text class="t" x="160" y="184" text-anchor="middle">Ø 11 mm</text>
-      <text class="t k" x="184" y="24">M10 · yok</text>
+      <text class="t" x="160" y="184" text-anchor="middle" data-t="yok.text.1">Ø 11 mm</text>
+      <text class="t k" x="184" y="24" data-t="yok.text.2">M10 · yok</text>
     </svg>
-    <figcaption><span>Detay ? · boş delik</span><span>Ölçek 1:1</span></figcaption>
+    <figcaption><span data-t="yok.span.2">Detay ? · boş delik</span><span data-t="yok.span.3">Ölçek 1:1</span></figcaption>
   </figure>
 </main>
-<footer><span>Undustit · prototip</span><a href="vaka-01/" style="color:var(--ink-2);display:inline-flex;align-items:center;min-height:44px">Vaka 01</a></footer>
+<footer><span data-t="yok.span.4">Undustit · prototip</span><a href="vaka-01/" style="color:var(--ink-2);display:inline-flex;align-items:center;min-height:44px" data-t="yok.a.2">Vaka 01</a></footer>
+<script>
+// no ud.js here, so the page puts its own text in place (same data-t / data-ta as every other page)
+(function(){ var M = window.UD_METIN; if (!M) return;
+  document.querySelectorAll('[data-t]').forEach(function(n){ var v = M.al(n.dataset.t); if (v != null) n.innerHTML = v; });
+  document.querySelectorAll('[data-ta]').forEach(function(n){ n.dataset.ta.split(';').forEach(function(p){ var a = p.split(':'), v = M.al(a[1]); if (v != null) n.setAttribute(a[0], v); }); });
+})();
+</script>

@@ -92,8 +92,8 @@ const withStil = h => STIL.withStil(h);
 
 // =========================================================== nav + footer
 // TR / EN switch in the bar: a link to the same page in the other language (keeps style and edit mode)
-function langSwitch(){
-  return `<span class="lang" role="group" aria-label="${T('ud.menu.dil')}">${Object.keys(STIL.langs || { tr:1 }).map(l =>
+function langSwitch(extra=''){
+  return `<span class="lang${extra}" role="group" aria-label="${T('ud.menu.dil')}">${Object.keys(STIL.langs || { tr:1 }).map(l =>
     `<a data-stil-link lang="${l}" hreflang="${l}" href="${STIL.withLang ? STIL.withLang(location.pathname + location.hash, l) : '#'}"${l === LANG ? ' aria-current="true"' : ''}>${l.toUpperCase()}</a>`).join('')}</span>`;
 }
 function mountChrome(){
@@ -103,7 +103,7 @@ function mountChrome(){
   if (host){
     host.className = 'nav'; host.id = 'nav';
     host.innerHTML = `<div class="wrap"><a class="brand" lang="en" href="${homeHref()}" aria-label="${T('ud.menu.anasayfa')}"><b>Undust<i>it</i></b></a>
-      <div class="nav-r"><nav class="nav-links" id="nav-links" aria-label="${T('ud.menu.ana')}">${links.map(([k,l,h])=>`<a href="${ROOT+h}"${k===cur?' aria-current="page"':''}>${l}</a>`).join('')}</nav>
+      <div class="nav-r"><nav class="nav-links" id="nav-links" aria-label="${T('ud.menu.ana')}">${links.map(([k,l,h])=>`<a href="${ROOT+h}"${k===cur?' aria-current="page"':''}>${l}</a>`).join('')}${langSwitch(' lang-m')}</nav>
       <a class="btn sig sm" href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${langSwitch()}
       <button type="button" class="menu-t" aria-expanded="false" aria-controls="nav-links" aria-label="${T('ud.menu.menu')}"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>`;
     const btn = $('.menu-t', host);
@@ -112,11 +112,12 @@ function mountChrome(){
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && host.classList.contains('open')){ set(false); btn.focus(); } });
   }
   const foot = $('[data-ud-foot]');
+  const showStilBar = STIL.edit || cur === 'stiller' || /[?&]stil=/.test(location.search);
   if (foot){
     foot.className = 'foot';
     foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>${T('ud.alt.prototip')} <span class="mode-badge" id="mode-badge"><i></i>${T('ud.alt.baglaniyor')}</span></span>
       <nav aria-label="${T('ud.alt.menu')}"><a href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${links.map(([k,l,h]) => `<a href="${ROOT+h}">${l}</a>`).join('')}</nav></div>
-      <div class="wrap stil-bar"><span>${T('ud.alt.stil')}</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${STIL.withStil(location.pathname, k)}"${k === STIL.current ? ' aria-current="true"' : ''}>${T('ud.stil.' + k)}</a>`).join('')}<a href="${ROOT}stiller/">${T('ud.alt.hepsi')}</a></div>`;
+      ${showStilBar ? `<div class="wrap stil-bar"><span>${T('ud.alt.stil')}</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${STIL.withStil(location.pathname, k)}"${k === STIL.current ? ' aria-current="true"' : ''}>${T('ud.stil.' + k)}</a>`).join('')}<a href="${ROOT}stiller/">${T('ud.alt.hepsi')}</a></div>` : ''}`;
   }
 }
 
@@ -629,7 +630,7 @@ function mountMotion(){
     if (!e.isIntersecting) return;
     const a = e.target; dio.unobserve(a); a.classList.add('drawn');
     const cap = $('figcaption', a); if (!cap) return;
-    const full = cap.textContent, n = parseInt(full.replace(/\D/g, ''), 10); if (!n) return;
+    const full = cap.textContent, n = parseInt(full.replace(/\D/g, ''), 10); if (!n || !/^×/.test(full.trim())) return;
     const t0 = performance.now(), ms = 1400;
     const f = now => { const p = Math.min(1, (now - t0) / ms), v = Math.round(n * (1 - Math.pow(1 - p, 4)));
       cap.textContent = '× ' + v.toLocaleString(LOCALE); if (p < 1) requestAnimationFrame(f); else cap.textContent = full; };

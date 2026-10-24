@@ -38,6 +38,7 @@ h1 em,h2 em,.cb-h em{font-style:normal;background:linear-gradient(transparent 58
 .chip:hover{background:var(--sun);border-color:var(--ink)}
 .lang{border:2px solid var(--ink)}
 .lang a:hover{background:var(--sun)}
+.lang a[aria-current="true"]:hover{background:var(--ink);color:#fff}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff}
 .chip.case[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--ink)}
 
@@ -117,9 +118,6 @@ html .fig{border:2px solid var(--ink);font-weight:500;background:var(--bg-2)}
 .disc a,.disc a + a{padding:22px 22px 24px;border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg-2);box-shadow:var(--hard);transition:transform 220ms var(--pop),box-shadow 220ms var(--pop),background-color 160ms ease}
 .disc a:hover{transform:translate(-2px,-2px) rotate(-.6deg);box-shadow:6px 6px 0 var(--ink);background:var(--sun)}
 .disc a:hover b,.disc a:hover .go{color:var(--ink)}
-.disc a:nth-child(2):hover{background:#DFF5EA}
-.disc a:nth-child(3):hover{background:#E9E2FF}
-.disc a:nth-child(4):hover{background:var(--pink)}
 @media (max-width:900px){.disc{grid-template-columns:repeat(2,minmax(0,1fr))}.disc a:nth-child(3){padding-inline-start:22px;border-inline-start:2px solid var(--ink)}}
 @media (max-width:560px){.disc{grid-template-columns:minmax(0,1fr)}}
 /* Bricolage has no italic: emphasis in running text is weight, not a fake slant */
@@ -199,3 +197,7 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 @media (max-width:800px){.y-yan{border-right:0;border-bottom:2px solid var(--ink)}}
 .damga{border:2.5px solid var(--ink);border-radius:8px;background:var(--sun);color:var(--ink);font-weight:800;box-shadow:var(--hard);font-size:13px;letter-spacing:.06em;padding:4px 10px}
 @media (prefers-reduced-motion:reduce){.bildirim,.diyalog[open],.bildirim.ok,.zaman-cizelgesi li::before{animation:none;transition:none}.istat:hover,.y-yan a:hover,.sekmeler .sekme:hover,.sekmeler [role="tab"]:hover,.anahtar:hover input{transform:none}}
+
+/* one accent family: violet acts, sun highlights, green only means "open / paid". Example labels are grey,
+   not warning orange, so orange is left for real warnings. */
+.icard .m .ex{color:var(--muted)}

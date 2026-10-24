@@ -405,9 +405,11 @@ dialog.idlg{width:min(720px,100% - 24px);max-height:min(88vh,920px);padding:0;bo
 dialog.idlg::backdrop{background:rgba(22,24,29,.32);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
 @keyframes dlg{from{opacity:0;transform:translateY(12px) scale(.98)}}
-.idlg header{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px 14px 24px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+.idlg header{position:sticky;top:0;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px 14px 24px;background:var(--bg-2);border-bottom:1px solid var(--line)}
 .idlg .x{width:40px;height:40px;border-radius:999px;border:1px solid var(--line-2);background:transparent;display:inline-flex;align-items:center;justify-content:center}
 .idlg .x:hover{border-color:var(--ink-2)}
+.idlg .own{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:12px 14px;border:1px dashed var(--line-2);border-radius:var(--r-md);font-size:14px;color:var(--ink-2)}
+.idlg .own .link{background:none;border:0;padding:0;font:inherit;color:var(--err);text-decoration-color:currentColor;cursor:pointer}
 .idlg .x svg{width:18px;height:18px}
 .idlg .in{display:grid;gap:26px;padding:24px}
 .idlg h2{font-size:clamp(30px,3.6vw,44px);line-height:1.05}
@@ -493,6 +495,7 @@ dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
 [data-stil="kagit"] .nav{background:rgba(248,246,241,.82)}
 [data-stil="kagit"] .btn.sig:hover{box-shadow:0 0 0 4px rgba(31,47,134,.14)}
 [data-stil="kagit"] .iform:focus-within{box-shadow:0 0 0 6px rgba(31,47,134,.07)}
+[data-stil="kagit"] .buy-f input:focus{box-shadow:0 0 0 4px rgba(31,47,134,.12)}
 [data-stil="kagit"] .pc-stage{background:radial-gradient(60% 60% at 60% 60%,rgba(31,47,134,.04),transparent 70%),var(--bg)}
 /* type: headlines a size up and set tighter; eyebrows get a hairline lead-in like a printed catalogue */
 [data-stil="kagit"] h1{letter-spacing:-.035em}

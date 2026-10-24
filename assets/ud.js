@@ -138,21 +138,31 @@ const Store = (function(){
   })().catch(() => {}).finally(badge);
   document.addEventListener('DOMContentLoaded', badge);
 
+  // Everything below comes from other people's documents in live mode, so it is shaped before use:
+  // strings are cut to the form's limits, a missing or future date never extends the 30 days.
+  const str = (v, n) => typeof v === 'string' ? v.slice(0, n) : '';
+  const when = v => { const t = Date.parse(v); return isNaN(t) ? null : new Date(Math.min(t, Date.now())).toISOString(); };
+  const KINDS = ['yorum','oneri','endise'];
+  function clean(it, owner){
+    return { k: str(String(it.k), 24), key: owner + ':' + str(String(it.k), 24), owner, title: str(it.title, 140), cat: str(it.cat, 40),
+      problem: str(it.problem, 400), solution: str(it.solution, 400), handle: str(it.handle, 30),
+      feats: (Array.isArray(it.feats) ? it.feats : []).slice(0, 3).map(x => str(x, 80)).filter(Boolean), at: when(it.at) };
+  }
   function ideas(){
     const out = [];
     for (const [owner, doc] of Object.entries(S.ideas)){
       (Array.isArray(doc.items) ? doc.items : []).forEach(it => {
-        if (it && typeof it.title === 'string' && it.k) out.push({ ...it, key: owner + ':' + it.k, owner });
+        if (it && typeof it.title === 'string' && it.k) out.push(clean(it, owner));
       });
     }
     const buy = {}, rates = {};
     for (const [voter, v] of Object.entries(S.votes)){
       Object.entries((v && v.buy) || {}).forEach(([k, p]) => { const n = Number(p); if (n > 0 && n <= TERMS.maxPrice) (buy[k] = buy[k] || {})[voter] = n; });
-      Object.entries((v && v.rate) || {}).forEach(([k, r]) => { (rates[k] = rates[k] || []).push(r); });
+      Object.entries((v && v.rate) || {}).forEach(([k, r]) => { if (r && typeof r === 'object') (rates[k] = rates[k] || []).push(r); });
     }
     const notes = {};
     for (const [owner, doc] of Object.entries(S.notes)){
-      (Array.isArray(doc.items) ? doc.items : []).forEach(n => { if (n && n.idea && typeof n.text === 'string') (notes[n.idea] = notes[n.idea] || []).push({ ...n, owner }); });
+      (Array.isArray(doc.items) ? doc.items : []).forEach(n => { if (n && typeof n.idea === 'string' && typeof n.text === 'string') (notes[n.idea] = notes[n.idea] || []).push({ k: n.k, idea: n.idea, kind: KINDS.includes(n.kind) ? n.kind : 'yorum', text: str(n.text, 500), handle: str(n.handle, 30), at: when(n.at), owner }); });
     }
     out.forEach(i => {
       const bs = Object.values(buy[i.key] || {});
@@ -179,6 +189,10 @@ const Store = (function(){
     addIdea(data){
       const it = { k:key(), ...data, at:new Date().toISOString() };
       return write('ideas', { items: myItems('ideas').concat([it]).slice(-40) }).then(() => S.uid + ':' + it.k);
+    },
+    removeIdea(key){
+      const k = key.slice(key.lastIndexOf(':') + 1);
+      return write('ideas', { items: myItems('ideas').filter(it => it.k !== k) });
     },
     setBuy(k, price){ const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; return write('votes', v); },
     rate(k, c, n){ const v = myVotes(); v.rate[k] = { ...(v.rate[k] || {}), [c]: n }; return write('votes', v); },
@@ -421,6 +435,7 @@ function openIdea(key, push=true){
         <span class="eyebrow">${it.buyers ? 'Ortalama ' + tl(it.avg) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
       <dl><div><dt>Problem</dt><dd>${esc(it.problem || '')}</dd></div><div><dt>Çözüm</dt><dd>${esc(it.solution || '')}</dd></div>
         <div><dt>Temel özellikler</dt><dd><ul>${(it.feats || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div></dl>
+      ${it.owner === Store.uid && Store.canWrite ? `<div class="own" aria-live="polite"><span>Bu fikir senin.</span><button type="button" class="link own-x">Fikrimi geri çek</button></div>` : ''}
       <section class="crit" aria-label="Üç ölçüt"><span class="eyebrow">Senin puanın · topluluk ortalaması (${it.raters} kişi)</span>
         ${CRIT.map(([c,l]) => `<div class="crit-row"><span>${l}</span><div class="stars" role="group" aria-label="${l} puanı">${[1,2,3,4,5].map(n => `<button type="button" data-c="${c}" data-n="${n}" aria-pressed="${mine[c] === n}" ${Store.canWrite ? '' : 'disabled'}>${n}</button>`).join('')}</div><output>${it.crit[c] ? it.crit[c].toFixed(1) : '–'}</output></div>`).join('')}
       </section>
@@ -433,6 +448,11 @@ function openIdea(key, push=true){
     </div>`;
     $('.x', dlg).onclick = () => dlg.close();
     $('.dv', dlg).replaceWith(buyCtl(it));
+    const own = $('.own-x', dlg);
+    if (own) own.onclick = () => {
+      if (own.dataset.sure){ Store.removeIdea(key).then(() => dlg.close()).catch(() => { own.textContent = 'Geri çekilemedi, bir daha dene'; }); return; }
+      own.dataset.sure = '1'; own.textContent = 'Eminsen bir daha bas: fikir, talepler ve yorumlar listeden kalkar';
+    };
     $$('.stars button', dlg).forEach(b => b.onclick = () => Store.rate(key, b.dataset.c, Number(b.dataset.n)).catch(()=>{}));
     let kind = 'yorum';
     $$('.note-form .chip', dlg).forEach(b => b.onclick = () => { kind = b.dataset.k; $$('.note-form .chip', dlg).forEach(x => x.setAttribute('aria-pressed', String(x === b))); });

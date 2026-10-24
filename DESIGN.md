@@ -49,6 +49,33 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
   sonradan hazır bir çizim olarak beliriyordu; fikrin ürüne dönüştüğü görünmüyordu.
 - "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
+## Canlıya çıkış: eksikler (24 Ekim 2026)
+
+**Bu turda kapatılanlar**
+- Başkalarının verisi güvenilmez kabul ediliyor: başlık, metin ve listeler formun sınırlarına kırpılıyor,
+  geçersiz ya da ileri tarihli `at` 30 günü uzatamıyor, yorum türü beyaz listeden (`class` içine giden
+  türden HTML sızıntısı kapandı).
+- Fikir sahibi fikrini geri çekebiliyor (iki adımlı onay; KVKK'daki silme hakkının ön yüz tarafı).
+- Paylaşım görseli mutlak adreste (sosyal ağlar göreli adresi okumaz); her sayfada canonical ve og:url,
+  `sitemap.xml`, `robots.txt`. Stil sayfaları Kâğıt'ı canonical gösterir, kopya içerik sayılmaz.
+- 404 GitHub Pages alt klasöründe çalışıyor.
+
+**Canlıdan önce şart (ön yüzle çözülmez)**
+1. Sunucu ve veritabanı: fikirler ve "alırdım"lar şimdi tarayıcıda. Ortak veri, sunucu tarafı doğrulama
+   (140 karakter, fiyat sınırı, 30 gün) ve hız sınırı gerekir; tarayıcıdaki kontroller atlatılabilir.
+2. Hesap: e-posta ya da telefonla giriş. Bir kişinin bir oyu olmalı; yoksa "alırdım" sayısı şişirilebilir.
+3. Ödeme: 99 ₺ / 10 ₺ gönderim ücreti ve ön satış için ödeme altyapısı (iyzico, PayTR, Stripe),
+   eşik dolmazsa iade akışı, fatura.
+4. Hukuk: KVKK aydınlatma metni ve açık rıza, kullanım şartları, mesafeli satış ve ön bilgilendirme
+   (ön satış için), gelir paylaşımı sözleşmesi, **fikri mülkiyet**: fikir herkese açık yayımlanınca kopyalanabilir;
+   gönderim anında zaman damgası, kimin neyi önerdiğinin kaydı ve hakların kime geçtiği yazılı olmalı.
+5. Moderasyon: uygunsuz, kopya ya da spam fikir için "bildir" ve yönetici paneli.
+6. İletişim ve fabrika tarafı: vaka açmak isteyen firma için başvuru formu ve iletişim adresi.
+7. Bildirim: perşembe yayını, fikre yorum, eşik doldu gibi anlar için e-posta.
+8. Ölçüm: çerezsiz analitik (Plausible gibi) ve hata takibi.
+9. Kendi alan adı: `robots.txt` GitHub Pages alt klasöründe arama motorlarınca okunmaz; alan adına
+   geçince canonical, og ve sitemap adresleri tek yerden güncellenmeli.
+
 ## Karar: Kâğıt ve Oyuncu (24 Ekim 2026)
 
 Ürün sahibiyle görüşmede Kâğıt ve Oyuncu beğenildi; proje bu ikisiyle ilerliyor. Teknik çizim,

@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="tr" data-root="../../" data-page="yonetim-vaka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FFF6E9">
+<title>Vaka · Yönetim · Undustit</title>
+<link rel="stylesheet" href="../../assets/fonts/base.css">
+<link rel="stylesheet" href="../../assets/ud.css">
+<link rel="stylesheet" href="../../assets/bilesen.css">
+<script src="../../assets/stil.js"></script>
+<style>
+/* Vaka yönetimi: yalnız bu sayfanın düzeni. Bileşenler bilesen.css'ten gelir. */
+.y-ust{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.y-ust-metin{min-width:0;display:grid;gap:6px;justify-items:start}
+.y-ust h1{font-size:clamp(28px,3.2vw,40px);line-height:1.08;letter-spacing:-.02em;margin:4px 0 0;overflow-wrap:anywhere}
+.y-eylemler,.y-eylem{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.y-eylem{margin-top:20px}
+.y-eylemler .y-sil{color:var(--err);border-color:var(--err)}
+.y-eylemler [disabled]{opacity:.5;cursor:not-allowed}
+.y-alanlar{display:grid;gap:16px}
+.sekmeler{margin-bottom:20px}
+[role="tabpanel"]{margin:0}
+[role="tabpanel"][hidden]{display:none}
+.panel-ic .y-disa{display:grid;gap:16px;justify-items:start}
+.tablo td a{color:var(--ink)}
+.tablo .anahtar{min-height:36px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:640px){.y-ust{align-items:stretch}.y-eylemler .btn{flex:1 1 auto}}
+</style>
+</head>
+<body class="yonetim">
+<a class="skip" href="#main">İçeriğe geç</a>
+<header class="y-bas">
+  <div style="display:flex;align-items:center;gap:12px;min-width:0">
+    <a class="link" href="../../" style="font-weight:500;color:var(--ink);text-decoration:none">Undustit</a>
+    <span style="color:var(--muted);font-size:14px">Yönetim</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;min-width:0">
+    <span data-y-kim style="font-size:14px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44vw"></span>
+    <button type="button" class="btn alt sm" data-y-cikis hidden>Çıkış</button>
+  </div>
+</header>
+<div class="y-govde">
+  <nav class="y-yan" aria-label="Yönetim menüsü">
+    <a href="../">Özet</a>
+    <a href="../#vakalar" data-nav="vakalar">Vakalar</a>
+    <a href="./" data-nav="yeni">Yeni vaka</a>
+    <a href="../../">Siteye dön</a>
+  </nav>
+  <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
+</div>
+
+<script src="../../assets/ud.js"></script>
+<script src="../../assets/ayar.js"></script>
+<script src="../../assets/veri.js"></script>
+<script src="../yonetim.js"></script>
+<script>
+(function(){
+'use strict';
+var YON = window.YONETIM;
+var esc = YON.esc, sayi = YON.sayi, tutar = YON.tutar;
+var params = new URLSearchParams(location.search);
+var id = (params.get('id') || '').trim();
+var enc = encodeURIComponent;
+var GECIS_ETIKET = { acik:'Açık yap', degerlendirme:'Değerlendirmeye al', kazanan:'Kazananı onayla', uretim:'Üretime al', kapali:'Kapat' };
+var ana = null;
+var vaka = null;
+var aktifSekme = 'bilgiler';
+var fikirListesi = [];
+
+function $(s){ return ana.querySelector(s); }
+function $$(s){ return Array.prototype.slice.call(ana.querySelectorAll(s)); }
+function hata(err, varsayilan){ YON.toast((err && err.message) || varsayilan, 'hata'); }
+
+function navIsaretle(yeni){
+  document.querySelectorAll('.y-yan [data-nav]').forEach(function(a){
+    var on = a.dataset.nav === (yeni ? 'yeni' : 'vakalar');
+    if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+}
+
+function ciz(o, a){
+  ana = a;
+  navIsaretle(!id);
+  if (!id) return yeniFormCiz();
+  kabukCiz();
+}
+
+// ----------------------------------------------------------- yeni vaka
+function yeniFormCiz(){
+  document.title = 'Yeni vaka · Yönetim · Undustit';
+  ana.innerHTML =
+    '<div class="y-ust"><div class="y-ust-metin"><a class="link" href="../">← Vakalar</a>' +
+      '<h1>Yeni vaka</h1></div></div>' +
+    '<section class="panel" aria-labelledby="yn-b"><header class="panel-bas"><h2 id="yn-b">Vaka bilgileri</h2>' +
+      '<span class="sayac">Taslak olarak açılır</span></header>' +
+    '<div class="panel-ic"><form id="vaka-form" novalidate>' +
+      '<div class="y-alanlar" id="alanlar"></div>' +
+      '<div class="y-eylem"><button class="btn sig" type="submit">Vakayı oluştur</button>' +
+      '<a class="btn alt" href="../">Vazgeç</a></div>' +
+    '</form></div></section>';
+  var form = $('#vaka-form');
+  YON.formCiz($('#alanlar'), null);
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = YON.formOku(form), h = YON.formDogrula(v);
+    if (Object.keys(h).length) return YON.formHatalari(form, h);
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    Promise.resolve().then(function(){ return UDV.vakalar.olustur(v); }).then(function(yeni){
+      YON.sonrakiBildirim('“' + yeni.baslik + '” taslak olarak açıldı.', 'ok');
+      location.href = '?id=' + enc(yeni.id);
+    }).catch(function(err){
+      btn.disabled = false;
+      hata(err, 'Vaka oluşturulamadı.');
+    });
+  });
+}
+
+// ----------------------------------------------------------- vaka kabuğu
+function kabukCiz(){
+  document.title = 'Vaka · Yönetim · Undustit';
+  ana.innerHTML =
+    '<div class="y-ust"><div class="y-ust-metin"><a class="link" href="../">← Vakalar</a>' +
+      '<h1 id="v-baslik">Yükleniyor…</h1><div id="v-durum"></div></div>' +
+      '<div class="y-eylemler" id="v-eylem"></div></div>' +
+    '<div class="sekmeler" role="tablist" aria-label="Vaka bölümleri">' +
+      '<button type="button" role="tab" class="sekme" id="t-bilgiler" data-sekme="bilgiler" aria-selected="true" aria-controls="p-bilgiler">Bilgiler</button>' +
+      '<button type="button" role="tab" class="sekme" id="t-fikirler" data-sekme="fikirler" aria-selected="false" aria-controls="p-fikirler" tabindex="-1">Fikirler</button>' +
+      '<button type="button" role="tab" class="sekme" id="t-gecmis" data-sekme="gecmis" aria-selected="false" aria-controls="p-gecmis" tabindex="-1">Geçmiş</button>' +
+      '<button type="button" role="tab" class="sekme" id="t-disa" data-sekme="disa" aria-selected="false" aria-controls="p-disa" tabindex="-1">Dışa aktar</button>' +
+    '</div>' +
+    '<section class="panel" role="tabpanel" id="p-bilgiler" data-sekme="bilgiler" aria-labelledby="t-bilgiler">' +
+      '<div class="panel-ic"><form id="vaka-form" novalidate>' +
+        '<div class="y-alanlar" id="alanlar"></div>' +
+        '<div class="y-eylem"><button class="btn sig" type="submit">Kaydet</button></div>' +
+      '</form></div></section>' +
+    '<section class="panel" role="tabpanel" id="p-fikirler" data-sekme="fikirler" aria-labelledby="t-fikirler" hidden>' +
+      '<div class="panel-ic" id="fikirler"><p class="lead">Yükleniyor…</p></div></section>' +
+    '<section class="panel" role="tabpanel" id="p-gecmis" data-sekme="gecmis" aria-labelledby="t-gecmis" hidden>' +
+      '<div class="panel-ic" id="gecmis"><p class="lead">Yükleniyor…</p></div></section>' +
+    '<section class="panel" role="tabpanel" id="p-disa" data-sekme="disa" aria-labelledby="t-disa" hidden>' +
+      '<div class="panel-ic y-disa"><p class="lead">Fikirler bir CSV dosyası olarak indirilir. Dosya Excel’de Türkçe karakterlerle açılır.</p>' +
+      '<button class="btn sig" type="button" data-csv>CSV indir</button></div></section>';
+
+  var tl = $('.sekmeler');
+  tl.addEventListener('click', function(e){
+    var t = e.target.closest('[role="tab"]');
+    if (t) sekmeSec(t.dataset.sekme, true);
+  });
+  tl.addEventListener('keydown', function(e){
+    var tablar = $$('[role="tab"]');
+    var i = tablar.indexOf(document.activeElement);
+    if (i < 0) return;
+    var j = null;
+    if (e.key === 'ArrowRight') j = (i + 1) % tablar.length;
+    else if (e.key === 'ArrowLeft') j = (i - 1 + tablar.length) % tablar.length;
+    else if (e.key === 'Home') j = 0;
+    else if (e.key === 'End') j = tablar.length - 1;
+    if (j === null) return;
+    e.preventDefault();
+    sekmeSec(tablar[j].dataset.sekme, true);
+  });
+
+  $('#vaka-form').addEventListener('submit', kaydet);
+  $('#v-eylem').addEventListener('click', eylemTikla);
+  $('#fikirler').addEventListener('change', gizleDegisti);
+  $('#fikirler').addEventListener('click', kazananTikla);
+  $('[data-csv]').addEventListener('click', csvIndir);
+
+  yukle(true);
+}
+
+function sekmeSec(ad, odakla){
+  aktifSekme = ad;
+  $$('[role="tab"]').forEach(function(t){
+    var on = t.dataset.sekme === ad;
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    if (on && odakla) t.focus();
+  });
+  $$('[role="tabpanel"]').forEach(function(p){ p.hidden = p.dataset.sekme !== ad; });
+  sekmeYukle(ad);
+}
+
+function sekmeYukle(ad){
+  if (!vaka) return;
+  if (ad === 'fikirler') return fikirleriYaz();
+  if (ad === 'gecmis') return gecmisYaz();
+}
+
+function bulunamadi(){
+  document.title = 'Vaka bulunamadı · Yönetim · Undustit';
+  ana.innerHTML =
+    '<div class="y-ust"><div class="y-ust-metin"><a class="link" href="../">← Vakalar</a><h1>Vaka bulunamadı</h1></div></div>' +
+    '<div class="bos"><b>“' + esc(id) + '” kimliğiyle vaka yok</b>' +
+    '<p>Bağlantı yanlış olabilir ya da vaka silinmiş olabilir.</p>' +
+    '<a class="btn sig sm" href="../">Vakalara dön</a></div>';
+}
+
+// vaka verisini okur; ilk yüklemede formu kurar, sonrakilerde yalnız üst bilgiyi yeniler
+function yukle(ilk){
+  return Promise.resolve().then(function(){ return UDV.vakalar.al(id); }).then(function(v){
+    if (!v){ vaka = null; return bulunamadi(); }
+    vaka = v;
+    if (ilk) YON.formCiz($('#alanlar'), v);
+    ustYaz();
+    sekmeYukle(aktifSekme);
+  }).catch(function(err){
+    if (!vaka) return bulunamadi();
+    hata(err, 'Vaka yüklenemedi.');
+  });
+}
+
+function ustYaz(){
+  document.title = vaka.baslik + ' · Yönetim · Undustit';
+  $('#v-baslik').textContent = vaka.baslik;
+  $('#v-durum').innerHTML = YON.durumRozeti(vaka.durum);
+  var gecisler = (UDV.GECIS[vaka.durum] || []).map(function(d){
+    var kapali = d === 'kapali';
+    var pasif = d === 'kazanan' && !vaka.kazanan;
+    return '<button type="button" class="btn ' + (kapali ? 'alt' : 'sig') + ' sm" data-gecis="' + esc(d) + '"' +
+      (pasif ? ' disabled title="Önce Fikirler sekmesinden kazanan seç"' : '') + '>' +
+      esc(GECIS_ETIKET[d] || UDV.DURUM_ADI[d]) + '</button>';
+  }).join('');
+  var sil = vaka.durum === 'taslak' ? '<button type="button" class="btn alt sm y-sil" data-sil>Sil</button>' : '';
+  $('#v-eylem').innerHTML = gecisler +
+    '<a class="btn alt sm" href="../../vaka/?id=' + enc(vaka.id) + '">Sitede gör</a>' + sil;
+}
+
+function eylemTikla(e){
+  var b = e.target.closest('button');
+  if (!b || b.disabled) return;
+  if (b.dataset.gecis) return gecis(b.dataset.gecis);
+  if (b.hasAttribute('data-sil')) return sil();
+}
+
+function gecis(d){
+  var ad = UDV.DURUM_ADI[d];
+  YON.onay({
+    baslik: GECIS_ETIKET[d] + '?',
+    metin: '“' + vaka.baslik + '” “' + ad + '” durumuna geçecek. Not geçmişte görünür.',
+    eylem: GECIS_ETIKET[d],
+    notAlani: true,
+    notEtiketi: 'Not',
+    notIpucu: 'İsteğe bağlı'
+  }).then(function(s){
+    if (!s) return;
+    return Promise.resolve(UDV.vakalar.durum(vaka.id, d, s.not)).then(function(){
+      YON.toast('Durum “' + ad + '” oldu.', 'ok');
+      return yukle(false);
+    });
+  }).catch(function(err){ hata(err, 'Durum değiştirilemedi.'); });
+}
+
+function sil(){
+  YON.onay({
+    baslik: 'Taslak silinsin mi?',
+    metin: '“' + vaka.baslik + '” kalıcı olarak silinir. Bu işlem geri alınamaz.',
+    eylem: 'Sil',
+    tehlike: true
+  }).then(function(s){
+    if (!s) return;
+    return Promise.resolve(UDV.vakalar.sil(vaka.id)).then(function(){
+      YON.sonrakiBildirim('Taslak silindi.', 'ok');
+      location.href = '../';
+    });
+  }).catch(function(err){ hata(err, 'Vaka silinemedi.'); });
+}
+
+function kaydet(e){
+  e.preventDefault();
+  var form = e.currentTarget;
+  var v = YON.formOku(form), h = YON.formDogrula(v);
+  if (Object.keys(h).length) return YON.formHatalari(form, h);
+  var btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  Promise.resolve().then(function(){ return UDV.vakalar.guncelle(vaka.id, v); }).then(function(g){
+    vaka = Object.assign({}, vaka, g || {});
+    YON.toast('Kaydedildi.', 'ok');
+    ustYaz();
+  }).catch(function(err){
+    hata(err, 'Kaydedilemedi.');
+  }).then(function(){ btn.disabled = false; });
+}
+
+// ----------------------------------------------------------- fikirler
+function fikirleriYaz(){
+  var kap = $('#fikirler');
+  return Promise.resolve().then(function(){ return UDV.fikirler.vaka(vaka.id); }).then(function(liste){
+    fikirListesi = liste;
+    if (!liste.length){
+      kap.innerHTML = '<div class="bos"><b>Henüz fikir yok</b>' +
+        '<p>Fikirler burada görünür. Vaka sayfasını paylaşarak fikir topla.</p>' +
+        '<a class="btn alt sm" href="../../vaka/?id=' + enc(vaka.id) + '">Sitede gör</a></div>';
+      return;
+    }
+    var degerlendirme = vaka.durum === 'degerlendirme';
+    kap.innerHTML = '<div class="tablo-kap"><table class="tablo">' +
+      '<caption class="sr-only">Bu vakaya gelen fikirler</caption>' +
+      '<thead><tr><th scope="col">Başlık</th><th scope="col">Ad</th>' +
+      '<th scope="col" class="sayi">Alıcı</th><th scope="col" class="sayi">Ort. fiyat</th>' +
+      '<th scope="col" class="sayi">Yorum</th><th scope="col">Gizli</th><th scope="col"><span class="sr-only">İşlem</span></th></tr></thead>' +
+      '<tbody>' + liste.map(function(f){
+        var kazanan = vaka.kazanan && vaka.kazanan === f.id;
+        var islem = kazanan ? '<span class="rozet yesil">Kazanan</span>' :
+          (degerlendirme ? '<button type="button" class="btn alt sm" data-kazanan="' + esc(f.id) + '">Kazanan seç</button>' : '');
+        return '<tr>' +
+          '<td>' + esc(f.baslik) + '</td>' +
+          '<td>' + esc(f.ad || '—') + '</td>' +
+          '<td class="sayi">' + sayi(f.alici) + '</td>' +
+          '<td class="sayi">' + tutar(f.ortFiyat) + '</td>' +
+          '<td class="sayi">' + sayi(f.yorum) + '</td>' +
+          '<td><label class="anahtar"><input type="checkbox" data-gizle="' + esc(f.id) + '" aria-label="' + esc(f.baslik) + ' fikrini gizle"' +
+            (f.gizli ? ' checked' : '') + '><span>Gizli</span></label></td>' +
+          '<td>' + islem + '</td>' +
+        '</tr>';
+      }).join('') + '</tbody></table></div>';
+  }).catch(function(err){
+    kap.innerHTML = '<p class="lead">Fikirler yüklenemedi.</p>';
+    hata(err, 'Fikirler yüklenemedi.');
+  });
+}
+
+function gizleDegisti(e){
+  var c = e.target;
+  if (!c.matches || !c.matches('input[data-gizle]')) return;
+  var gizli = c.checked;
+  Promise.resolve().then(function(){ return UDV.fikirler.gizle(c.dataset.gizle, gizli); }).then(function(){
+    YON.toast(gizli ? 'Fikir gizlendi.' : 'Fikir yeniden görünür.', 'ok');
+  }).catch(function(err){
+    c.checked = !gizli;
+    hata(err, 'Güncellenemedi.');
+  });
+}
+
+function kazananTikla(e){
+  var b = e.target.closest('[data-kazanan]');
+  if (!b) return;
+  var f = fikirListesi.find(function(x){ return x.id === b.dataset.kazanan; });
+  if (!f) return;
+  YON.onay({
+    baslik: 'Kazanan seçilsin mi?',
+    metin: '“' + f.baslik + '” kazanan olacak ve vaka “' + UDV.DURUM_ADI.kazanan + '” durumuna geçecek.',
+    eylem: 'Kazananı seç'
+  }).then(function(s){
+    if (!s) return;
+    return Promise.resolve(UDV.fikirler.kazanan(vaka.id, f.id)).then(function(){
+      YON.toast('Kazanan seçildi.', 'ok');
+      return yukle(false);
+    });
+  }).catch(function(err){ hata(err, 'Kazanan seçilemedi.'); });
+}
+
+// ----------------------------------------------------------- geçmiş ve dışa aktarma
+function gecmisYaz(){
+  var kap = $('#gecmis');
+  return Promise.resolve().then(function(){ return UDV.vakalar.gecmis(vaka.id); }).then(function(g){
+    if (!g.length){
+      kap.innerHTML = '<div class="bos"><b>Henüz kayıt yok</b><p>Durum değişiklikleri burada sırayla listelenir.</p></div>';
+      return;
+    }
+    kap.innerHTML = '<ol class="zaman-cizelgesi">' + g.map(function(s){
+      return '<li><b>' + esc(YON.durumAdi(s.durum)) + '</b>' +
+        '<span>' + esc(YON.tarihSaat(s.zaman)) + ' · ' + esc(s.kim || '—') + '</span>' +
+        (s.not ? '<p>' + esc(s.not) + '</p>' : '') + '</li>';
+    }).join('') + '</ol>';
+  }).catch(function(err){
+    kap.innerHTML = '<p class="lead">Geçmiş yüklenemedi.</p>';
+    hata(err, 'Geçmiş yüklenemedi.');
+  });
+}
+
+function csvIndir(){
+  Promise.resolve().then(function(){ return UDV.csv(vaka.id); }).then(function(metin){
+    var blob = new Blob([metin], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = vaka.id + '-fikirler.csv';
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    YON.toast('CSV indirildi.', 'ok');
+  }).catch(function(err){ hata(err, 'CSV hazırlanamadı.'); });
+}
+
+YON.guard(ciz);
+})();
+</script>
+</body>
+</html>

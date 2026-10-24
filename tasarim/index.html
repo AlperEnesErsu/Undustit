@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="tasarim">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tasarım dili · Undustit</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Undustit tasarım dili: renkler, tipografi, köşeler, gölgeler, hareket ve bileşenler.">
+<meta name="theme-color" content="#FFF6E9">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/fonts/base.css">
+<link rel="stylesheet" href="../assets/ud.css">
+<link rel="stylesheet" href="../assets/bilesen.css">
+<script src="../assets/stil.js"></script>
+<style>
+/* guide layout only: swatches, specimens, code blocks. Components are styled by the shared sheets. */
+.tas-idx{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tas-idx a.chip{display:inline-flex;align-items:center;text-decoration:none}
+.tas-sec h2{margin-bottom:12px}
+.tas-sec > .lead{margin-bottom:8px}
+.tas-sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;margin-top:28px}
+.tas-sw figure{margin:0;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2);overflow:hidden;min-width:0}
+.tas-sw i{display:block;height:72px;border-bottom:1px solid var(--line);background:var(--bg-3)}
+.tas-sw figcaption{display:grid;gap:2px;padding:10px 12px 12px}
+.tas-sw b{font-family:var(--f-mono);font-weight:500;font-size:12.5px;overflow-wrap:anywhere}
+.tas-sw span{font-family:var(--f-mono);font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.tas-tipo{display:grid;gap:20px;margin-top:28px;padding:28px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2);min-width:0}
+.tas-tipo small{display:block;font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.tas-tipo .sp{font-size:clamp(17px,1.6vw,20px);line-height:1.5;max-width:60ch}
+.tas-tipo .mono{font-family:var(--f-mono);font-size:14px}
+.tas-kutu{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-top:28px}
+.tas-kutu figure{margin:0;display:grid;gap:10px;align-content:start;min-width:0}
+.tas-kutu .kare{height:110px;border:1px solid var(--line-2);background:var(--bg-2)}
+.tas-kutu figcaption{font-size:13px;color:var(--ink-2);overflow-wrap:anywhere}
+.tas-kutu code{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tas-ornek{display:grid;gap:14px;margin-top:20px;padding:24px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg);min-width:0}
+.tas-ornek.yan{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.tas-ornek > p{color:var(--ink-2);font-size:14.5px}
+.tas-kod{margin:0;min-width:0}
+.tas-kod summary{cursor:pointer;display:inline-flex;align-items:center;min-height:44px;font-size:13.5px;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.tas-kod summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.tas-kod pre{margin:8px 0 0;padding:14px 16px;overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg-3);font-family:var(--f-mono);font-size:12.5px;line-height:1.55;color:var(--ink);white-space:pre}
+.tas-kod code{font-family:inherit}
+.tas-btns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.tas-zipla{width:72px;height:72px;border-radius:var(--r-md);border:1px solid var(--line-2);background:var(--bg-3);transition:transform var(--dur-slow,500ms) var(--pop,var(--ease-out))}
+.tas-zipla.yukari{transform:translateY(-36px) rotate(8deg)}
+.tas-sayi{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.tas-dar{max-width:100%;overflow:hidden}
+.tas-gizli{display:none}
+.tas-ornek .tablo-kap{max-height:none}
+@media (max-width:760px){.tas-ornek.yan{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.tas-ornek{padding:18px}.tas-tipo{padding:20px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1">
+  <div class="wrap phead">
+    <span class="eyebrow">Tasarım sistemi</span>
+    <h1>Oyun <em>tasarım dili.</em></h1>
+    <p class="lead">Sitenin renkleri, yazıları, köşeleri, hareketleri ve bileşenleri tek yerde. Her örnek canlı; altındaki kod aynen kopyalanabilir.</p>
+    <nav class="tas-idx" aria-label="Bu sayfada">
+      <a class="chip" href="#renkler">Renkler</a>
+      <a class="chip" href="#tipografi">Tipografi</a>
+      <a class="chip" href="#kose-golge">Köşe ve gölge</a>
+      <a class="chip" href="#hareket">Hareket</a>
+      <a class="chip" href="#bilesenler">Bileşenler</a>
+      <a class="chip" href="#yonetim-kabugu">Yönetim kabuğu</a>
+    </nav>
+  </div>
+
+  <section class="sec tas-sec" id="renkler" aria-labelledby="renkler-h">
+    <div class="wrap">
+      <span class="eyebrow">01</span>
+      <h2 id="renkler-h">Renkler</h2>
+      <p class="lead">Renkler yalnız değişkenlerden okunur. Mavi ve mor yalnız eyleme ayrılır; sarı vurgu ve durum içindir.</p>
+      <div class="tas-sw" id="sw" aria-label="Renk değişkenleri"></div>
+    </div>
+  </section>
+
+  <section class="sec tas-sec" id="tipografi" aria-labelledby="tipo-h">
+    <div class="wrap">
+      <span class="eyebrow">02</span>
+      <h2 id="tipo-h">Tipografi</h2>
+      <p class="lead">Başlıklar serif, metin sans, kodlar mono. Üç başlık düzeyi, bir giriş paragrafı ve bir gövde metni.</p>
+      <div class="tas-tipo">
+        <div><small>h1 · başlık</small><h1>Fikirden rafa</h1></div>
+        <div><small>h2 · bölüm başlığı</small><h2>Kim ne kazanır?</h2></div>
+        <div><small>h3 · kart başlığı</small><h3>Ön satış eşiği</h3></div>
+        <div><small>giriş paragrafı (lead)</small><p class="lead">Herkes fikir getirebilir, herkes bir ucundan tutabilir. Ürün satarsa tutan herkes payını alır.</p></div>
+        <div><small>gövde metni</small><p class="sp">Fikir sitede yayınlanır. Üyeler beğendiklerine değil, alacaklarına “alırdım” der ve kaça alacaklarını yazar.</p></div>
+        <div><small>eyebrow</small><span class="eyebrow">Vaka 01 · cıvata</span></div>
+        <div><small>mono · kod ve sayılar</small><p class="mono">M10 × 90 · 1.000.000 adet · 2,00 ₺</p></div>
+      </div>
+      <details class="tas-kod" style="margin-top:16px">
+        <summary>Kodu göster</summary>
+        <pre><code>&lt;h1&gt;Fikirden rafa&lt;/h1&gt;
+&lt;h2&gt;Kim ne kazanır?&lt;/h2&gt;
+&lt;h3&gt;Ön satış eşiği&lt;/h3&gt;
+&lt;p class="lead"&gt;Giriş paragrafı.&lt;/p&gt;
+&lt;span class="eyebrow"&gt;Vaka 01 · cıvata&lt;/span&gt;
+&lt;p class="mono"&gt;M10 × 90 · 2,00 ₺&lt;/p&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="sec tas-sec" id="kose-golge" aria-labelledby="kose-h">
+    <div class="wrap">
+      <span class="eyebrow">03</span>
+      <h2 id="kose-h">Köşe ve gölge</h2>
+      <p class="lead">Üç köşe ölçüsü: küçük alanlar, kartlar, büyük paneller. Gölge iki çeşit: yumuşak yükselti ve Oyuncu'nun sert kenarı.</p>
+      <div class="tas-kutu">
+        <figure><div class="kare" style="border-radius:var(--r-sm)"></div><figcaption>--r-sm<br><code>köşe küçük alanlar</code></figcaption></figure>
+        <figure><div class="kare" style="border-radius:var(--r-md)"></div><figcaption>--r-md<br><code>kart, panel</code></figcaption></figure>
+        <figure><div class="kare" style="border-radius:var(--r-lg)"></div><figcaption>--r-lg<br><code>büyük yüzey, diyalog</code></figcaption></figure>
+        <figure><div class="kare" style="box-shadow:var(--shadow);border-radius:var(--r-md)"></div><figcaption>--shadow<br><code>yükselti</code></figcaption></figure>
+        <figure><div class="kare" style="box-shadow:var(--hard);border-radius:var(--r-md)"></div><figcaption>--hard<br><code>sert gölge (Oyuncu)</code></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec tas-sec" id="hareket" aria-labelledby="hareket-h">
+    <div class="wrap">
+      <span class="eyebrow">04</span>
+      <h2 id="hareket-h">Hareket</h2>
+      <p class="lead">Süreler kısa ve tahmin edilebilir. Oyuncu'da şeyler zıplar (--pop); hareket tercihi “azalt” olduğunda hepsi durur.</p>
+      <div class="tas-ornek">
+        <div class="tas-btns">
+          <button class="btn sig" type="button" id="zipla-dugme" aria-pressed="false">Zıpla</button>
+          <div class="tas-zipla" id="zipla-kutu" aria-hidden="true"></div>
+          <span class="tas-sayi">--pop · --dur-slow</span>
+        </div>
+        <div class="tas-kutu" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+          <figure><span class="tas-sayi">--dur-fast</span><code>100ms</code></figure>
+          <figure><span class="tas-sayi">--dur-base</span><code>200ms</code></figure>
+          <figure><span class="tas-sayi">--dur-mod</span><code>300ms</code></figure>
+          <figure><span class="tas-sayi">--ease-out</span><code>cubic-bezier(.22,1,.36,1)</code></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec tas-sec" id="bilesenler" aria-labelledby="bil-h">
+    <div class="wrap">
+      <span class="eyebrow">05</span>
+      <h2 id="bil-h">Bileşenler</h2>
+      <p class="lead">Önce mevcut düğmeler, çipler ve kartlar; sonra yönetim paneli için yeni bileşenler. Her birinin kodu altında.</p>
+
+      <h3 style="margin-top:40px">Düğmeler</h3>
+      <div class="tas-ornek">
+        <p>Birincil eylem <code>.sig</code>, ikincil <code>.alt</code>, küçük boy <code>.sm</code>. Pasif durum <code>disabled</code>.</p>
+        <div class="tas-btns">
+          <a class="btn sig" href="#bilesenler">Fikrini yaz</a>
+          <button class="btn alt" type="button">Vazgeç</button>
+          <button class="btn sig sm" type="button">Küçük</button>
+          <button class="btn alt sm" type="button">Küçük ikincil</button>
+          <button class="btn sig" type="button" disabled>Pasif</button>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;a class="btn sig" href="..."&gt;Fikrini yaz&lt;/a&gt;
+&lt;button class="btn alt" type="button"&gt;Vazgeç&lt;/button&gt;
+&lt;button class="btn sig sm" type="button"&gt;Küçük&lt;/button&gt;
+&lt;button class="btn sig" type="button" disabled&gt;Pasif&lt;/button&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Çip ve bağlantı</h3>
+      <div class="tas-ornek">
+        <p>Çipler filtre için; <code>aria-pressed</code> seçili durumu gösterir. Bağlantılar metnin içinde.</p>
+        <div class="chips" role="group" aria-label="Örnek filtre">
+          <button class="chip" type="button" aria-pressed="true">Hepsi</button>
+          <button class="chip" type="button" aria-pressed="false">Açık</button>
+          <button class="chip" type="button" aria-pressed="false">Kapandı</button>
+        </div>
+        <p><a class="link" href="#bilesenler">Vakaları gör</a></p>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;div class="chips" role="group" aria-label="Filtre"&gt;
+  &lt;button class="chip" type="button" aria-pressed="true"&gt;Hepsi&lt;/button&gt;
+  &lt;button class="chip" type="button" aria-pressed="false"&gt;Açık&lt;/button&gt;
+&lt;/div&gt;
+&lt;a class="link" href="..."&gt;Vakaları gör&lt;/a&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Fikir kartı ve boş durum</h3>
+      <div class="tas-ornek">
+        <p>Kart <code>.icard</code>, boş durum <code>.empty</code>. Kartın tamamı bağlantı; alırdım düğmesi üstte.</p>
+        <div class="ideas">
+          <article class="icard top">
+            <span class="rank" aria-hidden="true">1</span>
+            <div class="body">
+              <div class="t"><a href="#bilesenler">Kendinden kilitli cıvata kutusu</a></div>
+              <div class="m"><span class="c">Ev</span><span>12 alıcı</span><span class="p">ort. 1,80 ₺</span></div>
+            </div>
+            <button class="vote" type="button" aria-pressed="false"><b>12</b><span>alırdım</span></button>
+          </article>
+        </div>
+        <div class="empty"><b>Henüz fikir yok.</b><span>İlk fikri sen yaz.</span></div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;article class="icard top"&gt;
+  &lt;span class="rank" aria-hidden="true"&gt;1&lt;/span&gt;
+  &lt;div class="body"&gt;
+    &lt;div class="t"&gt;&lt;a href="..."&gt;Kendinden kilitli cıvata kutusu&lt;/a&gt;&lt;/div&gt;
+    &lt;div class="m"&gt;&lt;span class="c"&gt;Ev&lt;/span&gt;&lt;span&gt;12 alıcı&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;button class="vote" type="button" aria-pressed="false"&gt;&lt;b&gt;12&lt;/b&gt;&lt;span&gt;alırdım&lt;/span&gt;&lt;/button&gt;
+&lt;/article&gt;
+&lt;div class="empty"&gt;&lt;b&gt;Henüz fikir yok.&lt;/b&gt;&lt;span&gt;İlk fikri sen yaz.&lt;/span&gt;&lt;/div&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Alan</h3>
+      <div class="tas-ornek">
+        <p>Etiket, ipucu ve hata. Girdi, metin alanı ve seçim aynı görünür. Hata durumunda kenar kırmızı olur ve mesaj eklenir.</p>
+        <div class="alan-iki">
+          <label class="alan">
+            <span>Vaka adı <small>en fazla 80 karakter</small></span>
+            <input type="text" name="baslik" value="Bir milyon cıvata">
+          </label>
+          <label class="alan">
+            <span>Firma</span>
+            <select name="firma"><option>Örnek Fabrika</option><option>Demir Lojistik</option></select>
+          </label>
+        </div>
+        <div class="alan-iki">
+          <label class="alan hata">
+            <span>Adet</span>
+            <input type="number" name="adet" value="0" aria-invalid="true" aria-describedby="adet-hata">
+            <em class="alan-hata" id="adet-hata">Adet sıfırdan büyük olmalı.</em>
+          </label>
+          <label class="alan">
+            <span>Açıklama</span>
+            <textarea name="aciklama" rows="3">Kısa bir not.</textarea>
+          </label>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;label class="alan"&gt;
+  &lt;span&gt;Vaka adı &lt;small&gt;en fazla 80 karakter&lt;/small&gt;&lt;/span&gt;
+  &lt;input type="text" name="baslik"&gt;
+&lt;/label&gt;
+&lt;label class="alan hata"&gt;
+  &lt;span&gt;Adet&lt;/span&gt;
+  &lt;input type="number" name="adet" aria-invalid="true" aria-describedby="adet-hata"&gt;
+  &lt;em class="alan-hata" id="adet-hata"&gt;Adet sıfırdan büyük olmalı.&lt;/em&gt;
+&lt;/label&gt;
+&lt;div class="alan-iki"&gt;...&lt;/div&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Anahtar</h3>
+      <div class="tas-ornek">
+        <p>Aç ve kapa. Kutunun tamamı dokunma alanıdır (en az 44 piksel).</p>
+        <div class="tas-btns">
+          <label class="anahtar"><input type="checkbox" checked><span>Yorumları aç</span></label>
+          <label class="anahtar"><input type="checkbox"><span>Gizli fikirleri göster</span></label>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;label class="anahtar"&gt;
+  &lt;input type="checkbox" checked&gt;
+  &lt;span&gt;Yorumları aç&lt;/span&gt;
+&lt;/label&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Rozet</h3>
+      <div class="tas-ornek">
+        <p>Vaka durumu için <code>data-durum</code>; renk için <code>.gri .yesil .sari .kirmizi .mor</code>.</p>
+        <div class="tas-btns">
+          <span class="rozet" data-durum="taslak">Taslak</span>
+          <span class="rozet" data-durum="acik">Açık</span>
+          <span class="rozet" data-durum="degerlendirme">Değerlendirmede</span>
+          <span class="rozet" data-durum="kazanan">Kazanan seçildi</span>
+          <span class="rozet" data-durum="uretim">Üretimde</span>
+          <span class="rozet" data-durum="kapali">Kapandı</span>
+        </div>
+        <div class="tas-btns">
+          <span class="rozet gri">Gri</span>
+          <span class="rozet yesil">Yeşil</span>
+          <span class="rozet sari">Sarı</span>
+          <span class="rozet kirmizi">Kırmızı</span>
+          <span class="rozet mor">Mor</span>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;span class="rozet" data-durum="acik"&gt;Açık&lt;/span&gt;
+&lt;span class="rozet" data-durum="kazanan"&gt;Kazanan seçildi&lt;/span&gt;
+&lt;span class="rozet yesil"&gt;Yeşil&lt;/span&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Tablo</h3>
+      <div class="tas-ornek">
+        <p>Yoğun satırlar, yapışkan başlık, sayılar sağa yaslı. Telefonda tablo kendi kutusu içinde kayar.</p>
+        <div class="tablo-kap" role="region" aria-labelledby="tablo-baslik" tabindex="0">
+          <table class="tablo">
+            <caption id="tablo-baslik" class="sr">Örnek vaka listesi</caption>
+            <thead>
+              <tr><th scope="col">Vaka</th><th scope="col">Firma</th><th scope="col">Durum</th><th scope="col" class="sayi">Adet</th><th scope="col" class="sayi">Fikir</th><th scope="col">Güncelleme</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><a href="#bilesenler">Bir milyon cıvata</a></td><td>Örnek Fabrika</td><td><span class="rozet" data-durum="acik">Açık</span></td><td class="sayi">1.000.000</td><td class="sayi">84</td><td>24 Eki</td></tr>
+              <tr><td><a href="#bilesenler">Paslanmaz boru bağlantısı</a></td><td>Demir Lojistik</td><td><span class="rozet" data-durum="degerlendirme">Değerlendirmede</span></td><td class="sayi">12.500</td><td class="sayi">31</td><td>21 Eki</td></tr>
+              <tr><td><a href="#bilesenler">Kuru gıda kutusu</a></td><td>Örnek Ambalaj</td><td><span class="rozet" data-durum="kazanan">Kazanan seçildi</span></td><td class="sayi">40.000</td><td class="sayi">17</td><td>19 Eki</td></tr>
+              <tr><td><a href="#bilesenler">Atölye lambası gövdesi</a></td><td>Metal Tasarım</td><td><span class="rozet" data-durum="uretim">Üretimde</span></td><td class="sayi">3.200</td><td class="sayi">9</td><td>12 Eki</td></tr>
+              <tr><td><a href="#bilesenler">Eski katalog kağıdı</a></td><td>Kağıt A.Ş.</td><td><span class="rozet" data-durum="kapali">Kapandı</span></td><td class="sayi">250.000</td><td class="sayi">58</td><td>02 Eki</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;div class="tablo-kap" role="region" aria-labelledby="tablo-baslik" tabindex="0"&gt;
+  &lt;table class="tablo"&gt;
+    &lt;caption id="tablo-baslik"&gt;Vakalar&lt;/caption&gt;
+    &lt;thead&gt;&lt;tr&gt;&lt;th scope="col"&gt;Vaka&lt;/th&gt;&lt;th scope="col" class="sayi"&gt;Adet&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+    &lt;tbody&gt;&lt;tr&gt;&lt;td&gt;Bir milyon cıvata&lt;/td&gt;&lt;td class="sayi"&gt;1.000.000&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Araç çubuğu</h3>
+      <div class="tas-ornek">
+        <p>Arama, filtre çipleri ve eylemler bir tablonun üstünde.</p>
+        <div class="arac-cubugu">
+          <div class="sol">
+            <label class="sr" for="ara-ornek">Vakalarda ara</label>
+            <input type="search" id="ara-ornek" placeholder="Vakalarda ara">
+            <div class="chips" role="group" aria-label="Durum">
+              <button class="chip" type="button" aria-pressed="true">Hepsi</button>
+              <button class="chip" type="button" aria-pressed="false">Açık</button>
+            </div>
+          </div>
+          <div class="sag"><button class="btn sig sm" type="button">Yeni vaka</button></div>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;div class="arac-cubugu"&gt;
+  &lt;div class="sol"&gt;
+    &lt;input type="search" placeholder="Vakalarda ara"&gt;
+    &lt;div class="chips"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="sag"&gt;&lt;button class="btn sig sm"&gt;Yeni vaka&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Sekmeler</h3>
+      <div class="tas-ornek">
+        <p>Ok tuşlarıyla gezilir. Seçili sekme <code>aria-selected="true"</code> alır.</p>
+        <div class="sekmeler" role="tablist" aria-label="Vaka bölümleri" id="sekmeler-ornek">
+          <button role="tab" type="button" id="sek-1" aria-selected="true" aria-controls="pan-1" tabindex="0">Bilgiler</button>
+          <button role="tab" type="button" id="sek-2" aria-selected="false" aria-controls="pan-2" tabindex="-1">Fikirler</button>
+          <button role="tab" type="button" id="sek-3" aria-selected="false" aria-controls="pan-3" tabindex="-1">Geçmiş</button>
+        </div>
+        <div role="tabpanel" id="pan-1" aria-labelledby="sek-1" tabindex="0"><p>Vakanın firma, stok ve adet bilgileri.</p></div>
+        <div role="tabpanel" id="pan-2" aria-labelledby="sek-2" tabindex="0" hidden><p>Bu vakaya yazılmış fikirler.</p></div>
+        <div role="tabpanel" id="pan-3" aria-labelledby="sek-3" tabindex="0" hidden><p>Durum değişiklikleri, eskiden yeniye.</p></div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;div class="sekmeler" role="tablist"&gt;
+  &lt;button role="tab" aria-selected="true" aria-controls="pan-1"&gt;Bilgiler&lt;/button&gt;
+  &lt;button role="tab" aria-selected="false" aria-controls="pan-2" tabindex="-1"&gt;Fikirler&lt;/button&gt;
+&lt;/div&gt;
+&lt;div role="tabpanel" id="pan-1" aria-labelledby="sek-1"&gt;...&lt;/div&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Panel</h3>
+      <div class="tas-ornek">
+        <p>Yönetim kartı: başlık satırı ve gövde.</p>
+        <section class="panel" aria-labelledby="panel-h">
+          <header class="panel-bas">
+            <h2 id="panel-h">Son hareketler</h2>
+            <a class="btn alt sm" href="#bilesenler">Tümünü gör</a>
+          </header>
+          <div class="panel-ic"><p>Üç vaka bu hafta güncellendi. Bir fikir kazanan seçildi.</p></div>
+        </section>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;section class="panel" aria-labelledby="panel-h"&gt;
+  &lt;header class="panel-bas"&gt;
+    &lt;h2 id="panel-h"&gt;Son hareketler&lt;/h2&gt;
+    &lt;a class="btn alt sm" href="..."&gt;Tümünü gör&lt;/a&gt;
+  &lt;/header&gt;
+  &lt;div class="panel-ic"&gt;...&lt;/div&gt;
+&lt;/section&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">İstatistik kartları ve ilerleme</h3>
+      <div class="tas-ornek">
+        <p>Sayılar büyük ve tabular; ilerleme çubuğu <code>--oran</code> ile 0 ile 1 arası alır.</p>
+        <div class="istatlar">
+          <div class="istat"><span>Toplam vaka</span><b>1.240</b><small>+12 bugün</small></div>
+          <div class="istat"><span>Açık</span><b>38</b><small>4 perşembe bekliyor</small></div>
+          <div class="istat"><span>Fikir</span><b>9.812</b><small>+204 bu hafta</small></div>
+        </div>
+        <div class="ilerleme" role="progressbar" aria-label="Ön sipariş" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42" style="--oran:.42"><i></i></div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;div class="istatlar"&gt;
+  &lt;div class="istat"&gt;&lt;span&gt;Açık&lt;/span&gt;&lt;b&gt;38&lt;/b&gt;&lt;small&gt;4 perşembe bekliyor&lt;/small&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="ilerleme" role="progressbar" aria-label="Ön sipariş"
+     aria-valuemin="0" aria-valuemax="100" aria-valuenow="42" style="--oran:.42"&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Bildirim</h3>
+      <div class="tas-ornek">
+        <p>Sağ altta belirir, dört saniye sonra kendiliğinden kapanır. Ekran okuyucu bunu sessizce duyurur.</p>
+        <div class="tas-btns">
+          <button class="btn sm sig" type="button" data-bildirim="ok">Kaydedildi</button>
+          <button class="btn sm alt" type="button" data-bildirim="hata">Hata</button>
+          <button class="btn sm alt" type="button" data-bildirim="bilgi">Bilgi</button>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;div class="bildirimler" aria-live="polite"&gt;
+  &lt;div class="bildirim ok"&gt;Kaydedildi&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- ok, hata, bilgi. Betik dört saniye sonra öğeyi kaldırır. --&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Boş durum</h3>
+      <div class="tas-ornek">
+        <p>Liste boş ya da vaka taslak olduğunda. Bir eylem ile birlikte.</p>
+        <div class="bos">
+          <b>Bu vakada henüz fikir yok.</b>
+          <p>Fikir gelmeden perşembe tartışması başlamaz.</p>
+          <a class="btn sig sm" href="#bilesenler">Fikir yaz</a>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;div class="bos"&gt;
+  &lt;b&gt;Bu vakada henüz fikir yok.&lt;/b&gt;
+  &lt;p&gt;Fikir gelmeden perşembe tartışması başlamaz.&lt;/p&gt;
+  &lt;a class="btn sig sm" href="..."&gt;Fikir yaz&lt;/a&gt;
+&lt;/div&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Zaman çizelgesi</h3>
+      <div class="tas-ornek">
+        <p>Bir vakanın geçmişi, eskiden yeniye. Son nokta vurgulu.</p>
+        <ol class="zaman-cizelgesi">
+          <li><b>Taslak</b><span>18 Eki 2026 · admin@undustit.local</span><p>Vaka oluşturuldu.</p></li>
+          <li><b>Açık</b><span>20 Eki 2026 · admin@undustit.local</span><p>Fikir toplama başladı.</p></li>
+          <li><b>Değerlendirmede</b><span>24 Eki 2026 · admin@undustit.local</span><p>Perşembe için dört fikir seçildi.</p></li>
+        </ol>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;ol class="zaman-cizelgesi"&gt;
+  &lt;li&gt;&lt;b&gt;Açık&lt;/b&gt;&lt;span&gt;24 Eki 2026 · admin@…&lt;/span&gt;&lt;p&gt;Not.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Diyalog</h3>
+      <div class="tas-ornek">
+        <p>Onay ya da kısa bir form. Açılınca odak içeri girer, Esc kapatır.</p>
+        <div class="tas-btns">
+          <button class="btn sig" type="button" id="dlg-ac">Geçiş notu yaz</button>
+        </div>
+        <dialog class="diyalog" id="dlg" aria-labelledby="dlg-h">
+            <header><h2 id="dlg-h">Vakayı “Açık” yap</h2></header>
+            <div class="ic">
+              <p>Bu geçiş fikir toplamayı başlatır. Not herkese açık geçmişe yazılır.</p>
+              <label class="alan">
+                <span>Not <small>isteğe bağlı</small></span>
+                <textarea name="not" rows="3"></textarea>
+              </label>
+            </div>
+            <footer>
+              <button class="btn alt sm" type="button" data-kapat="vazgec">Vazgeç</button>
+              <button class="btn sig sm" type="button" data-kapat="tamam">Açık yap</button>
+            </footer>
+        </dialog>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;dialog class="diyalog" id="dlg" aria-labelledby="dlg-h"&gt;
+  &lt;header&gt;&lt;h2 id="dlg-h"&gt;Vakayı “Açık” yap&lt;/h2&gt;&lt;/header&gt;
+  &lt;div class="ic"&gt;...&lt;/div&gt;
+  &lt;footer&gt;
+    &lt;button class="btn alt sm" type="button" data-kapat="vazgec"&gt;Vazgeç&lt;/button&gt;
+    &lt;button class="btn sig sm" type="button" data-kapat="tamam"&gt;Açık yap&lt;/button&gt;
+  &lt;/footer&gt;
+&lt;/dialog&gt;
+&lt;!-- açmak: dlg.showModal() --&gt;</code></pre></details>
+      </div>
+
+      <h3 style="margin-top:40px">Damga</h3>
+      <div class="tas-ornek">
+        <p>Oyuncu'nun lastik damgası. Alırdım ya da öne çıkan bir etiket için.</p>
+        <div class="tas-btns"><span class="damga">Alırdım!</span></div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;span class="damga"&gt;ALIRDIM!&lt;/span&gt;</code></pre></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec tas-sec" id="yonetim-kabugu" aria-labelledby="kabuk-h">
+    <div class="wrap">
+      <span class="eyebrow">06</span>
+      <h2 id="kabuk-h">Yönetim kabuğu</h2>
+      <p class="lead">Yönetim sayfalarının iskeleti: üstte başlık, solda menü, sağda geniş ana alan. Telefonda menü üstte yatay bir şerit olur.</p>
+      <div class="tas-ornek tas-dar">
+        <div class="yonetim" style="border:1px solid var(--line-2);border-radius:var(--r-md);overflow:hidden">
+          <header class="y-bas">
+            <span class="brand"><b>Undustit <i>·</i> yönetim</b></span>
+            <button class="btn alt sm" type="button">Çıkış</button>
+          </header>
+          <div class="y-govde" style="min-height:0">
+            <nav class="y-yan" aria-label="Yönetim menüsü">
+              <a href="#yonetim-kabugu" aria-current="page">Vakalar</a>
+              <a href="#yonetim-kabugu">Fikirler</a>
+              <a href="#yonetim-kabugu">Ayarlar</a>
+            </nav>
+            <div class="y-ana">
+              <p class="eyebrow">Vakalar</p>
+              <h3 style="margin-top:8px">Açık vakalar</h3>
+              <p style="color:var(--ink-2);margin-top:6px">Ana alan burada yer alır.</p>
+            </div>
+          </div>
+        </div>
+        <details class="tas-kod"><summary>Kodu göster</summary><pre><code>&lt;body class="yonetim"&gt;
+&lt;header class="y-bas"&gt;...&lt;/header&gt;
+&lt;div class="y-govde"&gt;
+  &lt;nav class="y-yan" aria-label="Yönetim menüsü"&gt;
+    &lt;a href="..." aria-current="page"&gt;Vakalar&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;main class="y-ana"&gt;...&lt;/main&gt;
+&lt;/div&gt;</code></pre></details>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="bildirimler" id="bildirimler" aria-live="polite"></div>
+<footer data-ud-foot></footer>
+<script src="../assets/ud.js"></script>
+<script>
+(function () {
+  /* colour swatches: read each token and show it as hex (or rgba when it has alpha) */
+  var isimler = ['--bg','--bg-2','--bg-3','--line','--line-2','--ink','--ink-2','--muted','--hint','--accent','--accent-hover','--accent-soft','--brand','--ok','--ok-soft','--warn','--err','--sun','--pink'];
+  var kok = document.documentElement, cs = getComputedStyle(kok), sonda = document.createElement('span');
+  sonda.style.display = 'none'; document.body.appendChild(sonda);
+  function metin(ad) {
+    var ham = cs.getPropertyValue(ad).trim();
+    if (!ham) return null;
+    sonda.style.color = 'var(' + ad + ')';
+    var m = getComputedStyle(sonda).color.match(/[\d.]+/g);
+    if (!m) return ham;
+    var r = +m[0], g = +m[1], b = +m[2], a = m[3] === undefined ? 1 : +m[3];
+    if (a < 1) return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + +a.toFixed(2) + ')';
+    return '#' + [r, g, b].map(function (v) { return ('0' + v.toString(16).toUpperCase()).slice(-2); }).join('');
+  }
+  var kap = document.getElementById('sw');
+  isimler.forEach(function (ad) {
+    var f = document.createElement('figure'), i = document.createElement('i'), c = document.createElement('figcaption');
+    var hex = metin(ad);
+    if (hex) i.style.background = 'var(' + ad + ')'; else i.setAttribute('aria-hidden', 'true');
+    c.innerHTML = '<b></b><span></span>';
+    c.firstChild.textContent = ad;
+    c.lastChild.textContent = hex || 'bu tema tanımlamıyor';
+    f.appendChild(i); f.appendChild(c); kap.appendChild(f);
+  });
+  sonda.remove();
+
+  /* hareket demo: the box springs with --pop; reduced motion is handled by the stylesheet */
+  var zd = document.getElementById('zipla-dugme'), zk = document.getElementById('zipla-kutu');
+  zd.addEventListener('click', function () {
+    var acik = zk.classList.toggle('yukari');
+    zd.setAttribute('aria-pressed', String(acik));
+  });
+
+  /* sekmeler: arrow keys move between tabs, the panel follows */
+  var sekmeler = Array.prototype.slice.call(document.querySelectorAll('#sekmeler-ornek [role="tab"]'));
+  function sec(i) {
+    sekmeler.forEach(function (s, k) {
+      var on = k === i;
+      s.setAttribute('aria-selected', String(on));
+      s.tabIndex = on ? 0 : -1;
+      document.getElementById(s.getAttribute('aria-controls')).hidden = !on;
+    });
+    sekmeler[i].focus();
+  }
+  sekmeler.forEach(function (s, k) {
+    s.addEventListener('click', function () { sec(k); });
+    s.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); sec((k + 1) % sekmeler.length); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); sec((k - 1 + sekmeler.length) % sekmeler.length); }
+    });
+  });
+
+  /* bildirim demo: appends a toast and removes it after four seconds */
+  var kutu = document.getElementById('bildirimler');
+  document.querySelectorAll('[data-bildirim]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = b.getAttribute('data-bildirim');
+      var metinler = { ok: 'Kaydedildi', hata: 'Kayıt yapılamadı', bilgi: 'Vaka iki gün içinde kapanacak' };
+      var el = document.createElement('div');
+      el.className = 'bildirim ' + t;
+      el.textContent = metinler[t];
+      kutu.appendChild(el);
+      setTimeout(function () { el.remove(); }, 4000);
+    });
+  });
+
+  /* diyalog demo */
+  var dlg = document.getElementById('dlg'), dAc = document.getElementById('dlg-ac');
+  dAc.addEventListener('click', function () { dlg.showModal(); });
+  document.querySelectorAll("[data-kapat]").forEach(function (b) { b.addEventListener("click", function () { dlg.close(b.getAttribute("data-kapat")); }); });
+  dlg.addEventListener("close", function () { dAc.focus(); });
+})();
+</script>
+</body>
+</html>

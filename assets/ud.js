@@ -87,7 +87,7 @@ function daysLeft(at){
 }
 const homeHref = () => ROOT || './';
 // stil.js (loaded in <head>) owns the ?stil= choice; without it every page is the default look
-const STIL = window.UD_STIL || { list:{}, current:'kagit', withStil: h => h };
+const STIL = window.UD_STIL || { list:{}, current:'oyuncu', withStil: h => h };
 const withStil = h => STIL.withStil(h);
 
 // =========================================================== nav + footer

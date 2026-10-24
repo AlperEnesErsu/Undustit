@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="vaka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vaka · Undustit</title>
+<meta name="description" content="Undustit vakası: bir üretici, bir stok ve bir soru. Fikrini yaz, talebi birlikte ölçelim.">
+<meta name="theme-color" content="#FFF6E9">
+<link rel="stylesheet" href="../assets/fonts/base.css">
+<link rel="stylesheet" href="../assets/ud.css">
+<link rel="stylesheet" href="../assets/bilesen.css">
+<script src="../assets/stil.js"></script>
+<style>
+/* Veriden beslenen vaka sayfası: yalnız bu sayfanın düzeni. */
+.vaka-sayfa{padding-block:clamp(48px,7vw,96px) clamp(40px,5vw,72px)}
+.vaka-ust{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.vaka-sayfa h1{font-size:clamp(40px,5.6vw,80px);line-height:.98;letter-spacing:-.03em;max-width:18ch;overflow-wrap:anywhere}
+.vaka-bilgi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:8px 0 0;border-top:1px solid var(--line);width:100%}
+.vaka-bilgi > div{padding:12px 16px 0 0;display:grid;gap:2px;min-width:0}
+.vaka-bilgi > div + div{padding-inline-start:16px;border-inline-start:1px solid var(--line)}
+.vaka-bilgi dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.vaka-bilgi dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.vaka-metin{max-width:68ch;display:grid;gap:12px;color:var(--ink-2);font-weight:300}
+.vaka-gorsel{margin:0;max-width:420px}
+.vaka-gorsel img{display:block;width:100%;height:auto;border-radius:var(--r-md);border:1px solid var(--line)}
+.vaka-eylem{margin-top:8px}
+@media (max-width:720px){.vaka-bilgi{grid-template-columns:repeat(2,minmax(0,1fr))}.vaka-bilgi > div:nth-child(3){padding-inline-start:0;border-inline-start:0}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1">
+  <div class="wrap vaka-sayfa" id="kabuk">
+    <p class="lead">Yükleniyor…</p>
+  </div>
+</main>
+<footer data-ud-foot></footer>
+
+<script src="../assets/ud.js"></script>
+<script src="../assets/ayar.js"></script>
+<script src="../assets/veri.js"></script>
+<script>
+(function(){
+'use strict';
+var kap = document.getElementById('kabuk');
+var id = (new URLSearchParams(location.search).get('id') || '').trim();
+var enc = encodeURIComponent;
+
+function esc(v){
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
+    return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c];
+  });
+}
+function sayi(v){
+  return v == null || v === '' || !isFinite(Number(v)) ? '—' : Number(v).toLocaleString('tr-TR');
+}
+
+function bulunamadi(){
+  document.title = 'Vaka bulunamadı · Undustit';
+  kap.innerHTML = '<div class="bos"><b>Bu vaka bulunamadı</b>' +
+    '<p>Bağlantı yanlış olabilir ya da vaka henüz yayında değil.</p>' +
+    '<a class="btn sig sm" href="../vakalar/">Vakalara dön</a></div>';
+}
+
+function ciz(v){
+  var durumAd = UDV.DURUM_ADI[v.durum] || v.durum;
+  document.title = v.baslik + ' · Undustit';
+  var paragraflar = String(v.aciklama || '').split(/\n\s*\n/).map(function(p){ return p.trim(); }).filter(Boolean);
+  var gorsel = /^https?:\/\//i.test(v.gorsel || '') ? v.gorsel : '';
+
+  kap.innerHTML =
+    '<section class="phead" aria-labelledby="vb">' +
+      '<div class="vaka-ust"><span class="eyebrow">Vaka</span>' +
+        '<span class="rozet" data-durum="' + esc(v.durum) + '">' + esc(durumAd) + '</span></div>' +
+      '<h1 id="vb">' + esc(v.baslik) + '</h1>' +
+      (v.ozet ? '<p class="lead">' + esc(v.ozet) + '</p>' : '') +
+      '<dl class="vaka-bilgi">' +
+        '<div><dt>Adet</dt><dd>' + sayi(v.adet) + '</dd></div>' +
+        '<div><dt>Ölçü</dt><dd>' + esc(v.olcu || '—') + '</dd></div>' +
+        '<div><dt>Sınıf</dt><dd>' + esc(v.sinif || '—') + '</dd></div>' +
+        '<div><dt>Deneme partisi</dt><dd>' + (v.deneme_adedi ? sayi(v.deneme_adedi) + ' adet' : '—') + '</dd></div>' +
+      '</dl>' +
+      (gorsel ? '<figure class="vaka-gorsel"><img src="' + esc(gorsel) + '" alt="' + esc(v.baslik) + '" loading="lazy"></figure>' : '') +
+      (paragraflar.length ? '<div class="vaka-metin">' + paragraflar.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' : '') +
+      '<div class="vaka-eylem"><a class="btn sig" href="../fikir/?vaka=' + enc(v.id) + '">Bu vakaya fikir yaz ' + UD.ICON.arrow + '</a></div>' +
+    '</section>';
+}
+
+function hataGoster(err){
+  kap.innerHTML = '<div class="bos"><b>Vaka yüklenemedi</b><p>' + esc(err && err.message) + '</p>' +
+    '<a class="btn alt sm" href="../vakalar/">Vakalara dön</a></div>';
+}
+
+if (!id){
+  bulunamadi();
+} else {
+  Promise.resolve(UDV.hazir)
+    .then(function(){ return UDV.vakalar.al(id); })
+    .then(function(v){
+      if (!v || v.durum === 'taslak') return bulunamadi();
+      ciz(v);
+    })
+    .catch(hataGoster);
+}
+})();
+</script>
+</body>
+</html>

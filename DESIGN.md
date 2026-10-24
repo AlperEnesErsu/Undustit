@@ -49,6 +49,23 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
   sonradan hazır bir çizim olarak beliriyordu; fikrin ürüne dönüştüğü görünmüyordu.
 - "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
+## Ürüne geçiş: Oyun tasarım dili, veri katmanı, yönetim (24 Ekim 2026)
+
+- **Oyuncu artık varsayılan görünüm**; Kâğıt `?stil=kagit` ile açılır. Yeni bileşenler önce Oyuncu için.
+- **Sözleşme:** `docs/urun-sozlesmesi.md` bileşen sınıflarını, `window.UDV` veri arayüzünü ve yönetim
+  sayfalarını sabitler; üç parça buna göre ayrı ayrı yazıldı.
+- **Tasarım sistemi:** `assets/bilesen.css` (alan, anahtar, rozet, tablo, araç çubuğu, sekme, panel,
+  istatistik, ilerleme, bildirim, boş durum, zaman çizelgesi, diyalog, yönetim iskeleti, damga), Oyuncu'ya
+  özgü hâli `oyuncu.css` sonunda. Canlı rehber: `/tasarim/`.
+- **Veri:** `assets/veri.js` + `assets/ayar.js`. Supabase bilgisi boşken yerel mod (tarayıcıda, Vaka 01
+  hazır; deneme yöneticisi `admin@undustit.local` / `undustit`). Bilgi girilince Supabase. Şema ve erişim
+  kuralları `supabase/sema.sql`, kurulum `supabase/KURULUM.md`.
+- **Yönetim:** `/yonetim/` (özet, vaka listesi, arama, durum filtresi), `/yonetim/vaka/` (oluştur, düzenle,
+  durum geçişi notlu, fikir gizleme, kazanan seçme, geçmiş, CSV). Herkese açık, veriden beslenen vaka
+  sayfası `/vaka/?id=…`.
+- **Açık:** yerel moddaki deneme şifresi kodda görünür; yalnız o tarayıcının verisini etkiler ama gerçek
+  koruma Supabase'e geçince başlar. Supabase modu henüz bir projeyle denenmedi.
+
 ## Metin altyapısı, İngilizce ve yazı tipi (24 Ekim 2026)
 
 **Metin altyapısı.** Sitedeki her yazı `assets/metin/tr.js` ve `assets/metin/en.js` sözlüklerinde

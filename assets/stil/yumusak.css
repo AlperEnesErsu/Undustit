@@ -1,19 +1,19 @@
 /* Yumuşak: warm soft-SaaS, the everyday-app feel. Warm white with pastel section fields, a rounded
    heavy sans, pill buttons that sit on a chunky shade of their own colour and sink when pressed,
    coral for actions, teal for progress. The "alırdım" button squishes and pops when you commit.
-   Contrast on --bg: ink 13.8, ink-2 8.2, muted 5.3, accent 5.0 (white on accent 5.1), ok 4.9.
-   On the pastel fields muted stays above 4.6. */
+   Contrast on --bg: ink 13.8, ink-2 8.2, muted 5.3, accent 5.0 (white on accent 5.1), ok 6.3 (muted and ok darkened after the round-2 jury found 4.44-4.46 on the pastel fields).
+   On the pastel fields muted stays above 5.5. */
 @import url("../fonts/yumusak.css");
 @font-face{font-family:"Nunito Fallback";font-weight:100 600;src:local("Arial"),local("ArialMT");size-adjust:101.08%;ascent-override:99.92%;descent-override:34.63%;line-gap-override:0%}
 @font-face{font-family:"Nunito Fallback";font-weight:700 900;src:local("Arial Bold"),local("Arial-BoldMT");size-adjust:101.51%;ascent-override:99.5%;descent-override:34.48%;line-gap-override:0%}
 
 :root{
   --bg:#FFFBF5; --bg-2:#FFFFFF; --bg-3:#FFF1E6; --line:#F0E6DA; --line-2:#E2D5C6;
-  --ink:#2A2A35; --ink-2:#4D4B5C; --muted:#6B6879; --hint:#8A8797;
+  --ink:#2A2A35; --ink-2:#4D4B5C; --muted:#5C5969; --hint:#8A8797;
   --accent:#C93A1C; --accent-hover:#B5321A; --accent-active:#9E2C13; --accent-ink:#FFFFFF;
   --accent-soft:rgba(201,58,28,.08); --accent-line:rgba(201,58,28,.35);
   --accent-deep:#8E2610;
-  --brand:#C93A1C; --ok:#0D7C70; --ok-soft:rgba(13,124,112,.1); --warn:#8A5A00; --err:#B42318;
+  --brand:#C93A1C; --ok:#0A6A5F; --ok-soft:rgba(13,124,112,.1); --warn:#8A5A00; --err:#B42318;
   --peach:#FFE9DD; --mint:#DFF5EA; --lilac:#ECE6FF;
   --f-serif:"Nunito","Nunito Fallback",system-ui,sans-serif;
   --f-body:"Nunito","Nunito Fallback",system-ui,sans-serif;
@@ -126,7 +126,7 @@ html h1 em,html h2 em,html .cb-h em,html .mission q em{font-style:normal;color:v
   .hero-l > .eyebrow,.phead > .eyebrow{animation:pop-in 600ms cubic-bezier(.34,1.56,.64,1) both}
   .disc a:hover{transform:translateY(-4px) rotate(-.6deg);transition:transform 260ms var(--spring)}
 }
-@keyframes pop-in{from{opacity:.01;transform:scale(.6)}}
+@keyframes pop-in{from{transform:scale(.6)}}
 
 /* page titles: the 14ch cap is fixed in em, so the box is the same width before and after the font loads */
 .phead h1{max-width:8.4em}

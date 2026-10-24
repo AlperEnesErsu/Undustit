@@ -116,6 +116,18 @@ görünüm değişir. Her stil ayrı bir site gibi açılır:
 - Sayfa başlıklarının `14ch` sınırı Oyuncu (8,32em) ve Yumuşak'ta (8,4em) em'e sabitlendi: `ch` yazı
   tipine bağlı olduğu için kutu, yazı tipi yüklenince daralıp başlığı yeniden kırıyordu.
 - Telefonda kategori çipleri tek satırda yatay kayar (ekranı doldurmuyordu).
+- 2. jüri turu (24 Ekim 2026, `.jury/styles/scorecard.md`): Kâğıt 7,0, Oyuncu 7,1, Premium 7,1, Yumuşak
+  7,1, Teknik 6,0 (kaydırınca boş ekran hatası; düzeltildi). Karşılaştırma jürisi Yumuşak'ın çıkarılmasını
+  ve bugün seçilecekse Kâğıt'ı (mavi yerine logodaki kiremit turuncusu tek vurgu olarak) önerdi; ikisi de
+  ürün sahibinin kararına bırakıldı.
+- Ortaya çıkış artık saydamlıkla değil kırpma maskesiyle (`clip-path`): metin hiçbir an yarı saydam
+  olmaz, erişilebilirlik tarayıcıları sayfa açılışında kontrast hatası bulmaz (önce 38–57 düğüm).
+  Hızlı yolculuk (bağlantı, End, savurma, araçların `scrollTo`'su) son 150 ms'deki hızla algılanır ve
+  bloklar anında gösterilir; okuma hızında kaydırma animasyonlu kalır.
+- Vakalar, Hikâye ve Fikirler başlıklarının sağında vaka çizimiyle aynı elden çizimler: palet üstünde
+  stok, tozu alınan raf, fiyat etiketli talep kürsüsü (`.phead.has-art`, `.ph-art`).
+- Yazı tipleri `assets/fonts/` altında woff2 (latin + latin-ext), stil başına başlık yazı tipi önden
+  yüklenir (`stil.js`). Google'a istek yok.
 - Logo `lang="en"` taşır ki büyük harf yapan stillerde "UNDUSTİT" değil "UNDUSTIT" yazsın.
 - `404.html` tek dosyalık olduğu için stil almaz; her zaman Kâğıt görünür.
 

@@ -88,6 +88,11 @@ gece mavisi `#1F2F86`; köşeler 22→14 px; yumuşak gölge yerine kıl çizgi 
 sayfa başlıkları bir boy büyük ve daha sıkı; etiketlerin önünde katalog tarzı kısa çizgi; bölümler
 arası daha fazla boşluk. axe 0 ciddi sorun, CLS ≤ 0,017.
 
+Kâğıt ikinci geçiş: kutular yerine katalog gibi çizgili sütunlar (fikir listesi, yan notlar, vaka
+adımları, "Her şey açıkta"); %10 / %30 gibi rakamlar yeşilden mürekkebe; vaka etiketi sade çerçeve;
+altbilgide büyük serif "Undust*it*" imzası (yalnız Kâğıt); açılış hareketi daha yavaş ve hafif
+bulanıktan netleşen (1000 ms, 110 ms kademe).
+
 Aşağıdaki bölümler beş stilli dönemin kaydıdır.
 
 ## Stiller: aynı site, dört görünüm (22 Ekim 2026)

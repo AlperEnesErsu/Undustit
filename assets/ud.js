@@ -85,7 +85,7 @@ function mountChrome(){
   const foot = $('[data-ud-foot]');
   if (foot){
     foot.className = 'foot';
-    foot.innerHTML = `<div class="wrap"><span>Undustit · prototip · <span class="mode-badge" id="mode-badge"><i></i>bağlanıyor</span></span>
+    foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>Undustit · prototip · <span class="mode-badge" id="mode-badge"><i></i>bağlanıyor</span></span>
       <nav aria-label="Alt menü"><a href="${ROOT}fikir/">Fikrini yaz</a><a href="${ROOT}fikirler/">Fikirler</a><a href="${ROOT}nasil/">Nasıl işler</a><a href="${ROOT}vakalar/">Vakalar</a><a href="${ROOT}hikaye/">Hikâye</a></nav></div>
       <div class="wrap stil-bar"><span>Stil</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${location.pathname}${k === 'kagit' ? '' : '?stil=' + k}"${k === STIL.current ? ' aria-current="true"' : ''}>${l}</a>`).join('')}<a data-stil-link href="${ROOT}stiller/">Hepsi yan yana</a></div>`;
   }

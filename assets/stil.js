@@ -3,14 +3,14 @@
    so each style opens as its own site and two tabs in two styles never affect each other. */
 (function(){
   'use strict';
-  var LIST = { kagit:'Kâğıt', oyuncu:'Oyuncu', teknik:'Teknik çizim', yumusak:'Yumuşak', premium:'Premium' };
+  var LIST = { kagit:'Kâğıt', oyuncu:'Oyuncu' };
   var base = document.currentScript.src.replace(/assets\/stil\.js.*$/, '');
   var q = new URLSearchParams(location.search).get('stil');
   var stil = LIST[q] ? q : 'kagit';
   window.UD_STIL = { list: LIST, current: stil, withStil: withStil };
   document.documentElement.setAttribute('data-stil', stil);
   // the heading face is what the first screen waits for, so ask for it before the stylesheets find it
-  var HEAD = { kagit:'instrument-serif-normal-400', oyuncu:'bricolage-grotesque-normal-500_800', teknik:'ibm-plex-sans-condensed-normal-600', premium:'inter-tight-normal-300', yumusak:'nunito-normal-500' }[stil];
+  var HEAD = { kagit:'instrument-serif-normal-400', oyuncu:'bricolage-grotesque-normal-500_800' }[stil];
   ['latin', 'latin-ext'].forEach(function(sub){ document.write('<link rel="preload" as="font" type="font/woff2" crossorigin href="' + base + 'assets/fonts/' + HEAD + '-' + sub + '.woff2">'); });
   if (stil !== 'kagit') document.write('<link rel="stylesheet" href="' + base + 'assets/stil/' + stil + '.css">');
 

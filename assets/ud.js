@@ -324,7 +324,7 @@ function sortIdeas(list, by){
 }
 const tl = n => Math.round(n).toLocaleString('tr-TR') + ' ₺';
 // "Alırdım": one tap opens a price field in place; saving it counts as purchase intent at that price.
-// The card that was just saved gets .just once, so a style can celebrate it (Yumuşak squishes and pops).
+// The card that was just saved gets .just once, so a style can celebrate it.
 let justBought = null;
 function buyCtl(i){
   const box = el('div', { class:'buy' });

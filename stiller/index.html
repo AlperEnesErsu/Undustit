@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Stil panosu · Undustit</title>
-<meta name="description" content="Undustit'in aynı içerikle beş farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır.">
+<meta name="description" content="Undustit'in aynı içerikle iki farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#FAF9F6">
+<meta name="theme-color" content="#F8F6F1">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Undustit">
 <meta property="og:locale" content="tr_TR">
@@ -33,7 +33,7 @@
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .styles{display:grid;gap:20px}
 .styles.desk{grid-template-columns:repeat(2,minmax(0,1fr))}
-.styles.phone{grid-template-columns:repeat(5,minmax(200px,1fr));overflow-x:auto;padding-bottom:8px}
+.styles.phone{grid-template-columns:repeat(2,minmax(200px,1fr));overflow-x:auto;padding-bottom:8px}
 .style{display:grid;gap:12px;align-content:start;padding:12px 12px 16px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2);transition:border-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
 .style:hover{border-color:var(--ink-2);transform:translateY(-2px)}
 .style header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-inline:6px}
@@ -66,8 +66,8 @@ dialog.view.is-phone iframe{width:390px;height:min(844px,100%);border-radius:24p
 <main id="main" tabindex="-1" class="wrap">
   <div class="phead">
     <span class="eyebrow">Stil örnekleri</span>
-    <h1>Aynı site, <em>beş stil.</em></h1>
-    <p class="lead">Bir sayfa seç, beş stilde yan yana gör. Önizlemelerin hepsi canlı site; birine tıklayınca büyür, içinde gezinip animasyonları oynatabilirsin. Her biri ayrı bir site olarak da açılır.</p>
+    <h1>Aynı site, <em>iki stil.</em></h1>
+    <p class="lead">Bir sayfa seç, iki stilde yan yana gör. Önizlemelerin hepsi canlı site; birine tıklayınca büyür, içinde gezinip animasyonları oynatabilirsin. Her biri ayrı bir site olarak da açılır.</p>
   </div>
   <div class="board-bar" role="toolbar" aria-label="Görünüm seçimi">
     <div class="grp"><span id="pg-l">Sayfa</span><div class="seg" role="group" aria-labelledby="pg-l" id="pages"></div></div>
@@ -85,10 +85,7 @@ dialog.view.is-phone iframe{width:390px;height:min(844px,100%);border-radius:24p
 <script>
 const STYLES = [
   ['kagit','Kâğıt','Sıcak kâğıt beyazı, editoryal serif başlıklar; mavi yalnız eylemde. Sakin ve güvenilir.'],
-  ['oyuncu','Oyuncu','Quirky havası: kalın grotesk, mürekkep çerçeve ve sert gölge, sarı işaretleyici.'],
-  ['teknik','Teknik çizim','Mavi pafta ve ızgara, dar büyük harfli başlıklar, mono etiketler. Üretim hissi.'],
-  ['premium','Premium','Sessiz lüks: derin siyah, ince büyük başlıklar, tek beyaz hap düğme, şampanya dokunuşlar.'],
-  ['yumusak','Yumuşak','Gündelik uygulama sıcaklığı: pastel bölümler, yuvarlak kalın yazı, basınca gömülen düğmeler.']
+  ['oyuncu','Oyuncu','Quirky havası: kalın grotesk, mürekkep çerçeve ve sert gölge, sarı işaretleyici.']
 ];
 const PAGES = [['', 'Ana sayfa'], ['fikir/', 'Fikir yaz'], ['fikirler/', 'Fikirler'], ['nasil/', 'Nasıl işler'], ['vakalar/', 'Vakalar'], ['vaka-01/', 'Vaka 01'], ['hikaye/', 'Hikâye']];
 const DEVICES = [['masaustu', 'Masaüstü', 1440, 900], ['telefon', 'Telefon', 390, 760]];

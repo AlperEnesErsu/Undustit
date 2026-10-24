@@ -474,3 +474,36 @@ dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
   *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}
   ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
 }
+
+/* ---------- Kâğıt, premium pass (owner's pick, 24 Oct 2026)
+   Same paper and same rule (blue only for what you act on), set quieter and richer: ivory paper with a
+   faint grain, a deep midnight blue instead of the default-looking one, tighter radii, hairlines in
+   place of soft shadows, bigger and tighter headlines, more air between sections.
+   Scoped to Kâğıt so Oyuncu keeps its own tokens. Contrast on --bg: ink 16.9, ink-2 8.6, muted 5.1, accent 10.4. */
+:root[data-stil="kagit"]{
+  --bg:#F8F6F1; --bg-2:#FDFCF9; --bg-3:#F0EDE5; --line:#E4DFD4; --line-2:#CFC8BA;
+  --ink:#141519; --ink-2:#43464D; --muted:#686B71; --hint:#74777D;
+  --accent:#1F2F86; --accent-hover:#18256E; --accent-active:#121C55;
+  --accent-soft:rgba(31,47,134,.06); --accent-line:rgba(31,47,134,.3);
+  --shadow:0 1px 0 rgba(20,21,25,.04),0 30px 60px -40px rgba(20,21,25,.22);
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+}
+[data-stil="kagit"] body::before{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;opacity:.035;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+[data-stil="kagit"] .nav{background:rgba(248,246,241,.82)}
+[data-stil="kagit"] .btn.sig:hover{box-shadow:0 0 0 4px rgba(31,47,134,.14)}
+[data-stil="kagit"] .iform:focus-within{box-shadow:0 0 0 6px rgba(31,47,134,.07)}
+[data-stil="kagit"] .pc-stage{background:radial-gradient(60% 60% at 60% 60%,rgba(31,47,134,.04),transparent 70%),var(--bg)}
+/* type: headlines a size up and set tighter; eyebrows get a hairline lead-in like a printed catalogue */
+[data-stil="kagit"] h1{letter-spacing:-.035em}
+[data-stil="kagit"] .phead h1{font-size:clamp(52px,7.6vw,120px);line-height:.92}
+[data-stil="kagit"] .sec h2{font-size:clamp(40px,5vw,72px);letter-spacing:-.03em;line-height:.98}
+[data-stil="kagit"] .phead > .eyebrow,[data-stil="kagit"] .hero-l > .eyebrow,[data-stil="kagit"] .sec .wrap > .eyebrow{display:inline-flex;align-items:center;gap:12px}
+[data-stil="kagit"] .phead > .eyebrow::before,[data-stil="kagit"] .hero-l > .eyebrow::before,[data-stil="kagit"] .sec .wrap > .eyebrow::before{content:"";width:28px;height:1px;background:currentColor}
+[data-stil="kagit"] .eyebrow{letter-spacing:.16em}
+/* surfaces: hairline, no float; cards lift by their border, not a shadow */
+[data-stil="kagit"] .sec{padding-block:clamp(72px,9vw,136px)}
+[data-stil="kagit"] .case-band,[data-stil="kagit"] .iform,[data-stil="kagit"] .pc-stage{box-shadow:var(--shadow)}
+[data-stil="kagit"] .icard:hover{border-color:var(--ink-2);background:var(--bg-2)}
+[data-stil="kagit"] .btn{letter-spacing:.005em}
+[data-stil="kagit"] .foot{border-top-color:var(--line-2)}

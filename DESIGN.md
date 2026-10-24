@@ -49,6 +49,20 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
   sonradan hazır bir çizim olarak beliriyordu; fikrin ürüne dönüştüğü görünmüyordu.
 - "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
+## Karar: Kâğıt ve Oyuncu (24 Ekim 2026)
+
+Ürün sahibiyle görüşmede Kâğıt ve Oyuncu beğenildi; proje bu ikisiyle ilerliyor. Teknik çizim,
+Premium ve Yumuşak tamamen kaldırıldı (stil dosyaları, yazı tipleri, stil panosu kartları).
+Eski `?stil=teknik|premium|yumusak` bağlantıları Kâğıt'a düşer.
+
+Kâğıt'a premium katman (`ud.css` sonunda, yalnız `data-stil="kagit"`): fildişi kâğıt `#F8F6F1` ve
+çok hafif kâğıt dokusu; mavi aynı kuralla (yalnız eylemde) ama varsayılan görünen `#2337C6` yerine
+gece mavisi `#1F2F86`; köşeler 22→14 px; yumuşak gölge yerine kıl çizgi + çok uzak, silik gölge;
+sayfa başlıkları bir boy büyük ve daha sıkı; etiketlerin önünde katalog tarzı kısa çizgi; bölümler
+arası daha fazla boşluk. axe 0 ciddi sorun, CLS ≤ 0,017.
+
+Aşağıdaki bölümler beş stilli dönemin kaydıdır.
+
 ## Stiller: aynı site, dört görünüm (22 Ekim 2026)
 
 Ürün sahibi aynı siteyi farklı tarzlarda görmek istedi. İçerik, sayfalar ve akış tek; yalnız
@@ -166,5 +180,5 @@ Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist
 - Menü: Fikirler · Nasıl işler · Vakalar · Hikâye + "Fikrini yaz". 900 px altında menü bir
   düğmenin açtığı panele taşınır, "Fikrini yaz" görünür kalır.
 - Her hareketin `prefers-reduced-motion` karşılığı var. Sayfalar arası geçiş `@view-transition` ile.
-- 404 sayfası linkleri kök (`/`) varsayar; site bir alt klasörde yayınlanırsa güncellenmeli.
+- 404 sayfası köke göre bağlanır; GitHub Pages'te (`/Undustit/`) kökü kendisi bulur.
 - Sayfalar yalnız Türkçe; eski Vaka 01'deki TR/EN seçimi taşınmadı.

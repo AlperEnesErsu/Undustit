@@ -6,12 +6,21 @@
 <title>Fikirler · Undustit</title>
 <meta name="description" content="Talep toplayan fikirler. Alırdım de ve fiyat yaz, tasarım, pazar ve uygulanabilirlik açısından puanla, iyileştirme öner ya da endişeni yaz.">
 <meta name="theme-color" content="#FAF9F6">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Undustit">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:image" content="../assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="../assets/og.png">
 <meta property="og:title" content="Fikirler · Undustit">
 <meta property="og:description" content="Talep toplayan fikirler: alırdım de, puanla, geliştir.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
+<script src="../assets/stil.js"></script>
 <style>
 .bar{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center;padding-block:18px;border-block:1px solid var(--line);margin-bottom:24px;position:sticky;top:68px;z-index:5;background:var(--bg)}
 .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
@@ -31,10 +40,18 @@
 <a class="skip" href="#main">İçeriğe geç</a>
 <header data-ud-nav></header>
 <main id="main" tabindex="-1" class="wrap">
-  <div class="phead">
+  <div class="phead has-art">
     <span class="thu" id="thu" style="justify-self:start"></span>
     <h1>Yarışan <em>fikirler.</em></h1>
     <p class="lead">Gerçekten alacağın fikre “alırdım” de ve kaça alacağını yaz. Fikre girip üç ölçütte puanla, nasıl daha iyi olacağını ya da neden endişelendiğini yaz. Hepsi ücretsiz.</p>
+      <figure class="cb-art ph-art" aria-hidden="true"><svg viewBox="0 0 260 150">
+      <g class="cb-l"><path d="M66 82h42v44H66z"/><path d="M108 62h44v64h-44z"/><path d="M152 94h42v32h-42z"/>
+      <path d="M113 34h34v14h-34z"/><path d="M71 56h32v14H71z"/><path d="M157 70h32v14h-32z"/>
+      <path class="th" d="M130 48v14M87 70v12M173 84v10"/></g>
+      <path class="cb-c" d="M20 126H240"/>
+      <g class="cb-d"><text x="130" y="44.5" text-anchor="middle">₺260</text><text x="87" y="66.5" text-anchor="middle">₺240</text><text x="173" y="80.5" text-anchor="middle">₺220</text>
+        <text x="130" y="100" text-anchor="middle">1</text><text x="87" y="110" text-anchor="middle">2</text><text x="173" y="116" text-anchor="middle">3</text></g>
+    </svg><figcaption>Talep sırası</figcaption></figure>
   </div>
   <div class="bar">
     <div class="seg" role="group" aria-label="Sıralama"><button type="button" data-s="top" aria-pressed="true">En çok talep</button><button type="button" data-s="new" aria-pressed="false">En yeni</button></div>

@@ -39,10 +39,97 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
   sözcüğü kalır, çünkü orada gerçekten seçim yapılır.
 - Açık vaka kartı (`mountCase`): "Bu vakaya fikir yaz" sayfa değiştirmez; aynı sayfadaki
   formu vaka seçili açar.
-- Süreç animasyonu kaydırmaya bağlı değil ve dört adımdır: Yaz → Alırdım → Ön satış → Kazan.
-  Ekrana girince yaklaşık 5,5 sn'de bir kez oynar, ürün (katlanır kesme tahtası) gerçekten
-  çizilir, sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
+- Süreç animasyonu "eskizden rafa" (23 Ekim 2026): kaydırmaya bağlı değil, ekrana girince yaklaşık
+  7,5 sn'de bir kez oynar, sonunda "Tekrar oynat". Altı adım: Eskiz → Talep → Ortak tasarım → Prototip →
+  Ön satış → Raf. Aynı çizim baştan sona yaşar: fikir yazılırken kaba bir kurşun kalem eskizi çizilir,
+  çevresinde fiyat balonları belirir, topluluğun notları (isim, renk, ambalaj) iğnelenirken titrek
+  çizgiler CSS `d` geçişiyle düzgün çizgiye dönüşür (Safari'de dönüşüm yok, eskiz titrek kalır), sonra
+  ahşap, ölçüler ve katlanma hareketi gelir, ürün kraft kutuya girer, kutular dizilir, tezgâh rafa
+  dönüşür ve pay kartı çıkar. Hareketi azalt açıkken doğrudan son kare. Eski genel animasyonda ürün
+  sonradan hazır bir çizim olarak beliriyordu; fikrin ürüne dönüştüğü görünmüyordu.
 - "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
+
+## Stiller: aynı site, dört görünüm (22 Ekim 2026)
+
+Ürün sahibi aynı siteyi farklı tarzlarda görmek istedi. İçerik, sayfalar ve akış tek; yalnız
+görünüm değişir. Her stil ayrı bir site gibi açılır:
+
+| Stil | Bağlantı | Dosya | Özü |
+|---|---|---|---|
+| Kâğıt | `/` | (varsayılan, `ud.css`) | Sıcak kâğıt, editoryal serif, mavi yalnız eylemde |
+| Oyuncu | `/?stil=oyuncu` | `assets/stil/oyuncu.css` | Krem zemin, Bricolage Grotesque, mürekkep çerçeve + sert gölge, mor eylem, sarı işaretleyici |
+| Teknik çizim | `/?stil=teknik` | `assets/stil/teknik.css` | Mavi pafta + ızgara, IBM Plex Condensed büyük harf, mono etiketler, kesikli çizgi, sarı eylem |
+| Premium | `/?stil=premium` | `assets/stil/premium.css` | Sessiz lüks: sıcak derin siyah `#0A0A0A`, Inter Tight 300 büyük başlıklar (ikinci yarı gri), geniş aralıklı mono etiketler, tek beyaz hap düğme, şampanya `#CDB892` yalnız logo/canlı nokta/odak; gölge yok |
+| Yumuşak | `/?stil=yumusak` | `assets/stil/yumusak.css` | Warm Soft-SaaS: sıcak beyaz + pastel bölümler, Nunito 800–900, kendi renginin koyu tonuna oturan ve basınca gömülen hap düğmeler, mercan eylem, turkuaz ilerleme |
+
+- `assets/stil.js` her sayfanın `<head>`'inde çalışır: `?stil=` değerini okur, stil dosyasını
+  sayfa çizilmeden yükler ve bütün iç bağlantılara aynı `?stil=` değerini ekler. Stil tarayıcıya
+  kaydedilmez; bu yüzden dört stil ayrı sekmelerde yan yana açılabilir, birbirini etkilemez.
+- `stiller/` stil panosu: üstte sayfa seçici (7 sayfa) ve Masaüstü/Telefon anahtarı; seçilen sayfa beş
+  stilde canlı önizlemeyle yan yana görünür. Önizlemeye tıklayınca tam boy ve kullanılabilir açılır,
+  "Yeni sekmede aç" ayrı site olarak açar. Seçim adreste durur (`?sayfa=nasil/&cihaz=telefon`), yani
+  belli bir karşılaştırma bağlantı olarak paylaşılabilir. Her sayfanın alt bilgisinde stiller arası geçiş satırı var.
+- Stil dosyaları yalnız token'ları ve bileşen görünümünü ezer; düzen ve içerik `ud.css` /
+  sayfalarda kalır. Yeni bir stil = yeni bir `assets/stil/<ad>.css` + `stil.js` içindeki listeye bir satır.
+- Kontrast her stil dosyasının başında yazılı; metin çiftleri AA'yı geçer. Oyuncu'daki turuncu
+  (`--brand`, 3.7) yalnız büyük logo harfinde ve canlı yayın noktasında kullanılır.
+- Jüri turu (22 Ekim 2026, `.jury/styles/scorecard.md`): dört stil tek tek 6,8–7,1 aldı, hepsi
+  "düzeltilerek kalsın". Karşılaştırma jürisi El yapımı'nı çıkardı: Kâğıt'la aynı şeyi söylüyordu ve
+  el yazısı pay oranlarında ve sanayi teklifinde güveni zayıflatıyordu. Eksik kalan yumuşak/yuvarlak
+  tüketici uygulaması hissi için UI-UX kit'in Warm Soft-SaaS arketipinden (Duolingo profili) Yumuşak
+  eklendi. Duolingo'nun açık yeşili ve önerilen açık mercan kontrastı geçmediği için eylem rengi
+  `#C93A1C` (beyaz yazı 5,1). Yumuşak'ın imzası: "Alırdım" kaydedilince düğme ezilir ve küçük bir
+  konfeti patlar (`ud.js` kaydedilen kartı bir kez `.just` ile işaretler; diğer stiller bunu kullanmaz).
+- Jüri sonrası ortak düzeltmeler (dört stile birden):
+  - Sayfa geçişi: menü yerinde kalır, eski sayfa 220 ms'de yukarı kalkar, yenisi 420 ms'de aşağıdan
+    yükselir (`::view-transition-*`). Varsayılan çapraz geçiş görünmeyecek kadar kısaydı.
+  - Erişilebilirlik: "Alırdım" düğmesinin adı görünen metinle başlar, fikir adı ekran okuyucuya
+    gizli metinle eklenir; animasyon sahnesi artık `role="img"` değil (içinde düğme vardı), anlatımı
+    gizli bir paragrafta. Kontrollerde arada boşluklu mürekkep odak halkası; yazma alanında görünür odak.
+    Tek başına duran bağlantılar 24 px dokunma yüksekliği alır.
+  - Hover: seçili çip ve sıralama düğmeleri, "Alırdım", "Tekrar oynat", "Bağlantıyı kopyala" ve
+    bağlantılar artık yalnız renk değiştirmiyor (kalkma, dolgu, kalınlaşan alt çizgi).
+  - Kayma: başlık yazı tipleri `display=block` ve ölçülmüş yedeklerle yüklenir (`size-adjust`,
+    `ascent/descent-override`; Instrument Serif→Georgia %76,73, Bricolage→Arial Bold %91,58,
+    Plex Condensed→Arial Bold %88,44, Nunito→Arial %101,08 / Arial Bold %101,51; iki kalın yazı tipi ilk ölçümde %13 yanlıştı, gerçek başlıklarla yeniden ölçüldü). JS'in doldurduğu
+    form ve animasyon alanına baştan yer ayrılır; `main` en az bir ekran boyu, alt bilgi ilk ekranda
+    başlamaz. Masaüstü CLS 0,15–0,38'den 0–0,05'e indi; Oyuncu'nun Hikâye sayfası (büyük ilk harf) 0,05.
+  - Yazı tipleri: Geist 300–600'e indirildi, Yumuşak'ta Nunito 400/600 kaldırıldı.
+  - Paylaşım: `assets/og.png` (1200×630) ve `og:*`, `twitter:card` her sayfada; üç uzun açıklama
+    160 karakterin altına indi. **Alan adı belli olunca** `og:image` mutlak adrese çevrilmeli,
+    `canonical` ve `sitemap.xml` eklenmeli (şimdi göreli olduğu için bazı platformlar görseli okumaz).
+- Premium (23 Ekim 2026): ürün sahibi "sade ama ultra premium" bir seçenek istedi. UI-UX kit'ten
+  Bugatti'nin tek renkli sadeliği ve Apple'ın beyaz hap düğmesi alındı. Eylem rengi beyaz (siyah yazı
+  17,9), şampanya yalnız küçük dokunuşlarda; Inter Tight için ölçülmüş Arial yedeği (%95,33 / %93,77)
+  kaymayı önler. Henüz jüriye girmedi.
+- Hareket katmanı (23 Ekim 2026). Önceden süreç animasyonu ve hover dışında hiçbir şey oynamıyordu;
+  iç sayfalar tamamen durağandı ve Teknik'in hiç kendi hareketi yoktu.
+  - Ortak (`ud.js` `mountMotion`, `ud.css`): sayfa açılışında başlık/metin/form/görsel sırayla gelir;
+    ilk ekranın altındaki bloklar ekrana girince bir kez belirir (ızgaralarda 90 ms kademe). Teknik
+    çizimler (cıvata) ekrana girince çizilir, "× 1.000.000" sıfırdan sayar. Store'un yeniden çizdiği
+    fikir listeleri bilerek dışarıda: kartlar tekrar tekrar oynamaz. Hareketi azalt açıkken hiçbiri oynamaz,
+    çizimler tamamlanmış gelir. Yalnız transform/opacity/clip-path/filter kullanılır, kayma eklemez.
+  - Stillere göre (`--in-*` değişkenleri + imza): Kâğıt sakin yükselme; Oyuncu eğik düşüp yaylanma,
+    sarı işaretleyici soldan sağa sürülür, çıkartma etiket düşer; Teknik plotter taraması (clip-path),
+    yavaş çizim, yanıp sönen işaret; Yumuşak küçükten yaylanarak büyüme; Premium bulanıktan netleşen yavaş
+    yükselme, başlığın gri yarısı gecikmeli gelir.
+- Sayfa başlıklarının `14ch` sınırı Oyuncu (8,32em) ve Yumuşak'ta (8,4em) em'e sabitlendi: `ch` yazı
+  tipine bağlı olduğu için kutu, yazı tipi yüklenince daralıp başlığı yeniden kırıyordu.
+- Telefonda kategori çipleri tek satırda yatay kayar (ekranı doldurmuyordu).
+- 2. jüri turu (24 Ekim 2026, `.jury/styles/scorecard.md`): Kâğıt 7,0, Oyuncu 7,1, Premium 7,1, Yumuşak
+  7,1, Teknik 6,0 (kaydırınca boş ekran hatası; düzeltildi). Karşılaştırma jürisi Yumuşak'ın çıkarılmasını
+  ve bugün seçilecekse Kâğıt'ı (mavi yerine logodaki kiremit turuncusu tek vurgu olarak) önerdi; ikisi de
+  ürün sahibinin kararına bırakıldı.
+- Ortaya çıkış artık saydamlıkla değil kırpma maskesiyle (`clip-path`): metin hiçbir an yarı saydam
+  olmaz, erişilebilirlik tarayıcıları sayfa açılışında kontrast hatası bulmaz (önce 38–57 düğüm).
+  Hızlı yolculuk (bağlantı, End, savurma, araçların `scrollTo`'su) son 150 ms'deki hızla algılanır ve
+  bloklar anında gösterilir; okuma hızında kaydırma animasyonlu kalır.
+- Vakalar, Hikâye ve Fikirler başlıklarının sağında vaka çizimiyle aynı elden çizimler: palet üstünde
+  stok, tozu alınan raf, fiyat etiketli talep kürsüsü (`.phead.has-art`, `.ph-art`).
+- Yazı tipleri `assets/fonts/` altında woff2 (latin + latin-ext), stil başına başlık yazı tipi önden
+  yüklenir (`stil.js`). Google'a istek yok.
+- Logo `lang="en"` taşır ki büyük harf yapan stillerde "UNDUSTİT" değil "UNDUSTIT" yazsın.
+- `404.html` tek dosyalık olduğu için stil almaz; her zaman Kâğıt görünür.
 
 ## Tema: kâğıt ve fikir mavisi (22 Ekim 2026)
 

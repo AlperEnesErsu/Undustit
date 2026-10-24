@@ -6,12 +6,21 @@
 <title>Vakalar · Undustit</title>
 <meta name="description" content="Firmaların fazla stokları için açılan fikir çağrıları. Her vakanın kendi sayfası ve paylaşılabilir bağlantısı var.">
 <meta name="theme-color" content="#FAF9F6">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Undustit">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:image" content="../assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="../assets/og.png">
 <meta property="og:title" content="Vakalar · Undustit">
 <meta property="og:description" content="Fazla stoklar için açık fikir çağrıları.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
+<script src="../assets/stil.js"></script>
 <style>
 .cases{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:16px}
 .case{display:grid;gap:18px;align-content:start;padding:clamp(22px,3vw,36px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:radial-gradient(70% 70% at 70% 30%,var(--accent-soft),transparent 70%),var(--bg-2)}
@@ -28,7 +37,7 @@
 .share{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted);border:1px dashed var(--line-2);border-radius:var(--r-sm);padding:8px 8px 8px 12px;min-width:0}
 .share code{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .share button{flex:none;min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line-2);background:transparent;font-size:12.5px;color:var(--ink-2)}
-.share button:hover{border-color:var(--ink-2);color:var(--ink)}
+.share button:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .open{border-style:dashed;background:transparent}
 .open ol{margin:0;padding-inline-start:20px;color:var(--ink-2);display:grid;gap:8px;font-weight:300}
 @media (max-width:900px){.cases{grid-template-columns:minmax(0,1fr)}}
@@ -39,10 +48,17 @@
 <a class="skip" href="#main">İçeriğe geç</a>
 <header data-ud-nav></header>
 <main id="main" tabindex="-1" class="wrap">
-  <div class="phead">
+  <div class="phead has-art">
     <span class="eyebrow">Vakalar</span>
     <h1>Fazla stok, <em>açık çağrı.</em></h1>
     <p class="lead">Bir firma satamadığı stoğu vaka olarak açar. O stoğa yeni bir iş bulan fikirler diğer fikirlerle aynı yoldan yarışır. Her vakanın kendi sayfası ve paylaşılabilir bağlantısı vardır.</p>
+      <figure class="cb-art ph-art" aria-hidden="true"><svg viewBox="0 0 260 150">
+      <g class="cb-l"><path d="M40 112h180v8H40z"/><path d="M48 120h14v8H48zM123 120h14v8h-14zM198 120h14v8h-14z"/>
+      <path d="M50 72h74v40H50z"/><path d="M128 72h82v40h-82z"/><path d="M86 34h82v38H86z"/>
+      <path class="th" d="M87 72v40M169 72v40M127 34v38M50 92h74M128 92h82"/></g>
+      <path class="cb-c" d="M18 128H242"/>
+      <g class="cb-d"><path d="M170 40 L206 22"/><text x="208" y="20">fazla stok</text><path d="M40 140h180M40 136v8M220 136v8"/><text x="130" y="149" text-anchor="middle">1 palet</text></g>
+    </svg><figcaption>Bekleyen stok</figcaption></figure>
   </div>
   <div class="cases">
     <article class="case">

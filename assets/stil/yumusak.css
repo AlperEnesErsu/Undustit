@@ -1,0 +1,132 @@
+/* Yumuşak: warm soft-SaaS, the everyday-app feel. Warm white with pastel section fields, a rounded
+   heavy sans, pill buttons that sit on a chunky shade of their own colour and sink when pressed,
+   coral for actions, teal for progress. The "alırdım" button squishes and pops when you commit.
+   Contrast on --bg: ink 13.8, ink-2 8.2, muted 5.3, accent 5.0 (white on accent 5.1), ok 6.3 (muted and ok darkened after the round-2 jury found 4.44-4.46 on the pastel fields).
+   On the pastel fields muted stays above 5.5. */
+@import url("../fonts/yumusak.css");
+@font-face{font-family:"Nunito Fallback";font-weight:100 600;src:local("Arial"),local("ArialMT");size-adjust:101.08%;ascent-override:99.92%;descent-override:34.63%;line-gap-override:0%}
+@font-face{font-family:"Nunito Fallback";font-weight:700 900;src:local("Arial Bold"),local("Arial-BoldMT");size-adjust:101.51%;ascent-override:99.5%;descent-override:34.48%;line-gap-override:0%}
+
+:root{
+  --bg:#FFFBF5; --bg-2:#FFFFFF; --bg-3:#FFF1E6; --line:#F0E6DA; --line-2:#E2D5C6;
+  --ink:#2A2A35; --ink-2:#4D4B5C; --muted:#5C5969; --hint:#8A8797;
+  --accent:#C93A1C; --accent-hover:#B5321A; --accent-active:#9E2C13; --accent-ink:#FFFFFF;
+  --accent-soft:rgba(201,58,28,.08); --accent-line:rgba(201,58,28,.35);
+  --accent-deep:#8E2610;
+  --brand:#C93A1C; --ok:#0A6A5F; --ok-soft:rgba(13,124,112,.1); --warn:#8A5A00; --err:#B42318;
+  --peach:#FFE9DD; --mint:#DFF5EA; --lilac:#ECE6FF;
+  --f-serif:"Nunito","Nunito Fallback",system-ui,sans-serif;
+  --f-body:"Nunito","Nunito Fallback",system-ui,sans-serif;
+  --f-mono:"Nunito","Nunito Fallback",system-ui,sans-serif;
+  --r-sm:14px; --r-md:22px; --r-lg:28px;
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --shadow:0 18px 40px -22px rgba(120,60,30,.35);
+}
+body{font-weight:500}
+h1,h2,h3{font-weight:900;letter-spacing:-.03em;line-height:1}
+h3{font-weight:800}
+h1 em,h2 em,.cb-h em{font-style:normal;color:var(--accent)}
+.hero h1 em,.phead h1 em,.sec h2 em,.case-head h1 em{color:var(--accent)}
+.brand b{font-weight:900;letter-spacing:-.04em}
+.brand b i{font-style:normal}
+/* labels: friendly sentence case instead of mono capitals */
+.eyebrow{font-size:14px;font-weight:800;letter-spacing:0;text-transform:none;color:var(--muted)}
+.eyebrow.k{color:var(--accent)}
+.lead{font-weight:500}
+
+/* pastel fields: every section gets its own soft colour, in turn */
+main > .sec:nth-of-type(3n+1){background:var(--peach);border-top:0}
+main > .sec:nth-of-type(3n+2){background:var(--mint);border-top:0}
+main > .sec:nth-of-type(3n){background:var(--lilac);border-top:0}
+
+/* buttons: pills on a chunky shade of their own colour; pressing sinks them into it */
+.btn{border-radius:999px;font-weight:800;border-width:0;box-shadow:0 4px 0 #000;transition:transform 160ms var(--spring),box-shadow 160ms var(--spring),background-color var(--dur-fast) ease}
+.btn:hover{background:#000;transform:translateY(-1px);box-shadow:0 5px 0 #000}
+.btn:active{transform:translateY(4px);box-shadow:0 0 0 #000}
+.btn.sig{box-shadow:0 4px 0 var(--accent-deep)}
+.btn.sig:hover{background:var(--accent-hover);box-shadow:0 5px 0 var(--accent-deep)}
+.btn.sig:active{box-shadow:0 0 0 var(--accent-deep)}
+.btn.alt{background:var(--bg-2);border:2px solid var(--line-2);box-shadow:0 4px 0 var(--line-2)}
+.btn.alt:hover{background:var(--bg-2);color:var(--ink);border-color:var(--ink-2);box-shadow:0 5px 0 var(--ink-2)}
+.btn.alt:active{box-shadow:0 0 0 var(--ink-2)}
+.chip{border-radius:999px;border:2px solid var(--line-2);background:var(--bg-2);font-weight:700;color:var(--ink-2);box-shadow:0 3px 0 var(--line-2);transition:transform 160ms var(--spring),box-shadow 160ms var(--spring)}
+.chip:hover{border-color:var(--ink-2);color:var(--ink);transform:translateY(-1px)}
+.chip:active{transform:translateY(3px);box-shadow:none}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 3px 0 #000}
+.chip.case[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);box-shadow:0 3px 0 var(--accent-deep)}
+
+/* surfaces: big radii, soft warm shadows, no hard outlines */
+.nav{background:rgba(255,251,245,.9);border-bottom:0;box-shadow:0 1px 0 var(--line)}
+.nav-links a{font-weight:700}
+.iform{border:2px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.iform:focus-within{border-color:var(--accent);box-shadow:0 0 0 6px rgba(201,58,28,.12),var(--shadow)}
+.if-pitch{font-weight:800;letter-spacing:-.02em}
+.if-field textarea,.if-field input{border-radius:var(--r-sm);border-width:2px}
+.icard{border:0;border-radius:var(--r-md);box-shadow:0 10px 26px -18px rgba(120,60,30,.45),0 0 0 1px var(--line);transition:transform 220ms var(--spring),box-shadow 220ms ease}
+.icard:hover{transform:translateY(-3px);box-shadow:0 18px 34px -20px rgba(120,60,30,.5),0 0 0 1px var(--line-2);background:var(--bg-2)}
+.icard .rank{font-weight:900}
+.icard .m{font-weight:700}
+.vote{border-radius:18px;border:2px solid var(--line-2);background:var(--bg-2);box-shadow:0 4px 0 var(--line-2);transition:transform 140ms var(--spring),box-shadow 140ms var(--spring)}
+.vote:hover:not(:disabled){border-color:var(--accent);box-shadow:0 5px 0 var(--accent-line);transform:translateY(-1px)}
+.vote:active:not(:disabled){transform:translateY(4px) scale(.94);box-shadow:none}
+.vote span{font-weight:800;letter-spacing:.02em;text-transform:none;font-size:12px}
+.vote b{font-weight:900}
+.vote[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 4px 0 var(--accent-deep)}
+.buy-f input{border-radius:var(--r-sm);border-width:2px}
+/* the signature: committing to "alırdım" squishes the button and pops a little confetti */
+.buy.just .vote{animation:squish 520ms var(--spring)}
+.buy.just::before,.buy.just::after{content:"";position:absolute;left:50%;top:24px;width:6px;height:6px;border-radius:50%;pointer-events:none;
+  box-shadow:-26px -22px 0 var(--accent),24px -26px 0 var(--ok),-34px 4px 0 #F2B33D,36px 2px 0 #7B5CE0,-14px -36px 0 #7B5CE0,16px -38px 0 #F2B33D,0 -44px 0 var(--accent);
+  animation:confetti 700ms ease-out forwards}
+.buy.just::after{rotate:40deg;animation-delay:60ms}
+@keyframes squish{0%{transform:scale(1)}30%{transform:scale(1.16,.82)}55%{transform:scale(.9,1.1)}100%{transform:scale(1)}}
+@keyframes confetti{0%{opacity:1;transform:translate(-50%,0) scale(.3)}100%{opacity:0;transform:translate(-50%,-14px) scale(1.3)}}
+.case-band{border:0;border-radius:var(--r-lg);background:var(--bg-2);box-shadow:var(--shadow)}
+.cb-tag{border-radius:999px;background:var(--mint);border-color:transparent;font-family:var(--f-body);font-weight:800;text-transform:none;letter-spacing:0;font-size:13px}
+.cb-art{border-radius:var(--r-md);background-color:var(--peach);background-image:none}
+.cb-l path{fill:var(--bg-2);stroke-width:1.6}
+.cb-art figcaption{font-weight:900}
+.pc-stage{border:0;border-radius:var(--r-lg);background:var(--bg-2);box-shadow:var(--shadow)}
+.pc-stage::before{background-image:radial-gradient(var(--line-2) 1.4px,transparent 1.8px);background-size:22px 22px;opacity:.7}
+.pc-card,.pc-pay{border:0;border-radius:var(--r-md);box-shadow:0 14px 30px -18px rgba(120,60,30,.45),0 0 0 1px var(--line)}
+.pc-txt{font-weight:800;letter-spacing:-.02em}
+.pc-buy b,.pc-pay b{font-weight:900}
+.pc-pay{background:var(--mint)}
+/* the pre-sale bar fills like a game meter */
+.pc-pre .pc-bar{height:14px;border-radius:999px;background:var(--line)}
+.pc-pre .pc-bar i{background:repeating-linear-gradient(-45deg,var(--ok) 0 10px,#11998B 10px 20px);border-radius:inherit}
+.pc-steps li{font-weight:700}
+.pc-steps li::before{height:5px;border-radius:999px}
+.pc-replay{border-radius:999px;font-weight:700;box-shadow:0 3px 0 var(--line-2)}
+.thu{border:0;background:var(--bg-2);box-shadow:0 0 0 2px var(--line);font-weight:700}
+.round header{border-top:0;background:var(--bg-2);padding:12px 16px;border-radius:999px;box-shadow:0 0 0 1px var(--line)}
+.round header b{font-size:22px;font-weight:900}
+.slot,.empty{border:2px dashed var(--line-2);border-radius:var(--r-md);background:rgba(255,255,255,.6)}
+.disc{border-top:0;gap:14px}
+.disc a,.disc a + a{padding:24px;border:0;border-radius:var(--r-md);background:var(--bg-2);box-shadow:0 10px 24px -18px rgba(120,60,30,.45)}
+.disc b{font-weight:900}
+.how3 li,.open3 div,.case,.after,.arena aside div{border:0;border-radius:var(--r-md);background:var(--bg-2);box-shadow:0 10px 24px -18px rgba(120,60,30,.45)}
+.mission{border:0;border-radius:var(--r-lg);background:var(--bg-2);box-shadow:var(--shadow)}
+.big2{border-radius:var(--r-md)}
+dialog.idlg{border:0;border-radius:var(--r-lg);box-shadow:0 40px 90px -30px rgba(80,40,20,.45)}
+.crit,.note{border-radius:var(--r-sm)}
+.foot{border-top:0;background:var(--bg-3)}
+.link{text-decoration-thickness:2px;text-decoration-color:var(--accent-line)}
+
+/* page-level headings that are set at weight 400 elsewhere get the style's heavy weight here */
+.steps h3,.big2 b,.vals b,.mission q,.style h2,.round header b,.case h2,.cb-art figcaption{font-weight:800}
+.steps > li::before,.how3 li::before{font-weight:900}
+/* Nunito has no italic: emphasis is colour, never a faked slant; html raises it above page styles */
+html h1 em,html h2 em,html .cb-h em,html .mission q em{font-style:normal;color:var(--accent)}
+.pc-pay b em{font-style:normal;color:var(--ink)}
+
+/* motion: soft and springy. Blocks grow from slightly small and settle with a little overshoot */
+:root{--in-y:28px;--in-scale:.93;--in-dur:680ms;--in-ease:cubic-bezier(.34,1.56,.64,1);--in-step:85ms}
+@media (prefers-reduced-motion:no-preference){
+  .hero-l > .eyebrow,.phead > .eyebrow{animation:pop-in 600ms cubic-bezier(.34,1.56,.64,1) both}
+  .disc a:hover{transform:translateY(-4px) rotate(-.6deg);transition:transform 260ms var(--spring)}
+}
+@keyframes pop-in{from{transform:scale(.6)}}
+
+/* page titles: the 14ch cap is fixed in em, so the box is the same width before and after the font loads */
+.phead h1{max-width:8.4em}

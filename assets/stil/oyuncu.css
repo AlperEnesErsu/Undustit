@@ -1,0 +1,89 @@
+/* Oyuncu: Quirky's own mood. Cream paper, a heavy grotesque, ink outlines with hard offset shadows,
+   violet for anything you act on, a yellow marker for emphasis, things that bounce a little.
+   Contrast on --bg: ink 16.4, ink-2 10.3, muted 6.0, accent 6.0 (white on accent 6.4), ok 5.0. */
+@import url("../fonts/oyuncu.css");
+@font-face{font-family:"Bricolage Fallback";font-weight:100 900;src:local("Arial Bold"),local("Arial-BoldMT"),local("Arial");size-adjust:91.58%;ascent-override:101.56%;descent-override:29.48%;line-gap-override:0%}
+
+:root{
+  --bg:#FFF6E9; --bg-2:#FFFFFF; --bg-3:#FFEBD1; --line:#EADCC6; --line-2:#1B1530;
+  --ink:#1B1530; --ink-2:#3F3856; --muted:#625B78; --hint:#7A738E;
+  --accent:#5B2EFF; --accent-hover:#4A1FE6; --accent-active:#3A14C2; --accent-ink:#FFFFFF;
+  --accent-soft:rgba(91,46,255,.08); --accent-line:rgba(91,46,255,.4);
+  --brand:#E8462A; --sun:#FFD23F; --pink:#FF8FC2;
+  --ok:#0A7A4E; --ok-soft:rgba(10,122,78,.08); --warn:#8A5A00; --err:#B42318;
+  --f-serif:"Bricolage Grotesque","Bricolage Fallback","Geist",system-ui,sans-serif;
+  --r-sm:12px; --r-md:20px; --r-lg:28px;
+  --pop:cubic-bezier(.34,1.56,.64,1);
+  --hard:4px 4px 0 var(--ink);
+  --shadow:6px 6px 0 var(--ink);
+}
+h1,h2,h3{font-weight:800;letter-spacing:-.035em}
+h1 em,h2 em,.cb-h em{font-style:normal;background:linear-gradient(transparent 58%,var(--sun) 58%,var(--sun) 92%,transparent 92%);padding-inline:.06em}
+.hero h1,.phead h1,.case-head h1{line-height:.92}
+.brand b{font-family:var(--f-serif);font-weight:800;letter-spacing:-.04em}
+.brand b i{font-style:normal}
+
+/* stickers: the first label on a page */
+.hero-l > .eyebrow,.phead > .eyebrow,.write .eyebrow:first-child{justify-self:start;display:inline-block;padding:5px 12px;background:var(--sun);color:var(--ink);border:2px solid var(--ink);border-radius:999px;transform:rotate(-2deg);font-weight:500}
+
+/* buttons: ink outline, hard shadow, a small hop on hover */
+.btn{border-width:2px;border-color:var(--ink);box-shadow:var(--hard);transition:transform 220ms var(--pop),box-shadow 220ms var(--pop),background-color var(--dur-fast) ease}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);background:var(--ink);border-color:var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.sig{border-color:var(--ink)}
+.btn.sig:hover{background:var(--accent-hover);border-color:var(--ink);box-shadow:6px 6px 0 var(--ink)}
+.btn.alt{background:var(--bg-2)}
+.btn.alt:hover{background:var(--sun);color:var(--ink)}
+.chip{border-width:2px;border-color:var(--ink);color:var(--ink);font-weight:500}
+.chip:hover{background:var(--sun);border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.chip.case[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--ink)}
+
+/* surfaces */
+.nav{background:rgba(255,246,233,.9);border-bottom:2px solid var(--ink)}
+.iform{border:2px solid var(--ink);box-shadow:var(--shadow)}
+.iform:focus-within{border-color:var(--ink);box-shadow:8px 8px 0 var(--accent)}
+.if-field textarea,.if-field input{border:2px solid var(--line)}
+.icard{border:2px solid var(--ink);box-shadow:var(--hard);transition:transform 220ms var(--pop),box-shadow 220ms var(--pop)}
+.icard:hover{transform:translate(-2px,-2px) rotate(-.4deg);box-shadow:6px 6px 0 var(--ink);background:var(--bg-2)}
+.icard .rank{font-family:var(--f-serif);font-weight:800}
+.vote{border:2px solid var(--ink);border-radius:14px}
+.vote[aria-pressed="true"]{border-color:var(--ink)}
+.case-band{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--sun),10px 10px 0 2px var(--ink)}
+.cb-tag{background:#DFF5EA;border:2px solid var(--ok)}
+.cb-art{border:2px solid var(--ink);background-color:#FFF0D6;background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:20px 20px}
+.cb-art figcaption{font-weight:800}
+.pc-stage{border:2px solid var(--ink);box-shadow:var(--shadow);background:#FFF0D6}
+.pc-stage::before{background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:22px 22px;opacity:.18}
+.pc-card,.pc-pay{border:2px solid var(--ink);box-shadow:var(--hard)}
+.pc-pay{background:#DFF5EA}
+.pc-steps li::before{height:4px}
+.pc-replay{background:var(--bg-2);border:2px solid var(--ink)}
+.thu{border:2px solid var(--ink);background:var(--bg-2)}
+.round header{border-top-width:3px}
+.round header b{font-weight:800}
+.slot,.empty{border:2px dashed var(--ink-2)}
+.disc b{font-weight:800}
+.disc a:hover b{color:var(--accent)}
+.how3 li,.open3 div,.case,.after,.arena aside div{border:2px solid var(--ink);box-shadow:var(--hard)}
+.mission{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--sun),10px 10px 0 2px var(--ink);background:var(--bg-2)}
+dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
+.foot{border-top:2px solid var(--ink)}
+.link{text-decoration-color:var(--accent);text-decoration-thickness:2px}
+
+/* phones: a slimmer payout card so it clears the pre-sale row */
+@media (max-width:640px){.pc-pay{padding:12px 14px;gap:4px}.pc-pay b{font-size:30px}.pc-pay span{font-size:12px}}
+
+/* motion: things drop in a little tilted and bounce into place; the highlighter is swiped across */
+:root{--in-y:34px;--in-rot:-1.6deg;--in-dur:760ms;--in-ease:cubic-bezier(.34,1.56,.64,1);--in-step:90ms}
+@media (prefers-reduced-motion:no-preference){
+  h1 em,.seen h2 em,.cb-h em{background-size:0% 100%;background-repeat:no-repeat;animation:hl-swipe 700ms cubic-bezier(.65,0,.35,1) 450ms forwards}
+  .seen h2 em,.seen .cb-h em{animation-delay:300ms}
+  .hero-l > .eyebrow,.phead > .eyebrow{animation:sticker 700ms cubic-bezier(.34,1.56,.64,1) both}
+  .hero-l > .eyebrow:hover,.phead > .eyebrow:hover{transform:rotate(3deg) scale(1.05);transition:transform 260ms var(--pop)}
+}
+@keyframes hl-swipe{to{background-size:100% 100%}}
+@keyframes sticker{from{transform:translateY(-30px) rotate(-14deg) scale(1.3)}60%{transform:translateY(3px) rotate(1deg) scale(.97)}to{transform:rotate(-2deg)}}
+
+/* page titles: the 14ch cap is fixed in em, so the box is the same width before and after the font loads */
+.phead h1{max-width:8.32em}

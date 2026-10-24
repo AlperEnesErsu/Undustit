@@ -3,7 +3,7 @@
    coral for actions, teal for progress. The "alırdım" button squishes and pops when you commit.
    Contrast on --bg: ink 13.8, ink-2 8.2, muted 5.3, accent 5.0 (white on accent 5.1), ok 4.9.
    On the pastel fields muted stays above 4.6. */
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=block");
+@import url("../fonts/yumusak.css");
 @font-face{font-family:"Nunito Fallback";font-weight:100 600;src:local("Arial"),local("ArialMT");size-adjust:101.08%;ascent-override:99.92%;descent-override:34.63%;line-gap-override:0%}
 @font-face{font-family:"Nunito Fallback";font-weight:700 900;src:local("Arial Bold"),local("Arial-BoldMT");size-adjust:101.51%;ascent-override:99.5%;descent-override:34.48%;line-gap-override:0%}
 
@@ -95,7 +95,6 @@ main > .sec:nth-of-type(3n){background:var(--lilac);border-top:0}
 /* the pre-sale bar fills like a game meter */
 .pc-pre .pc-bar{height:14px;border-radius:999px;background:var(--line)}
 .pc-pre .pc-bar i{background:repeating-linear-gradient(-45deg,var(--ok) 0 10px,#11998B 10px 20px);border-radius:inherit}
-.pc-card .pc-bar{height:6px;border-radius:999px}
 .pc-steps li{font-weight:700}
 .pc-steps li::before{height:5px;border-radius:999px}
 .pc-replay{border-radius:999px;font-weight:700;box-shadow:0 3px 0 var(--line-2)}

@@ -447,37 +447,57 @@ function openIdea(key, push=true){
 }
 
 // =========================================================== the process run
-// One quick pass (about 5.5 s) in four beats: write the idea, people say "alırdım" with a price,
-// pre-sale fills while the product is drawn, then the payout. Plays once when seen, replay at the end.
+// Sketch to shelf in one pass (about 7.5 s). The same drawing lives through the whole story: a rough
+// pencil sketch next to the idea, price bubbles from people who would buy it, the community's notes
+// pinned on while the wobbly lines straighten into a clean drawing, then wood, dimensions and the fold,
+// then into a kraft box, boxes stack as pre-sales fill, and the box lands on a shelf with the payout.
+// Plays once when seen, replay at the end; reduced motion shows the last frame.
 function mountProc(host, opts={}){
   const text = 'Tezgâh kenarına takılan, katlanınca rafa dönen kesme tahtası.';
-  const steps = ['Yaz','Alırdım','Ön satış','Kazan'];
+  const steps = ['Eskiz','Talep','Ortak tasarım','Prototip','Ön satış','Raf'];
   const BUYERS = 312, AVG = 240, PRE = 300;
+  const tag = (x, y, w, label, val, lx, ly, tx, ty, i) => `<g class="dw-tag" style="--i:${i}"><path class="dw-lead" pathLength="1" d="M${lx} ${ly} L${tx} ${ty}"/><circle class="dw-pin" cx="${tx}" cy="${ty}" r="2.2"/><rect x="${x}" y="${y}" width="${w}" height="17" rx="8.5"/><text x="${x + 9}" y="${y + 11.6}">${label} <tspan>${val}</tspan></text></g>`;
+  const bub = (x, y, v, i) => `<g class="dw-bub" style="--i:${i}"><rect x="${x}" y="${y}" width="38" height="17" rx="8.5"/><text x="${x + 19}" y="${y + 11.8}" text-anchor="middle">₺${v}</text></g>`;
   host.classList.add('proc');
   host.innerHTML = `
-  <p class="sr">Bir fikrin ürüne dönüşmesi: fikir tek cümleyle yazılır, ${BUYERS} kişi ortalama ${AVG} liraya alırdım der, ön satış ${PRE} siparişe ulaşınca kesme tahtası üretilir, satıştan fikir sahibine ve katkı verenlere yüzde ${TERMS.shareRetail} ile ${TERMS.shareDirect} arası pay ödenir.</p>
+  <p class="sr">Bir fikrin ürüne dönüşmesi: fikir tek cümleyle yazılır ve yanında kaba bir eskiz çizilir. ${BUYERS} kişi ortalama ${AVG} liraya alırdım der. Topluluk isim, renk ve ambalaj önerir, eskiz düzgün bir teknik çizime dönüşür. Prototipte ahşap, ölçüler ve katlanma hareketi eklenir. Ürün kraft kutuya girer, ön satış ${PRE} siparişe ulaşır. Kutu rafa çıkar; satıştan fikir sahibine ve katkı verenlere yüzde ${TERMS.shareRetail} ile ${TERMS.shareDirect} arası pay ödenir.</p>
   <div class="pc-stage">
-    <div class="pc-dots" aria-hidden="true">${Array.from({length:14}, (_,n) => { const a = n/14*Math.PI*2; return `<i style="left:34%;top:30%;--x:${Math.round(Math.cos(a)*260)}px;--y:${Math.round(Math.sin(a)*200)}px;animation-delay:${(n%7)*60}ms"></i>`; }).join('')}</div>
     <div class="pc-card" aria-hidden="true">
       <div class="h"><span class="tag">Mutfak</span><span class="pc-n">0 / 140</span></div>
       <p class="pc-txt"></p>
       <div class="pc-buy"><span><b class="pc-bn">0</b> kişi “alırdım” dedi</span><span>ort. <b class="pc-avg">0</b> ₺</span></div>
-      <div class="pc-bar"><i></i></div>
     </div>
-    <div class="pc-prod" aria-hidden="true"><svg viewBox="0 0 240 180">
-      <path class="cnt" d="M6 128H234V160H6Z"/>
-      <path class="cnt-t" d="M6 128L24 112H234V128Z"/>
-      <path class="ghost" d="M62 126L150 126L164 114L76 114Z"/>
-      <path class="ln wood" style="--len:420" d="M70 112V42Q70 34 78 34H154Q162 34 162 42V112Z"/>
-      <path class="ln edge" style="--len:180" d="M162 42L169 37V107L162 112"/>
-      <path class="ln" style="--len:70" d="M106 44h20a5 5 0 0 1 0 10h-20a5 5 0 0 1 0 -10z"/>
-      <path class="ln grain" style="--len:300" d="M80 70C100 65 128 75 152 69M80 86C104 82 126 92 152 86M80 101C100 98 128 105 152 100"/>
-      <path class="ln" style="--len:120" d="M84 112h18v9h-18zM130 112h18v9h-18z"/>
-      <path class="arc" d="M150 120Q206 96 176 44"/><path class="arc-h" d="M170 52l6-9 5 10"/>
-      <g class="lbl"><rect x="18" y="138" width="114" height="16" rx="3"/><text x="25" y="149.5">RAFLA · MUCİT: SEN</text></g>
+    <div class="pc-pay" aria-hidden="true"><span class="eb">Satıştan pay</span><b><em>%${TERMS.shareRetail}–${TERMS.shareDirect}</em></b><span>Rafla’nın mucidine ve ona isim, renk, ambalaj verenlere</span></div>
+    <div class="pc-draw" aria-hidden="true"><svg viewBox="0 0 320 240">
+      <g class="dw-shelf"><path d="M8 170 H312"/><path d="M40 170 v14 h10 M270 170 v14 h10"/></g>
+      <g class="dw-counter">
+        <path class="dw-sk m1" pathLength="1" d="M18 171 C 100 166 210 175 302 168"/>
+        <path class="dw-sk m2" pathLength="1" d="M22 201 C 110 198 200 204 298 199"/>
+        <path class="dw-sk m3" pathLength="1" d="M19 170 C 19 180 21 190 21 201"/>
+        <path class="dw-sk m4" pathLength="1" d="M301 168 C 300 180 299 190 299 199"/>
+      </g>
+      <g class="dw-product">
+        <path class="dw-ghost" d="M120 166 L200 166 L214 156 L134 156 Z"/>
+        <path class="dw-arc" pathLength="1" d="M206 154 Q 246 120 214 66"/><path class="dw-arch" d="M207 72 l7 -7 3 10"/>
+        <path class="dw-sk dw-board m5" pathLength="1" d="M118 170 C 117 130 121 95 119 64 C 140 59 170 62 201 60 C 203 95 198 130 202 171"/>
+        <path class="dw-sk dw-edge m6" pathLength="1" d="M201 60 C 204 58 207 57 209 55 C 210 95 208 135 210 166"/>
+        <path class="dw-sk dw-slot m7" pathLength="1" d="M146 76 C 158 73 166 75 174 77 C 175 82 173 84 172 86 C 160 87 152 85 147 85 C 144 82 145 79 146 76"/>
+        <g class="dw-hatch"><path d="M130 120 l14 -14 M136 140 l22 -22 M150 152 l26 -26 M168 158 l20 -20"/></g>
+        <g class="dw-grain"><path d="M128 104 C 150 99 176 108 194 102 M128 126 C 154 121 172 131 194 125 M128 148 C 150 144 178 152 194 147"/></g>
+        <g class="dw-hinge"><rect x="134" y="168" width="18" height="7" rx="1.5"/><rect x="168" y="168" width="18" height="7" rx="1.5"/></g>
+      </g>
+      <g class="dw-dims"><path pathLength="1" d="M120 46 H200 M120 41 v10 M200 41 v10"/><text x="160" y="40" text-anchor="middle">38 cm</text>
+        <path pathLength="1" d="M104 60 V170 M99 60 h10 M99 170 h10"/><text x="96" y="118" text-anchor="end">26 cm</text></g>
+      <g class="dw-bubs">${bub(30, 70, 240, 0)}${bub(226, 92, 260, 1)}${bub(52, 128, 220, 2)}${bub(240, 140, 300, 3)}</g>
+      <g class="dw-tags">${tag(8, 118, 86, 'İsim', 'Rafla', 94, 126, 121, 126, 0)}${tag(222, 98, 96, 'Renk', 'Kum beji', 222, 106, 196, 112, 1)}${tag(216, 30, 98, 'Ambalaj', 'Kraft', 216, 38, 206, 58, 2)}</g>
+      <g class="dw-boxes">
+        <g class="dw-box b3"><path class="side" d="M246 120 L258 111 L258 160 L246 170 Z"/><path class="front" d="M190 120 H246 V170 H190 Z"/><path class="lid" d="M190 120 L202 111 L258 111 L246 120 Z"/></g>
+        <g class="dw-box b2"><path class="side" d="M118 120 L130 111 L130 160 L118 170 Z"/><path class="front" d="M62 120 H118 V170 H62 Z"/><path class="lid" d="M62 120 L74 111 L130 111 L118 120 Z"/></g>
+        <g class="dw-box b1"><path class="side" d="M224 104 L240 92 L240 158 L224 170 Z"/><path class="front" d="M96 104 H224 V170 H96 Z"/><path class="lid" d="M96 104 L112 92 L240 92 L224 104 Z"/>
+          <g class="dw-label"><rect x="112" y="122" width="96" height="30" rx="3"/><text class="nm" x="160" y="139" text-anchor="middle">Rafla</text><text class="by" x="160" y="148" text-anchor="middle">MUCİT: SEN</text></g></g>
+      </g>
     </svg></div>
     <div class="pc-pre" aria-hidden="true"><div class="pc-row"><span>Ön satış</span><b class="pc-pn">0 / ${PRE}</b></div><div class="pc-bar"><i></i></div><span class="ok">Eşik doldu · üretimde</span></div>
-    <div class="pc-pay" aria-hidden="true"><span class="eb">Satıştan pay</span><b><em>%${TERMS.shareRetail}–${TERMS.shareDirect}</em></b><span>fikir sahibine ve ürünü birlikte geliştirenlere</span></div>
     <span class="pc-ex" aria-hidden="true">Örnek akış</span>
     <button type="button" class="pc-replay">${ICON.replay}Tekrar oynat</button>
   </div>
@@ -487,10 +507,10 @@ function mountProc(host, opts={}){
   const at = (ms, fn) => timers.push(setTimeout(fn, ms));
   const count = (node, to, ms, fmt) => { const t0 = performance.now(); const f = now => { const p = Math.min(1, (now - t0)/ms); node.textContent = fmt(Math.round(to * (1 - Math.pow(1-p, 3)))); if (p < 1) timers.push(requestAnimationFrame(f)); }; requestAnimationFrame(f); };
   const step = s => lis.forEach((li, ix) => { li.classList.toggle('on', ix === s); li.classList.toggle('past', ix < s); });
-  const S = ['s1','s2','s3','s3b','s4','end'];
+  const S = ['s1','s2','s3','s4','s5','s5b','s6','end'];
   function finalState(){
     host.classList.add(...S); txt.textContent = text; n.textContent = text.length + ' / 140';
-    bn.textContent = String(BUYERS); avg.textContent = String(AVG); pn.textContent = PRE + ' / ' + PRE; step(3);
+    bn.textContent = String(BUYERS); avg.textContent = String(AVG); pn.textContent = PRE + ' / ' + PRE; step(5);
   }
   function play(){
     timers.forEach(t => { clearTimeout(t); cancelAnimationFrame(t); }); timers = [];
@@ -500,15 +520,18 @@ function mountProc(host, opts={}){
     host.classList.add('s1'); step(0);
     const per = 950 / text.length;
     for (let c = 1; c <= text.length; c++) at(c*per, () => { txt.textContent = text.slice(0, c); n.textContent = c + ' / 140'; });
-    at(1150, () => { host.classList.add('s2'); step(1); count(bn, BUYERS, 1000, v => String(v)); count(avg, AVG, 1000, v => String(v)); });
-    at(2700, () => { host.classList.add('s3'); step(2); count(pn, PRE, 1100, v => v + ' / ' + PRE); });
-    at(3800, () => host.classList.add('s3b'));
-    at(4300, () => { host.classList.add('s4'); step(3); });
-    at(5200, () => host.classList.add('end'));
+    at(1700, () => { host.classList.add('s2'); step(1); count(bn, BUYERS, 1000, v => String(v)); count(avg, AVG, 1000, v => String(v)); });
+    at(2900, () => { host.classList.add('s3'); step(2); });
+    at(4100, () => { host.classList.add('s4'); step(3); });
+    at(5200, () => { host.classList.add('s5'); step(4); count(pn, PRE, 1100, v => v + ' / ' + PRE); });
+    at(5900, () => host.classList.add('s5b'));
+    at(6600, () => { host.classList.add('s6'); step(5); });
+    at(7500, () => { host.classList.add('end'); try { sessionStorage.setItem('ud-proc-seen', '1'); } catch(e){} });
   }
   $('.pc-replay', host).onclick = play;
   if (opts.manual) return { play };
-  if (reduce.matches){ finalState(); return { play }; }
+  let seen = false; try { seen = sessionStorage.getItem('ud-proc-seen') === '1'; } catch(e){}
+  if (reduce.matches || seen){ finalState(); return { play }; }
   const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ io.disconnect(); setTimeout(play, opts.delay || 250); } }, { threshold:.35 });
   io.observe(host);
   return { play };
@@ -530,13 +553,25 @@ function mountMotion(){
       Array.from(inner.children).forEach((c, i) => { c.style.setProperty('--d', Math.min(i, 6) * 90 + 'ms'); picked.push(c); });
     } else picked.push(n);
   });
+  // fast travel (an anchor, End, a fling, scrollTo from a tool; smooth scrolling turns these into many
+  // small steps, so it is measured as speed over the last 150 ms) skips the transition, so nothing is
+  // ever caught half-faded; normal reading-speed scrolling still gets the reveal
+  let samples = [[performance.now(), scrollY]], jumpT = 0;
+  addEventListener('scroll', () => {
+    const now = performance.now(); samples.push([now, scrollY]); samples = samples.filter(s => now - s[0] < 150);
+    if (Math.abs(scrollY - samples[0][1]) > innerHeight * .5){
+      html.classList.add('rv-jump'); clearTimeout(jumpT); jumpT = setTimeout(() => html.classList.remove('rv-jump'), 700);
+      $$('.rv:not(.in)').forEach(n => { const r = n.getBoundingClientRect(); if (r.top < innerHeight * 1.1 && r.bottom > 0) n.classList.add('in', 'seen'); });
+    }
+  }, { passive:true });
+  addEventListener('beforeprint', () => $$('.rv').forEach(n => n.classList.add('in')));
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
     const n = e.target; io.unobserve(n);
     n.classList.add('in', 'seen');
     // hand the element back to its own hover and transform rules once it has arrived
     setTimeout(() => n.classList.remove('rv', 'in'), 1600 + (parseInt(n.style.getPropertyValue('--d')) || 0));
-  }), { threshold:.12, rootMargin:'0px 0px -6% 0px' });
+  }), { threshold:0, rootMargin:'0px 0px 12% 0px' });
   picked.forEach(n => { n.classList.add('rv'); io.observe(n); });
   // drawings: every stroke is normalised to length 1 so CSS can draw it in; the figure counts up
   const dio = new IntersectionObserver(es => es.forEach(e => {

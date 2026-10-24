@@ -39,9 +39,14 @@ Fazla stoklar "vaka" olarak açılır; vaka fikirleri de aynı listeye ve aynı 
   sözcüğü kalır, çünkü orada gerçekten seçim yapılır.
 - Açık vaka kartı (`mountCase`): "Bu vakaya fikir yaz" sayfa değiştirmez; aynı sayfadaki
   formu vaka seçili açar.
-- Süreç animasyonu kaydırmaya bağlı değil ve dört adımdır: Yaz → Alırdım → Ön satış → Kazan.
-  Ekrana girince yaklaşık 5,5 sn'de bir kez oynar, ürün (katlanır kesme tahtası) gerçekten
-  çizilir, sonunda "Tekrar oynat". Reduced motion'da doğrudan son kare.
+- Süreç animasyonu "eskizden rafa" (23 Ekim 2026): kaydırmaya bağlı değil, ekrana girince yaklaşık
+  7,5 sn'de bir kez oynar, sonunda "Tekrar oynat". Altı adım: Eskiz → Talep → Ortak tasarım → Prototip →
+  Ön satış → Raf. Aynı çizim baştan sona yaşar: fikir yazılırken kaba bir kurşun kalem eskizi çizilir,
+  çevresinde fiyat balonları belirir, topluluğun notları (isim, renk, ambalaj) iğnelenirken titrek
+  çizgiler CSS `d` geçişiyle düzgün çizgiye dönüşür (Safari'de dönüşüm yok, eskiz titrek kalır), sonra
+  ahşap, ölçüler ve katlanma hareketi gelir, ürün kraft kutuya girer, kutular dizilir, tezgâh rafa
+  dönüşür ve pay kartı çıkar. Hareketi azalt açıkken doğrudan son kare. Eski genel animasyonda ürün
+  sonradan hazır bir çizim olarak beliriyordu; fikrin ürüne dönüştüğü görünmüyordu.
 - "Vakanı aç" şimdilik bilgi amaçlı; başvuru kanalı (e-posta, form) seçilince bağlanmalı.
 
 ## Stiller: aynı site, dört görünüm (22 Ekim 2026)

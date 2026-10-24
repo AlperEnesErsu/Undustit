@@ -4,7 +4,7 @@
    From the UI-UX kit: Bugatti's monochrome austerity and Apple's white pill.
    Contrast on --bg: ink 17.9, ink-2 11.6, muted 7.1, hint 4.8, champagne 10.3, ok 11.5;
    black on the white button 17.9. */
-@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;1,300&display=block");
+@import url("../fonts/premium.css");
 @font-face{font-family:"Inter Tight Fallback";font-weight:100 400;src:local("Arial"),local("ArialMT");size-adjust:95.33%;ascent-override:101.76%;descent-override:25.18%;line-gap-override:0%}
 @font-face{font-family:"Inter Tight Fallback";font-weight:500 900;src:local("Arial"),local("ArialMT");size-adjust:93.77%;ascent-override:103.44%;descent-override:25.59%;line-gap-override:0%}
 
@@ -81,10 +81,6 @@ h1 em,h2 em,.cb-h em,html .hero h1 em,html .phead h1 em,html .sec h2 em,html .ca
 .pc-txt{font-weight:300;letter-spacing:-.02em}
 .pc-buy b,.pc-pay b{font-weight:300}
 .pc-pay{background:rgba(143,212,168,.06);border-color:rgba(143,212,168,.25)}
-.pc-prod .cnt{fill:var(--bg-3)}
-.pc-prod .cnt-t{fill:var(--bg-2)}
-.pc-prod .lbl rect{fill:var(--ink)}
-.pc-prod .lbl text{fill:#0A0A0A}
 .pc-replay{background:var(--bg-2)}
 .pc-steps li.on::before{background:var(--champ)}
 .thu{background:transparent;border-color:var(--line-2)}

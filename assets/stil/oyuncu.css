@@ -124,3 +124,78 @@ html .fig{border:2px solid var(--ink);font-weight:500;background:var(--bg-2)}
 @media (max-width:560px){.disc{grid-template-columns:minmax(0,1fr)}}
 /* Bricolage has no italic: emphasis in running text is weight, not a fake slant */
 p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;font-weight:700;color:var(--ink)}
+
+/* ---------- design system components (bilesen.css) in the Oyuncu hand
+   The shared components get the same ink outlines, hard shadows, sun and violet fills and bouncy
+   transitions as the page parts above. Nothing here changes the rules above this line. */
+.alan input:not([type]),.alan input[type="text"],.alan input[type="email"],.alan input[type="url"],.alan input[type="number"],.alan input[type="password"],.alan input[type="search"],.alan input[type="date"],.alan textarea,.alan select,.arac-cubugu input[type="search"],.arac-cubugu select{border:2px solid var(--ink);border-radius:var(--r-sm);background:var(--bg-2)}
+.alan input:focus,.alan textarea:focus,.alan select:focus,.arac-cubugu input:focus,.arac-cubugu select:focus{box-shadow:4px 4px 0 var(--accent)}
+.alan.hata input,.alan.hata textarea,.alan.hata select{border-color:var(--err);box-shadow:3px 3px 0 var(--err)}
+.alan > span{color:var(--ink);font-weight:500}
+.alan-hata{font-weight:500}
+.anahtar input{border:2px solid var(--ink);background:var(--bg-2);box-shadow:var(--hard);transition:background-color 220ms var(--pop),transform 220ms var(--pop)}
+.anahtar input::after{top:2px;left:2px;background:var(--ink);box-shadow:none;transition:transform 300ms var(--pop),background-color 200ms ease}
+.anahtar input:checked{background:var(--sun);border-color:var(--ink)}
+.anahtar input:checked::after{background:var(--ink);transform:translateX(18px)}
+.anahtar:hover input{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+.anahtar input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.rozet{border:2px solid var(--ink);font-weight:500;box-shadow:2px 2px 0 var(--ink)}
+.rozet[data-durum="taslak"]{background:var(--bg-2);color:var(--ink-2);border-style:dashed}
+.rozet[data-durum="acik"]{background:var(--accent);color:#fff;border-color:var(--ink)}
+.rozet[data-durum="degerlendirme"]{background:var(--sun);color:var(--ink)}
+.rozet[data-durum="kazanan"]{background:var(--ok);color:#fff}
+.rozet[data-durum="uretim"]{background:var(--pink);color:var(--ink)}
+.rozet[data-durum="kapali"]{background:var(--bg-3);color:var(--ink-2);border-style:solid;box-shadow:none}
+.rozet.gri{background:var(--bg-3);color:var(--ink-2)}
+.rozet.yesil{background:var(--bg-2);color:var(--ok);border-color:var(--ok)}
+.rozet.sari{background:var(--sun);color:var(--ink)}
+.rozet.kirmizi{background:var(--err);color:#fff;border-color:var(--ink)}
+.rozet.mor{background:var(--accent-soft);color:var(--accent)}
+.tablo-kap{border:2px solid var(--ink);border-radius:var(--r-md);box-shadow:var(--hard);background:var(--bg-2)}
+.tablo th{background:var(--sun);color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--ink)}
+.tablo th,.tablo td{border-bottom-color:var(--line)}
+.tablo tbody tr:hover td{background:var(--bg-3)}
+.tablo td.sayi{font-weight:500}
+.tablo td a:hover{color:var(--accent)}
+.arac-cubugu .chip{border-width:2px}
+.arac-cubugu .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--ink);color:#fff}
+.sekmeler{border-bottom:2px solid var(--ink)}
+.sekmeler .sekme,.sekmeler [role="tab"]{font-weight:500;border-radius:var(--r-sm) var(--r-sm) 0 0;transition:transform 220ms var(--pop),background-color 160ms ease,color 160ms ease}
+.sekmeler .sekme:hover,.sekmeler [role="tab"]:hover{background:var(--sun);color:var(--ink);transform:translateY(-2px)}
+.sekmeler .sekme[aria-selected="true"],.sekmeler [role="tab"][aria-selected="true"]{background:var(--accent);color:#fff;border:2px solid var(--ink);border-bottom:2px solid var(--accent);margin-bottom:-2px}
+.panel{border:2px solid var(--ink);border-radius:var(--r-md);box-shadow:var(--hard)}
+.panel-bas{background:var(--bg-2);border-bottom:2px solid var(--ink)}
+.panel-bas h2{font-family:var(--f-serif);font-weight:800;font-size:19px;letter-spacing:-.02em}
+.istat{border:2px solid var(--ink);border-radius:var(--r-md);box-shadow:var(--hard);transition:transform 220ms var(--pop),box-shadow 220ms var(--pop)}
+.istat:hover{transform:translate(-2px,-2px) rotate(-.4deg);box-shadow:6px 6px 0 var(--ink)}
+.istat:nth-child(3n+2){background:var(--bg-3)}
+.istat b{font-family:var(--f-serif);font-weight:800}
+.ilerleme{border:2px solid var(--ink);border-radius:999px;background:var(--bg-2);height:14px}
+.ilerleme i{background:repeating-linear-gradient(-45deg,var(--sun) 0 8px,var(--ink) 8px 10px);border-right:2px solid var(--ink)}
+.bildirim{border:2px solid var(--ink);border-left-width:10px;box-shadow:var(--shadow);font-weight:500;animation:bildirim-zipla 520ms var(--pop) both}
+.bildirim.ok{border-left-color:var(--ok)}
+.bildirim.hata{border-left-color:var(--err)}
+.bildirim.bilgi{border-left-color:var(--accent)}
+@keyframes bildirim-zipla{from{opacity:0;transform:translateY(16px) rotate(-2deg) scale(.96)}}
+.bos{border:2px dashed var(--ink);border-radius:var(--r-md);background:var(--bg-2);box-shadow:var(--hard)}
+.bos b{font-family:var(--f-serif);font-weight:800;font-size:20px;letter-spacing:-.02em}
+.zaman-cizelgesi{border-inline-start:2px solid var(--ink)}
+.zaman-cizelgesi li::before{border:2px solid var(--ink);background:var(--sun);transition:transform 260ms var(--pop)}
+.zaman-cizelgesi li:last-child::before{background:var(--accent)}
+.zaman-cizelgesi li:hover::before{transform:scale(1.25) rotate(-8deg)}
+.zaman-cizelgesi b{font-weight:700}
+.diyalog{border:2px solid var(--ink);border-radius:var(--r-lg);box-shadow:10px 10px 0 var(--ink)}
+.diyalog > header{background:var(--sun);border-bottom:2px solid var(--ink)}
+.diyalog > header h2{font-family:var(--f-serif);font-weight:800;font-size:21px;letter-spacing:-.02em}
+.diyalog > footer{border-top:2px solid var(--ink);background:var(--bg-2)}
+.diyalog[open]{animation:dlg-zipla 420ms var(--pop)}
+@keyframes dlg-zipla{from{opacity:0;transform:translateY(16px) rotate(-1.5deg) scale(.96)}}
+.y-bas{background:var(--bg-2);border-bottom:2px solid var(--ink)}
+.y-bas .brand b{font-family:var(--f-serif);font-weight:800}
+.y-yan{border-right:2px solid var(--ink)}
+.y-yan a{border:2px solid transparent;font-weight:500;transition:transform 200ms var(--pop),background-color 160ms ease,border-color 160ms ease}
+.y-yan a:hover{background:var(--sun);border-color:var(--ink);color:var(--ink);transform:translate(-2px,-2px);box-shadow:var(--hard)}
+.y-yan a[aria-current="page"]{background:var(--accent);color:#fff;border-color:var(--ink);box-shadow:var(--hard)}
+@media (max-width:800px){.y-yan{border-right:0;border-bottom:2px solid var(--ink)}}
+.damga{border:2.5px solid var(--ink);border-radius:8px;background:var(--sun);color:var(--ink);font-weight:800;box-shadow:var(--hard);font-size:13px;letter-spacing:.06em;padding:4px 10px}
+@media (prefers-reduced-motion:reduce){.bildirim,.diyalog[open],.bildirim.ok,.zaman-cizelgesi li::before{animation:none;transition:none}.istat:hover,.y-yan a:hover,.sekmeler .sekme:hover,.sekmeler [role="tab"]:hover,.anahtar:hover input{transform:none}}

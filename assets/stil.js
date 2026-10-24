@@ -4,11 +4,13 @@
    own site and two tabs never affect each other. */
 (function(){
   'use strict';
-  var LIST = { kagit:'Kâğıt', oyuncu:'Oyuncu' };
+  // Oyuncu is the design language (owner's call, 24 Oct 2026); Kâğıt stays as ?stil=kagit
+  var LIST = { oyuncu:'Oyuncu', kagit:'Kâğıt' };
+  var DEFAULT = 'oyuncu';
   var LANGS = { tr:'Türkçe', en:'English' };
   var base = document.currentScript.src.replace(/assets\/stil\.js.*$/, '');
   var qs = new URLSearchParams(location.search);
-  var stil = LIST[qs.get('stil')] ? qs.get('stil') : 'kagit';
+  var stil = LIST[qs.get('stil')] ? qs.get('stil') : DEFAULT;
   var dil = LANGS[qs.get('dil')] ? qs.get('dil') : 'tr';
   var edit = qs.get('duzenle') === '1';
   var html = document.documentElement;
@@ -31,14 +33,14 @@
     document.write('<script src="' + base + 'assets/duzenle.js" defer><\/script>');
   }
 
-  window.UD_STIL = { list: LIST, current: stil, langs: LANGS, lang: dil, edit: edit, withStil: withStil, withLang: withLang };
+  window.UD_STIL = { list: LIST, current: stil, fallback: DEFAULT, langs: LANGS, lang: dil, edit: edit, withStil: withStil, withLang: withLang };
   // the heading face is what the first screen waits for, so ask for it before the stylesheets find it
   var HEAD = { kagit:'instrument-serif-normal-400', oyuncu:'bricolage-grotesque-normal-500_800' }[stil];
   ['latin', 'latin-ext'].forEach(function(sub){ document.write('<link rel="preload" as="font" type="font/woff2" crossorigin href="' + base + 'assets/fonts/' + HEAD + '-' + sub + '.woff2">'); });
-  if (stil !== 'kagit') document.write('<link rel="stylesheet" href="' + base + 'assets/stil/' + stil + '.css">');
+  if (stil === 'oyuncu') document.write('<link rel="stylesheet" href="' + base + 'assets/stil/oyuncu.css">');
 
   function carry(u, s, l){
-    if (s === 'kagit') u.searchParams.delete('stil'); else u.searchParams.set('stil', s);
+    if (s === DEFAULT) u.searchParams.delete('stil'); else u.searchParams.set('stil', s);
     if (l === 'tr') u.searchParams.delete('dil'); else u.searchParams.set('dil', l);
     if (edit) u.searchParams.set('duzenle', '1');
     return u.pathname + u.search + u.hash;
@@ -51,7 +53,7 @@
     var u = new URL(href, location.href);
     return u.origin !== location.origin ? href : carry(u, u.searchParams.get('stil') || stil, l);
   }
-  var plain = stil === 'kagit' && dil === 'tr' && !edit;
+  var plain = stil === DEFAULT && dil === 'tr' && !edit;
   function fix(root){
     if (plain || !root.querySelectorAll) return;
     var links = root.matches && root.matches('a[href]') ? [root] : root.querySelectorAll('a[href]');

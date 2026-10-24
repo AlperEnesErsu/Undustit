@@ -1,27 +1,59 @@
-/* Style loader. ?stil=<name> picks one look for the whole visit. It runs in <head> so the page never
-   flashes the default look, and it carries the style on every internal link instead of storing it,
-   so each style opens as its own site and two tabs in two styles never affect each other. */
+/* Look and language loader. ?stil=<name> picks one look, ?dil=en the English text, ?duzenle=1 the in-page
+   text editor. It runs in <head> so the page never flashes the default look or the wrong language, and it
+   carries these choices on every internal link instead of storing them, so each combination opens as its
+   own site and two tabs never affect each other. */
 (function(){
   'use strict';
   var LIST = { kagit:'Kâğıt', oyuncu:'Oyuncu' };
+  var LANGS = { tr:'Türkçe', en:'English' };
   var base = document.currentScript.src.replace(/assets\/stil\.js.*$/, '');
-  var q = new URLSearchParams(location.search).get('stil');
-  var stil = LIST[q] ? q : 'kagit';
-  window.UD_STIL = { list: LIST, current: stil, withStil: withStil };
-  document.documentElement.setAttribute('data-stil', stil);
+  var qs = new URLSearchParams(location.search);
+  var stil = LIST[qs.get('stil')] ? qs.get('stil') : 'kagit';
+  var dil = LANGS[qs.get('dil')] ? qs.get('dil') : 'tr';
+  var edit = qs.get('duzenle') === '1';
+  var html = document.documentElement;
+  html.setAttribute('data-stil', stil);
+  html.setAttribute('lang', dil);
+  if (edit) html.setAttribute('data-duzenle', '');
+
+  // text: every language's dictionary sits on top of Turkish, so a key missing in English still reads
+  window.UD_METIN = {
+    lang: dil, tr: {}, en: {},
+    ekle: function(l, o){ for (var k in o) this[l][k] = o[k]; },
+    al: function(k){ var d = this[dil]; return k in d ? d[k] : this.tr[k]; }
+  };
+  document.write('<script src="' + base + 'assets/metin/tr.js"><\/script>');
+  if (dil !== 'tr') document.write('<script src="' + base + 'assets/metin/' + dil + '.js"><\/script>');
+  if (edit){
+    // edit mode: remember the dictionary as shipped, then lay this browser's unsaved edits on top
+    document.write('<script>(function(M){var d=M.' + dil + ';M._base={};for(var k in M.tr)M._base[k]=k in d?d[k]:M.tr[k];' +
+      'try{var o=JSON.parse(localStorage.getItem("ud-metin-' + dil + '")||"{}");for(var j in o)d[j]=o[j];}catch(e){}})(UD_METIN)<\/script>');
+    document.write('<script src="' + base + 'assets/duzenle.js" defer><\/script>');
+  }
+
+  window.UD_STIL = { list: LIST, current: stil, langs: LANGS, lang: dil, edit: edit, withStil: withStil, withLang: withLang };
   // the heading face is what the first screen waits for, so ask for it before the stylesheets find it
   var HEAD = { kagit:'instrument-serif-normal-400', oyuncu:'bricolage-grotesque-normal-500_800' }[stil];
   ['latin', 'latin-ext'].forEach(function(sub){ document.write('<link rel="preload" as="font" type="font/woff2" crossorigin href="' + base + 'assets/fonts/' + HEAD + '-' + sub + '.woff2">'); });
   if (stil !== 'kagit') document.write('<link rel="stylesheet" href="' + base + 'assets/stil/' + stil + '.css">');
 
-  function withStil(href){
-    var u = new URL(href, location.href);
-    if (u.origin !== location.origin) return href;
-    if (stil === 'kagit') u.searchParams.delete('stil'); else u.searchParams.set('stil', stil);
+  function carry(u, s, l){
+    if (s === 'kagit') u.searchParams.delete('stil'); else u.searchParams.set('stil', s);
+    if (l === 'tr') u.searchParams.delete('dil'); else u.searchParams.set('dil', l);
+    if (edit) u.searchParams.set('duzenle', '1');
     return u.pathname + u.search + u.hash;
   }
+  function withStil(href, s){
+    var u = new URL(href, location.href);
+    return u.origin !== location.origin ? href : carry(u, s || stil, u.searchParams.get('dil') || dil);
+  }
+  function withLang(href, l){
+    var u = new URL(href, location.href);
+    return u.origin !== location.origin ? href : carry(u, u.searchParams.get('stil') || stil, l);
+  }
+  var plain = stil === 'kagit' && dil === 'tr' && !edit;
   function fix(root){
-    if (stil === 'kagit' || !root.querySelectorAll) return;
+    if (plain || !root.querySelectorAll) return;
     var links = root.matches && root.matches('a[href]') ? [root] : root.querySelectorAll('a[href]');
     Array.prototype.forEach.call(links, function(a){
       var h = a.getAttribute('href');

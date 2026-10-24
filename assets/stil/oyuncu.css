@@ -36,6 +36,8 @@ h1 em,h2 em,.cb-h em{font-style:normal;background:linear-gradient(transparent 58
 .btn.alt:hover{background:var(--sun);color:var(--ink)}
 .chip{border-width:2px;border-color:var(--ink);color:var(--ink);font-weight:500}
 .chip:hover{background:var(--sun);border-color:var(--ink)}
+.lang{border:2px solid var(--ink)}
+.lang a:hover{background:var(--sun)}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff}
 .chip.case[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--ink)}
 
@@ -92,6 +94,7 @@ dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 /* "Alırdım" lands like a rubber stamp: the button thumps down and a tilted stamp flashes over it */
 .buy.just .vote{animation:stamp-thump 420ms var(--pop)}
 .buy.just::after{content:"ALIRDIM!";position:absolute;left:50%;top:50%;z-index:3;padding:3px 8px;border:2.5px solid var(--accent);border-radius:6px;background:var(--bg-2);color:var(--accent);font:800 13px/1 var(--f-serif);letter-spacing:.02em;white-space:nowrap;pointer-events:none;animation:stamp 900ms cubic-bezier(.2,.9,.3,1.2) forwards}
+html[lang="en"] .buy.just::after{content:"I'D BUY!"}
 @keyframes stamp-thump{0%{transform:scale(1)}35%{transform:scale(.86) rotate(-3deg)}100%{transform:none}}
 @keyframes stamp{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2) rotate(-24deg)}30%{opacity:1;transform:translate(-50%,-50%) scale(.95) rotate(-12deg)}70%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-12deg)}100%{opacity:0;transform:translate(-50%,-90%) scale(1) rotate(-12deg)}}
 @media (prefers-reduced-motion:reduce){.buy.just .vote,.buy.just::after{animation:none}.buy.just::after{display:none}}
@@ -119,3 +122,5 @@ html .fig{border:2px solid var(--ink);font-weight:500;background:var(--bg-2)}
 .disc a:nth-child(4):hover{background:var(--pink)}
 @media (max-width:900px){.disc{grid-template-columns:repeat(2,minmax(0,1fr))}.disc a:nth-child(3){padding-inline-start:22px;border-inline-start:2px solid var(--ink)}}
 @media (max-width:560px){.disc{grid-template-columns:minmax(0,1fr)}}
+/* Bricolage has no italic: emphasis in running text is weight, not a fake slant */
+p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;font-weight:700;color:var(--ink)}

@@ -5,6 +5,28 @@
 const html = document.documentElement;
 const ROOT = html.dataset.root || '';
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+// =========================================================== text
+// Every word the site shows comes from assets/metin/<dil>.js (loaded by stil.js). T('key', {n:3}) fills {n}.
+const METIN = window.UD_METIN || { lang:'tr', al: () => undefined };
+const LANG = METIN.lang;
+const LOCALE = LANG === 'en' ? 'en-GB' : 'tr-TR';
+function T(k, v){
+  let s = METIN.al(k);
+  if (s == null) return k;
+  if (v) s = s.replace(/\{(\w+)\}/g, (m, n) => n in v ? v[n] : m);
+  return s;
+}
+// pages carry their text in place (data-t for the inside, data-ta="attr:key;attr:key" for attributes)
+function applyText(root=document){
+  if (root === document && LANG !== 'tr'){
+    // the English page is its own page for search engines, not a copy of the Turkish one
+    const c = $('link[rel=canonical]'); if (c) c.href = c.href.split('?')[0] + '?dil=' + LANG;
+    const l = $('meta[property="og:locale"]'); if (l) l.content = 'en_GB';
+  }
+  root.querySelectorAll('[data-t]').forEach(n => { const v = METIN.al(n.dataset.t); if (v != null && n.innerHTML !== v) n.innerHTML = v; });
+  if (LANG !== 'tr') root.querySelectorAll('figcaption').forEach(n => { if (/^×\s?[\d.]+$/.test(n.textContent.trim())) n.textContent = '× ' + Number(n.textContent.replace(/\D/g, '')).toLocaleString(LOCALE); });
+  root.querySelectorAll('[data-ta]').forEach(n => n.dataset.ta.split(';').forEach(p => { const [a, k] = p.split(':'); const v = METIN.al(k); if (v != null) n.setAttribute(a, v); }));
+}
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 function el(tag, props={}, kids=[]){
@@ -37,18 +59,20 @@ const TERMS = {
   liveDay: 4, liveHourUtc: 17 // Thursday 20:00 Istanbul (UTC+3, no DST)
 };
 const CATS = ['Mutfak','Ev & dekor','Fitness','Ofis & masa','Dış mekân','Teknoloji aksesuarı','Çocuk','Evcil hayvan'];
-const CASES = [{ id:'vaka-01', name:'Vaka 01 · Bir milyon cıvata', short:'Vaka 01 · Cıvata', href:'vaka-01/' }];
-const CRIT = [['d','Tasarım'],['m','Pazar'],['u','Uygulanabilirlik']];
+const CASES = [{ id:'vaka-01', name:T('ud.vaka1.ad'), tag:T('ud.vaka1.etiket'), short:'Vaka 01 · Cıvata', href:'vaka-01/' }];
+// categories and case names are stored in Turkish (they are data); only what is shown is translated
+const catName = c => { const v = METIN.al('ud.kat.' + c); return v == null ? c : v; };
+const CRIT = [['d',T('ud.olcut.d')],['m',T('ud.olcut.m')],['u',T('ud.olcut.u')]];
 const EXAMPLES = [
-  { key:'ex:1', ex:true, title:'Tezgâh kenarına takılan, katlanınca rafa dönen kesme tahtası.', cat:'Mutfak', problem:'Dar mutfakta kesme tahtası tezgâhı kaplıyor.', solution:'Menteşeli tabla tezgâh kenarına kelepçeyle takılır, kullanılmayınca dikey rafa döner.', feats:['Delmeden montaj','Bulaşık makinesine girer'], at:null },
-  { key:'ex:2', ex:true, title:'Halter plakalarını duvarda dik tutan, cıvatalı modüler raf.', cat:'Vaka 01 · Cıvata', problem:'Ev spor köşesinde plakalar yerde dağınık duruyor.', solution:'Vaka 01 cıvataları pim olur; duvar profiline istenen aralıkla takılır.', feats:['Fazla stok cıvata kullanır','Modüler'], at:null },
-  { key:'ex:3', ex:true, title:'Kedi kumunu her açılışta tartıp sağlık uyarısı veren kapak.', cat:'Evcil hayvan', problem:'Kedinin idrar düzenindeki değişiklik geç fark ediliyor.', solution:'Kapağa gömülü tartı ziyaret sayısını ve ağırlığı telefona yollar.', feats:['Pil ile 6 ay','Uygulama gerekmez, SMS'], at:null }
+  { key:'ex:1', ex:true, title:T('ud.ornek.1.baslik'), cat:'Mutfak', problem:T('ud.ornek.1.problem'), solution:T('ud.ornek.1.cozum'), feats:[T('ud.ornek.1.oz1'),T('ud.ornek.1.oz2')], at:null },
+  { key:'ex:2', ex:true, title:T('ud.ornek.2.baslik'), cat:'Vaka 01 · Cıvata', problem:T('ud.ornek.2.problem'), solution:T('ud.ornek.2.cozum'), feats:[T('ud.ornek.2.oz1'),T('ud.ornek.2.oz2')], at:null },
+  { key:'ex:3', ex:true, title:T('ud.ornek.3.baslik'), cat:'Evcil hayvan', problem:T('ud.ornek.3.problem'), solution:T('ud.ornek.3.cozum'), feats:[T('ud.ornek.3.oz1'),T('ud.ornek.3.oz2')], at:null }
 ];
 
 // =========================================================== helpers
 const DAY = 864e5;
-const fmtDate = d => d.toLocaleDateString('tr-TR', { day:'numeric', month:'long' });
-const fmtDay = d => d.toLocaleDateString('tr-TR', { weekday:'long', day:'numeric', month:'long' });
+const fmtDate = d => d.toLocaleDateString(LOCALE, { day:'numeric', month:'long' });
+const fmtDay = d => d.toLocaleDateString(LOCALE, { weekday:'long', day:'numeric', month:'long' });
 function nextLive(now = new Date()){
   const t = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), TERMS.liveHourUtc));
   let add = (TERMS.liveDay - t.getUTCDay() + 7) % 7;
@@ -67,16 +91,21 @@ const STIL = window.UD_STIL || { list:{}, current:'kagit', withStil: h => h };
 const withStil = h => STIL.withStil(h);
 
 // =========================================================== nav + footer
+// TR / EN switch in the bar: a link to the same page in the other language (keeps style and edit mode)
+function langSwitch(){
+  return `<span class="lang" role="group" aria-label="${T('ud.menu.dil')}">${Object.keys(STIL.langs || { tr:1 }).map(l =>
+    `<a data-stil-link lang="${l}" hreflang="${l}" href="${STIL.withLang ? STIL.withLang(location.pathname + location.hash, l) : '#'}"${l === LANG ? ' aria-current="true"' : ''}>${l.toUpperCase()}</a>`).join('')}</span>`;
+}
 function mountChrome(){
   const cur = html.dataset.page || '';
-  const links = [['fikirler','Fikirler','fikirler/'],['nasil','Nasıl işler','nasil/'],['vakalar','Vakalar','vakalar/'],['hikaye','Hikâye','hikaye/']];
+  const links = [['fikirler',T('ud.menu.fikirler'),'fikirler/'],['nasil',T('ud.menu.nasil'),'nasil/'],['vakalar',T('ud.menu.vakalar'),'vakalar/'],['hikaye',T('ud.menu.hikaye'),'hikaye/']];
   const host = $('[data-ud-nav]');
   if (host){
     host.className = 'nav'; host.id = 'nav';
-    host.innerHTML = `<div class="wrap"><a class="brand" lang="en" href="${homeHref()}" aria-label="Undustit ana sayfa"><b>Undust<i>it</i></b></a>
-      <div class="nav-r"><nav class="nav-links" id="nav-links" aria-label="Ana menü">${links.map(([k,l,h])=>`<a href="${ROOT+h}"${k===cur?' aria-current="page"':''}>${l}</a>`).join('')}</nav>
-      <a class="btn sig sm" href="${ROOT}fikir/">Fikrini yaz</a>
-      <button type="button" class="menu-t" aria-expanded="false" aria-controls="nav-links" aria-label="Menü"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>`;
+    host.innerHTML = `<div class="wrap"><a class="brand" lang="en" href="${homeHref()}" aria-label="${T('ud.menu.anasayfa')}"><b>Undust<i>it</i></b></a>
+      <div class="nav-r"><nav class="nav-links" id="nav-links" aria-label="${T('ud.menu.ana')}">${links.map(([k,l,h])=>`<a href="${ROOT+h}"${k===cur?' aria-current="page"':''}>${l}</a>`).join('')}</nav>
+      <a class="btn sig sm" href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${langSwitch()}
+      <button type="button" class="menu-t" aria-expanded="false" aria-controls="nav-links" aria-label="${T('ud.menu.menu')}"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>`;
     const btn = $('.menu-t', host);
     const set = o => { host.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); };
     btn.onclick = () => set(!host.classList.contains('open'));
@@ -85,9 +114,9 @@ function mountChrome(){
   const foot = $('[data-ud-foot]');
   if (foot){
     foot.className = 'foot';
-    foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>Undustit · prototip · <span class="mode-badge" id="mode-badge"><i></i>bağlanıyor</span></span>
-      <nav aria-label="Alt menü"><a href="${ROOT}fikir/">Fikrini yaz</a><a href="${ROOT}fikirler/">Fikirler</a><a href="${ROOT}nasil/">Nasıl işler</a><a href="${ROOT}vakalar/">Vakalar</a><a href="${ROOT}hikaye/">Hikâye</a></nav></div>
-      <div class="wrap stil-bar"><span>Stil</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${location.pathname}${k === 'kagit' ? '' : '?stil=' + k}"${k === STIL.current ? ' aria-current="true"' : ''}>${l}</a>`).join('')}<a data-stil-link href="${ROOT}stiller/">Hepsi yan yana</a></div>`;
+    foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>${T('ud.alt.prototip')} <span class="mode-badge" id="mode-badge"><i></i>${T('ud.alt.baglaniyor')}</span></span>
+      <nav aria-label="${T('ud.alt.menu')}"><a href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${links.map(([k,l,h]) => `<a href="${ROOT+h}">${l}</a>`).join('')}</nav></div>
+      <div class="wrap stil-bar"><span>${T('ud.alt.stil')}</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${STIL.withStil(location.pathname, k)}"${k === STIL.current ? ' aria-current="true"' : ''}>${T('ud.stil.' + k)}</a>`).join('')}<a href="${ROOT}stiller/">${T('ud.alt.hepsi')}</a></div>`;
   }
 }
 
@@ -118,7 +147,7 @@ const Store = (function(){
   const badge = () => {
     const b = $('#mode-badge'); if (!b) return;
     b.classList.toggle('live', S.mode === 'live');
-    b.lastChild.textContent = S.mode === 'live' ? 'canlı' : 'önizleme · veriler bu tarayıcıda';
+    b.lastChild.textContent = S.mode === 'live' ? T('ud.alt.canli') : T('ud.alt.onizleme');
   };
   const ready = (async () => {
     if (!(window.claude && window.claude.use)) return;
@@ -208,8 +237,8 @@ function mountThu(node){
   const tick = () => {
     const t = nextLive(), ms = t - Date.now();
     const d = Math.floor(ms/DAY), h = Math.floor(ms%DAY/36e5), m = Math.floor(ms%36e5/6e4);
-    node.innerHTML = `<i class="dot" aria-hidden="true"></i><span>Perşembe 20.00 canlı</span><b>${d ? d+'g ' : ''}${h}s ${String(m).padStart(2,'0')}dk</b>`;
-    node.setAttribute('title', fmtDay(t) + ', 20.00');
+    node.innerHTML = `<i class="dot" aria-hidden="true"></i><span>${T('ud.persembe.canli')}</span><b>${d ? d + T('ud.persembe.g') + ' ' : ''}${h}${T('ud.persembe.s')} ${String(m).padStart(2,'0')}${T('ud.persembe.dk')}</b>`;
+    node.setAttribute('title', fmtDay(t) + T('ud.persembe.saat'));
   };
   tick(); setInterval(tick, 30000);
 }
@@ -219,29 +248,29 @@ const handleGet = () => { try { return localStorage.getItem('ud-handle') || ''; 
 const handleSet = v => { try { localStorage.setItem('ud-handle', v); } catch(e){} };
 function feeLine(){
   const f = TERMS.fee, n = Store.myCount();
-  const now = n ? `${f.next} ${f.cur}` : `${f.first} ${f.cur}`;
-  return `Gönderim ücreti: ilk fikir <b>${f.first} ${f.cur}</b>, sonrakiler <b>${f.next} ${f.cur}</b> (bu fikir için ${now}). “Alırdım” demek ve geliştirmeye katılmak ücretsiz.` + (f.charged ? '' : ' <b>Prototipte ödeme alınmıyor.</b>');
+  const now = tl(n ? f.next : f.first);
+  return T('ud.form.ucret', { ilk:tl(f.first), sonra:tl(f.next), bu:now }) + (f.charged ? '' : ' ' + T('ud.form.odemeyok'));
 }
 function mountForm(host, opts={}){
   const preCase = opts.caseId ? CASES.find(c => c.id === opts.caseId) : null;
   const id = 'f' + Math.random().toString(36).slice(2,7);
   host.innerHTML = `
-  <form class="iform" novalidate aria-label="Fikir gönder">
+  <form class="iform" novalidate aria-label="${T('ud.form.aria')}">
     <div class="if-top">
-      <label for="${id}-p"><span class="eyebrow k">${opts.label || 'Fikrin, tek cümlede'}</span><span class="if-count" aria-live="polite">0 / 140</span></label>
-      <textarea id="${id}-p" class="if-pitch" rows="1" maxlength="160" placeholder="${opts.placeholder || 'Ne yapıyor, kimin işine yarıyor?'}" required></textarea>
-      <button type="button" class="btn sig if-next" aria-controls="${id}-more" aria-expanded="false">Devam ${ICON.arrow}</button>
+      <label for="${id}-p"><span class="eyebrow k">${opts.label || T('ud.form.etiket')}</span><span class="if-count" aria-live="polite">0 / 140</span></label>
+      <textarea id="${id}-p" class="if-pitch" rows="1" maxlength="160" placeholder="${opts.placeholder || T('ud.form.ipucu')}" required></textarea>
+      <button type="button" class="btn sig if-next" aria-controls="${id}-more" aria-expanded="false">${T('ud.form.devam')} ${ICON.arrow}</button>
     </div>
     <div class="if-more" id="${id}-more"><div><div class="if-body">
-      <div class="if-field" role="group" aria-labelledby="${id}-cl"><span id="${id}-cl">Kategori</span><div class="chips if-cats"></div></div>
+      <div class="if-field" role="group" aria-labelledby="${id}-cl"><span id="${id}-cl">${T('ud.form.kategori')}</span><div class="chips if-cats"></div></div>
       <div class="if-two">
-        <label class="if-field"><span>Çözdüğü problem <small>kısa</small></span><textarea name="problem" maxlength="400" required placeholder="Bugün neyi zorlaştırıyor?"></textarea></label>
-        <label class="if-field"><span>Çözüm <small>kısa</small></span><textarea name="solution" maxlength="400" required placeholder="Fikrin bunu nasıl çözüyor?"></textarea></label>
+        <label class="if-field"><span>${T('ud.form.problem')} <small>${T('ud.form.kisa')}</small></span><textarea name="problem" maxlength="400" required placeholder="${T('ud.form.problem.ipucu')}"></textarea></label>
+        <label class="if-field"><span>${T('ud.form.cozum')} <small>${T('ud.form.kisa')}</small></span><textarea name="solution" maxlength="400" required placeholder="${T('ud.form.cozum.ipucu')}"></textarea></label>
       </div>
-      <div class="if-field" role="group" aria-labelledby="${id}-fl"><span id="${id}-fl">Temel özellikler <small>en az 1, en çok 3</small></span>
-        <div class="feats"><input name="f1" maxlength="80" placeholder="1. özellik" aria-label="1. özellik"><input name="f2" maxlength="80" placeholder="2. özellik (isteğe bağlı)" aria-label="2. özellik"><input name="f3" maxlength="80" placeholder="3. özellik (isteğe bağlı)" aria-label="3. özellik"></div></div>
-      <label class="if-field" style="max-width:320px"><span>Görünen ad <small>isteğe bağlı</small></span><input name="handle" maxlength="30" autocomplete="nickname" placeholder="ör. ayse.k"></label>
-      <div class="if-foot"><p class="if-fee"></p><button type="submit" class="btn sig">Fikri gönder ${ICON.arrow}</button></div>
+      <div class="if-field" role="group" aria-labelledby="${id}-fl"><span id="${id}-fl">${T('ud.form.ozellik')} <small>${T('ud.form.ozellik.not')}</small></span>
+        <div class="feats"><input name="f1" maxlength="80" placeholder="${T('ud.form.oz1')}" aria-label="${T('ud.form.oz1')}"><input name="f2" maxlength="80" placeholder="${T('ud.form.oz2')}" aria-label="${T('ud.form.oz2.aria')}"><input name="f3" maxlength="80" placeholder="${T('ud.form.oz3')}" aria-label="${T('ud.form.oz3.aria')}"></div></div>
+      <label class="if-field" style="max-width:320px"><span>${T('ud.form.ad')} <small>${T('ud.form.istege')}</small></span><input name="handle" maxlength="30" autocomplete="nickname" placeholder="${T('ud.form.ad.ipucu')}"></label>
+      <div class="if-foot"><p class="if-fee"></p><button type="submit" class="btn sig">${T('ud.form.gonder')} ${ICON.arrow}</button></div>
       <p class="if-status" role="status" aria-live="polite"></p>
     </div></div></div>
     <div class="if-done" tabindex="-1"></div>
@@ -250,7 +279,7 @@ function mountForm(host, opts={}){
   let cat = preCase ? preCase.short : '';
   const cats = $('.if-cats', f);
   const all = CASES.map(c => [c.short, true]).concat(CATS.map(c => [c, false]));
-  all.forEach(([c, isCase]) => cats.append(el('button', { type:'button', class:'chip' + (isCase ? ' case' : ''), 'aria-pressed': String(c === cat), text:c, onclick(){ cat = c; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.textContent === c))); } })));
+  all.forEach(([c, isCase]) => cats.append(el('button', { type:'button', class:'chip' + (isCase ? ' case' : ''), 'aria-pressed': String(c === cat), 'data-cat':c, text:catName(c), onclick(){ cat = c; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c))); } })));
   f.handle.value = handleGet();
   const paintFee = () => { $('.if-fee', f).innerHTML = feeLine(); };
   Store.sub(paintFee);
@@ -269,35 +298,35 @@ function mountForm(host, opts={}){
     e.preventDefault();
     const title = pitch.value.trim(), feats = [f.f1, f.f2, f.f3].map(x => x.value.trim()).filter(Boolean);
     const fail = (msg, node) => { say(msg, true); open(); node && node.focus(); };
-    if (title.length < 10) return fail('Fikri en az 10 karakterle anlat.', pitch);
-    if (title.length > 140) return fail('Tek cümle 140 karakteri geçmesin.', pitch);
-    if (!cat) return fail('Bir kategori seç.', $('.chip', cats));
-    if (f.problem.value.trim().length < 8) return fail('Problemi bir cümleyle yaz.', f.problem);
-    if (f.solution.value.trim().length < 8) return fail('Çözümü bir cümleyle yaz.', f.solution);
-    if (!feats.length) return fail('En az bir temel özellik yaz.', f.f1);
-    if (!Store.canWrite) return fail('Bu bağlantıyla yalnız okuyabilirsin; fikir göndermek için katkı izni gerekiyor.');
+    if (title.length < 10) return fail(T('ud.form.hata.kisa'), pitch);
+    if (title.length > 140) return fail(T('ud.form.hata.uzun'), pitch);
+    if (!cat) return fail(T('ud.form.hata.kategori'), $('.chip', cats));
+    if (f.problem.value.trim().length < 8) return fail(T('ud.form.hata.problem'), f.problem);
+    if (f.solution.value.trim().length < 8) return fail(T('ud.form.hata.cozum'), f.solution);
+    if (!feats.length) return fail(T('ud.form.hata.ozellik'), f.f1);
+    if (!Store.canWrite) return fail(T('ud.form.hata.izin'));
     const handle = f.handle.value.trim(); handleSet(handle);
-    say('Gönderiliyor…');
+    say(T('ud.form.gonderiliyor'));
     $('[type=submit]', f).disabled = true;
     Store.addIdea({ title, cat, problem:f.problem.value.trim(), solution:f.solution.value.trim(), feats, handle }).then(k => {
       const end = new Date(Date.now() + TERMS.voteDays*DAY);
       const done = $('.if-done', f);
-      done.innerHTML = `<span class="eyebrow k">Gönderildi · talep topluyor</span><h3>${esc(title)}</h3>
-        <dl><div><dt>Talep süresi biter</dt><dd>${fmtDate(end)}</dd></div><div><dt>İlk canlı değerlendirme</dt><dd>${fmtDay(nextLive())}, 20.00</dd></div><div><dt>Ölçütler</dt><dd>Tasarım · Pazar · Uygulanabilirlik</dd></div></dl>
-        <p class="lead" style="font-size:15px">Topluluk 30 gün boyunca “alırdım” der ve kaça alacağını yazar; iyileştirme önerir, endişesini söyler. Seçilmesen de kaç kişinin hangi fiyata alacağını görürsün.</p>
-        <div class="acts"><a class="btn" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">Fikrini gör ${ICON.arrow}</a><button type="button" class="btn alt again">Bir fikir daha yaz</button></div>`;
+      done.innerHTML = `<span class="eyebrow k">${T('ud.gonderildi.etiket')}</span><h3>${esc(title)}</h3>
+        <dl><div><dt>${T('ud.gonderildi.bitis')}</dt><dd>${fmtDate(end)}</dd></div><div><dt>${T('ud.gonderildi.ilk')}</dt><dd>${fmtDay(nextLive())}${T('ud.persembe.saat')}</dd></div><div><dt>${T('ud.gonderildi.olcut')}</dt><dd>${CRIT.map(c => c[1]).join(' · ')}</dd></div></dl>
+        <p class="lead" style="font-size:15px">${T('ud.gonderildi.not')}</p>
+        <div class="acts"><a class="btn" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">${T('ud.gonderildi.gor')} ${ICON.arrow}</a><button type="button" class="btn alt again">${T('ud.gonderildi.yeni')}</button></div>`;
       f.classList.add('done'); done.focus();
       $('.again', done).onclick = () => { f.reset(); f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
       opts.onSent && opts.onSent(k);
     }).catch(err => {
       $('[type=submit]', f).disabled = false;
-      say(err && err.code === 'invalid_argument' ? 'Bu bağlantıyla fikir gönderemezsin; katkı izni gerekiyor.' : 'Gönderilemedi. Bir daha dene.', true);
+      say(err && err.code === 'invalid_argument' ? T('ud.form.hata.izin2') : T('ud.form.hata.genel'), true);
     });
   });
   if (opts.focus) setTimeout(() => pitch.focus({ preventScroll:true }), 50);
   const useCase = id => {
     const c = CASES.find(x => x.id === id); if (!c) return;
-    cat = c.short; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.textContent === cat)));
+    cat = c.short; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === cat)));
     open(); f.scrollIntoView({ block:'center', behavior: reduce.matches ? 'auto' : 'smooth' }); pitch.focus({ preventScroll:true });
   };
   return { focus: () => pitch.focus(), open, useCase };
@@ -310,11 +339,11 @@ function mountCase(host, opts={}){
   host.classList.add('case-band');
   host.innerHTML = `
     <div class="cb-txt">
-      <span class="cb-tag"><i aria-hidden="true"></i>Açık vaka · ${c.name.split(' · ')[0]}</span>
-      <h2 class="cb-h">Bir milyon cıvata <em>yeni bir iş arıyor.</em></h2>
-      <p>Bir fabrikanın deposunda satılmayı bekleyen M10 × 90 flanşlı cıvata takımları. Onları kullanan bir ürün bul: malzeme hazır olduğu için üretim riski düşük, kazanan fikirle 1.000 adetlik deneme partisi yapılır.</p>
-      <dl><div><dt>Adet</dt><dd>1.000.000</dd></div><div><dt>Ölçü</dt><dd>M10 × 90 · 8.8</dd></div><div><dt>Gelen fikir</dt><dd class="cb-n">0</dd></div></dl>
-      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${c.id}" data-case="${c.id}">Bu vakaya fikir yaz ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">Vakayı gör</a><a class="link" href="${ROOT}vakalar/">Fazlan mı var? Vaka aç</a></div>
+      <span class="cb-tag"><i aria-hidden="true"></i>${T('ud.vaka.acik')} · ${c.tag}</span>
+      <h2 class="cb-h">${T('ud.vaka.baslik')}</h2>
+      <p>${T('ud.vaka.metin')}</p>
+      <dl><div><dt>${T('ud.vaka.adet')}</dt><dd>${(1e6).toLocaleString(LOCALE)}</dd></div><div><dt>${T('ud.vaka.olcu')}</dt><dd>M10 × 90 · 8.8</dd></div><div><dt>${T('ud.vaka.gelen')}</dt><dd class="cb-n">0</dd></div></dl>
+      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${c.id}" data-case="${c.id}">${T('ud.vaka.yaz')} ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">${T('ud.vaka.gor')}</a><a class="link" href="${ROOT}vakalar/">${T('ud.vaka.ac')}</a></div>
     </div>
     <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">
       <g class="cb-l"><path d="M24 52h26v46H24z"/><path d="M50 60h10v30H50z"/><path d="M60 66h150v18H60z"/>
@@ -322,7 +351,7 @@ function mountCase(host, opts={}){
       <path d="M176 56h16v38h-16z"/><path d="M192 60h8v30h-8z"/></g>
       <path class="cb-c" d="M14 75H232" />
       <g class="cb-d"><path d="M60 108v12M210 108v12M60 116H210"/><text x="135" y="132" text-anchor="middle">l = 90</text><text x="226" y="70">M10</text></g>
-    </svg><figcaption>× 1.000.000</figcaption></figure>`;
+    </svg><figcaption>× ${(1e6).toLocaleString(LOCALE)}</figcaption></figure>`;
   const a = $('[data-case]', host);
   if (opts.form) a.addEventListener('click', e => { e.preventDefault(); opts.form.useCase(c.id); });
   Store.sub(() => { $('.cb-n', host).textContent = String(Store.ideas().filter(i => i.cat === c.short).length); });
@@ -336,7 +365,9 @@ function sortIdeas(list, by){
   else c.sort((a,b) => b.buyers - a.buyers || b.avg - a.avg || String(b.at).localeCompare(String(a.at)));
   return c;
 }
-const tl = n => Math.round(n).toLocaleString('tr-TR') + ' ₺';
+// Turkish writes the percent sign first (%10), English after (10%)
+const pct = v => LANG === 'en' ? v + '%' : '%' + v;
+const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
 // "Alırdım": one tap opens a price field in place; saving it counts as purchase intent at that price.
 // The card that was just saved gets .just once, so a style can celebrate it.
 let justBought = null;
@@ -346,25 +377,25 @@ function buyCtl(i){
   const paint = () => {
     box.replaceChildren();
     // the accessible name starts with the visible text ("3 alırdım") and adds the context after it
-    const more = i.ex ? ' (örnek fikir, talep toplanmıyor)' : i.mine ? `: ${esc(i.title)}, sen ${tl(i.myPrice)} dedin, değiştir` : `: ${esc(i.title)}`;
+    const more = i.ex ? ' ' + T('ud.al.ornek') : i.mine ? ': ' + T('ud.al.benim', { baslik:esc(i.title), fiyat:tl(i.myPrice) }) : `: ${esc(i.title)}`;
     const btn = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: i.ex || !voting || !Store.canWrite,
-      html:`<b>${i.ex ? '–' : i.buyers}</b> <span>alırdım</span><span class="sr">${more}</span>` });
+      html:`<b>${i.ex ? '–' : i.buyers}</b> <span>${T('ud.al.alirdim')}</span><span class="sr">${more}</span>` });
     btn.onclick = edit;
     box.append(btn);
-    if (i.mine) box.append(el('small', { class:'buy-mine', text:'Sen: ' + tl(i.myPrice) }));
+    if (i.mine) box.append(el('small', { class:'buy-mine', text:T('ud.al.sen', { fiyat:tl(i.myPrice) }) }));
     if (justBought === i.key){ box.classList.add('just'); justBought = null; }
   };
   function edit(){
     box.replaceChildren();
-    const f = el('form', { class:'buy-f', 'aria-label':'Kaça alırdın?' });
-    const inp = el('input', { type:'text', inputmode:'decimal', placeholder:'Kaça? ₺', 'aria-label':'Kaça alırdın, lira', value: i.myPrice ? String(i.myPrice) : '' });
-    const ok = el('button', { type:'submit', class:'btn sig sm', text:'Kaydet' });
-    const no = el('button', { type:'button', class:'buy-x', 'aria-label': i.mine ? 'Alırdım demekten vazgeç' : 'Vazgeç', text: i.mine ? 'Geri al' : 'Vazgeç' });
+    const f = el('form', { class:'buy-f', 'aria-label':T('ud.al.form') });
+    const inp = el('input', { type:'text', inputmode:'decimal', placeholder:T('ud.al.ipucu'), 'aria-label':T('ud.al.aria'), value: i.myPrice ? String(i.myPrice) : '' });
+    const ok = el('button', { type:'submit', class:'btn sig sm', text:T('ud.al.kaydet') });
+    const no = el('button', { type:'button', class:'buy-x', 'aria-label': i.mine ? T('ud.al.geri.aria') : T('ud.al.vazgec'), text: i.mine ? T('ud.al.geri') : T('ud.al.vazgec') });
     no.onclick = () => { if (i.mine) Store.setBuy(i.key, 0).catch(()=>{}); else paint(); };
     f.onsubmit = e => {
       e.preventDefault();
-      const n = Math.round(parseFloat(inp.value.replace(/\./g,'').replace(',', '.')));
-      if (!(n > 0) || n > TERMS.maxPrice){ inp.focus(); inp.setAttribute('aria-invalid','true'); inp.placeholder = 'Fiyat yaz'; return; }
+      const n = Math.round(parseFloat(LANG === 'en' ? inp.value.replace(/,/g,'') : inp.value.replace(/\./g,'').replace(',', '.')));
+      if (!(n > 0) || n > TERMS.maxPrice){ inp.focus(); inp.setAttribute('aria-invalid','true'); inp.placeholder = T('ud.al.fiyatyaz'); return; }
       justBought = i.key;
       Store.setBuy(i.key, n).catch(()=>{});
     };
@@ -378,10 +409,10 @@ function buyCtl(i){
 function card(i, ix, opts={}){
   const voting = i.left > 0;
   const meta = el('div', { class:'m' }, [
-    el('span', { class:'c', text:i.cat }),
-    i.ex ? el('span', { class:'ex', text:'örnek · talep toplanmıyor' }) : el('span', { text: voting ? i.left + ' gün kaldı' : 'süre doldu' }),
-    !i.ex && i.buyers ? el('span', { class:'p', text:'ort. ' + tl(i.avg) }) : null,
-    !i.ex && i.notes && i.notes.length ? el('span', { text: i.notes.length + ' yorum' }) : null,
+    el('span', { class:'c', text:catName(i.cat) }),
+    i.ex ? el('span', { class:'ex', text:T('ud.kart.ornek') }) : el('span', { text: voting ? T('ud.kart.kaldi', { n:i.left }) : T('ud.kart.bitti') }),
+    !i.ex && i.buyers ? el('span', { class:'p', text:T('ud.kart.ort', { fiyat:tl(i.avg) }) }) : null,
+    !i.ex && i.notes && i.notes.length ? el('span', { text: T('ud.kart.yorum', { n:i.notes.length }) }) : null,
     !i.ex && i.handle ? el('span', { text: i.handle }) : null
   ]);
   const href = i.ex ? null : `${ROOT}fikirler/?f=${encodeURIComponent(i.key)}`;
@@ -399,12 +430,12 @@ function mountBoard(host, opts={}){
     host.replaceChildren();
     const box = el('div', { class:'ideas' });
     if (!list.length && opts.examples === false){
-      host.append(el('div', { class:'empty' }, [el('b', { text: opts.emptyTitle || 'Henüz aday yok.' }), el('p', { text: opts.emptyNote || '' })]));
+      host.append(el('div', { class:'empty' }, [el('b', { text: opts.emptyTitle || T('ud.liste.bos') }), el('p', { text: opts.emptyNote || '' })]));
       return;
     }
     if (!list.length){
       EXAMPLES.slice(0, opts.limit || 3).forEach((x, ix) => box.append(card(x, ix, opts)));
-      host.append(box, el('p', { class:'ex-note', text: opts.emptyNote || 'Henüz gönderilmiş fikir yok; bunlar biçimi gösteren örnekler. İlk gerçek fikir buraya düşer.' }));
+      host.append(box, el('p', { class:'ex-note', text: opts.emptyNote || T('ud.liste.ornekler') }));
       return;
     }
     list.forEach((i, ix) => box.append(card(i, ix, opts)));
@@ -428,30 +459,30 @@ function openIdea(key, push=true){
   const paint = () => {
     const it = Store.ideas().find(x => x.key === key); if (!it) return;
     const mine = Store.myRate(key);
-    dlg.innerHTML = `<header><span class="eyebrow">${esc(it.cat)} · ${it.left > 0 ? it.left + ' gün talep topluyor' : 'süre doldu'}</span><button type="button" class="x" aria-label="Kapat">${ICON.x}</button></header>
+    dlg.innerHTML = `<header><span class="eyebrow">${esc(catName(it.cat))} · ${it.left > 0 ? T('ud.pencere.topluyor', { n:it.left }) : T('ud.kart.bitti')}</span><button type="button" class="x" aria-label="${T('ud.kapat')}">${ICON.x}</button></header>
     <div class="in">
       <div style="display:grid;gap:14px"><h2 id="idlg-h">${esc(it.title)}</h2>
         <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center"><span class="dv"></span>
-        <span class="eyebrow">${it.buyers ? 'Ortalama ' + tl(it.avg) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
-      <dl><div><dt>Problem</dt><dd>${esc(it.problem || '')}</dd></div><div><dt>Çözüm</dt><dd>${esc(it.solution || '')}</dd></div>
-        <div><dt>Temel özellikler</dt><dd><ul>${(it.feats || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div></dl>
-      ${it.owner === Store.uid && Store.canWrite ? `<div class="own" aria-live="polite"><span>Bu fikir senin.</span><button type="button" class="link own-x">Fikrimi geri çek</button></div>` : ''}
-      <section class="crit" aria-label="Üç ölçüt"><span class="eyebrow">Senin puanın · topluluk ortalaması (${it.raters} kişi)</span>
-        ${CRIT.map(([c,l]) => `<div class="crit-row"><span>${l}</span><div class="stars" role="group" aria-label="${l} puanı">${[1,2,3,4,5].map(n => `<button type="button" data-c="${c}" data-n="${n}" aria-pressed="${mine[c] === n}" ${Store.canWrite ? '' : 'disabled'}>${n}</button>`).join('')}</div><output>${it.crit[c] ? it.crit[c].toFixed(1) : '–'}</output></div>`).join('')}
+        <span class="eyebrow">${it.buyers ? T('ud.pencere.ort', { fiyat:tl(it.avg) }) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
+      <dl><div><dt>${T('ud.pencere.problem')}</dt><dd>${esc(it.problem || '')}</dd></div><div><dt>${T('ud.form.cozum')}</dt><dd>${esc(it.solution || '')}</dd></div>
+        <div><dt>${T('ud.form.ozellik')}</dt><dd><ul>${(it.feats || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div></dl>
+      ${it.owner === Store.uid && Store.canWrite ? `<div class="own" aria-live="polite"><span>${T('ud.pencere.senin')}</span><button type="button" class="link own-x">${T('ud.pencere.gerial')}</button></div>` : ''}
+      <section class="crit" aria-label="${T('ud.pencere.olcut')}"><span class="eyebrow">${T('ud.pencere.puan', { n:it.raters })}</span>
+        ${CRIT.map(([c,l]) => `<div class="crit-row"><span>${l}</span><div class="stars" role="group" aria-label="${T('ud.pencere.puani', { olcut:l })}">${[1,2,3,4,5].map(n => `<button type="button" data-c="${c}" data-n="${n}" aria-pressed="${mine[c] === n}" ${Store.canWrite ? '' : 'disabled'}>${n}</button>`).join('')}</div><output>${it.crit[c] ? it.crit[c].toFixed(1) : '–'}</output></div>`).join('')}
       </section>
-      <section style="display:grid;gap:14px" aria-labelledby="nt-h"><h3 id="nt-h" style="font-size:17px">Yorumlar, öneriler, endişeler</h3>
-        <div class="notes">${it.notes.length ? it.notes.map(n => `<div class="note ${n.kind}"><small>${n.kind === 'oneri' ? 'İyileştirme' : n.kind === 'endise' ? 'Endişe' : 'Yorum'} · ${esc(n.handle || 'isimsiz')}</small><p>${esc(n.text)}</p></div>`).join('') : '<p class="ex-note">İlk yorumu sen yaz.</p>'}</div>
-        <form class="note-form"><textarea name="t" maxlength="500" placeholder="Nasıl daha iyi olur? Neyden endişelisin?" aria-label="Yorum"></textarea>
-          <div class="row"><div class="chips" role="group" aria-label="Tür">${[['yorum','Yorum'],['oneri','İyileştirme'],['endise','Endişe']].map(([k,l],x) => `<button type="button" class="chip" data-k="${k}" aria-pressed="${x===0}">${l}</button>`).join('')}</div>
-          <button type="submit" class="btn sm" ${Store.canWrite ? '' : 'disabled'}>Ekle</button></div></form>
+      <section style="display:grid;gap:14px" aria-labelledby="nt-h"><h3 id="nt-h" style="font-size:17px">${T('ud.pencere.yorumlar')}</h3>
+        <div class="notes">${it.notes.length ? it.notes.map(n => `<div class="note ${n.kind}"><small>${T('ud.not.' + n.kind)} · ${esc(n.handle || T('ud.not.isimsiz'))}</small><p>${esc(n.text)}</p></div>`).join('') : `<p class="ex-note">${T('ud.not.ilk')}</p>`}</div>
+        <form class="note-form"><textarea name="t" maxlength="500" placeholder="${T('ud.not.ipucu')}" aria-label="${T('ud.not.yorum')}"></textarea>
+          <div class="row"><div class="chips" role="group" aria-label="${T('ud.not.tur')}">${[['yorum',T('ud.not.yorum')],['oneri',T('ud.not.oneri')],['endise',T('ud.not.endise')]].map(([k,l],x) => `<button type="button" class="chip" data-k="${k}" aria-pressed="${x===0}">${l}</button>`).join('')}</div>
+          <button type="submit" class="btn sm" ${Store.canWrite ? '' : 'disabled'}>${T('ud.not.ekle')}</button></div></form>
       </section>
     </div>`;
     $('.x', dlg).onclick = () => dlg.close();
     $('.dv', dlg).replaceWith(buyCtl(it));
     const own = $('.own-x', dlg);
     if (own) own.onclick = () => {
-      if (own.dataset.sure){ Store.removeIdea(key).then(() => dlg.close()).catch(() => { own.textContent = 'Geri çekilemedi, bir daha dene'; }); return; }
-      own.dataset.sure = '1'; own.textContent = 'Eminsen bir daha bas: fikir, talepler ve yorumlar listeden kalkar';
+      if (own.dataset.sure){ Store.removeIdea(key).then(() => dlg.close()).catch(() => { own.textContent = T('ud.pencere.gerial.hata'); }); return; }
+      own.dataset.sure = '1'; own.textContent = T('ud.pencere.gerial.emin');
     };
     $$('.stars button', dlg).forEach(b => b.onclick = () => Store.rate(key, b.dataset.c, Number(b.dataset.n)).catch(()=>{}));
     let kind = 'yorum';
@@ -473,21 +504,21 @@ function openIdea(key, push=true){
 // then into a kraft box, boxes stack as pre-sales fill, and the box lands on a shelf with the payout.
 // Plays once when seen, replay at the end; reduced motion shows the last frame.
 function mountProc(host, opts={}){
-  const text = 'Tezgâh kenarına takılan, katlanınca rafa dönen kesme tahtası.';
-  const steps = ['Eskiz','Talep','Ortak tasarım','Prototip','Ön satış','Raf'];
+  const text = T('ud.ornek.1.baslik');
+  const steps = [1,2,3,4,5,6].map(n => T('ud.akis.adim' + n));
   const BUYERS = 312, AVG = 240, PRE = 300;
   const tag = (x, y, w, label, val, lx, ly, tx, ty, i) => `<g class="dw-tag" style="--i:${i}"><path class="dw-lead" pathLength="1" d="M${lx} ${ly} L${tx} ${ty}"/><circle class="dw-pin" cx="${tx}" cy="${ty}" r="2.2"/><rect x="${x}" y="${y}" width="${w}" height="17" rx="8.5"/><text x="${x + 9}" y="${y + 11.6}">${label} <tspan>${val}</tspan></text></g>`;
   const bub = (x, y, v, i) => `<g class="dw-bub" style="--i:${i}"><rect x="${x}" y="${y}" width="38" height="17" rx="8.5"/><text x="${x + 19}" y="${y + 11.8}" text-anchor="middle">₺${v}</text></g>`;
   host.classList.add('proc');
   host.innerHTML = `
-  <p class="sr">Bir fikrin ürüne dönüşmesi: fikir tek cümleyle yazılır ve yanında kaba bir eskiz çizilir. ${BUYERS} kişi ortalama ${AVG} liraya alırdım der. Topluluk isim, renk ve ambalaj önerir, eskiz düzgün bir teknik çizime dönüşür. Prototipte ahşap, ölçüler ve katlanma hareketi eklenir. Ürün kraft kutuya girer, ön satış ${PRE} siparişe ulaşır. Kutu rafa çıkar; satıştan fikir sahibine ve katkı verenlere yüzde ${TERMS.shareRetail} ile ${TERMS.shareDirect} arası pay ödenir.</p>
+  <p class="sr">${T('ud.akis.sr', { kisi:BUYERS, ort:AVG, on:PRE, az:TERMS.shareRetail, cok:TERMS.shareDirect })}</p>
   <div class="pc-stage">
     <div class="pc-card" aria-hidden="true">
-      <div class="h"><span class="tag">Mutfak</span><span class="pc-n">0 / 140</span></div>
+      <div class="h"><span class="tag">${catName('Mutfak')}</span><span class="pc-n">0 / 140</span></div>
       <p class="pc-txt"></p>
-      <div class="pc-buy"><span><b class="pc-bn">0</b> kişi “alırdım” dedi</span><span>ort. <b class="pc-avg">0</b> ₺</span></div>
+      <div class="pc-buy"><span>${T('ud.akis.dedi', { n:'<b class="pc-bn">0</b>' })}</span><span>${T('ud.akis.ort', { n:'<b class="pc-avg">0</b>' })}</span></div>
     </div>
-    <div class="pc-pay" aria-hidden="true"><span class="eb">Satıştan pay</span><b><em>%${TERMS.shareRetail}–${TERMS.shareDirect}</em></b><span>Rafla’nın mucidine ve ona isim, renk, ambalaj verenlere</span></div>
+    <div class="pc-pay" aria-hidden="true"><span class="eb">${T('ud.akis.pay')}</span><b><em>${pct(TERMS.shareRetail + '–' + TERMS.shareDirect)}</em></b><span>${T('ud.akis.paykime')}</span></div>
     <div class="pc-draw" aria-hidden="true"><svg viewBox="0 0 320 240">
       <g class="dw-shelf"><path d="M8 170 H312"/><path d="M40 170 v14 h10 M270 170 v14 h10"/></g>
       <g class="dw-counter">
@@ -509,17 +540,17 @@ function mountProc(host, opts={}){
       <g class="dw-dims"><path pathLength="1" d="M120 46 H200 M120 41 v10 M200 41 v10"/><text x="160" y="40" text-anchor="middle">38 cm</text>
         <path pathLength="1" d="M104 60 V170 M99 60 h10 M99 170 h10"/><text x="96" y="118" text-anchor="end">26 cm</text></g>
       <g class="dw-bubs">${bub(30, 70, 240, 0)}${bub(226, 92, 260, 1)}${bub(52, 128, 220, 2)}${bub(240, 140, 300, 3)}</g>
-      <g class="dw-tags">${tag(8, 118, 86, 'İsim', 'Rafla', 94, 126, 121, 126, 0)}${tag(222, 98, 96, 'Renk', 'Kum beji', 222, 106, 196, 112, 1)}${tag(216, 30, 98, 'Ambalaj', 'Kraft', 216, 38, 206, 58, 2)}</g>
+      <g class="dw-tags">${tag(8, 118, 86, T('ud.akis.isim'), T('ud.akis.ad'), 94, 126, 121, 126, 0)}${tag(222, 98, 96, T('ud.akis.renk'), T('ud.akis.renk.v'), 222, 106, 196, 112, 1)}${tag(216, 30, 98, T('ud.akis.ambalaj'), T('ud.akis.ambalaj.v'), 216, 38, 206, 58, 2)}</g>
       <g class="dw-boxes">
         <g class="dw-box b3"><path class="side" d="M246 120 L258 111 L258 160 L246 170 Z"/><path class="front" d="M190 120 H246 V170 H190 Z"/><path class="lid" d="M190 120 L202 111 L258 111 L246 120 Z"/></g>
         <g class="dw-box b2"><path class="side" d="M118 120 L130 111 L130 160 L118 170 Z"/><path class="front" d="M62 120 H118 V170 H62 Z"/><path class="lid" d="M62 120 L74 111 L130 111 L118 120 Z"/></g>
         <g class="dw-box b1"><path class="side" d="M224 104 L240 92 L240 158 L224 170 Z"/><path class="front" d="M96 104 H224 V170 H96 Z"/><path class="lid" d="M96 104 L112 92 L240 92 L224 104 Z"/>
-          <g class="dw-label"><rect x="112" y="122" width="96" height="30" rx="3"/><text class="nm" x="160" y="139" text-anchor="middle">Rafla</text><text class="by" x="160" y="148" text-anchor="middle">MUCİT: SEN</text></g></g>
+          <g class="dw-label"><rect x="112" y="122" width="96" height="30" rx="3"/><text class="nm" x="160" y="139" text-anchor="middle">${T('ud.akis.ad')}</text><text class="by" x="160" y="148" text-anchor="middle">${T('ud.akis.mucit')}</text></g></g>
       </g>
     </svg></div>
-    <div class="pc-pre" aria-hidden="true"><div class="pc-row"><span>Ön satış</span><b class="pc-pn">0 / ${PRE}</b></div><div class="pc-bar"><i></i></div><span class="ok">Eşik doldu · üretimde</span></div>
-    <span class="pc-ex" aria-hidden="true">Örnek akış</span>
-    <button type="button" class="pc-replay">${ICON.replay}Tekrar oynat</button>
+    <div class="pc-pre" aria-hidden="true"><div class="pc-row"><span>${T('ud.akis.adim5')}</span><b class="pc-pn">0 / ${PRE}</b></div><div class="pc-bar"><i></i></div><span class="ok">${T('ud.akis.doldu')}</span></div>
+    <span class="pc-ex" aria-hidden="true">${T('ud.akis.ornek')}</span>
+    <button type="button" class="pc-replay">${ICON.replay}${T('ud.akis.tekrar')}</button>
   </div>
   <ol class="pc-steps">${steps.map(s => `<li>${s}</li>`).join('')}</ol>`;
   const txt = $('.pc-txt', host), n = $('.pc-n', host), bn = $('.pc-bn', host), avg = $('.pc-avg', host), pn = $('.pc-pn', host), lis = $$('.pc-steps li', host);
@@ -601,14 +632,15 @@ function mountMotion(){
     const full = cap.textContent, n = parseInt(full.replace(/\D/g, ''), 10); if (!n) return;
     const t0 = performance.now(), ms = 1400;
     const f = now => { const p = Math.min(1, (now - t0) / ms), v = Math.round(n * (1 - Math.pow(1 - p, 4)));
-      cap.textContent = '× ' + v.toLocaleString('tr-TR'); if (p < 1) requestAnimationFrame(f); else cap.textContent = full; };
+      cap.textContent = '× ' + v.toLocaleString(LOCALE); if (p < 1) requestAnimationFrame(f); else cap.textContent = full; };
     requestAnimationFrame(f);
   }), { threshold:.35 });
   $$('.cb-art').forEach(a => { $$('path', a).forEach(p => p.setAttribute('pathLength', '1')); a.classList.add('will-draw'); dio.observe(a); });
 }
 
 // =========================================================== boot
+applyText();
 mountChrome();
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { TERMS, CATS, CASES, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
+window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
 })();

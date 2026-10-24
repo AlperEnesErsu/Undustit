@@ -3,11 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stil panosu · Undustit</title>
-<meta name="description" content="Undustit'in aynı içerikle iki farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır.">
+<title data-t="stiller.title.1">Stil panosu · Undustit</title>
+<meta name="description" content="Undustit'in aynı içerikle iki farklı stilde hazırlanmış örnekleri. Her biri ayrı bir site olarak açılır." data-ta="content:stiller.attr.1">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#F8F6F1">
 <link rel="canonical" href="https://alperenesersu.github.io/Undustit/stiller/">
+<link rel="alternate" hreflang="tr" href="https://alperenesersu.github.io/Undustit/stiller/">
+<link rel="alternate" hreflang="en" href="https://alperenesersu.github.io/Undustit/stiller/?dil=en">
+<link rel="alternate" hreflang="x-default" href="https://alperenesersu.github.io/Undustit/stiller/">
 <meta property="og:url" content="https://alperenesersu.github.io/Undustit/stiller/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Undustit">
@@ -15,7 +18,7 @@
 <meta property="og:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi.">
+<meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi." data-ta="content:stiller.attr.2">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
@@ -43,9 +46,10 @@
 .style p{color:var(--muted);font-size:13.5px;padding-inline:6px;max-width:60ch}
 .thumb{position:relative;display:block;width:100%;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg-3);cursor:zoom-in;padding:0}
 .desk .thumb{aspect-ratio:16/10}
+html[lang="en"] .thumb{--buyut:"Enlarge"}
 .phone .thumb{aspect-ratio:390/760;border-radius:24px}
 .thumb iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none}
-.thumb::after{content:"Büyüt";position:absolute;right:10px;bottom:10px;padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font-size:12.5px;opacity:0;transform:translateY(4px);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.thumb::after{content:var(--buyut,"Büyüt");position:absolute;right:10px;bottom:10px;padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font-size:12.5px;opacity:0;transform:translateY(4px);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
 .thumb:hover::after,.thumb:focus-visible::after{opacity:1;transform:none}
 .style .acts{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-inline:6px}
 dialog.view{width:min(1480px,100% - 24px);height:calc(100dvh - 24px);max-height:none;padding:0;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2);color:var(--ink);overflow:hidden}
@@ -63,38 +67,38 @@ dialog.view.is-phone iframe{width:390px;height:min(844px,100%);border-radius:24p
 </style>
 </head>
 <body>
-<a class="skip" href="#main">İçeriğe geç</a>
+<a class="skip" href="#main" data-t="stiller.a.1">İçeriğe geç</a>
 <header data-ud-nav></header>
 <main id="main" tabindex="-1" class="wrap">
   <div class="phead">
-    <span class="eyebrow">Stil örnekleri</span>
-    <h1>Aynı site, <em>iki stil.</em></h1>
-    <p class="lead">Bir sayfa seç, iki stilde yan yana gör. Önizlemelerin hepsi canlı site; birine tıklayınca büyür, içinde gezinip animasyonları oynatabilirsin. Her biri ayrı bir site olarak da açılır.</p>
+    <span class="eyebrow" data-t="stiller.span.1">Stil örnekleri</span>
+    <h1 data-t="stiller.h1.1">Aynı site, <em>iki stil.</em></h1>
+    <p class="lead" data-t="stiller.p.1">Bir sayfa seç, iki stilde yan yana gör. Önizlemelerin hepsi canlı site; birine tıklayınca büyür, içinde gezinip animasyonları oynatabilirsin. Her biri ayrı bir site olarak da açılır.</p>
   </div>
-  <div class="board-bar" role="toolbar" aria-label="Görünüm seçimi">
-    <div class="grp"><span id="pg-l">Sayfa</span><div class="seg" role="group" aria-labelledby="pg-l" id="pages"></div></div>
-    <div class="grp"><span id="dv-l">Cihaz</span><div class="seg" role="group" aria-labelledby="dv-l" id="devices"></div>
-      <button type="button" class="btn alt sm" id="replay">Hepsini yeniden oynat</button></div>
+  <div class="board-bar" role="toolbar" aria-label="Görünüm seçimi" data-ta="aria-label:stiller.attr.3">
+    <div class="grp"><span id="pg-l" data-t="stiller.span.2">Sayfa</span><div class="seg" role="group" aria-labelledby="pg-l" id="pages"></div></div>
+    <div class="grp"><span id="dv-l" data-t="stiller.span.3">Cihaz</span><div class="seg" role="group" aria-labelledby="dv-l" id="devices"></div>
+      <button type="button" class="btn alt sm" id="replay" data-t="stiller.button.1">Hepsini yeniden oynat</button></div>
   </div>
   <div class="styles desk" id="styles"></div>
 </main>
 <footer data-ud-foot></footer>
 <dialog class="view" id="view" aria-labelledby="view-h">
-  <header><b id="view-h"></b><div style="display:flex;gap:10px;align-items:center"><a class="btn sm alt" id="view-open" data-stil-link target="_blank" rel="noopener">Yeni sekmede aç</a><button type="button" class="x" id="view-x" aria-label="Kapat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></header>
-  <div class="stage"><iframe id="view-f" title="Büyük önizleme"></iframe></div>
+  <header><b id="view-h"></b><div style="display:flex;gap:10px;align-items:center"><a class="btn sm alt" id="view-open" data-stil-link target="_blank" rel="noopener" data-t="stiller.a.2">Yeni sekmede aç</a><button type="button" class="x" id="view-x" aria-label="Kapat" data-ta="aria-label:stiller.attr.4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></header>
+  <div class="stage"><iframe id="view-f" title="Büyük önizleme" data-ta="title:stiller.attr.5"></iframe></div>
 </dialog>
 <script src="../assets/ud.js"></script>
 <script>
 const STYLES = [
-  ['kagit','Kâğıt','Sıcak kâğıt beyazı, editoryal serif başlıklar; mavi yalnız eylemde. Sakin ve güvenilir.'],
-  ['oyuncu','Oyuncu','Quirky havası: kalın grotesk, mürekkep çerçeve ve sert gölge, sarı işaretleyici.']
+  ['kagit',UD.T('ud.stil.kagit'),UD.T('stiller.js.kagit')],
+  ['oyuncu',UD.T('ud.stil.oyuncu'),UD.T('stiller.js.oyuncu')]
 ];
-const PAGES = [['', 'Ana sayfa'], ['fikir/', 'Fikir yaz'], ['fikirler/', 'Fikirler'], ['nasil/', 'Nasıl işler'], ['vakalar/', 'Vakalar'], ['vaka-01/', 'Vaka 01'], ['hikaye/', 'Hikâye']];
-const DEVICES = [['masaustu', 'Masaüstü', 1440, 900], ['telefon', 'Telefon', 390, 760]];
+const PAGES = [['', UD.T('stiller.js.anasayfa')], ['fikir/', UD.T('ud.menu.yaz')], ['fikirler/', UD.T('ud.menu.fikirler')], ['nasil/', UD.T('ud.menu.nasil')], ['vakalar/', UD.T('ud.menu.vakalar')], ['vaka-01/', 'Vaka 01'], ['hikaye/', UD.T('ud.menu.hikaye')]];
+const DEVICES = [['masaustu', UD.T('stiller.js.masaustu'), 1440, 900], ['telefon', UD.T('stiller.js.telefon'), 390, 760]];
 const q = new URLSearchParams(location.search);
 let page = PAGES.some(p => p[0] === q.get('sayfa')) ? q.get('sayfa') : '';
 let device = q.get('cihaz') === 'telefon' ? 'telefon' : 'masaustu';
-const urlFor = (k) => '../' + page + (k === 'kagit' ? '' : '?stil=' + k);
+const urlFor = (k) => UD_STIL.withStil('../' + page, k);
 const host = document.getElementById('styles');
 
 function seg(id, items, current, set){
@@ -115,9 +119,9 @@ function render(){
     const href = urlFor(k);
     const card = UD.el('article', { class:'style' });
     card.innerHTML = `<header><h2>${name}</h2><span class="eyebrow">${pageName}</span></header>
-      <button type="button" class="thumb" aria-label="${name}, ${pageName}: büyüt"><iframe src="${href}" title="${name} önizleme" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></button>
+      <button type="button" class="thumb" aria-label="${UD.T('stiller.js.buyut', { stil:name, sayfa:pageName })}"><iframe src="${href}" title="${UD.T('stiller.js.onizleme', { stil:name })}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></button>
       <p>${about}</p>
-      <div class="acts"><a class="link" data-stil-link href="${href}" target="_blank" rel="noopener">Yeni sekmede aç</a></div>`;
+      <div class="acts"><a class="link" data-stil-link href="${href}" target="_blank" rel="noopener">${UD.T('stiller.js.yeni')}</a></div>`;
     card.querySelector('.thumb').onclick = () => openView(k, name, pageName, href);
     host.append(card);
   });

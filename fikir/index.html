@@ -65,12 +65,13 @@
   </div>
 </main>
 <footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
 <script src="../assets/ud.js"></script>
 <script>
 const q = new URLSearchParams(location.search).get('vaka');
-const c = UD.CASES.find(x => x.id === q);
-if (c) document.getElementById('case-line').textContent = UD.T('fikir.js.vaka', { vaka:c.name });
-UD.mountForm(document.getElementById('form'), { open:true, caseId: c ? c.id : null });
+UD.mountForm(document.getElementById('form'), { open:true, caseId:q });
+// the case list comes from the database; the form picks the case itself once it arrives
+UD.Store.cases().then(() => { const c = UD.openCases().find(x => x.id === q); if (c) document.getElementById('case-line').textContent = UD.T('fikir.js.vaka', { vaka:c.name }); });
 </script>
 </body>
 </html>

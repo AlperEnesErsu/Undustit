@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Vaka · Undustit</title>
-<meta name="description" content="Undustit vakası: bir üretici, bir stok ve bir soru. Fikrini yaz, talebi birlikte ölçelim.">
+<title data-t="vakasayfa.title.1">Vaka · Undustit</title>
+<meta name="description" content="Undustit vakası: bir üretici, bir stok ve bir soru. Fikrini yaz, talebi birlikte ölçelim." data-ta="content:vakasayfa.attr.1">
 <meta name="theme-color" content="#FFF6E9">
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
@@ -24,72 +24,84 @@
 .vaka-gorsel{margin:0;max-width:420px}
 .vaka-gorsel img{display:block;width:100%;height:auto;border-radius:var(--r-md);border:1px solid var(--line)}
 .vaka-eylem{margin-top:8px}
+.vaka-yaz{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,72px);align-items:start}
+.vaka-yaz > div{display:grid;gap:16px;align-content:start}
+@media (max-width:980px){.vaka-yaz{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:720px){.vaka-bilgi{grid-template-columns:repeat(2,minmax(0,1fr))}.vaka-bilgi > div:nth-child(3){padding-inline-start:0;border-inline-start:0}}
 </style>
 </head>
 <body>
-<a class="skip" href="#main">İçeriğe geç</a>
+<a class="skip" href="#main" data-t="vakasayfa.a.1">İçeriğe geç</a>
 <header data-ud-nav></header>
 <main id="main" tabindex="-1">
   <div class="wrap vaka-sayfa" id="kabuk">
-    <p class="lead">Yükleniyor…</p>
+    <p class="lead" data-t="vakasayfa.p.1">Yükleniyor…</p>
   </div>
 </main>
 <footer data-ud-foot></footer>
 
-<script src="../assets/ud.js"></script>
 <script src="../assets/ayar.js"></script>
+<script src="../assets/ud.js"></script>
 <script src="../assets/veri.js"></script>
 <script>
 (function(){
 'use strict';
+// A case opened from the admin panel: its facts, the idea form while it is open, and the ideas it got.
+var T = UD.T, esc = UD.esc;
 var kap = document.getElementById('kabuk');
 var id = (new URLSearchParams(location.search).get('id') || '').trim();
-var enc = encodeURIComponent;
 
-function esc(v){
-  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
-    return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c];
-  });
-}
 function sayi(v){
-  return v == null || v === '' || !isFinite(Number(v)) ? '—' : Number(v).toLocaleString('tr-TR');
+  return v == null || v === '' || !isFinite(Number(v)) || !Number(v) ? '—' : Number(v).toLocaleString(UD.LOCALE);
 }
 
 function bulunamadi(){
-  document.title = 'Vaka bulunamadı · Undustit';
-  kap.innerHTML = '<div class="bos"><b>Bu vaka bulunamadı</b>' +
-    '<p>Bağlantı yanlış olabilir ya da vaka henüz yayında değil.</p>' +
-    '<a class="btn sig sm" href="../vakalar/">Vakalara dön</a></div>';
+  document.title = T('vakasayfa.js.yok') + ' · Undustit';
+  kap.innerHTML = '<div class="bos"><b>' + T('vakasayfa.js.yok') + '</b>' +
+    '<p>' + T('vakasayfa.js.yok.not') + '</p>' +
+    '<a class="btn sig sm" href="../vakalar/">' + T('vakasayfa.js.don') + '</a></div>';
 }
 
 function ciz(v){
-  var durumAd = UDV.DURUM_ADI[v.durum] || v.durum;
+  var acik = v.durum === 'acik';
+  var vaka = { id: v.id, short: String(v.baslik).slice(0, 40) };
   document.title = v.baslik + ' · Undustit';
   var paragraflar = String(v.aciklama || '').split(/\n\s*\n/).map(function(p){ return p.trim(); }).filter(Boolean);
   var gorsel = /^https?:\/\//i.test(v.gorsel || '') ? v.gorsel : '';
 
   kap.innerHTML =
     '<section class="phead" aria-labelledby="vb">' +
-      '<div class="vaka-ust"><span class="eyebrow">Vaka</span>' +
-        '<span class="rozet" data-durum="' + esc(v.durum) + '">' + esc(durumAd) + '</span></div>' +
+      '<div class="vaka-ust"><span class="eyebrow">' + T('vakasayfa.js.vaka') + '</span>' +
+        '<span class="rozet" data-durum="' + esc(v.durum) + '">' + T('ud.durum.' + v.durum) + '</span></div>' +
       '<h1 id="vb">' + esc(v.baslik) + '</h1>' +
       (v.ozet ? '<p class="lead">' + esc(v.ozet) + '</p>' : '') +
       '<dl class="vaka-bilgi">' +
-        '<div><dt>Adet</dt><dd>' + sayi(v.adet) + '</dd></div>' +
-        '<div><dt>Ölçü</dt><dd>' + esc(v.olcu || '—') + '</dd></div>' +
-        '<div><dt>Sınıf</dt><dd>' + esc(v.sinif || '—') + '</dd></div>' +
-        '<div><dt>Deneme partisi</dt><dd>' + (v.deneme_adedi ? sayi(v.deneme_adedi) + ' adet' : '—') + '</dd></div>' +
+        '<div><dt>' + T('vakasayfa.js.adet') + '</dt><dd>' + sayi(v.adet) + '</dd></div>' +
+        '<div><dt>' + T('vakasayfa.js.olcu') + '</dt><dd>' + esc([v.olcu, v.sinif].filter(Boolean).join(' · ') || '—') + '</dd></div>' +
+        '<div><dt>' + T('vakasayfa.js.deneme') + '</dt><dd>' + (v.deneme_adedi ? T('vakasayfa.js.deneme.adet', { n: sayi(v.deneme_adedi) }) : '—') + '</dd></div>' +
+        '<div><dt>' + T('vakasayfa.js.gelen') + '</dt><dd id="n-fikir">0</dd></div>' +
       '</dl>' +
       (gorsel ? '<figure class="vaka-gorsel"><img src="' + esc(gorsel) + '" alt="' + esc(v.baslik) + '" loading="lazy"></figure>' : '') +
       (paragraflar.length ? '<div class="vaka-metin">' + paragraflar.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' : '') +
-      '<div class="vaka-eylem"><a class="btn sig" href="../fikir/?vaka=' + enc(v.id) + '">Bu vakaya fikir yaz ' + UD.ICON.arrow + '</a></div>' +
+      (acik ? '<div class="vaka-eylem"><a class="btn sig" href="#yaz">' + T('vakasayfa.js.yaz') + ' ' + UD.ICON.arrow + '</a></div>'
+            : '<p class="lead" style="font-size:15px">' + T('vakasayfa.js.kapali') + '</p>') +
+    '</section>' +
+    '<section class="vaka-yaz" id="yaz" aria-label="' + T('vakasayfa.js.fikirler') + '">' +
+      (acik ? '<div><span class="eyebrow">' + T('vakasayfa.js.sira') + '</span><div id="form"></div></div>' : '') +
+      '<div><span class="eyebrow">' + T('vakasayfa.js.fikirler') + '</span><div id="board"></div></div>' +
     '</section>';
+
+  if (acik) UD.mountForm(document.getElementById('form'), { caseId: v.id });
+  UD.mountBoard(document.getElementById('board'), { filter: function(i){ return UD.inCase(i, vaka); }, examples: false,
+    emptyTitle: T('vakasayfa.js.bos'), emptyNote: acik ? T('vakasayfa.js.bos.not') : '' });
+  UD.Store.sub(function(){
+    document.getElementById('n-fikir').textContent = String(UD.Store.ideas().filter(function(i){ return UD.inCase(i, vaka); }).length);
+  });
 }
 
 function hataGoster(err){
-  kap.innerHTML = '<div class="bos"><b>Vaka yüklenemedi</b><p>' + esc(err && err.message) + '</p>' +
-    '<a class="btn alt sm" href="../vakalar/">Vakalara dön</a></div>';
+  kap.innerHTML = '<div class="bos"><b>' + T('vakasayfa.js.hata') + '</b><p>' + esc(err && err.message) + '</p>' +
+    '<a class="btn alt sm" href="../vakalar/">' + T('vakasayfa.js.don') + '</a></div>';
 }
 
 if (!id){

@@ -148,9 +148,10 @@
   </section>
 </main>
 <footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
 <script src="../assets/ud.js"></script>
 <script>
-const CASE = UD.CASES.find(c => c.id === 'vaka-01');
+const CASE = { id:'vaka-01', short:'Vaka 01 · Cıvata' };
 const form = UD.mountForm(document.getElementById('form'), { caseId: CASE.id, label:UD.T('vaka.js.etiket'), placeholder:UD.T('vaka.js.ipucu') });
 // starters only put a beginning into the field; the person finishes the sentence
 const starters = [1,2,3].map(n => [UD.T('vaka.js.basla' + n), UD.T('vaka.js.basla' + n + '.metin')]);
@@ -158,8 +159,8 @@ const host = document.getElementById('starters');
 starters.forEach(([l, t]) => host.append(UD.el('button', { type:'button', class:'chip', text:l, onclick(){
   const p = document.querySelector('#form .if-pitch'); p.value = t; p.dispatchEvent(new Event('input')); form.useCase(CASE.id); p.setSelectionRange(t.length, t.length);
 } })));
-UD.mountBoard(document.getElementById('board'), { filter:i => i.cat === CASE.short, examples:false, emptyTitle:UD.T('vaka.js.bos'), emptyNote:UD.T('vaka.js.bos.not') });
-UD.Store.sub(() => { document.getElementById('n-ideas').textContent = String(UD.Store.ideas().filter(i => i.cat === CASE.short).length); });
+UD.mountBoard(document.getElementById('board'), { filter:i => UD.inCase(i, CASE), examples:false, emptyTitle:UD.T('vaka.js.bos'), emptyNote:UD.T('vaka.js.bos.not') });
+UD.Store.sub(() => { document.getElementById('n-ideas').textContent = String(UD.Store.ideas().filter(i => UD.inCase(i, CASE)).length); });
 </script>
 </body>
 </html>

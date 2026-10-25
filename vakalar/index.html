@@ -27,7 +27,7 @@
 <link rel="stylesheet" href="../assets/ud.css">
 <script src="../assets/stil.js"></script>
 <style>
-.cases{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:16px}
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:16px}
 .case{display:grid;gap:18px;align-content:start;padding:clamp(22px,3vw,36px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:radial-gradient(70% 70% at 70% 30%,var(--accent-soft),transparent 70%),var(--bg-2)}
 .case h2{font-size:clamp(40px,4.6vw,68px);line-height:.95}
 .case p{color:var(--ink-2);font-weight:300;max-width:52ch}
@@ -45,7 +45,6 @@
 .share button:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .open{border-style:dashed;background:transparent}
 .open ol{margin:0;padding-inline-start:20px;color:var(--ink-2);display:grid;gap:8px;font-weight:300}
-@media (max-width:900px){.cases{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:560px){.case dl{grid-template-columns:minmax(0,1fr)}.case dl div + div{padding-inline-start:0;border-inline-start:0;border-top:1px solid var(--line)}}
 </style>
 </head>
@@ -88,13 +87,41 @@
   </div>
 </main>
 <footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
 <script src="../assets/ud.js"></script>
 <script>
-const url = new URL(UD_STIL.withStil('../vaka-01/'), location.href).href;
-document.getElementById('link-01').textContent = url;
-document.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => {
+// The cards come from the vakalar table (opened from the admin panel); the Vaka 01 card above is what
+// search engines and visitors without JS see. Each card counts its ideas and carries its own link.
+const { T, el, esc, ICON, ROOT, LOCALE } = UD;
+const list = document.querySelector('.cases'), ask = document.getElementById('vakani-ac');
+function copyBtn(b){ b.onclick = () => {
   const t = document.getElementById(b.dataset.copy).textContent;
-  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { const back = b.textContent; b.textContent = UD.T('vakalar.js.kopyalandi'); setTimeout(() => b.textContent = back, 1600); }).catch(() => { b.textContent = UD.T('vakalar.js.sec'); });
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { const back = b.textContent; b.textContent = T('vakalar.js.kopyalandi'); setTimeout(() => b.textContent = back, 1600); }).catch(() => { b.textContent = T('vakalar.js.sec'); });
+}; }
+function caseCard(c, ix){
+  const v01 = c.id === 'vaka-01', open = c.durum === 'acik';
+  const href = UD_STIL.withStil(ROOT + c.href), link = 'link-' + ix;
+  const n = v => v ? Number(v).toLocaleString(LOCALE) : '–';
+  const a = el('article', { class:'case', html:`
+    <span class="tag"${open ? '' : ' style="color:var(--muted);border-color:var(--line-2)"'}><i aria-hidden="true"${open ? '' : ' style="background:var(--muted)"'}></i>${T('ud.durum.' + c.durum)}</span>
+    <span class="eyebrow">${v01 ? T('vakalar.span.3') : esc(c.tag)}</span>
+    <h2>${v01 ? T('vakalar.h2.1') : esc(c.name)}</h2>
+    ${v01 ? `<p>${T('vakalar.p.2')}</p>` : c.ozet ? `<p>${esc(c.ozet)}</p>` : ''}
+    <dl><div><dt>${T('vakalar.dt.1')}</dt><dd>${n(c.adet)}</dd></div><div><dt>${T('vakalar.dt.2')}</dt><dd>${v01 ? T('vakalar.dd.1') : esc([c.olcu, c.sinif].filter(Boolean).join(' · ') || '–')}</dd></div><div><dt>${T('vakalar.js.gelen')}</dt><dd class="n">0</dd></div></dl>
+    <div class="acts">${open ? `<a class="btn sig" href="${UD_STIL.withStil(ROOT + 'fikir/?vaka=' + encodeURIComponent(c.id))}">${T('vakalar.a.2')} ${ICON.arrow}</a>` : ''}<a class="btn alt" href="${href}">${T('vakalar.a.3')}</a></div>
+    <div class="share"><code id="${link}"></code><button type="button" data-copy="${link}">${T('vakalar.button.1')}</button></div>` });
+  a.querySelector('code').textContent = new URL(href, location.href).href;
+  copyBtn(a.querySelector('[data-copy]'));
+  UD.Store.sub(() => { a.querySelector('.n').textContent = String(UD.Store.ideas().filter(i => UD.inCase(i, c)).length); });
+  return a;
+}
+document.getElementById('link-01').textContent = new URL(UD_STIL.withStil('../vaka-01/'), location.href).href;
+document.querySelectorAll('[data-copy]').forEach(copyBtn);
+// open cases first, then the ones being judged or produced, closed ones last
+const ORDER = ['acik','degerlendirme','kazanan','uretim','kapali'];
+UD.Store.cases().then(cs => {
+  list.querySelectorAll('.case:not(.open)').forEach(n => n.remove());
+  cs.slice().sort((a, b) => ORDER.indexOf(a.durum) - ORDER.indexOf(b.durum)).forEach((c, ix) => list.insertBefore(caseCard(c, ix), ask));
 });
 </script>
 </body>

@@ -55,8 +55,8 @@
     bellek = d;
     try { localStorage.setItem(LS, JSON.stringify(d)); } catch(e){}
   }
-  // Sitenin fikirleri. Yalnız Vaka 01 kategorisi okunur; alıcı = o fikre fiyat yazan kişi sayısı.
-  function yerelFikirler(){
+  // Sitenin fikirleri. Vakanın kimliğiyle gönderilenler (eskiler için Vaka 01 etiketi); alıcı = o fikre fiyat yazan kişi sayısı.
+  function yerelFikirler(vakaId){
     let s = {};
     try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
     const gizli = oku().gizli;
@@ -69,7 +69,7 @@
     }));
     const out = [];
     Object.entries(s.ideas || {}).forEach(([owner, doc]) => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(it => {
-      if (!it || it.cat !== CAT || !it.k) return;
+      if (!it || !it.k || (it.caseId ? it.caseId !== vakaId : !(vakaId === 'vaka-01' && it.cat === CAT))) return;
       const id = owner + ':' + it.k, f = fiyatlar[id] || [];
       out.push({ id, baslik: str(it.title), problem: str(it.problem), cozum: str(it.solution),
         ozellikler: (Array.isArray(it.feats) ? it.feats : []).map(x => str(x)).filter(Boolean), ad: str(it.handle),
@@ -87,7 +87,7 @@
     sil: async id => { const d = oku(); delete d.vakalar[id]; delete d.gecmis[id]; yaz(d); },
     gecmisEkle: async (id, satir) => { const d = oku(); (d.gecmis[id] = d.gecmis[id] || []).push(satir); yaz(d); },
     gecmis: async id => (oku().gecmis[id] || []).slice().sort((a,b) => Date.parse(a.zaman) - Date.parse(b.zaman)),
-    fikirler: async vakaId => vakaId === 'vaka-01' ? yerelFikirler() : [],
+    fikirler: async vakaId => yerelFikirler(vakaId),
     gizle: async (id, gizli) => { const d = oku(); if (gizli) d.gizli[id] = true; else delete d.gizli[id]; yaz(d); }
   };
 
@@ -139,7 +139,9 @@
     oturum = o;
     if (JSON.stringify(o) !== eski) bildir();
   }
+  // ud.js aynı sayfadaysa onun istemcisi kullanılır (window.UD_SB): tek istemci, tek oturum.
   function sbYukle(){
+    if (window.UD_SB) return window.UD_SB();
     return new Promise((ok, no) => {
       if (window.supabase && window.supabase.createClient) return ok(window.supabase);
       const s = document.createElement('script');
@@ -343,8 +345,8 @@
   // ----------------------------------------------------------- başlangıç
   window.addEventListener('storage', e => { if (!SB_URL && e.key === LS) bildir(); });
   if (SB_URL){
-    sbYukle().then(lib => {
-      sb = lib.createClient(SB_URL, SB_ANON);
+    sbYukle().then(x => {
+      sb = x.auth ? x : x.createClient(SB_URL, SB_ANON);
       // İlk oturum getSession ile alınır; INITIAL_SESSION ikinci kez yüklemeyi önlemek için atlanır.
       sb.auth.onAuthStateChange((olay, session) => { if (olay !== 'INITIAL_SESSION') oturumYukle(session); });
       return sb.auth.getSession();

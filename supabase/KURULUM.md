@@ -16,6 +16,11 @@ aşağıdaki adımları izleyin.
 2. `supabase/sema.sql` dosyasının tüm içeriğini kopyalayıp yapıştırın ve **Run** ile çalıştırın.
 3. Hata olmadığını ve **Table Editor** ekranında `vakalar`, `profiller`, `fikirler` gibi tabloları
    gördüğünüzü kontrol edin. Vaka 01 de `vakalar` tablosunda olmalı.
+4. Aynı şekilde sırayla `supabase/2-fikirler.sql` (sitenin fikirleri, talepleri, puanları ve yorumları)
+   ve `supabase/3-hiz.sql` (puan ve talep için günlük sınır, fikirleri vakalarına bağlama) dosyalarını
+   çalıştırın. İkisi de tekrar çalıştırılabilir.
+5. **Authentication** > **Sign In / Providers** altında **Allow anonymous sign-ins** seçeneğini açın:
+   ziyaretçiler hesap açmadan fikir yazar ve "alırdım" der.
 
 ## 3. E-posta girişini açın
 

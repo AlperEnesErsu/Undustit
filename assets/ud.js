@@ -59,7 +59,18 @@ const TERMS = {
   liveDay: 4, liveHourUtc: 17 // Thursday 20:00 Istanbul (UTC+3, no DST)
 };
 const CATS = ['Mutfak','Ev & dekor','Fitness','Ofis & masa','Dış mekân','Teknoloji aksesuarı','Çocuk','Evcil hayvan'];
-const CASES = [{ id:'vaka-01', name:T('ud.vaka1.ad'), tag:T('ud.vaka1.etiket'), short:'Vaka 01 · Cıvata', href:'vaka-01/' }];
+// Cases are rows of the vakalar table (opened from yonetim/); Store.cases() fills this array in place.
+// Vaka 01 keeps its hand-made page and its translated text; every other case lives at vaka/?id=<id>.
+const CASES = [];
+const V01 = { id:'vaka-01', name:T('ud.vaka1.ad'), tag:T('ud.vaka1.etiket'), short:'Vaka 01 · Cıvata', href:'vaka-01/', durum:'acik', adet:1e6 };
+function caseOf(v){
+  if (v.id === V01.id) return { ...V01, durum:v.durum };
+  return { id:v.id, name:v.baslik, tag:v.olcu || v.stok || '', short:String(v.baslik).slice(0, 40), href:'vaka/?id=' + encodeURIComponent(v.id),
+    durum:v.durum, ozet:v.ozet || '', adet:Number(v.adet) || 0, olcu:v.olcu || '', sinif:v.sinif || '' };
+}
+const openCases = () => CASES.filter(c => c.durum === 'acik');
+// an idea belongs to a case by its vaka_id; older ideas only carry the case's label as their category
+const inCase = (i, c) => i.caseId ? i.caseId === c.id : i.cat === c.short;
 // categories and case names are stored in Turkish (they are data); only what is shown is translated
 const catName = c => { const v = METIN.al('ud.kat.' + c); return v == null ? c : v; };
 const CRIT = [['d',T('ud.olcut.d')],['m',T('ud.olcut.m')],['u',T('ud.olcut.u')]];
@@ -122,6 +133,20 @@ function mountChrome(){
 }
 
 // =========================================================== store
+// One Supabase client per page, shared with veri.js (window.UD_SB), so the visitor and the admin
+// panel never run two auth sessions side by side. The library loads on first use only.
+function sbClient(){
+  const A = window.UD_AYAR || {};
+  if (!sbClient.p) sbClient.p = (window.supabase && window.supabase.createClient ? Promise.resolve(window.supabase) : new Promise((ok, no) => {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+    sc.onload = () => window.supabase && window.supabase.createClient ? ok(window.supabase) : no(new Error('Veri servisi yüklenemedi'));
+    sc.onerror = () => no(new Error('Veri servisi yüklenemedi'));
+    document.head.append(sc);
+  })).then(lib => lib.createClient(A.supabaseUrl, A.supabaseAnon));
+  return sbClient.p;
+}
+window.UD_SB = sbClient;
 // Live on claude.ai (db capability): ideas/<uid>, votes/<uid>, notes/<uid>, each person writes their own doc.
 // A vote is purchase intent, not a like: votes/<uid>.buy maps an idea to the price that person would pay.
 // Anywhere else it keeps the same shape in localStorage so the pages can be tried as a preview.
@@ -157,15 +182,7 @@ const Store = (function(){
   const AYAR = window.UD_AYAR || {};
   let sb = null;
   const idOf = key => key.slice(key.lastIndexOf(':') + 1);
-  function sbLib(){
-    if (window.supabase && window.supabase.createClient) return Promise.resolve(window.supabase);
-    return new Promise((ok, no) => {
-      const sc = document.createElement('script');
-      sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
-      sc.onload = () => ok(window.supabase); sc.onerror = () => no(new Error('Veri servisi yüklenemedi'));
-      document.head.append(sc);
-    });
-  }
+  if (AYAR.supabaseUrl) S.mode = 'supabase';
   async function sbLoad(){
     const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => sb.from(t).select('*').limit(5000)));
     const bad = res.find(r => r.error); if (bad) throw bad.error;
@@ -173,7 +190,7 @@ const Store = (function(){
     const keyOf = {}, ideas = {}, votes = {}, notes = {};
     const vote = u => (votes[u] = votes[u] || { buy:{}, rate:{} });
     f.forEach(r => { keyOf[r.id] = r.sahip + ':' + r.id;
-      (ideas[r.sahip] = ideas[r.sahip] || { items:[] }).items.push({ k:r.id, title:r.baslik, cat:r.kategori, problem:r.problem, solution:r.cozum, feats:r.ozellikler, handle:r.ad, at:r.zaman }); });
+      (ideas[r.sahip] = ideas[r.sahip] || { items:[] }).items.push({ k:r.id, caseId:r.vaka_id, title:r.baslik, cat:r.kategori, problem:r.problem, solution:r.cozum, feats:r.ozellikler, handle:r.ad, at:r.zaman }); });
     t.forEach(r => { if (keyOf[r.fikir_id]) vote(r.uye).buy[keyOf[r.fikir_id]] = r.fiyat; });
     p.forEach(r => { const k = keyOf[r.fikir_id]; if (k) { const v = vote(r.uye); v.rate[k] = { ...(v.rate[k] || {}), [r.olcut]: r.puan }; } });
     y.forEach(r => { if (keyOf[r.fikir_id]) (notes[r.uye] = notes[r.uye] || { items:[] }).items.push({ k:r.id, idea:keyOf[r.fikir_id], kind:r.tur, text:r.metin, handle:r.ad, at:r.zaman }); });
@@ -188,13 +205,14 @@ const Store = (function(){
     return (S.uid = r.data.user.id);
   }
   // every write: make sure we are someone, do it, then read back what the database now says
-  const sbDo = async fn => { await sbUser(); const r = await fn(); if (r && r.error) { sbReload(); throw r.error; } await sbLoad(); return r; };
+  const sbDo = async fn => { await start(); await sbUser(); const r = await fn(); if (r && r.error) { sbReload(); throw r.error; } await sbLoad(); return r; };
 
-  const ready = (async () => {
+  // Nothing is fetched until a page shows data (its first sub() or cases()), so the reading pages stay light.
+  let ready = null;
+  const start = () => ready || (ready = (async () => {
     if (AYAR.supabaseUrl){
-      const lib = await sbLib();
-      sb = lib.createClient(AYAR.supabaseUrl, AYAR.supabaseAnon);
-      S.mode = 'supabase'; S.ideas = {}; S.votes = {}; S.notes = {};
+      sb = await sbClient();
+      S.ideas = {}; S.votes = {}; S.notes = {};
       const { data } = await sb.auth.getSession();
       S.uid = data && data.session ? data.session.user.id : 'anon';
       await sbLoad();
@@ -217,8 +235,25 @@ const Store = (function(){
       }, () => {});
     });
     emit();
-  })().catch(() => {}).finally(badge);
+  })().catch(() => {}).finally(badge));
   document.addEventListener('DOMContentLoaded', badge);
+
+  // Open and past cases (drafts never). Without the database: the admin panel's local copy, else Vaka 01.
+  let casesP = null;
+  async function loadCases(){
+    let rows = null;
+    if (AYAR.supabaseUrl){
+      const c = await sbClient();
+      const r = await c.from('vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
+      if (!r.error) rows = r.data;
+    } else if (!(window.claude && window.claude.use)){
+      try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null'); if (d && d.vakalar) rows = Object.values(d.vakalar).filter(v => v.durum !== 'taslak').sort((a,b) => String(b.olusturma).localeCompare(String(a.olusturma))); } catch(e){}
+    }
+    CASES.splice(0, CASES.length, ...(rows && rows.length ? rows.map(caseOf) : [V01]));
+    emit();
+    return CASES;
+  }
+  const cases = () => casesP || (casesP = loadCases().catch(() => { if (!CASES.length) CASES.push(V01); emit(); return CASES; }));
 
   // Everything below comes from other people's documents in live mode, so it is shaped before use:
   // strings are cut to the form's limits, a missing or future date never extends the 30 days.
@@ -226,7 +261,7 @@ const Store = (function(){
   const when = v => { const t = Date.parse(v); return isNaN(t) ? null : new Date(Math.min(t, Date.now())).toISOString(); };
   const KINDS = ['yorum','oneri','endise'];
   function clean(it, owner){
-    return { k: str(String(it.k), 40), key: owner + ':' + str(String(it.k), 40), owner, title: str(it.title, 140), cat: str(it.cat, 40),
+    return { k: str(String(it.k), 40), key: owner + ':' + str(String(it.k), 40), owner, caseId: str(it.caseId, 80), title: str(it.title, 140), cat: str(it.cat, 40),
       problem: str(it.problem, 400), solution: str(it.solution, 400), handle: str(it.handle, 30),
       feats: (Array.isArray(it.feats) ? it.feats : []).slice(0, 3).map(x => str(x, 80)).filter(Boolean), at: when(it.at) };
   }
@@ -265,13 +300,12 @@ const Store = (function(){
   const key = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   return {
     get mode(){ return S.mode; }, get canWrite(){ return S.canWrite; }, get uid(){ return S.uid; },
-    ready, ideas,
-    sub(fn){ subs.add(fn); fn(); return () => subs.delete(fn); },
+    get ready(){ return start(); }, ideas, cases,
+    sub(fn){ start(); subs.add(fn); fn(); return () => subs.delete(fn); },
     myCount(){ return myItems('ideas').length; },
     addIdea(data){
       if (S.mode === 'supabase'){
-        const c = CASES.find(x => x.short === data.cat);
-        return sbDo(() => sb.from('fikirler').insert({ sahip:S.uid, vaka_id: c ? c.id : null, baslik:data.title, kategori:data.cat, problem:data.problem,
+        return sbDo(() => sb.from('fikirler').insert({ sahip:S.uid, vaka_id: data.caseId || null, baslik:data.title, kategori:data.cat, problem:data.problem,
           cozum:data.solution, ozellikler:data.feats, ad:data.handle || '' }).select('id').single()).then(r => S.uid + ':' + r.data.id);
       }
       const it = { k:key(), ...data, at:new Date().toISOString() };
@@ -320,8 +354,7 @@ function feeLine(){
   return T('ud.form.ucret', { ilk:tl(f.first), sonra:tl(f.next), bu:now }) + (f.charged ? '' : ' ' + T('ud.form.odemeyok'));
 }
 function mountForm(host, opts={}){
-  const preCase = opts.caseId ? CASES.find(c => c.id === opts.caseId) : null;
-  const id = 'f' + Math.random().toString(36).slice(2,7);
+  const id ='f' + Math.random().toString(36).slice(2,7);
   host.innerHTML = `
   <form class="iform" novalidate aria-label="${T('ud.form.aria')}">
     <div class="if-top">
@@ -344,10 +377,21 @@ function mountForm(host, opts={}){
     <div class="if-done" tabindex="-1"></div>
   </form>`;
   const f = $('form', host), pitch = $('.if-pitch', f), count = $('.if-count', f), next = $('.if-next', f), status = $('.if-status', f);
-  let cat = preCase ? preCase.short : '';
+  let cat = '';
   const cats = $('.if-cats', f);
-  const all = CASES.map(c => [c.short, true]).concat(CATS.map(c => [c, false]));
-  all.forEach(([c, isCase]) => cats.append(el('button', { type:'button', class:'chip' + (isCase ? ' case' : ''), 'aria-pressed': String(c === cat), 'data-cat':c, text:catName(c), onclick(){ cat = c; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c))); } })));
+  const pick = c => { cat = c; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c))); };
+  // open cases arrive from the database; the chips are drawn again then, keeping what was picked
+  const paintCats = () => {
+    cats.replaceChildren();
+    openCases().map(c => [c.short, true]).concat(CATS.map(c => [c, false])).forEach(([c, isCase]) =>
+      cats.append(el('button', { type:'button', class:'chip' + (isCase ? ' case' : ''), 'aria-pressed': String(c === cat), 'data-cat':c, text:catName(c), onclick(){ pick(c); } })));
+  };
+  paintCats();
+  Store.cases().then(() => {
+    const pre = opts.caseId && openCases().find(c => c.id === opts.caseId);
+    if (pre && !cat) cat = pre.short;
+    paintCats();
+  });
   f.handle.value = handleGet();
   const paintFee = () => { $('.if-fee', f).innerHTML = feeLine(); };
   Store.sub(paintFee);
@@ -376,7 +420,8 @@ function mountForm(host, opts={}){
     const handle = f.handle.value.trim(); handleSet(handle);
     say(T('ud.form.gonderiliyor'));
     $('[type=submit]', f).disabled = true;
-    Store.addIdea({ title, cat, problem:f.problem.value.trim(), solution:f.solution.value.trim(), feats, handle }).then(k => {
+    const isCase = openCases().find(c => c.short === cat);
+    Store.addIdea({ title, cat, caseId: isCase ? isCase.id : null, problem:f.problem.value.trim(), solution:f.solution.value.trim(), feats, handle }).then(k => {
       const end = new Date(Date.now() + TERMS.voteDays*DAY);
       const done = $('.if-done', f);
       done.innerHTML = `<span class="eyebrow k">${T('ud.gonderildi.etiket')}</span><h3>${esc(title)}</h3>
@@ -393,8 +438,8 @@ function mountForm(host, opts={}){
   });
   if (opts.focus) setTimeout(() => pitch.focus({ preventScroll:true }), 50);
   const useCase = id => {
-    const c = CASES.find(x => x.id === id); if (!c) return;
-    cat = c.short; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === cat)));
+    const c = openCases().find(x => x.id === id); if (!c) return;
+    pick(c.short);
     open(); f.scrollIntoView({ block:'center', behavior: reduce.matches ? 'auto' : 'smooth' }); pitch.focus({ preventScroll:true });
   };
   return { focus: () => pitch.focus(), open, useCase };
@@ -402,27 +447,39 @@ function mountForm(host, opts={}){
 
 // =========================================================== open case card
 // The surplus-stock angle on the home pages: one open case, its numbers, and a one-tap way to write for it.
-function mountCase(host, opts={}){
-  const c = CASES[0];
-  host.classList.add('case-band');
-  host.innerHTML = `
-    <div class="cb-txt">
-      <span class="cb-tag"><i aria-hidden="true"></i>${T('ud.vaka.acik')} · ${c.tag}</span>
-      <h2 class="cb-h">${T('ud.vaka.baslik')}</h2>
-      <p>${T('ud.vaka.metin')}</p>
-      <dl><div><dt>${T('ud.vaka.adet')}</dt><dd>${(1e6).toLocaleString(LOCALE)}</dd></div><div><dt>${T('ud.vaka.olcu')}</dt><dd>M10 × 90 · 8.8</dd></div><div><dt>${T('ud.vaka.gelen')}</dt><dd class="cb-n">0</dd></div></dl>
-      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${c.id}" data-case="${c.id}">${T('ud.vaka.yaz')} ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">${T('ud.vaka.gor')}</a><a class="link" href="${ROOT}vakalar/">${T('ud.vaka.ac')}</a></div>
-    </div>
-    <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">
-      <g class="cb-l"><path d="M24 52h26v46H24z"/><path d="M50 60h10v30H50z"/><path d="M60 66h150v18H60z"/>
+// The newest open case is shown; with none open the band stays hidden.
+// Vaka 01 keeps its bolt drawing and text; other cases show their own numbers over a pallet of stock.
+const BOLT = `<g class="cb-l"><path d="M24 52h26v46H24z"/><path d="M50 60h10v30H50z"/><path d="M60 66h150v18H60z"/>
       ${Array.from({length:12}, (_,k) => `<path class="th" d="M${120 + k*7.5} 66l4 18"/>`).join('')}
       <path d="M176 56h16v38h-16z"/><path d="M192 60h8v30h-8z"/></g>
       <path class="cb-c" d="M14 75H232" />
-      <g class="cb-d"><path d="M60 108v12M210 108v12M60 116H210"/><text x="135" y="132" text-anchor="middle">l = 90</text><text x="226" y="70">M10</text></g>
-    </svg><figcaption>× ${(1e6).toLocaleString(LOCALE)}</figcaption></figure>`;
-  const a = $('[data-case]', host);
-  if (opts.form) a.addEventListener('click', e => { e.preventDefault(); opts.form.useCase(c.id); });
-  Store.sub(() => { $('.cb-n', host).textContent = String(Store.ideas().filter(i => i.cat === c.short).length); });
+      <g class="cb-d"><path d="M60 108v12M210 108v12M60 116H210"/><text x="135" y="132" text-anchor="middle">l = 90</text><text x="226" y="70">M10</text></g>`;
+const PALLET = `<g class="cb-l"><path d="M40 112h180v8H40z"/><path d="M48 120h14v8H48zM123 120h14v8h-14zM198 120h14v8h-14z"/>
+      <path d="M50 72h74v40H50z"/><path d="M128 72h82v40h-82z"/><path d="M86 34h82v38H86z"/>
+      <path class="th" d="M87 72v40M169 72v40M127 34v38M50 92h74M128 92h82"/></g>
+      <path class="cb-c" d="M18 128H242"/>`;
+function mountCase(host, opts={}){
+  const box = host.closest('section') || host;
+  box.hidden = true;
+  Store.cases().then(() => {
+    const c = openCases()[0];
+    if (!c) return;
+    const v01 = c.id === V01.id;
+    box.hidden = false;
+    host.classList.add('case-band');
+    host.innerHTML = `
+    <div class="cb-txt">
+      <span class="cb-tag"><i aria-hidden="true"></i>${T('ud.vaka.acik')} · ${esc(c.tag)}</span>
+      <h2 class="cb-h">${v01 ? T('ud.vaka.baslik') : esc(c.name)}</h2>
+      ${v01 ? `<p>${T('ud.vaka.metin')}</p>` : c.ozet ? `<p>${esc(c.ozet)}</p>` : ''}
+      <dl><div><dt>${T('ud.vaka.adet')}</dt><dd>${c.adet ? c.adet.toLocaleString(LOCALE) : '–'}</dd></div><div><dt>${T('ud.vaka.olcu')}</dt><dd>${v01 ? 'M10 × 90 · 8.8' : esc([c.olcu, c.sinif].filter(Boolean).join(' · ') || '–')}</dd></div><div><dt>${T('ud.vaka.gelen')}</dt><dd class="cb-n">0</dd></div></dl>
+      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${encodeURIComponent(c.id)}" data-case>${T('ud.vaka.yaz')} ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">${T('ud.vaka.gor')}</a><a class="link" href="${ROOT}vakalar/">${T('ud.vaka.ac')}</a></div>
+    </div>
+    <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">${v01 ? BOLT : PALLET}</svg>${c.adet ? `<figcaption>× ${c.adet.toLocaleString(LOCALE)}</figcaption>` : ''}</figure>`;
+    const a = $('[data-case]', host);
+    if (opts.form) a.addEventListener('click', e => { e.preventDefault(); opts.form.useCase(c.id); });
+    Store.sub(() => { $('.cb-n', host).textContent = String(Store.ideas().filter(i => inCase(i, c)).length); });
+  });
 }
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
@@ -710,5 +767,5 @@ function mountMotion(){
 applyText();
 mountChrome();
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
+window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
 })();

@@ -72,17 +72,19 @@
   </div>
 </main>
 <footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
 <script src="../assets/ud.js"></script>
 <script>
-let sort = 'top', cat = '';
-const board = UD.mountBoard(document.getElementById('board'), { dialog:true, sort:() => sort, filter:i => !cat || i.cat === cat });
+let sort = 'top', cat = null;
+// a chip is a category name or a case (a case also holds the ideas sent with its id)
+const board = UD.mountBoard(document.getElementById('board'), { dialog:true, sort:() => sort, filter:i => !cat || (typeof cat === 'string' ? i.cat === cat : UD.inCase(i, cat)) });
 document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { sort = b.dataset.s; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); });
 const cats = document.getElementById('cats');
-[''].concat(UD.CASES.map(c => c.short), UD.CATS).forEach((c, ix) => {
-  const b = UD.el('button', { type:'button', class:'chip', 'aria-pressed': String(ix === 0), text: ix === 0 ? UD.T('fikirler.js.tumu') : UD.catName(c) });
-  b.onclick = () => { cat = ix === 0 ? '' : c; cats.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); };
+UD.Store.cases().then(() => [null].concat(UD.CASES, UD.CATS).forEach((c, ix) => {
+  const b = UD.el('button', { type:'button', class:'chip', 'aria-pressed': String(ix === 0), text: ix === 0 ? UD.T('fikirler.js.tumu') : UD.catName(typeof c === 'string' ? c : c.short) });
+  b.onclick = () => { cat = c; cats.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); };
   cats.append(b);
-});
+}));
 UD.mountThu(document.getElementById('thu'));
 // a shared link (?f=<idea>) opens that idea; the live store can take a moment to arrive
 const f = new URLSearchParams(location.search).get('f');

@@ -355,3 +355,16 @@ Yol haritası: `docs/yol-haritasi.md`. Jüri 4. tur: eleştirmen 7,0 (`.jury/127
   Yönetim Özet'te "Bildirilen fikirler": "Fikir gizlendi" fikri sitede gizler.
 - **Yönetim:** başvurular, mesajlar ve bildirimler aynı tablo bileşeniyle (`KAYITLAR`); veri tarafında `kayitTuru`.
 - SQL: `supabase/5-guven.sql` (mesajlar, bildirimler).
+
+## Faz 2, 1. bölüm: hesap ve "Benim" (26 Ekim 2026)
+
+- **Hesap isteğe bağlı:** ziyaretçi anonim yazar ve "alırdım" der (sürtünme yok). "Benim" sayfasında e-posta bağlayınca
+  Supabase anonim kullanıcıyı aynı kimlikle kalıcı yapar (`updateUser({ email })`), bütün satırları onda kalır.
+  Başka cihazda `signInWithOtp` (`shouldCreateUser:false`) ile sihirli bağlantı; o tarayıcının bağlanmamış
+  katkıları taşınmaz, sayfa bunu söyler. Oturum değişince store kendi satırlarını yeniden okur.
+- **`benim/`** (noindex): üç sayı (yazdığın fikir, fikirlerine "alırdım" diyen kişi, "alırdım" dediğin fikir), hesap
+  kartı (önizleme / anonim / bağlantı bekleniyor / girildi), fikirlerin (Perşembe'ye uzaklıkla), "alırdım"
+  dediklerin, "haber ver" istekleri (vazgeçilebilir). Üst çubukta kişi simgesi.
+- **Perşembe'ye uzaklık (`hedef`):** adaylar açık fikirlerin "alırdım"a göre ilk 5'i (ana sayfanın 2. turu). Aday
+  olmayana "n kişi daha alırdım derse adaylara girer"; fikir penceresinde ve "Benim"de görünür.
+- Gerçek ziyaretçiye e-posta için özel SMTP şart (KURULUM 10).

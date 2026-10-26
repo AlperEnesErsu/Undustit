@@ -46,6 +46,7 @@ const ICON = {
   arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>',
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  ben:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
   replay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>'
 };
 
@@ -121,7 +122,7 @@ function mountChrome(){
     host.className = 'nav'; host.id = 'nav';
     host.innerHTML = `<div class="wrap"><a class="brand" lang="en" href="${homeHref()}" aria-label="${T('ud.menu.anasayfa')}"><b>Undust<i>it</i></b></a>
       <div class="nav-r"><nav class="nav-links" id="nav-links" aria-label="${T('ud.menu.ana')}">${links.map(([k,l,h])=>`<a href="${ROOT+h}"${k===cur?' aria-current="page"':''}>${l}</a>`).join('')}${langSwitch(' lang-m')}</nav>
-      <a class="btn sig sm" href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${langSwitch()}
+      <a class="btn sig sm" href="${ROOT}fikir/">${T('ud.menu.yaz')}</a><a class="ben" href="${ROOT}benim/" aria-label="${T('ud.menu.benim')}" title="${T('ud.menu.benim')}"${cur === 'benim' ? ' aria-current="page"' : ''}>${ICON.ben}</a>${langSwitch()}
       <button type="button" class="menu-t" aria-expanded="false" aria-controls="nav-links" aria-label="${T('ud.menu.menu')}"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>`;
     const btn = $('.menu-t', host);
     const set = o => { host.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); };
@@ -250,6 +251,11 @@ const Store = (function(){
       const { data } = await sb.auth.getSession();
       S.uid = data && data.session ? data.session.user.id : 'anon';
       await sbLoad();
+      // signing in elsewhere, out, or back from an e-mail link changes who "I" am: read my rows again
+      sb.auth.onAuthStateChange((ev, session) => {
+        const id = session ? session.user.id : 'anon';
+        if (id !== S.uid){ S.uid = id; sbReload(); } else emit();
+      });
       // others' demand and comments arrive on a slow tick and whenever the tab comes back
       setInterval(() => { if (document.visibilityState === 'visible') sbReload(); }, 30000);
       document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sbReload(); });
@@ -379,6 +385,49 @@ const Store = (function(){
       }
       let d = []; try { d = JSON.parse(localStorage.getItem('ud-haber') || '[]') || []; } catch(e){}
       d = d.filter(x => !(x.key === key && x.tur === tur)).concat([{ eposta, key, tur, at:new Date().toISOString() }]);
+      try { localStorage.setItem('ud-haber', JSON.stringify(d)); } catch(e){}
+    },
+    // ---- account. Visitors stay anonymous until they choose otherwise. Linking an e-mail turns the
+    // anonymous user into a permanent one with the same id (Supabase), so every idea, price and comment
+    // stays theirs; on another device the same e-mail signs in with a link. Returns null in preview mode.
+    async hesap(){
+      if (S.mode !== 'supabase') return null;
+      await start();
+      const { data } = await sb.auth.getUser();
+      const u = data && data.user;
+      return { var: !!u, anonim: !u || !!u.is_anonymous, eposta: (u && u.email) || '', bekleyen: (u && u.new_email) || '' };
+    },
+    async epostaBagla(eposta, donus){
+      await start();
+      const { data } = await sb.auth.getSession();
+      const u = data && data.session && data.session.user;
+      const r = u && u.is_anonymous
+        ? await sb.auth.updateUser({ email:eposta }, { emailRedirectTo:donus })
+        : await sb.auth.signInWithOtp({ email:eposta, options:{ emailRedirectTo:donus } });
+      if (r.error) throw r.error;
+    },
+    async girisBaglantisi(eposta, donus){
+      await start();
+      const r = await sb.auth.signInWithOtp({ email:eposta, options:{ shouldCreateUser:false, emailRedirectTo:donus } });
+      if (r.error) throw r.error;
+    },
+    async cikis(){ await start(); await sb.auth.signOut(); },
+    // this person's "haber ver" requests, to see and cancel them
+    async haberlerim(){
+      if (S.mode === 'supabase'){
+        await start();
+        if (S.uid === 'anon') return [];
+        const r = await sb.from('haber_istekleri').select('id,eposta,fikir_id,tur,gonderildi').eq('uye', S.uid);
+        if (r.error) return [];
+        return r.data.map(h => ({ id:h.id, eposta:h.eposta, tur:h.tur, gonderildi:h.gonderildi, idea:(ideas().find(i => idOf(i.key) === h.fikir_id) || {}).key }));
+      }
+      let d = []; try { d = JSON.parse(localStorage.getItem('ud-haber') || '[]') || []; } catch(e){}
+      return d.map((h, ix) => ({ id:String(ix), eposta:h.eposta, tur:h.tur, idea:h.key }));
+    },
+    async haberIptal(h){
+      if (S.mode === 'supabase'){ await start(); const r = await sb.from('haber_istekleri').delete().eq('id', h.id); if (r.error) throw r.error; return; }
+      let d = []; try { d = JSON.parse(localStorage.getItem('ud-haber') || '[]') || []; } catch(e){}
+      d = d.filter(x => !(x.key === h.idea && x.tur === h.tur));
       try { localStorage.setItem('ud-haber', JSON.stringify(d)); } catch(e){}
     },
     // A row only admins read back: "Vakanı aç" applications, contact messages, idea reports
@@ -643,6 +692,17 @@ function sortIdeas(list, by){
   else c.sort((a,b) => b.buyers - a.buyers || b.avg - a.avg || String(b.at).localeCompare(String(a.at)));
   return c;
 }
+// How close an idea is to Thursday: the five open ideas with the most "alırdım" are the candidates
+// (the home page's second round). Returns {aday:rank} for one of them, {eksik:n} for how many more
+// "alırdım" it needs to pass the fifth, or null when demand is closed or it is an example.
+function hedef(i, list = Store.ideas()){
+  if (i.ex || !(i.left > 0)) return null;
+  const top = sortIdeas(list.filter(x => x.left > 0 && x.buyers > 0), 'top').slice(0, 5);
+  const ix = top.findIndex(x => x.key === i.key);
+  if (ix > -1) return { aday: ix + 1 };
+  return { eksik: top.length < 5 ? Math.max(1, 1 - i.buyers) : top[4].buyers - i.buyers + 1 };
+}
+const hedefMetni = h => !h ? '' : h.aday ? T('ud.hedef.aday', { n:h.aday }) : T('ud.hedef.eksik', { n:h.eksik });
 // Turkish writes the percent sign first (%10), English after (10%)
 const pct = v => LANG === 'en' ? v + '%' : '%' + v;
 const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
@@ -709,6 +769,7 @@ function card(i, ix, opts={}){
   const href = i.ex ? null : `${ROOT}fikirler/?f=${encodeURIComponent(i.key)}`;
   const title = el('p', { class:'t' }, href ? el('a', { href, text:i.title, onclick(e){ if (opts.dialog){ e.preventDefault(); openIdea(i.key); } } }) : document.createTextNode(i.title));
   const body = el('div', { class:'body' }, [title, meta]);
+  if (opts.hedef && hedef(i)){ const h = hedef(i); body.append(el('p', { class:'hedef' + (h.aday ? ' aday' : ''), text:hedefMetni(h) })); }
   if (!i.ex && i.at){ const bar = el('div', { class:'days', 'aria-hidden':'true' }, el('i')); bar.firstChild.style.width = (100 * (TERMS.voteDays - i.left) / TERMS.voteDays) + '%'; body.append(bar); }
   return el('article', { class:'icard' + (ix < 3 && !i.ex && i.buyers ? ' top' : '') }, [el('span', { class:'rank', 'aria-hidden':'true', text: opts.rank === false ? '' : String(ix+1) }), body, buyCtl(i)]);
 }
@@ -794,7 +855,8 @@ function openIdea(key, push=true){
     <div class="in">
       <div style="display:grid;gap:14px"><h2 id="idlg-h">${esc(it.title)}</h2>
         <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center"><span class="dv"></span>
-        <span class="eyebrow">${it.buyers ? T('ud.pencere.ort', { fiyat:tl(it.avg) }) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
+        <span class="eyebrow">${it.buyers ? T('ud.pencere.ort', { fiyat:tl(it.avg) }) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div>
+        ${hedef(it) ? `<p class="hedef${hedef(it).aday ? ' aday' : ''}">${hedefMetni(hedef(it))}</p>` : ''}</div>
       ${it.problem || it.solution || (it.feats || []).length ? `<dl>${it.problem ? `<div><dt>${T('ud.pencere.problem')}</dt><dd>${esc(it.problem)}</dd></div>` : ''}${it.solution ? `<div><dt>${T('ud.form.cozum')}</dt><dd>${esc(it.solution)}</dd></div>` : ''}
         ${(it.feats || []).length ? `<div><dt>${T('ud.form.ozellik')}</dt><dd><ul>${it.feats.map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div>` : ''}</dl>` : ''}
       ${it.mine && it.owner !== Store.uid ? '<div class="haber-yer"></div>' : ''}
@@ -991,5 +1053,5 @@ function mountMotion(){
 applyText();
 mountChrome();
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
+window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, hedef, hedefMetni, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
 })();

@@ -112,6 +112,24 @@ https://plausible.io'da siteyi ekleyin ve `assets/ayar.js` içindeki `analitik` 
 (Fikir gönderildi, Alırdım, Paylaş, Haber ver, Vaka başvurusu) Plausible'da **Goals** altında aynı
 adlarla eklenmelidir.
 
+## 10. Hesaplar: e-posta bağlama ve giriş ("Benim" sayfası)
+
+Ziyaretçi anonim kalır; "Benim" sayfasında e-postasını bağlayınca anonim kullanıcı aynı kimlikle kalıcı hesaba
+döner (fikirleri, fiyatları, yorumları onda kalır). Başka cihazda aynı e-postayla sihirli bağlantıyla girer.
+
+1. **E-posta gönderimi (şart):** Supabase'in kendi e-posta servisi yalnız proje ekibindeki adreslere ve saatte
+   birkaç e-posta gönderir; gerçek ziyaretçilere ulaşmaz. **Authentication** > **Emails** > **SMTP Settings**
+   altında kendi SMTP'nizi açın (Resend: host `smtp.resend.com`, port `465`, kullanıcı `resend`, şifre Resend
+   API anahtarı, gönderen kendi alan adınızdan bir adres).
+2. **Yönlendirme adresleri:** **Authentication** > **URL Configuration** > **Redirect URLs** listesine
+   `https://alperenesersu.github.io/Undustit/**` ve `http://localhost:4317/**` ekleyin (e-postadaki bağlantı
+   "Benim" sayfasına döner).
+3. **E-posta şablonları:** **Authentication** > **Emails** > **Templates** altında "Magic Link" ve
+   "Change Email Address" şablonlarını Türkçeleştirin (ör. konu: "Undustit hesabını onayla").
+4. **Deneme:** kendi e-postanızla bir fikre "alırdım" deyin, "Benim" sayfasında e-postanızı bağlayın, gelen
+   bağlantıya tıklayın: sayfa "… ile girdin" demeli ve fikir hâlâ "Fikirlerin" altında olmalı. Sonra başka bir
+   tarayıcıda "Giriş yap" ile aynı e-postaya bağlantı isteyin.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

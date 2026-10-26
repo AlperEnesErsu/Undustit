@@ -45,6 +45,14 @@
 .share button:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .open{border-style:dashed;background:transparent}
 .open ol{margin:0;padding-inline-start:20px;color:var(--ink-2);display:grid;gap:8px;font-weight:300}
+.basvuru{display:grid;gap:14px}
+.basvuru .iki{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.basvuru .onay{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
+.basvuru .onay input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent)}
+.basvuru .durum{font-size:14px;min-height:1.4em}
+.basvuru .durum.bad{color:var(--err)}
+.basvuru-tamam{display:grid;gap:6px;padding:16px;border:1px solid var(--ok);border-radius:var(--r-md);background:var(--ok-soft)}
+@media (max-width:560px){.basvuru .iki{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:560px){.case dl{grid-template-columns:minmax(0,1fr)}.case dl div + div{padding-inline-start:0;border-inline-start:0;border-top:1px solid var(--line)}}
 </style>
 </head>
@@ -82,7 +90,8 @@
         <li data-t="vakalar.li.2">Vaka sayfası ve kendi bağlantısı hazırlanır.</li>
         <li data-t="vakalar.li.3">Topluluk fikir yazar, “alırdım” der ve fiyat yazar; en çok talep gören fikirle deneme partisi yapılır.</li>
       </ol>
-      <p style="font-size:13.5px;color:var(--muted)" data-t="vakalar.p.3">Başvuru kanalı prototip aşamasında henüz açık değil.</p>
+      <p style="font-size:13.5px;color:var(--muted)" data-t="vakalar.p.3">Formu doldur; stoğuna bakıp sana e-postayla dönelim.</p>
+      <div id="basvuru"></div>
     </article>
   </div>
 </main>
@@ -119,6 +128,45 @@ document.getElementById('link-01').textContent = new URL(UD_STIL.withStil('../va
 document.querySelectorAll('[data-copy]').forEach(copyBtn);
 // open cases first, then the ones being judged or produced, closed ones last
 const ORDER = ['acik','degerlendirme','kazanan','uretim','kapali'];
+// "Vakanı aç": the form opens on demand; applications reach only the admin panel
+const kutu = document.getElementById('basvuru');
+const ac = el('button', { type:'button', class:'btn sig', html:T('vakalar.js.b.ac') + ' ' + ICON.arrow });
+kutu.append(ac);
+ac.onclick = () => {
+  const alan = (ad, etiket, tur, zorunlu, ipucu, uzun) => `<label class="if-field"><span>${etiket}${zorunlu ? '' : ` <small>${T('ud.form.istege')}</small>`}</span>${uzun
+    ? `<textarea name="${ad}" maxlength="1000" placeholder="${ipucu}"></textarea>`
+    : `<input name="${ad}" type="${tur}" maxlength="${ad === 'stok' ? 300 : 160}"${zorunlu ? ' required' : ''}${ipucu ? ` placeholder="${ipucu}"` : ''}${tur === 'email' ? ' autocomplete="email"' : tur === 'tel' ? ' autocomplete="tel"' : ad === 'kisi' ? ' autocomplete="name"' : ad === 'firma' ? ' autocomplete="organization"' : ''}>`}</label>`;
+  const f = el('form', { class:'basvuru', novalidate:true, 'aria-label':T('vakalar.h2.2').replace(/<[^>]+>/g, ''), html:
+    alan('firma', T('vakalar.js.b.firma'), 'text', true, T('vakalar.js.b.firma.ipucu')) +
+    alan('stok', T('vakalar.js.b.stok'), 'text', true, T('vakalar.js.b.stok.ipucu')) +
+    `<div class="iki">${alan('adet', T('vakalar.js.b.adet'), 'text', false, T('vakalar.js.b.adet.ipucu'))}${alan('kisi', T('vakalar.js.b.kisi'), 'text', false)}</div>` +
+    `<div class="iki">${alan('eposta', T('vakalar.js.b.eposta'), 'email', true)}${alan('telefon', T('vakalar.js.b.telefon'), 'tel', false)}</div>` +
+    alan('notlar', T('vakalar.js.b.not'), 'text', false, T('vakalar.js.b.not.ipucu'), true) +
+    `<label class="onay"><input type="checkbox" name="onay" required><span>${T('vakalar.js.b.onay')}</span></label>` +
+    `<div><button type="submit" class="btn sig">${T('vakalar.js.b.gonder')} ${ICON.arrow}</button></div>` +
+    `<p class="durum" role="status" aria-live="polite"></p>` });
+  kutu.replaceChildren(f);
+  f.firma.focus();
+  const say = (t, bad) => { const d = f.querySelector('.durum'); d.textContent = t; d.classList.toggle('bad', !!bad); };
+  f.onsubmit = e => {
+    e.preventDefault();
+    const v = n => f[n].value.trim();
+    const fail = (t, n) => { say(t, true); f[n].focus(); };
+    if (v('firma').length < 2) return fail(T('vakalar.js.b.hata.firma'), 'firma');
+    if (v('stok').length < 3) return fail(T('vakalar.js.b.hata.stok'), 'stok');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('eposta'))) return fail(T('vakalar.js.b.hata.eposta'), 'eposta');
+    if (!f.onay.checked) return fail(T('vakalar.js.b.hata.onay'), 'onay');
+    const gonder = f.querySelector('[type=submit]'); gonder.disabled = true; say(T('vakalar.js.b.gidiyor'));
+    UD.Store.basvur({ firma:v('firma'), stok:v('stok'), adet:v('adet'), kisi:v('kisi'), eposta:v('eposta'), telefon:v('telefon'), notlar:v('notlar') })
+      .then(() => {
+        UD.olcu('Vaka başvurusu');
+        kutu.innerHTML = `<div class="basvuru-tamam" tabindex="-1"><b>${T('vakalar.js.b.tamam')}</b><p>${T('vakalar.js.b.tamam.not', { eposta:esc(v('eposta')) })}</p></div>`;
+        kutu.firstChild.focus();
+      })
+      .catch(err => { gonder.disabled = false; say(err && err.code === 'P0001' ? T('vakalar.js.b.hata.sinir') : T('vakalar.js.b.hata.genel'), true); });
+  };
+};
+
 UD.Store.cases().then(cs => {
   list.querySelectorAll('.case:not(.open)').forEach(n => n.remove());
   cs.slice().sort((a, b) => ORDER.indexOf(a.durum) - ORDER.indexOf(b.durum)).forEach((c, ix) => list.insertBefore(caseCard(c, ix), ask));

@@ -16,9 +16,11 @@ aşağıdaki adımları izleyin.
 2. `supabase/sema.sql` dosyasının tüm içeriğini kopyalayıp yapıştırın ve **Run** ile çalıştırın.
 3. Hata olmadığını ve **Table Editor** ekranında `vakalar`, `profiller`, `fikirler` gibi tabloları
    gördüğünüzü kontrol edin. Vaka 01 de `vakalar` tablosunda olmalı.
-4. Aynı şekilde sırayla `supabase/2-fikirler.sql` (sitenin fikirleri, talepleri, puanları ve yorumları)
-   ve `supabase/3-hiz.sql` (puan ve talep için günlük sınır, fikirleri vakalarına bağlama) dosyalarını
-   çalıştırın. İkisi de tekrar çalıştırılabilir.
+4. Aynı şekilde sırayla `supabase/2-fikirler.sql` (sitenin fikirleri, talepleri, puanları ve yorumları),
+   `supabase/3-hiz.sql` (puan ve talep için günlük sınır, fikirleri vakalarına bağlama) ve
+   `supabase/4-acilis.sql` (fikir başına özet görünümü, "Vakanı aç" başvuruları, "haber ver" e-postaları)
+   dosyalarını çalıştırın. Hepsi tekrar çalıştırılabilir. 4. dosya çalışmadan site eski yoldan (her satırı
+   okuyarak) çalışmaya devam eder.
 5. **Authentication** > **Sign In / Providers** altında **Allow anonymous sign-ins** seçeneğini açın:
    ziyaretçiler hesap açmadan fikir yazar ve "alırdım" der.
 
@@ -78,6 +80,37 @@ aşağıdaki adımları izleyin.
    giriş yapın. Vaka listesinde Vaka 01 görünmeli.
 2. Taslak bir vaka oluşturup durumunu değiştirin, sonra başka bir tarayıcı penceresinde (oturum açmadan)
    vakanın herkese açık sayfasını kontrol edin: taslak görünmemeli, açık vaka görünmeli.
+
+## 8. E-posta bildirimleri ("haber ver")
+
+Site e-posta adreslerini `haber_istekleri` tablosuna yazar; göndermeyi bir Edge Function yapar. Bu adım
+yapılmasa da site çalışır, adresler birikir ve sonra gönderilebilir.
+
+1. https://resend.com hesabı açın, kendi alan adınızı doğrulayın ve bir API anahtarı alın.
+2. Supabase CLI ile fonksiyonu yükleyin (proje klasöründe):
+
+   ```bash
+   supabase functions deploy haber-gonder --no-verify-jwt --project-ref azjdweynukmwxywdfewb
+   ```
+
+3. **Edge Functions** > **Secrets** altında şunları ekleyin: `RESEND_API_KEY`, `HABER_GONDEREN`
+   (ör. `Undustit <haber@alanadiniz.com>`), `SITE_URL` (`https://alperenesersu.github.io/Undustit/`) ve
+   `WEBHOOK_SECRET` (uzun, rastgele bir metin).
+4. **Database** > **Webhooks** > **Create a new hook**: tablo `public.talepler`, olay **Insert**, tür
+   **Supabase Edge Functions**, fonksiyon `haber-gonder`. **HTTP Headers**'a `x-undustit-imza` adıyla
+   3. adımdaki `WEBHOOK_SECRET` değerini ekleyin.
+5. Deneme: bir fikre "haber ver" ile kendi adresinizi bırakın, başka bir tarayıcıdan "alırdım" deyin.
+   E-posta gelmeli ve `haber_istekleri.gonderildi` dolmalı. Her fikir için yalnız bir kez yazılır.
+
+"Ön satışa çıkınca haber ver" istekleri (`tur = 'alirdim'`) şimdilik otomatik gönderilmez; ön satış
+başlayınca yönetim tarafından bu listeye yazılır.
+
+## 9. Ölçüm (Plausible)
+
+https://plausible.io'da siteyi ekleyin ve `assets/ayar.js` içindeki `analitik` alanına alan adını yazın
+(ör. `'alperenesersu.github.io'`). Çerez kullanmaz, KVKK için onay penceresi gerekmez. Özel olaylar
+(Fikir gönderildi, Alırdım, Paylaş, Haber ver, Vaka başvurusu) Plausible'da **Goals** altında aynı
+adlarla eklenmelidir.
 
 ## Sorun giderme
 

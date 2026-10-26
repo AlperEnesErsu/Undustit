@@ -91,7 +91,26 @@ function ciz(o, a){
           '<tbody id="tbody"></tbody>' +
         '</table></div>' +
       '</div>' +
+    '</section>' +
+    '<section class="panel" id="basvurular" aria-labelledby="bv-b">' +
+      '<header class="panel-bas"><h2 id="bv-b">Vaka başvuruları</h2><span class="sayac" id="bv-sayac"></span></header>' +
+      '<div class="panel-ic"><div class="tablo-kap"><table class="tablo">' +
+        '<caption class="sr-only">Vakanı aç formundan gelen başvurular</caption>' +
+        '<thead><tr><th scope="col">Firma</th><th scope="col">Stok</th><th scope="col">Adet</th>' +
+        '<th scope="col">İletişim</th><th scope="col">Not</th><th scope="col">Tarih</th><th scope="col">Durum</th></tr></thead>' +
+        '<tbody id="bv-tbody"></tbody>' +
+      '</table></div></div>' +
     '</section>';
+
+  ana.querySelector('#bv-tbody').addEventListener('change', function(e){
+    var s = e.target.closest('select[data-bv]');
+    if (!s) return;
+    s.disabled = true;
+    UDV.basvurular.durum(s.dataset.bv, s.value)
+      .then(function(){ YON.toast('Başvuru durumu kaydedildi.', 'ok'); })
+      .catch(function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); basvuruYenile(); })
+      .then(function(){ s.disabled = false; });
+  });
 
   ana.querySelector('.chipler').addEventListener('click', function(e){
     var b = e.target.closest('[data-durum]');
@@ -110,6 +129,29 @@ function ciz(o, a){
 
   istatYenile();
   yenile();
+  basvuruYenile();
+}
+
+// "Vakanı aç" formundan gelenler: yeni olanlar üstte, durum satırdan değişir
+function basvuruYenile(){
+  var tb = ana.querySelector('#bv-tbody');
+  tb.innerHTML = '<tr><td colspan="7">Yükleniyor…</td></tr>';
+  return Promise.resolve().then(function(){ return UDV.basvurular.liste(); }).then(function(liste){
+    ana.querySelector('#bv-sayac').textContent = liste.length + ' başvuru';
+    if (!liste.length){ tb.innerHTML = '<tr><td colspan="7">Henüz başvuru yok.</td></tr>'; return; }
+    var B = UDV.basvurular;
+    tb.innerHTML = liste.map(function(b){
+      return '<tr><td><b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : '') + '</td>' +
+        '<td>' + esc(b.stok) + '</td><td>' + esc(b.adet || '—') + '</td>' +
+        '<td><a class="link" href="mailto:' + encodeURIComponent(b.eposta).replace(/%40/g, '@') + '">' + esc(b.eposta) + '</a>' + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : '') + '</td>' +
+        '<td>' + esc(b.notlar || '—') + '</td><td>' + tarih(b.zaman) + '</td>' +
+        '<td><select data-bv="' + esc(b.id) + '" aria-label="' + esc(b.firma) + ' başvurusunun durumu">' +
+          B.DURUMLAR.map(function(d){ return '<option value="' + d + '"' + (d === b.durum ? ' selected' : '') + '>' + B.DURUM_ADI[d] + '</option>'; }).join('') +
+        '</select></td></tr>';
+    }).join('');
+  }).catch(function(err){
+    tb.innerHTML = '<tr><td colspan="7">' + esc(err.message || 'Başvurular yüklenemedi.') + '</td></tr>';
+  });
 }
 
 function $$chip(){

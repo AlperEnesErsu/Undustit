@@ -312,3 +312,18 @@ vardı. Oyuncu korunarak her renge tek görev verildi:
 - **Yeşil:** para ve "açık / kazanan / üretimde" durumu. **Kırmızı-turuncu:** logo ve canlı yayın noktası.
 - **Pembe (`--pink`)** kaldırıldı; "Üretimde" rozeti yeşil çerçeveli.
 - Gölgeler hep mürekkep.
+
+## Açılışa hazırlık (26 Ekim 2026)
+
+- **Veri yükü:** `supabase/4-acilis.sql` sonrası sayfa fikir başına tek özet satırı okur (`fikir_kart`: alıcı,
+  ortalama fiyat, puanlar, yorum sayısı; en yeni 1.000 fikir) ve kişinin yalnız kendi fiyat ve puanlarını
+  okur; yorumlar fikir penceresi açılınca gelir. Görünüm yoksa eski yol (her satır) sürer, site bozulmaz.
+- **Vakanı aç:** vakalar sayfasında açılan form (`vaka_basvurulari`): firma, stok, e-posta zorunlu, açık
+  onay kutusu. Kişi başı günde 3. Yalnız yönetici okur; Özet sayfasında "Vaka başvuruları" tablosu,
+  durum (Yeni / İncelendi / Kabul / Ret) satırdan değişir.
+- **Haber ver:** isteğe bağlı tek e-posta alanı: fikir gönderince ("ilk alırdım gelince") ve "alırdım"
+  denmiş fikrin penceresinde ("ön satışa çıkınca"). Adres tarayıcıda hatırlanır; veritabanında yalnız
+  sahibi ve yönetici görür. Gönderim `supabase/functions/haber-gonder` (Resend, talepler webhook'u).
+- **Ölçüm:** Plausible, `ayar.js` `analitik` boşken hiç yüklenmez. Olaylar: Fikir gönderildi, Alırdım,
+  Paylaş, Haber ver, Vaka başvurusu.
+- **İçerik kuralı:** açılış fikirleri gerçek kişilerden, kendi adlarıyla (`docs/acilis-icerik.md`).

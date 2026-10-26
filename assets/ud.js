@@ -186,7 +186,27 @@ const Store = (function(){
   let sb = null;
   const idOf = key => key.slice(key.lastIndexOf(':') + 1);
   if (AYAR.supabaseUrl) S.mode = 'supabase';
+  // With migration 4 (supabase/4-acilis.sql) a page reads one summary row per idea (fikir_kart: buyers,
+  // average price, scores, comment count) plus only this person's own prices and scores; comments load
+  // when an idea is opened. Without the view it falls back to reading every row of the four tables.
+  let summary = true;
+  const NEWEST = 1000;   // demand runs 30 days, so the newest thousand ideas is months of headroom
+  const num = v => Number(v) || 0;
   async function sbLoad(){
+    if (summary){
+      const k = await sb.from('fikir_kart').select('*').order('zaman', { ascending:false }).limit(NEWEST);
+      if (k.error){ summary = false; return sbLoad(); }
+      const me = S.uid !== 'anon' ? S.uid : null;
+      const [t, p] = me ? await Promise.all([sb.from('talepler').select('fikir_id,fiyat').eq('uye', me), sb.from('puanlar').select('fikir_id,olcut,puan').eq('uye', me)]) : [{}, {}];
+      const keyOf = {}, ideas = {}, mine = { buy:{}, rate:{} };
+      k.data.forEach(r => { keyOf[r.id] = r.sahip + ':' + r.id;
+        (ideas[r.sahip] = ideas[r.sahip] || { items:[] }).items.push({ k:r.id, caseId:r.vaka_id, title:r.baslik, cat:r.kategori, problem:r.problem, solution:r.cozum, feats:r.ozellikler, handle:r.ad, at:r.zaman,
+          agg:{ buyers:num(r.alici), avg:num(r.ort_fiyat), raters:num(r.puanci), crit:{ d:num(r.puan_d), m:num(r.puan_m), u:num(r.puan_u) }, notes:num(r.yorum) } }); });
+      (t.data || []).forEach(r => { if (keyOf[r.fikir_id]) mine.buy[keyOf[r.fikir_id]] = r.fiyat; });
+      (p.data || []).forEach(r => { const x = keyOf[r.fikir_id]; if (x) mine.rate[x] = { ...(mine.rate[x] || {}), [r.olcut]: r.puan }; });
+      S.ideas = ideas; S.votes = me ? { [me]: mine } : {}; emit();
+      return;
+    }
     const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => sb.from(t).select('*').limit(5000)));
     const bad = res.find(r => r.error); if (bad) throw bad.error;
     const [f, t, p, y] = res.map(r => r.data || []);
@@ -200,6 +220,14 @@ const Store = (function(){
     S.ideas = ideas; S.votes = votes; S.notes = notes; emit();
   }
   const sbReload = () => sbLoad().catch(() => {});
+  // an idea's comments, read when its window opens (summary mode keeps only their count in the list)
+  const noteCache = {};
+  async function sbNotes(key){
+    const r = await sb.from('yorumlar').select('id,tur,metin,ad,zaman,uye').eq('fikir_id', idOf(key)).order('zaman', { ascending:true }).limit(500);
+    if (r.error) return;
+    noteCache[key] = r.data.map(n => ({ k:n.id, idea:key, kind:n.tur, text:n.metin, handle:n.ad, at:n.zaman, owner:n.uye }));
+    emit();
+  }
   async function sbUser(){
     const { data } = await sb.auth.getSession();
     if (data && data.session) return (S.uid = data.session.user.id);
@@ -266,7 +294,7 @@ const Store = (function(){
   function clean(it, owner){
     return { k: str(String(it.k), 40), key: owner + ':' + str(String(it.k), 40), owner, caseId: str(it.caseId, 80), title: str(it.title, 140), cat: str(it.cat, 40),
       problem: str(it.problem, 400), solution: str(it.solution, 400), handle: str(it.handle, 30),
-      feats: (Array.isArray(it.feats) ? it.feats : []).slice(0, 3).map(x => str(x, 80)).filter(Boolean), at: when(it.at) };
+      feats: (Array.isArray(it.feats) ? it.feats : []).slice(0, 3).map(x => str(x, 80)).filter(Boolean), at: when(it.at), agg: it.agg || null };
   }
   function ideas(){
     const out = [];
@@ -286,15 +314,22 @@ const Store = (function(){
     }
     out.forEach(i => {
       const bs = Object.values(buy[i.key] || {});
-      i.buyers = bs.length;
-      i.avg = bs.length ? bs.reduce((a,b)=>a+b,0)/bs.length : 0;
       i.myPrice = (buy[i.key] || {})[S.uid] || 0;
       i.mine = i.myPrice > 0;
+      i.left = daysLeft(i.at);
+      // summary mode: the database counted everyone; the rows here are only this person's own
+      if (i.agg){
+        i.buyers = i.agg.buyers; i.avg = i.agg.avg; i.raters = i.agg.raters; i.crit = { ...i.agg.crit };
+        i.notes = noteCache[i.key] || []; i.noteCount = Math.max(i.agg.notes, i.notes.length); i.notesLoaded = !!noteCache[i.key];
+        return;
+      }
+      i.buyers = bs.length;
+      i.avg = bs.length ? bs.reduce((a,b)=>a+b,0)/bs.length : 0;
       const rs = rates[i.key] || [];
       i.raters = rs.length;
       i.crit = {}; CRIT.forEach(([c]) => { const v = rs.map(r => Number(r[c])).filter(n => n >= 1 && n <= 5); i.crit[c] = v.length ? v.reduce((a,b)=>a+b,0)/v.length : 0; });
       i.notes = (notes[i.key] || []).sort((a,b) => String(a.at).localeCompare(String(b.at)));
-      i.left = daysLeft(i.at);
+      i.noteCount = i.notes.length; i.notesLoaded = true;
     });
     return out;
   }
@@ -330,8 +365,35 @@ const Store = (function(){
       if (S.mode === 'supabase') return sbDo(() => sb.from('puanlar').upsert({ fikir_id:idOf(k), uye:S.uid, olcut:c, puan:n }, { onConflict:'fikir_id,uye,olcut' }));
       const v = myVotes(); v.rate[k] = { ...(v.rate[k] || {}), [c]: n }; return write('votes', v); },
     myRate(k){ return ((S.votes[S.uid] || {}).rate || {})[k] || {}; },
+    // "Haber ver": an e-mail to reach this person later about one idea (tur 'fikrim' or 'alirdim').
+    // The address is private: RLS lets a person read only their own rows (supabase/4-acilis.sql).
+    async haberVer(eposta, key, tur){
+      if (S.mode === 'supabase'){
+        await start(); await sbUser();
+        const r = await sb.from('haber_istekleri').upsert({ uye:S.uid, eposta, fikir_id:idOf(key), tur }, { onConflict:'uye,fikir_id,tur' });
+        if (r.error) throw r.error;
+        return;
+      }
+      let d = []; try { d = JSON.parse(localStorage.getItem('ud-haber') || '[]') || []; } catch(e){}
+      d = d.filter(x => !(x.key === key && x.tur === tur)).concat([{ eposta, key, tur, at:new Date().toISOString() }]);
+      try { localStorage.setItem('ud-haber', JSON.stringify(d)); } catch(e){}
+    },
+    // "Vakanı aç": a company's application; only admins can read it back (supabase/4-acilis.sql)
+    async basvur(data){
+      if (S.mode === 'supabase'){
+        await start(); await sbUser();
+        const r = await sb.from('vaka_basvurulari').insert(data);
+        if (r.error) throw r.error;
+        return;
+      }
+      // local preview: its own key, read by the admin panel's local store (veri.js)
+      let d = {}; try { d = JSON.parse(localStorage.getItem('udv-basvuru') || '{}') || {}; } catch(e){}
+      const id = key(); d[id] = { id, ...data, durum:'yeni', zaman:new Date().toISOString() };
+      try { localStorage.setItem('udv-basvuru', JSON.stringify(d)); } catch(e){}
+    },
+    loadNotes(key){ if (S.mode === 'supabase' && summary) start().then(() => sbNotes(key)).catch(() => {}); },
     addNote(idea, kind, text, handle){
-      if (S.mode === 'supabase') return sbDo(() => sb.from('yorumlar').insert({ fikir_id:idOf(idea), uye:S.uid, tur:kind, metin:text, ad:handle || '' }));
+      if (S.mode === 'supabase') return sbDo(() => sb.from('yorumlar').insert({ fikir_id:idOf(idea), uye:S.uid, tur:kind, metin:text, ad:handle || '' })).then(r => { if (summary) sbNotes(idea); return r; });
       return write('notes', { items: myItems('notes').concat([{ k:key(), idea, kind, text, handle, at:new Date().toISOString() }]).slice(-200) });
     }
   };
@@ -348,6 +410,18 @@ function mountThu(node){
   tick(); setInterval(tick, 30000);
 }
 
+// =========================================================== measuring
+// Cookieless page and event counts (Plausible) only once ayar.js names the site's domain; until then
+// nothing loads and olcu() does nothing. Events: idea sent, "alırdım", share, e-mail notice, application.
+const ANALITIK = (window.UD_AYAR || {}).analitik || '';
+if (ANALITIK){
+  window.plausible = window.plausible || function(){ (window.plausible.q = window.plausible.q || []).push(arguments); };
+  const sc = document.createElement('script');
+  sc.defer = true; sc.dataset.domain = ANALITIK; sc.src = 'https://plausible.io/js/script.js';
+  document.head.append(sc);
+}
+function olcu(ad, props){ if (ANALITIK && window.plausible) window.plausible(ad, props ? { props } : undefined); }
+
 // =========================================================== share
 // An idea needs buyers, so its link is one tap away: the phone's share sheet, else the clipboard.
 function shareIdea(title, key, btn){
@@ -357,6 +431,30 @@ function shareIdea(title, key, btn){
   (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
     .then(() => { btn.textContent = T('ud.paylas.kopyalandi'); }, () => { btn.textContent = url; })
     .then(() => setTimeout(() => { btn.innerHTML = back; }, 1800));
+}
+
+// =========================================================== "haber ver"
+// Optional and one field: the address is remembered on this browser so the next one is a single tap.
+const mailGet = () => { try { return localStorage.getItem('ud-eposta') || ''; } catch(e){ return ''; } };
+const mailSet = v => { try { localStorage.setItem('ud-eposta', v); } catch(e){} };
+function haberForm(key, tur){
+  const f = el('form', { class:'haber', novalidate:true, 'aria-label':T('ud.haber.' + tur) });
+  const p = el('p', { text:T('ud.haber.' + tur) });
+  const inp = el('input', { type:'email', autocomplete:'email', maxlength:'160', placeholder:T('ud.haber.ipucu'), 'aria-label':T('ud.haber.eposta'), value:mailGet() });
+  const ok = el('button', { type:'submit', class:'btn alt sm', text:T('ud.haber.gonder') });
+  const durum = el('small', { class:'haber-d', role:'status' });
+  f.append(p, el('div', { class:'haber-r' }, [inp, ok]), durum);
+  f.onsubmit = e => {
+    e.preventDefault();
+    const v = inp.value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ inp.setAttribute('aria-invalid', 'true'); durum.textContent = T('ud.haber.hata.eposta'); inp.focus(); return; }
+    ok.disabled = true; inp.removeAttribute('aria-invalid');
+    Store.haberVer(v, key, tur).then(() => {
+      mailSet(v); olcu('Haber ver', { tur });
+      f.replaceChildren(el('p', { class:'haber-tamam', text:T('ud.haber.tamam', { eposta:v }) }));
+    }).catch(() => { ok.disabled = false; durum.textContent = T('ud.haber.hata.genel'); });
+  };
+  return f;
 }
 
 // =========================================================== idea form
@@ -444,7 +542,9 @@ function mountForm(host, opts={}){
         <p class="lead" style="font-size:15px">${T('ud.gonderildi.not')}</p>
         <div class="acts"><button type="button" class="btn sig share">${T('ud.paylas.bul')} ${ICON.arrow}</button><a class="btn alt" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">${T('ud.gonderildi.gor')}</a><button type="button" class="btn alt again">${T('ud.gonderildi.yeni')}</button></div>`;
       f.classList.add('done'); done.focus();
-      const sh = $('.share', done); sh.onclick = () => shareIdea(title, k, sh);
+      const sh = $('.share', done); sh.onclick = () => { olcu('Paylaş', { yer:'gönderim' }); shareIdea(title, k, sh); };
+      done.append(haberForm(k, 'fikrim'));
+      olcu('Fikir gönderildi', { vaka: isCase ? isCase.id : 'yok' });
       $('.again', done).onclick = () => { f.reset(); $('.if-detay', f).open = false; f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
       opts.onSent && opts.onSent(k);
     }).catch(err => {
@@ -544,13 +644,14 @@ function buyCtl(i){
       const n = Math.round(parseFloat(LANG === 'en' ? inp.value.replace(/,/g,'') : inp.value.replace(/\./g,'').replace(',', '.')));
       if (!(n > 0) || n > TERMS.maxPrice){ inp.focus(); inp.setAttribute('aria-invalid','true'); inp.placeholder = T('ud.al.fiyatyaz'); return; }
       justBought = i.key;
+      olcu('Alırdım', { yol:'yazarak' });
       Store.setBuy(i.key, n).catch(()=>{});
     };
     f.append(inp, ok, no);
     // one tap: three prices around what others already said (or typical ones), typing stays possible
     const q = el('div', { class:'buy-q', role:'group', 'aria-label':T('ud.al.hizli') });
     quickPrices(i).forEach(n => q.append(el('button', { type:'button', class:'chip', text:tl(n), 'aria-pressed': String(n === i.myPrice),
-      onclick(){ justBought = i.key; Store.setBuy(i.key, n).catch(()=>{}); } })));
+      onclick(){ justBought = i.key; olcu('Alırdım', { yol:'hazır fiyat' }); Store.setBuy(i.key, n).catch(()=>{}); } })));
     box.append(q, f);
     // a price button gets the focus, so a phone does not open its keyboard unasked
     q.firstChild.focus();
@@ -564,7 +665,7 @@ function card(i, ix, opts={}){
     el('span', { class:'c', text:catName(i.cat) }),
     i.ex ? el('span', { class:'ex', text:T('ud.kart.ornek') }) : el('span', { text: voting ? T('ud.kart.kaldi', { n:i.left }) : T('ud.kart.bitti') }),
     !i.ex && i.buyers ? el('span', { class:'p', text:T('ud.kart.ort', { fiyat:tl(i.avg) }) }) : null,
-    !i.ex && i.notes && i.notes.length ? el('span', { text: T('ud.kart.yorum', { n:i.notes.length }) }) : null,
+    !i.ex && i.noteCount ? el('span', { text: T('ud.kart.yorum', { n:i.noteCount }) }) : null,
     !i.ex && i.handle ? el('span', { text: i.handle }) : null
   ]);
   const href = i.ex ? null : `${ROOT}fikirler/?f=${encodeURIComponent(i.key)}`;
@@ -602,6 +703,7 @@ let dlg = null;
 function openIdea(key, push=true){
   const i = Store.ideas().find(x => x.key === key);
   if (!i) return false;
+  Store.loadNotes(key);
   if (!dlg){
     dlg = el('dialog', { class:'idlg', 'aria-labelledby':'idlg-h' });
     document.body.append(dlg);
@@ -618,20 +720,22 @@ function openIdea(key, push=true){
         <span class="eyebrow">${it.buyers ? T('ud.pencere.ort', { fiyat:tl(it.avg) }) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
       ${it.problem || it.solution || (it.feats || []).length ? `<dl>${it.problem ? `<div><dt>${T('ud.pencere.problem')}</dt><dd>${esc(it.problem)}</dd></div>` : ''}${it.solution ? `<div><dt>${T('ud.form.cozum')}</dt><dd>${esc(it.solution)}</dd></div>` : ''}
         ${(it.feats || []).length ? `<div><dt>${T('ud.form.ozellik')}</dt><dd><ul>${it.feats.map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div>` : ''}</dl>` : ''}
+      ${it.mine && it.owner !== Store.uid ? '<div class="haber-yer"></div>' : ''}
       ${it.owner === Store.uid && Store.canWrite ? `<div class="own" aria-live="polite"><span>${T('ud.pencere.senin')}</span><button type="button" class="link own-x">${T('ud.pencere.gerial')}</button></div>` : ''}
       <section class="crit" aria-label="${T('ud.pencere.olcut')}"><span class="eyebrow">${T('ud.pencere.puan', { n:it.raters })}</span>
         ${CRIT.map(([c,l]) => `<div class="crit-row"><span>${l}</span><div class="stars" role="group" aria-label="${T('ud.pencere.puani', { olcut:l })}">${[1,2,3,4,5].map(n => `<button type="button" data-c="${c}" data-n="${n}" aria-pressed="${mine[c] === n}" ${Store.canWrite ? '' : 'disabled'}>${n}</button>`).join('')}</div><output>${it.crit[c] ? it.crit[c].toFixed(1) : '–'}</output></div>`).join('')}
       </section>
       <section style="display:grid;gap:14px" aria-labelledby="nt-h"><h3 id="nt-h" style="font-size:17px">${T('ud.pencere.yorumlar')}</h3>
-        <div class="notes">${it.notes.length ? it.notes.map(n => `<div class="note ${n.kind}"><small>${T('ud.not.' + n.kind)} · ${esc(n.handle || T('ud.not.isimsiz'))}</small><p>${esc(n.text)}</p></div>`).join('') : `<p class="ex-note">${T('ud.not.ilk')}</p>`}</div>
+        <div class="notes">${!it.notesLoaded ? `<p class="ex-note">${T('ud.not.yukleniyor')}</p>` : it.notes.length ? it.notes.map(n => `<div class="note ${n.kind}"><small>${T('ud.not.' + n.kind)} · ${esc(n.handle || T('ud.not.isimsiz'))}</small><p>${esc(n.text)}</p></div>`).join('') : `<p class="ex-note">${T('ud.not.ilk')}</p>`}</div>
         <form class="note-form"><textarea name="t" maxlength="500" placeholder="${T('ud.not.ipucu')}" aria-label="${T('ud.not.yorum')}"></textarea>
           <div class="row"><div class="chips" role="group" aria-label="${T('ud.not.tur')}">${[['yorum',T('ud.not.yorum')],['oneri',T('ud.not.oneri')],['endise',T('ud.not.endise')]].map(([k,l],x) => `<button type="button" class="chip" data-k="${k}" aria-pressed="${x===0}">${l}</button>`).join('')}</div>
           <button type="submit" class="btn sm" ${Store.canWrite ? '' : 'disabled'}>${T('ud.not.ekle')}</button></div></form>
       </section>
     </div>`;
     $('.x', dlg).onclick = () => dlg.close();
-    const sh = $('.sh', dlg); sh.onclick = () => shareIdea(it.title, it.key, sh);
+    const sh = $('.sh', dlg); sh.onclick = () => { olcu('Paylaş', { yer:'pencere' }); shareIdea(it.title, it.key, sh); };
     $('.dv', dlg).replaceWith(buyCtl(it));
+    const hy = $('.haber-yer', dlg); if (hy) hy.replaceWith(haberForm(it.key, 'alirdim'));
     const own = $('.own-x', dlg);
     if (own) own.onclick = () => {
       if (own.dataset.sure){ Store.removeIdea(key).then(() => dlg.close()).catch(() => { own.textContent = T('ud.pencere.gerial.hata'); }); return; }
@@ -802,5 +906,5 @@ function mountMotion(){
 applyText();
 mountChrome();
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, openShared, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
+window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
 })();

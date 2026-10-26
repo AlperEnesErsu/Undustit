@@ -72,6 +72,8 @@ h2 em,.cb-h em{font-style:normal}
 .pc-steps li::before{height:4px}
 .pc-replay{background:var(--bg-2);border:2px solid var(--ink)}
 .thu{border:2px solid var(--ink);background:var(--bg-2)}
+a.thu{box-shadow:2px 2px 0 var(--ink);transition:transform 180ms var(--pop),box-shadow 180ms var(--pop),background-color 120ms ease}
+a.thu:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);border-color:var(--ink)}
 .round header{border-top-width:3px}
 .round header b{font-weight:800}
 .slot,.empty{border:2px dashed var(--ink-2)}

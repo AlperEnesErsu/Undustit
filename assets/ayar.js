@@ -12,5 +12,7 @@ window.UD_AYAR = {
   iletisim: '',
   // KVKK ve kullanım koşulları sayfaları: veri sorumlusu bilgileri girilip avukat okuyunca true yapın.
   // true olunca alt bilgide bağlantılar ve formlardaki onayın yanında "Aydınlatma metni" görünür.
-  yasal: false
+  yasal: false,
+  // Perşembe yayınının adresi (YouTube, Twitch…). Doluyken persembe/ sayfasında "Yayına git" çıkar.
+  yayin: ''
 };

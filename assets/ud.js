@@ -60,7 +60,7 @@ const TERMS = {
   // surplus-stock cases (Vaka 01 · Boltun): the profit above the stock's floor price is split, not the sale;
   // the four parts are the slot winners' 10%, the rest stays with Undustit. Changing a cost is repaid first.
   caseShare: { inventor: 40, slots: { isim: 3, gorunum: 3, ambalaj: 2, kanal: 2 } },
-  liveDay: 4, liveHourUtc: 17 // Thursday 20:00 Istanbul (UTC+3, no DST)
+  liveDay: 4, liveHourUtc: 17, liveMinutes: 90 // Thursday 20:00 Istanbul (UTC+3, no DST), for about an hour and a half
 };
 const CATS = ['Mutfak','Ev & dekor','Fitness','Ofis & masa','Dış mekân','Teknoloji aksesuarı','Çocuk','Evcil hayvan'];
 // Cases are rows of the vakalar table (opened from yonetim/); Store.cases() fills this array in place.
@@ -95,6 +95,8 @@ function nextLive(now = new Date()){
   t.setUTCDate(t.getUTCDate() + add);
   return t;
 }
+// the stream is on from the start time for TERMS.liveMinutes; nextLive() already points at next week by then
+const liveNow = (now = new Date()) => now - (nextLive(now) - 7*DAY) < TERMS.liveMinutes * 6e4;
 function daysLeft(at){
   if (!at) return null;
   const end = new Date(at).getTime() + TERMS.voteDays*DAY;
@@ -460,7 +462,9 @@ function mountThu(node){
   const tick = () => {
     const t = nextLive(), ms = t - Date.now();
     const d = Math.floor(ms/DAY), h = Math.floor(ms%DAY/36e5), m = Math.floor(ms%36e5/6e4);
-    node.innerHTML = `<i class="dot" aria-hidden="true"></i><span>${T('ud.persembe.canli')}</span><b>${d ? d + T('ud.persembe.g') + ' ' : ''}${h}${T('ud.persembe.s')} ${String(m).padStart(2,'0')}${T('ud.persembe.dk')}</b>`;
+    node.classList.toggle('on', liveNow());
+    node.innerHTML = liveNow() ? `<i class="dot" aria-hidden="true"></i><b>${T('ud.persembe.simdi')}</b>`
+      : `<i class="dot" aria-hidden="true"></i><span>${T('ud.persembe.canli')}</span><b>${d ? d + T('ud.persembe.g') + ' ' : ''}${h}${T('ud.persembe.s')} ${String(m).padStart(2,'0')}${T('ud.persembe.dk')}</b>`;
     node.setAttribute('title', fmtDay(t) + T('ud.persembe.saat'));
   };
   tick(); setInterval(tick, 30000);
@@ -1053,5 +1057,5 @@ function mountMotion(){
 applyText();
 mountChrome();
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, hedef, hedefMetni, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
+window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, hedef, hedefMetni, nextLive, liveNow, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
 })();

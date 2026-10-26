@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="persembe">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title data-t="persembe.title.1">Perşembe 20.00 · Undustit</title>
+<meta name="description" content="Her perşembe 20.00’de en çok talep gören beş fikir canlı yayında konuşulur. Sonraki yayın, adaylar ve takvim." data-ta="content:persembe.attr.1">
+<meta name="theme-color" content="#FFF6E9">
+<link rel="canonical" href="https://alperenesersu.github.io/Undustit/persembe/">
+<link rel="alternate" hreflang="tr" href="https://alperenesersu.github.io/Undustit/persembe/">
+<link rel="alternate" hreflang="en" href="https://alperenesersu.github.io/Undustit/persembe/?dil=en">
+<link rel="alternate" hreflang="x-default" href="https://alperenesersu.github.io/Undustit/persembe/">
+<meta property="og:url" content="https://alperenesersu.github.io/Undustit/persembe/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Undustit">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi." data-ta="content:persembe.attr.2">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
+<meta property="og:title" content="Perşembe 20.00 · Undustit" data-ta="content:persembe.attr.3">
+<meta property="og:description" content="En çok istenen beş fikir, her perşembe canlı." data-ta="content:persembe.attr.4">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/fonts/base.css">
+<link rel="stylesheet" href="../assets/ud.css">
+<script src="../assets/stil.js"></script>
+<style>
+.prs{display:grid;gap:clamp(40px,6vw,80px);padding-bottom:clamp(56px,8vw,112px)}
+.sayac{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 32px;align-items:end;padding:clamp(22px,3.4vw,40px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2)}
+.sayac .eyebrow{grid-column:1 / -1}
+.sayac .ne{display:grid;gap:8px}
+.sayac .gun{font-size:15px;color:var(--ink-2)}
+.sayac .kalan{font-family:var(--f-serif);font-size:clamp(48px,8vw,104px);line-height:.9;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.sayac.on .kalan{color:var(--brand)}
+.sayac .acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.sayac .not{grid-column:1 / -1;font-size:13.5px;color:var(--muted)}
+.blok{display:grid;gap:18px}
+.blok h2{font-size:clamp(28px,3.2vw,44px)}
+.uc{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:u}
+.uc li{counter-increment:u;display:grid;gap:8px;align-content:start;padding:22px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2)}
+.uc li::before{content:counter(u);font-family:var(--f-serif);font-size:40px;line-height:.9;color:var(--muted)}
+.uc b{font-weight:500}
+.uc p{color:var(--ink-2);font-weight:300;font-size:15px}
+@media (max-width:820px){.sayac{grid-template-columns:minmax(0,1fr)}.sayac .acts{justify-content:flex-start}.uc{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-t="persembe.a.1">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="wrap">
+  <div class="phead">
+    <span class="eyebrow" data-t="persembe.span.1">Perşembe 20.00</span>
+    <h1 data-t="persembe.h1.1">Her perşembe <em>canlı.</em></h1>
+    <p class="lead" data-t="persembe.p.1">En çok “alırdım” toplayan beş fikir her perşembe 20.00’de canlı yayında tasarım, pazar ve uygulanabilirlik açısından konuşulur. Sen de izle, soru sor, puanla.</p>
+  </div>
+  <div class="prs">
+    <section class="sayac" id="sayac" aria-labelledby="sy-h" aria-live="polite">
+      <span class="eyebrow" id="sy-h" data-t="persembe.span.2">Sonraki yayın</span>
+      <div class="ne"><span class="gun" id="gun"></span><b class="kalan" id="kalan"></b></div>
+      <div class="acts" id="eylem"></div>
+      <p class="not" id="not" hidden></p>
+    </section>
+    <section class="blok" aria-labelledby="ad-h">
+      <h2 id="ad-h" data-t="persembe.h2.1">Bu haftanın <em>adayları.</em></h2>
+      <div id="adaylar"></div>
+    </section>
+    <section class="blok" aria-labelledby="ny-h">
+      <h2 id="ny-h" data-t="persembe.h2.2">Yayında ne olur?</h2>
+      <ol class="uc">
+        <li><b data-t="persembe.b.1">Beş fikir, kısa ve net.</b><p data-t="persembe.p.2">Her aday birkaç dakikada anlatılır: çözdüğü dert, kaç kişinin hangi fiyata alacağı, gelen yorumlar.</p></li>
+        <li><b data-t="persembe.b.2">Üç ölçüt.</b><p data-t="persembe.p.3">Tasarım, pazar ve uygulanabilirlik. Topluluğun puanları ve yayındaki konuklar aynı tabloda görünür.</p></li>
+        <li><b data-t="persembe.b.3">Sonraki tur.</b><p data-t="persembe.p.4">Öne çıkanlar birlikte büyütülür: isim, renk, kutu. Sonra ön satış eşiği açılır.</p></li>
+      </ol>
+    </section>
+  </div>
+</main>
+<footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
+<script src="../assets/ud.js"></script>
+<script>
+// Thursday: when the next stream is, a way in (ayar.js `yayin`), the calendar, and this week's five candidates.
+const { T, el, ICON, TERMS, LOCALE } = UD;
+const YAYIN = (window.UD_AYAR || {}).yayin || '';
+const SAYFA = new URL('./', location.href).href;
+const z = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');   // 20261029T170000Z
+
+// one weekly event, in UTC (Istanbul has no daylight saving, so 17:00Z is always 20:00 there)
+function takvim(){
+  const t = UD.nextLive(), son = new Date(+t + TERMS.liveMinutes * 6e4);
+  const ad = T('persembe.js.takvim.ad'), not = T('persembe.js.takvim.not') + ' ' + SAYFA;
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Undustit//Persembe//TR', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+    'UID:persembe@undustit', 'DTSTAMP:' + z(new Date()), 'DTSTART:' + z(t), 'DTEND:' + z(son), 'RRULE:FREQ=WEEKLY;BYDAY=TH',
+    'SUMMARY:' + ad, 'DESCRIPTION:' + not.replace(/[,;]/g, m => '\\' + m), 'URL:' + SAYFA, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const google = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(ad) +
+    '&dates=' + z(t) + '/' + z(son) + '&recur=' + encodeURIComponent('RRULE:FREQ=WEEKLY;BYDAY=TH') + '&details=' + encodeURIComponent(not);
+  return { ics: 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics), google };
+}
+
+function ciz(){
+  const canli = UD.liveNow(), t = UD.nextLive(), ms = t - Date.now();
+  const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+  document.getElementById('sayac').classList.toggle('on', canli);
+  document.getElementById('gun').textContent = canli ? T('persembe.js.simdi.not') : UD.fmtDay(t) + T('ud.persembe.saat');
+  document.getElementById('kalan').textContent = canli ? T('ud.persembe.simdi')
+    : (d ? d + T('ud.persembe.g') + ' ' : '') + h + T('ud.persembe.s') + ' ' + String(m).padStart(2, '0') + T('ud.persembe.dk');
+}
+const k = takvim(), eylem = document.getElementById('eylem');
+if (YAYIN) eylem.append(el('a', { class:'btn sig', href:YAYIN, target:'_blank', rel:'noopener', html:T('persembe.js.izle') + ' ' + ICON.arrow }));
+eylem.append(el('a', { class:'btn alt', href:k.ics, download:'undustit-persembe.ics', text:T('persembe.js.ics') }),
+  el('a', { class:'btn alt', href:k.google, target:'_blank', rel:'noopener', text:T('persembe.js.google') }));
+if (!YAYIN){ const n = document.getElementById('not'); n.textContent = T('persembe.js.baglanti.yok'); n.hidden = false; }
+ciz(); setInterval(ciz, 30000);
+
+// the same five as the home page's second round
+UD.mountBoard(document.getElementById('adaylar'), { dialog:true, limit:5, filter:i => i.left > 0 && i.buyers > 0, examples:false,
+  emptyTitle:T('persembe.js.bos'), emptyNote:T('persembe.js.bos.not') });
+UD.openShared();
+</script>
+</body>
+</html>

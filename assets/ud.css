@@ -306,7 +306,10 @@ a.thu:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .proc{position:relative;display:grid;gap:14px;min-width:0}
 .pc-stage{position:relative;aspect-ratio:5/4;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(60% 60% at 60% 60%,rgba(35,55,198,.05),transparent 70%),var(--bg);overflow:hidden;isolation:isolate}
 .pc-stage::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px;opacity:.45;mask-image:radial-gradient(75% 75% at 50% 50%,#000,transparent)}
-.pc-card,.pc-pre,.pc-pay{position:absolute;left:6%;top:7%;width:50%;z-index:2}
+.pc-card,.pc-pre,.pc-pay{position:absolute;left:5%;top:6%;width:50%;z-index:2}
+/* the idea card stays small in its corner and steps back once written, so the drawing carries the story */
+.pc-card{width:42%;transform-origin:0 0}
+.proc.s2 .pc-card{transform:scale(.84)}
 .pc-card{display:grid;gap:10px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2);box-shadow:var(--shadow);transition:opacity var(--dur-mod) var(--ease-out),transform var(--dur-slow) var(--ease-out)}
 .pc-card .h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em}
 .pc-card .tag{padding:2px 8px;border:1px solid var(--line-2);border-radius:999px}
@@ -315,7 +318,11 @@ a.thu:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .proc.s2 .pc-txt::after{display:none}
 @keyframes blink{50%{opacity:0}}
 .pc-buy{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px;color:var(--ink-2);opacity:.3;transition:opacity var(--dur-mod) var(--ease-out)}
-.pc-buy b{font-family:var(--f-serif);font-weight:400;font-size:1.8em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.pc-buy{flex-direction:column;align-items:flex-start;gap:6px}
+/* demand without figures: a row of people filling in as they say "alırdım" */
+.pc-meter{display:flex;flex-wrap:wrap;gap:4px}
+.pc-meter i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line-2);transition:background-color 200ms var(--ease-out) calc(var(--i) * 70ms),border-color 200ms var(--ease-out) calc(var(--i) * 70ms)}
+.proc.s2 .pc-meter i{background:var(--accent);border-color:var(--accent)}
 .proc.s2 .pc-buy{opacity:1}
 .proc.s5 .pc-card{opacity:0;transform:translateY(-10px)}
 .pc-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
@@ -336,7 +343,7 @@ a.thu:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .proc.s6 .pc-pay{opacity:1;transform:none}
 
 /* the drawing */
-.pc-draw{position:absolute;right:2%;bottom:5%;width:70%}
+.pc-draw{position:absolute;right:0;bottom:5%;width:76%}
 .pc-draw svg{display:block;width:100%;height:auto;overflow:visible}
 .pc-draw text{font-family:var(--f-mono);font-size:9.5px}
 .dw-sk{fill:none;stroke:var(--ink-2);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1100ms var(--ease-io),d 900ms var(--ease-io),stroke 500ms ease,stroke-width 500ms ease,fill 600ms ease}
@@ -351,15 +358,16 @@ a.thu:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .proc.s3 .m2{d:path("M20 200 C 113 200 207 200 300 200")}
 .proc.s3 .m3{d:path("M20 170 C 20 180 20 190 20 200")}
 .proc.s3 .m4{d:path("M300 170 C 300 180 300 190 300 200")}
-.proc.s3 .m5{d:path("M120 170 C 120 133 120 97 120 60 C 147 60 173 60 200 60 C 200 97 200 133 200 170")}
-.proc.s3 .m6{d:path("M200 60 C 203 58 205 57 208 55 C 208 92 208 129 208 165")}
-.proc.s3 .m7{d:path("M148 76 C 156 76 164 76 172 76 C 175 76 176 86 172 86 C 164 86 156 86 148 86 C 144 86 144 76 148 76")}
+/* a plain object: a body with a domed top, a side face and a dial; the wobbly sketch settles into these lines */
+.proc.s3 .m5{d:path("M120 170 C 120 140 120 112 122 94 C 140 86 180 86 198 94 C 200 112 200 140 200 170")}
+.proc.s3 .m6{d:path("M198 94 C 202 91 205 89 208 87 C 209 115 209 143 208 165")}
+.proc.s3 .m7{d:path("M146 124 C 146 116 152 110 160 110 C 168 110 174 116 174 124 C 174 132 168 138 160 138 C 152 138 146 132 146 124")}
 .proc.s3 .dw-hatch path{opacity:0;transition-delay:300ms}
 /* prototype: wood, grain, hinges, dimensions, and the fold it makes */
-.proc.s4 .dw-board{fill:#E9D2AE}
-.proc.s4 .dw-edge{fill:#D9B98C}
-.proc.s4 .dw-slot{fill:var(--bg-3)}
-.dw-grain path{fill:none;stroke:#B98F5F;stroke-width:.9;opacity:0;transition:opacity 500ms ease 250ms}
+.proc.s4 .dw-board{fill:#BFE3DA}
+.proc.s4 .dw-edge{fill:#9CCFC1}
+.proc.s4 .dw-slot{fill:var(--bg-2)}
+.dw-grain path{fill:none;stroke:var(--ink-2);stroke-width:1.2;stroke-linecap:round;opacity:0;transition:opacity 500ms ease 250ms}
 .proc.s4 .dw-grain path{opacity:1}
 .dw-hinge rect{fill:var(--ink-2);opacity:0;transition:opacity 400ms ease 300ms}
 .proc.s4 .dw-hinge rect{opacity:1}
@@ -367,11 +375,6 @@ a.thu:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .dw-dims text{fill:var(--muted);opacity:0;transition:opacity 400ms ease 700ms}
 .proc.s4 .dw-dims path{stroke-dashoffset:0}
 .proc.s4 .dw-dims text{opacity:1}
-.dw-ghost{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3;opacity:0;transition:opacity 400ms ease 500ms}
-.dw-arc{fill:none;stroke:var(--accent);stroke-width:1.4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 700ms var(--ease-io) 650ms,opacity 300ms ease}
-.dw-arch{fill:none;stroke:var(--accent);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity 200ms ease 1250ms}
-.proc.s4 .dw-ghost,.proc.s4 .dw-arch{opacity:1}
-.proc.s4 .dw-arc{stroke-dashoffset:0}
 /* demand: price bubbles pop around the sketch */
 .dw-bub rect{fill:var(--bg-2);stroke:var(--accent);stroke-width:1}
 .dw-bub text{fill:var(--accent);font-weight:500}
@@ -388,7 +391,7 @@ a.thu:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .proc.s3 .dw-tag{opacity:1;transform:none}
 .proc.s3 .dw-lead{stroke-dashoffset:0}
 .proc.s3 .dw-pin{opacity:1}
-.proc.s5 .dw-tag,.proc.s5 .dw-dims,.proc.s5 .dw-ghost,.proc.s5 .dw-arc,.proc.s5 .dw-arch{opacity:0;transition-delay:0ms}
+.proc.s5 .dw-tag,.proc.s5 .dw-dims{opacity:0;transition-delay:0ms}
 /* pre-sale: the product drops into its box, more boxes join */
 .dw-product{transition:transform 600ms var(--ease-io),opacity 300ms ease 380ms}
 .proc.s5 .dw-product{transform:translateY(26px);opacity:0}

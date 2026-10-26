@@ -396,3 +396,14 @@ bir kez, altında adımlar, sonda "Tekrar oynat", hareketi azaltta ya da aynı o
   Girişler `--ease-out`, ekranda yer değiştirme `--ease-io`; yalnız `transform`, `opacity`, çizgi çizimi.
 - **Telefon:** "Tekrar oynat" köşede yalnız simge (yazısı ekran okuyucu için duruyor), çizimin son satırını örtmesin diye.
 - **Erişilebilirlik:** çizim `aria-hidden`; her hikâyenin bir cümlelik metin karşılığı `.sr` içinde.
+
+## Ana sayfa animasyonu genelleşti (26 Ekim 2026)
+
+"Eskizden rafa" artık tek bir ürünü (katlanır kesme tahtası "Rafla") değil her fikri anlatıyor:
+- **Kart:** "Senin fikrin" etiketiyle "Günlük bir derdi çözen, tek cümlelik fikrin." yazılır. Kart köşede küçük
+  (%42) ve yazıldıktan sonra %84'e çekilir; çizim sahneyi alır (genişlik %76).
+- **Talep:** "131 kişi / ort. 101 ₺" gibi gerçek veri sanılacak sayılar yerine 12 noktalık bir talep sırası dolar;
+  fiyat balonları "₺…".
+- **Çizim:** ahşap tahta ve katlanma hareketi yerine sade bir nesne (kubbeli gövde, yan yüz, kadran). Titrek
+  eskizden temiz çizgiye, mint renge, "en / boy" ölçülerine. Etiketler "İsim ✓ / Renk ✓ / Ambalaj ✓", kutuda "Ürünün".
+- Ön satış eşiği `TERMS.presale[0]`'dan okunur.

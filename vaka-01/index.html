@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title data-t="vaka.title.1">Vaka 01: Bir milyon cıvata · Undustit</title>
+<title data-t="vaka.title.1">Vaka 01 · Boltun: Bir milyon cıvata · Undustit</title>
 <meta name="description" content="Bir fabrikanın deposunda bir milyon M10 × 90 cıvata bekliyor. Onları kullanan bir ürün fikri yaz; kazanan fikirle 1.000 adet üretilir." data-ta="content:vaka.attr.1">
 <meta name="theme-color" content="#FFF6E9">
 <link rel="canonical" href="https://alperenesersu.github.io/Undustit/vaka-01/">
@@ -20,17 +20,18 @@
 <meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi." data-ta="content:vaka.attr.2">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
-<meta property="og:title" content="Vaka 01: Bir milyon cıvata · Undustit" data-ta="content:vaka.attr.3">
+<meta property="og:title" content="Vaka 01 · Boltun: Bir milyon cıvata · Undustit" data-ta="content:vaka.attr.3">
 <meta property="og:description" content="Bir fabrikanın deposunda bir milyon M10 × 90 cıvata bekliyor. Onları kullanan bir ürün fikri yaz; kazanan fikirle 1.000 adet üretilir." data-ta="content:vaka.attr.4">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
 <script src="../assets/stil.js"></script>
 <style>
-/* Case page: the case in one screen, then write for it and see what came in, then the datasheet. */
-.case-head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,80px);align-items:center;padding-block:clamp(48px,7vw,96px) clamp(40px,5vw,72px)}
+/* Case page: the case and its form in one screen, then what came in, then the folded details. */
+.case-head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,80px);align-items:start;padding-block:clamp(28px,4.5vw,64px) clamp(40px,5vw,72px)}
+.case-head .cb-art{margin-top:clamp(0px,6vw,96px)}
 .case-head .txt{display:grid;gap:20px;justify-items:start}
-.case-head h1{font-size:clamp(48px,6.6vw,100px);line-height:.94;letter-spacing:-.03em}
+.case-head h1{font-size:clamp(42px,5.4vw,84px);line-height:.94;letter-spacing:-.03em}
 .tag-open{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);padding:4px 10px;border:1px solid rgba(20,122,78,.3);border-radius:999px}
 .tag-open i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
 .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;border-top:1px solid var(--line);width:100%}
@@ -38,10 +39,20 @@
 .facts div + div{padding-inline-start:16px;border-inline-start:1px solid var(--line)}
 .facts dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .facts dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
-.write{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(28px,5vw,72px);align-items:start}
-.write > div{display:grid;gap:18px;align-content:start}
-.write h2{font-size:clamp(34px,3.8vw,54px)}
 .starters{display:flex;flex-wrap:wrap;gap:8px}
+.hero-yaz{display:grid;gap:12px;width:100%}
+/* the details below the board are folded: the heading is the button */
+.more .wrap{display:grid;gap:0}
+.more details{border-top:1px solid var(--line)}
+.more details:last-child{border-bottom:1px solid var(--line)}
+.more summary{list-style:none;cursor:pointer;display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;padding-block:22px;padding-inline-end:44px;position:relative}
+.more summary::-webkit-details-marker{display:none}
+.more summary::after{content:"+";position:absolute;right:4px;top:50%;translate:0 -50%;font-family:var(--f-mono);font-size:26px;color:var(--accent)}
+.more details[open] summary::after{content:"–"}
+.more summary h2{font-size:clamp(26px,3vw,40px)}
+.more summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+.more details > :not(summary){margin-bottom:28px}
+.more .how3,.more .faq{margin-top:0}
 .spec{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(28px,5vw,72px);align-items:start}
 .spec dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto;border-top:1px solid var(--line)}
 .spec dt,.spec dd{margin:0;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -58,7 +69,7 @@
 .faq div{padding-block:20px;border-top:1px solid var(--line);display:grid;gap:6px}
 .faq b{font-weight:500}
 .faq p{color:var(--ink-2);font-weight:300}
-@media (max-width:980px){.case-head,.write,.spec{grid-template-columns:minmax(0,1fr)}.case-head .cb-art{order:-1}}
+@media (max-width:980px){.case-head,.spec{grid-template-columns:minmax(0,1fr)}.case-head .cb-art{order:0;margin-top:0;max-width:420px}}
 @media (max-width:720px){.spec dl{grid-template-columns:minmax(0,1fr)}.spec dt{border-bottom:0;padding-bottom:2px}.spec dd{text-align:left;padding:0 0 12px}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div:nth-child(3){padding-inline-start:0;border-inline-start:0}.how3,.faq{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
@@ -68,16 +79,19 @@
 <main id="main" tabindex="-1">
   <section class="wrap case-head" aria-labelledby="h">
     <div class="txt">
-      <span class="tag-open" data-t="vaka.span.1"><i aria-hidden="true"></i>Açık vaka · Vaka 01</span>
+      <span class="tag-open" data-t="vaka.span.1"><i aria-hidden="true"></i>Açık vaka · Vaka 01 · Boltun</span>
       <h1 id="h" data-t="vaka.h1.1">Bir milyon cıvata <em>yeni bir iş arıyor.</em></h1>
       <p class="lead" data-t="vaka.p.1">Bir fabrikanın deposunda bir milyon M10 × 90 flanşlı cıvata ve somun takımı bekliyor. Onlara yeni bir iş bul. Malzeme hazır olduğu için risk düşük; en çok talep gören fikirle 1.000 adetlik deneme partisi yapılır.</p>
       <dl class="facts">
         <div><dt data-t="vaka.dt.1">Adet</dt><dd>1.000.000</dd></div>
         <div><dt data-t="vaka.dt.2">Ölçü</dt><dd data-t="vaka.dd.1">M10 × 90 · 8.8</dd></div>
-        <div><dt data-t="vaka.dt.3">Toplam çelik</dt><dd data-t="vaka.dd.2">≈ 80 ton</dd></div>
+        <div><dt data-t="vaka.dt.13">Fikir sahibine</dt><dd id="v-pay-kisa">kârın %40’ı</dd></div>
         <div><dt data-t="vaka.dt.4">Gelen fikir</dt><dd id="n-ideas">0</dd></div>
       </dl>
-      <a class="btn sig" href="#yaz"><span data-t="vaka.a.2">Bu vakaya fikir yaz</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      <div class="hero-yaz" id="yaz">
+        <div class="starters" id="starters"></div>
+        <div id="form"></div>
+      </div>
     </div>
     <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">
       <g class="cb-l"><path d="M24 52h26v46H24z"/><path d="M50 60h10v30H50z"/><path d="M60 66h150v18H60z"/>
@@ -88,38 +102,26 @@
     </svg><figcaption>× 1.000.000</figcaption></figure>
   </section>
 
-  <section class="sec" id="yaz" aria-labelledby="w-h">
-    <div class="wrap write">
-      <div>
-        <span class="eyebrow" data-t="vaka.span.2">Senin sıran</span>
-        <h2 id="w-h" data-t="vaka.h2.1">Bu cıvata başka <em>nerede çalışır?</em></h2>
-        <p class="lead" style="font-size:16px" data-t="vaka.p.2">Bir yapı elemanı, bir mobilya, bir spor aleti ya da henüz kimsenin aklına gelmemiş bir şey. Bir yön seç ya da doğrudan yaz.</p>
-        <div class="starters" id="starters"></div>
-        <div id="form"></div>
-      </div>
-      <div>
-        <span class="eyebrow" data-t="vaka.span.3">Bu vakaya gelen fikirler</span>
-        <div id="board"></div>
-      </div>
+  <section class="sec" aria-labelledby="b-h">
+    <div class="wrap">
+      <span class="eyebrow" id="b-h" data-t="vaka.span.3">Bu vakaya gelen fikirler</span>
+      <div id="board"></div>
     </div>
   </section>
 
-  <section class="sec" aria-labelledby="hw-h">
+  <section class="sec more" aria-label="Ayrıntılar" data-ta="aria-label:vaka.attr.5">
     <div class="wrap">
-      <h2 id="hw-h" data-t="vaka.h2.2">Bu vaka <em>nasıl ilerler?</em></h2>
+      <details><summary><h2 id="hw-h" data-t="vaka.h2.2">Bu vaka <em>nasıl ilerler?</em></h2></summary>
       <ol class="how3">
         <li><b data-t="vaka.b.1">Fikirler gelir.</b><p data-t="vaka.p.3">Herkes cıvataya kendi gözüyle bakar. 30 gün boyunca fikir yazılır.</p></li>
         <li><b data-t="vaka.b.2">Talep ölçülür.</b><p data-t="vaka.p.4">Beğenen “alırdım” der ve kaça alacağını yazar. Sıralamayı kişi sayısı ve fiyat belirler.</p></li>
-        <li><b data-t="vaka.b.3">Deneme partisi.</b><p data-t="vaka.p.5">En çok talep gören fikirle 1.000 adet üretilir. Satarsa fikir sahibi ve katkı verenler pay alır. <a class="link" href="../nasil/#pay">Paylar</a></p></li>
+        <li><b data-t="vaka.b.3">Deneme partisi.</b><p id="v-pay">En çok talep gören fikirle 1.000 adet üretilip satışa çıkar. Taban fiyatın üstündeki kârın %40’ı fikir sahibine, %10’u isim, görünüm, ambalaj ve satış kanalı önerisi seçilenlere gider. <a class="link" href="../nasil/#vaka-pay">Ayrıntı</a></p></li>
       </ol>
-    </div>
-  </section>
+      </details>
 
-  <section class="sec" aria-labelledby="sp-h">
-    <div class="wrap spec">
+      <details><summary><h2 id="sp-h" data-t="vaka.h2.3">Teknik <em>föy.</em></h2><span class="eyebrow" data-t="vaka.span.4">Mühendisler için</span></summary>
+      <div class="spec">
       <div style="display:grid;gap:16px;align-content:start">
-        <span class="eyebrow" data-t="vaka.span.4">Mühendisler için</span>
-        <h2 id="sp-h" data-t="vaka.h2.3">Teknik <em>föy.</em></h2>
         <p class="lead" style="font-size:16px" data-t="vaka.p.6">Değerler EN 1993-1-8 Tablo 3.4'e göre hesaplandı. Kendi projende kendi kontrolünü yap.</p>
       </div>
       <dl>
@@ -132,18 +134,17 @@
         <dt data-t="vaka.dt.11">Ahşapta pul <small>EN 1995-1-1: çap ≥ 3d, kalınlık ≥ 0,3d</small></dt><dd data-t="vaka.dd.8">30 × 3 mm</dd>
         <dt data-t="vaka.dt.12">Stok</dt><dd data-t="vaka.dd.9">1.000.000 takım</dd>
       </dl>
-    </div>
-  </section>
+      </div>
+      </details>
 
-  <section class="sec" aria-labelledby="q-h">
-    <div class="wrap">
-      <h2 id="q-h" data-t="vaka.h2.4">Sık <em>sorulanlar.</em></h2>
+      <details><summary><h2 id="q-h" data-t="vaka.h2.4">Sık <em>sorulanlar.</em></h2></summary>
       <div class="faq">
         <div><b data-t="vaka.b.4">“Alırdım” dersem satın almış olur muyum?</b><p data-t="vaka.p.7">Hayır. Yalnız talebi ölçer; kimse bir şey almak zorunda değil. Ön satış ayrı bir adım.</p></div>
         <div><b data-t="vaka.b.5">Fikrimi kim görür?</b><p data-t="vaka.p.8">Bu sayfayı açan herkes. Fikrin yanında yalnız senin yazdığın isim görünür.</p></div>
         <div><b data-t="vaka.b.6">Bu gerçek bir satış mı?</b><p data-t="vaka.p.9">Bu bir prototip. Fikirleri ve talebi gerçekten toplar ama henüz satış ya da ödeme yok.</p></div>
         <div><b data-t="vaka.b.7">Benim de fazla stoğum var.</b><p data-t="vaka.p.10">Kendi vakanı açabilirsin. <a class="link" href="../vakalar/#vakani-ac">Vakanı aç</a></p></div>
       </div>
+      </details>
     </div>
   </section>
 </main>
@@ -152,6 +153,10 @@
 <script src="../assets/ud.js"></script>
 <script>
 const CASE = { id:'vaka-01', short:'Vaka 01 · Cıvata' };
+// the split is written once, in UD.TERMS.caseShare
+const CS = UD.TERMS.caseShare, slots = Object.values(CS.slots).reduce((a, b) => a + b, 0);
+document.getElementById('v-pay-kisa').textContent = UD.T('vaka.js.pay.kisa', { pay:UD.pct(CS.inventor) });
+document.getElementById('v-pay').innerHTML = UD.T('vaka.js.pay', { mucit:UD.pct(CS.inventor), slot:UD.pct(slots) });
 const form = UD.mountForm(document.getElementById('form'), { caseId: CASE.id, label:UD.T('vaka.js.etiket'), placeholder:UD.T('vaka.js.ipucu') });
 // starters only put a beginning into the field; the person finishes the sentence
 const starters = [1,2,3].map(n => [UD.T('vaka.js.basla' + n), UD.T('vaka.js.basla' + n + '.metin')]);

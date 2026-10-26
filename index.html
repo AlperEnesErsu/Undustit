@@ -43,6 +43,7 @@
 .round header span{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
 .round .icard{grid-template-columns:minmax(0,1fr) auto;padding:14px 16px}
 .round .icard .rank{display:none}
+.round .icard:has(.buy-f){grid-template-columns:minmax(0,1fr)}.round .icard:has(.buy-f) .buy{grid-column:1}
 .round .icard .t{font-size:15.5px}
 .slot{padding:22px 18px;border:1px dashed var(--line-2);border-radius:var(--r-md);color:var(--muted);font-size:14px;line-height:1.5}
 .slot b{display:block;color:var(--ink-2);font-weight:500;margin-bottom:4px}
@@ -99,8 +100,9 @@ UD.mountCase(document.getElementById('case'), { form });
 UD.mountProc(document.getElementById('proc'), { delay:500 });
 UD.mountThu(document.getElementById('thu'));
 // round 1: newest collecting demand; round 2: the five with the most "alırdım"
-UD.mountBoard(document.getElementById('r1'), { limit:4, sort:() => 'new', filter:i => i.left > 0, rank:false, emptyNote:UD.T('anasayfa.js.ornek') });
-UD.mountBoard(document.getElementById('r2'), { limit:5, filter:i => i.left > 0 && i.buyers > 0, rank:false, examples:false, emptyNote:UD.T('anasayfa.js.aday') });
+UD.mountBoard(document.getElementById('r1'), { dialog:true, limit:4, sort:() => 'new', filter:i => i.left > 0, rank:false, emptyNote:UD.T('anasayfa.js.ornek') });
+UD.mountBoard(document.getElementById('r2'), { dialog:true, limit:5, filter:i => i.left > 0 && i.buyers > 0, rank:false, examples:false, emptyNote:UD.T('anasayfa.js.aday') });
+UD.openShared();
 </script>
 </body>
 </html>

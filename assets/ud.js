@@ -56,6 +56,9 @@ const TERMS = {
   voteDays: 30, maxPrice: 100000,
   shareRetail: 10, shareDirect: 30,
   presale: [300, 750],
+  // surplus-stock cases (Vaka 01 · Boltun): the profit above the stock's floor price is split, not the sale;
+  // the four parts are the slot winners' 10%, the rest stays with Undustit. Changing a cost is repaid first.
+  caseShare: { inventor: 40, slots: { isim: 3, gorunum: 3, ambalaj: 2, kanal: 2 } },
   liveDay: 4, liveHourUtc: 17 // Thursday 20:00 Istanbul (UTC+3, no DST)
 };
 const CATS = ['Mutfak','Ev & dekor','Fitness','Ofis & masa','Dış mekân','Teknoloji aksesuarı','Çocuk','Evcil hayvan'];
@@ -345,6 +348,17 @@ function mountThu(node){
   tick(); setInterval(tick, 30000);
 }
 
+// =========================================================== share
+// An idea needs buyers, so its link is one tap away: the phone's share sheet, else the clipboard.
+function shareIdea(title, key, btn){
+  const url = new URL(withStil(ROOT + 'fikirler/?f=' + encodeURIComponent(key)), location.href).href;
+  if (navigator.share) return navigator.share({ title, text:T('ud.paylas.metin', { baslik:title }), url }).catch(() => {});
+  const back = btn.innerHTML;
+  (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+    .then(() => { btn.textContent = T('ud.paylas.kopyalandi'); }, () => { btn.textContent = url; })
+    .then(() => setTimeout(() => { btn.innerHTML = back; }, 1800));
+}
+
 // =========================================================== idea form
 const handleGet = () => { try { return localStorage.getItem('ud-handle') || ''; } catch(e){ return ''; } };
 const handleSet = v => { try { localStorage.setItem('ud-handle', v); } catch(e){} };
@@ -364,12 +378,14 @@ function mountForm(host, opts={}){
     </div>
     <div class="if-more" id="${id}-more"><div><div class="if-body">
       <div class="if-field" role="group" aria-labelledby="${id}-cl"><span id="${id}-cl">${T('ud.form.kategori')}</span><div class="chips if-cats"></div></div>
+      <details class="if-detay"><summary>${T('ud.form.detay')} <small>${T('ud.form.detay.not')}</small></summary><div class="if-detay-in">
       <div class="if-two">
-        <label class="if-field"><span>${T('ud.form.problem')} <small>${T('ud.form.kisa')}</small></span><textarea name="problem" maxlength="400" required placeholder="${T('ud.form.problem.ipucu')}"></textarea></label>
-        <label class="if-field"><span>${T('ud.form.cozum')} <small>${T('ud.form.kisa')}</small></span><textarea name="solution" maxlength="400" required placeholder="${T('ud.form.cozum.ipucu')}"></textarea></label>
+        <label class="if-field"><span>${T('ud.form.problem')} <small>${T('ud.form.kisa')}</small></span><textarea name="problem" maxlength="400" placeholder="${T('ud.form.problem.ipucu')}"></textarea></label>
+        <label class="if-field"><span>${T('ud.form.cozum')} <small>${T('ud.form.kisa')}</small></span><textarea name="solution" maxlength="400" placeholder="${T('ud.form.cozum.ipucu')}"></textarea></label>
       </div>
       <div class="if-field" role="group" aria-labelledby="${id}-fl"><span id="${id}-fl">${T('ud.form.ozellik')} <small>${T('ud.form.ozellik.not')}</small></span>
         <div class="feats"><input name="f1" maxlength="80" placeholder="${T('ud.form.oz1')}" aria-label="${T('ud.form.oz1')}"><input name="f2" maxlength="80" placeholder="${T('ud.form.oz2')}" aria-label="${T('ud.form.oz2.aria')}"><input name="f3" maxlength="80" placeholder="${T('ud.form.oz3')}" aria-label="${T('ud.form.oz3.aria')}"></div></div>
+      </div></details>
       <label class="if-field" style="max-width:320px"><span>${T('ud.form.ad')} <small>${T('ud.form.istege')}</small></span><input name="handle" maxlength="30" autocomplete="nickname" placeholder="${T('ud.form.ad.ipucu')}"></label>
       <div class="if-foot"><p class="if-fee"></p><button type="submit" class="btn sig">${T('ud.form.gonder')} ${ICON.arrow}</button></div>
       <p class="if-status" role="status" aria-live="polite"></p>
@@ -402,8 +418,10 @@ function mountForm(host, opts={}){
     count.classList.toggle('near', n > 120 && n <= 140); count.classList.toggle('over', n > 140);
   };
   pitch.addEventListener('input', () => { len(); if (pitch.value.trim().length >= 3 && opts.autoOpen !== false) open(); });
-  pitch.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); open(); f.problem.focus(); } });
-  next.onclick = () => { open(); if (pitch.value.trim().length < 10) pitch.focus(); else f.problem.focus(); };
+  // only the sentence and a category are needed: with a category already picked (a case page), Enter sends
+  const toCat = () => ($('.chip[aria-pressed="true"]', cats) || $('.chip', cats)).focus();
+  pitch.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); open(); if (cat && pitch.value.trim().length >= 10) f.requestSubmit(); else toCat(); } });
+  next.onclick = () => { open(); if (pitch.value.trim().length < 10) pitch.focus(); else toCat(); };
   if (opts.open) open();
   const say = (t, bad) => { status.textContent = t; status.classList.toggle('bad', !!bad); };
   f.addEventListener('submit', e => {
@@ -413,9 +431,6 @@ function mountForm(host, opts={}){
     if (title.length < 10) return fail(T('ud.form.hata.kisa'), pitch);
     if (title.length > 140) return fail(T('ud.form.hata.uzun'), pitch);
     if (!cat) return fail(T('ud.form.hata.kategori'), $('.chip', cats));
-    if (f.problem.value.trim().length < 8) return fail(T('ud.form.hata.problem'), f.problem);
-    if (f.solution.value.trim().length < 8) return fail(T('ud.form.hata.cozum'), f.solution);
-    if (!feats.length) return fail(T('ud.form.hata.ozellik'), f.f1);
     if (!Store.canWrite) return fail(T('ud.form.hata.izin'));
     const handle = f.handle.value.trim(); handleSet(handle);
     say(T('ud.form.gonderiliyor'));
@@ -427,9 +442,10 @@ function mountForm(host, opts={}){
       done.innerHTML = `<span class="eyebrow k">${T('ud.gonderildi.etiket')}</span><h3>${esc(title)}</h3>
         <dl><div><dt>${T('ud.gonderildi.bitis')}</dt><dd>${fmtDate(end)}</dd></div><div><dt>${T('ud.gonderildi.ilk')}</dt><dd>${fmtDay(nextLive())}${T('ud.persembe.saat')}</dd></div><div><dt>${T('ud.gonderildi.olcut')}</dt><dd>${CRIT.map(c => c[1]).join(' · ')}</dd></div></dl>
         <p class="lead" style="font-size:15px">${T('ud.gonderildi.not')}</p>
-        <div class="acts"><a class="btn" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">${T('ud.gonderildi.gor')} ${ICON.arrow}</a><button type="button" class="btn alt again">${T('ud.gonderildi.yeni')}</button></div>`;
+        <div class="acts"><button type="button" class="btn sig share">${T('ud.paylas.bul')} ${ICON.arrow}</button><a class="btn alt" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">${T('ud.gonderildi.gor')}</a><button type="button" class="btn alt again">${T('ud.gonderildi.yeni')}</button></div>`;
       f.classList.add('done'); done.focus();
-      $('.again', done).onclick = () => { f.reset(); f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
+      const sh = $('.share', done); sh.onclick = () => shareIdea(title, k, sh);
+      $('.again', done).onclick = () => { f.reset(); $('.if-detay', f).open = false; f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
       opts.onSent && opts.onSent(k);
     }).catch(err => {
       $('[type=submit]', f).disabled = false;
@@ -496,6 +512,12 @@ const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : M
 // "Alırdım": one tap opens a price field in place; saving it counts as purchase intent at that price.
 // The card that was just saved gets .just once, so a style can celebrate it.
 let justBought = null;
+// rounded to steps people say out loud: 10s under 200, 50s under 1000, 100s above
+const nice = n => { const st = n < 200 ? 10 : n < 1000 ? 50 : 100; return Math.max(st, Math.round(n / st) * st); };
+function quickPrices(i){
+  const base = i.buyers ? [.75, 1, 1.25].map(k => nice(i.avg * k)) : [150, 300, 500];
+  return [...new Set(base)].filter(n => n <= TERMS.maxPrice);
+}
 function buyCtl(i){
   const box = el('div', { class:'buy' });
   const voting = i.left > 0;
@@ -525,8 +547,13 @@ function buyCtl(i){
       Store.setBuy(i.key, n).catch(()=>{});
     };
     f.append(inp, ok, no);
-    box.append(f);
-    inp.focus();
+    // one tap: three prices around what others already said (or typical ones), typing stays possible
+    const q = el('div', { class:'buy-q', role:'group', 'aria-label':T('ud.al.hizli') });
+    quickPrices(i).forEach(n => q.append(el('button', { type:'button', class:'chip', text:tl(n), 'aria-pressed': String(n === i.myPrice),
+      onclick(){ justBought = i.key; Store.setBuy(i.key, n).catch(()=>{}); } })));
+    box.append(q, f);
+    // a price button gets the focus, so a phone does not open its keyboard unasked
+    q.firstChild.focus();
   }
   paint();
   return box;
@@ -584,13 +611,13 @@ function openIdea(key, push=true){
   const paint = () => {
     const it = Store.ideas().find(x => x.key === key); if (!it) return;
     const mine = Store.myRate(key);
-    dlg.innerHTML = `<header><span class="eyebrow">${esc(catName(it.cat))} · ${it.left > 0 ? T('ud.pencere.topluyor', { n:it.left }) : T('ud.kart.bitti')}</span><button type="button" class="x" aria-label="${T('ud.kapat')}">${ICON.x}</button></header>
+    dlg.innerHTML = `<header><span class="eyebrow">${esc(catName(it.cat))} · ${it.left > 0 ? T('ud.pencere.topluyor', { n:it.left }) : T('ud.kart.bitti')}</span><span class="hd-r"><button type="button" class="btn alt sm sh">${T('ud.paylas')}</button><button type="button" class="x" aria-label="${T('ud.kapat')}">${ICON.x}</button></span></header>
     <div class="in">
       <div style="display:grid;gap:14px"><h2 id="idlg-h">${esc(it.title)}</h2>
         <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center"><span class="dv"></span>
         <span class="eyebrow">${it.buyers ? T('ud.pencere.ort', { fiyat:tl(it.avg) }) + ' · ' : ''}${it.handle ? esc(it.handle) + ' · ' : ''}${it.at ? fmtDate(new Date(it.at)) : ''}</span></div></div>
-      <dl><div><dt>${T('ud.pencere.problem')}</dt><dd>${esc(it.problem || '')}</dd></div><div><dt>${T('ud.form.cozum')}</dt><dd>${esc(it.solution || '')}</dd></div>
-        <div><dt>${T('ud.form.ozellik')}</dt><dd><ul>${(it.feats || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div></dl>
+      ${it.problem || it.solution || (it.feats || []).length ? `<dl>${it.problem ? `<div><dt>${T('ud.pencere.problem')}</dt><dd>${esc(it.problem)}</dd></div>` : ''}${it.solution ? `<div><dt>${T('ud.form.cozum')}</dt><dd>${esc(it.solution)}</dd></div>` : ''}
+        ${(it.feats || []).length ? `<div><dt>${T('ud.form.ozellik')}</dt><dd><ul>${it.feats.map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div>` : ''}</dl>` : ''}
       ${it.owner === Store.uid && Store.canWrite ? `<div class="own" aria-live="polite"><span>${T('ud.pencere.senin')}</span><button type="button" class="link own-x">${T('ud.pencere.gerial')}</button></div>` : ''}
       <section class="crit" aria-label="${T('ud.pencere.olcut')}"><span class="eyebrow">${T('ud.pencere.puan', { n:it.raters })}</span>
         ${CRIT.map(([c,l]) => `<div class="crit-row"><span>${l}</span><div class="stars" role="group" aria-label="${T('ud.pencere.puani', { olcut:l })}">${[1,2,3,4,5].map(n => `<button type="button" data-c="${c}" data-n="${n}" aria-pressed="${mine[c] === n}" ${Store.canWrite ? '' : 'disabled'}>${n}</button>`).join('')}</div><output>${it.crit[c] ? it.crit[c].toFixed(1) : '–'}</output></div>`).join('')}
@@ -603,6 +630,7 @@ function openIdea(key, push=true){
       </section>
     </div>`;
     $('.x', dlg).onclick = () => dlg.close();
+    const sh = $('.sh', dlg); sh.onclick = () => shareIdea(it.title, it.key, sh);
     $('.dv', dlg).replaceWith(buyCtl(it));
     const own = $('.own-x', dlg);
     if (own) own.onclick = () => {
@@ -620,6 +648,13 @@ function openIdea(key, push=true){
   if (!dlg.open) dlg.showModal();
   if (push) history.replaceState(null, '', withStil(location.pathname + '?f=' + encodeURIComponent(key)));
   return true;
+}
+
+// a shared link (?f=<idea>) opens that idea; the store can take a moment to arrive
+function openShared(){
+  const f = new URLSearchParams(location.search).get('f');
+  if (!f) return;
+  let tries = 0; const t = setInterval(() => { if (openIdea(f, false) || ++tries > 40) clearInterval(t); }, 250);
 }
 
 // =========================================================== the process run
@@ -767,5 +802,5 @@ function mountMotion(){
 applyText();
 mountChrome();
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
+window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, openShared, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
 })();

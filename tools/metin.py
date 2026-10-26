@@ -7,7 +7,7 @@
   python tools/metin.py denetle    list keys missing from en.js, keys no page or script uses, empty values
                                    (--kati: exit 1 when anything is listed, for CI)
 
-Keys are <page>.<tag>.<n>; text the scripts build (ud.js, page scripts) uses hand-named keys such as ud.nav.ideas.
+Keys are <page>.<tag>.<n>; text the scripts build (assets/ud/*.js, page scripts) uses hand-named keys such as ud.nav.ideas.
 """
 import json, os, re, sys
 from html.parser import HTMLParser
@@ -179,7 +179,8 @@ def denetle():
         used |= set(re.findall(r'data-t="([^"]+)"', s))
         for spec in re.findall(r'data-ta="([^"]+)"', s): used |= {p.split(':')[1] for p in spec.split(';')}
         used |= set(re.findall(r"\bT\('([^']+)'", s))
-    used |= set(re.findall(r"\bT\('([^']+)'", read('assets/ud.js')))
+    for f in sorted(os.listdir(path('assets/ud'))):   # the shared script, split into assets/ud/*.js
+        used |= set(re.findall(r"\bT\('([^']+)'", read('assets/ud/' + f)))
     # the explainer stories name their keys as plain strings ('anl.vaka.s1', ...)
     used |= set(re.findall(r"'(anl\.[\w.]+)'", read('assets/anlatim.js')))
     # keys built in code ('ud.akis.adim' + n, 'ud.not.' + kind) count as prefixes

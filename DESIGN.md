@@ -451,3 +451,15 @@ birden seçemiyordu. Artık iki sıra var:
 - **Okunan bloklar sakin:** Oyuncu'da "nasıl ilerler" ve "her şey açıkta" kartları ince çizgi, sert gölge yok; düğmeler ve
   fikir kartları cesur kalır.
 - Doğru olmayanlar: mobil LCP ve boş kolonlar Faz 1'de çözülmüştü; sayfa geçişleri (View Transitions) zaten vardı.
+
+## `ud.js` dört dosyaya bölündü (26 Ekim 2026)
+
+1.100 satırlık ortak betik, sırayla yüklenen dört düz betiğe ayrıldı: `assets/ud/temel.js` (metin, TERMS, tarihler,
+yardımcılar, Supabase istemcisi, hata bildirimleri, ölçüm), `depo.js` (Store), `arayuz.js` (menü, form, kartlar, pencere,
+vaka bandı, paylaş, bildir), `hareket.js` (eskizden rafa, kaydırma; `window.UD`'yi kurar).
+- **Neden ES modülü değil:** sayfalar `UD.mountForm` gibi çağrıları betiğin hemen ardından satır içi `<script>` ile yapar;
+  modüller ertelenir ve bu sıra bozulurdu. Dosyalar ortak adlarını `window.UD_IC` üzerinden paylaşır, her dosya başında
+  hangi adları aldığını tek satırda listeler. Herkese açık yüzey (`window.UD`) aynı kaldı.
+- **Bölme denetimi:** her özgün satır tam bir kez yerleşti (betikle sayıldı); 72 test bölünmüş kodda geçiyor.
+- **CSS katmanları (`@layer`) bilerek yapılmadı:** katmanlanınca sayfaların kendi `<style>` blokları hepsini ezer, testler
+  görünüşü denetlemez; risk kazançtan büyük. Yerine README'de "hangi dosya neyi belirler" tablosu.

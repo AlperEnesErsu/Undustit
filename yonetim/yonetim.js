@@ -1,5 +1,5 @@
 /* Yönetim paneli ortak yardımcıları: oturum kapısı, bildirimler, onay diyalogu, vaka formu.
-   ud.js, ayar.js ve veri.js'ten sonra yüklenir; window.UDV kullanır. Sonuç: window.YONETIM. */
+   assets/ud/*.js, ayar.js ve veri.js'ten sonra yüklenir; window.UDV kullanır. Sonuç: window.YONETIM. */
 (function(){
 'use strict';
 

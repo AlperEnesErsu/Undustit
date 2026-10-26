@@ -30,7 +30,11 @@ Canlı: https://alperenesersu.github.io/Undustit/
 
 ```
 index.html, fikir/, fikirler/, …   sayfalar (her sayfa düz HTML; metinler data-t ile sözlükten gelir)
-assets/ud.js        ortak betik: menü, veri deposu (Supabase / yerel), form, kartlar, pencere, animasyon
+assets/ud/          ortak betik, sırayla yüklenen dört dosya:
+  temel.js          metinler, ticari şartlar (TERMS), tarihler, yardımcılar, Supabase istemcisi, hata bildirimleri, ölçüm
+  depo.js           veri deposu (Store): fikirler, talepler, puanlar, yorumlar (Supabase / yerel)
+  arayuz.js         menü, form, kartlar, fikir penceresi, vaka bandı, paylaş, bildir
+  hareket.js        "eskizden rafa" animasyonu, kaydırma hareketleri; window.UD'yi kurar
 assets/veri.js      yönetim paneli veri katmanı (window.UDV)
 assets/anlatim.js   Vakalar, Fikirler, Hikâye sayfalarındaki anlatıcı animasyonlar
 assets/ayar.js      ayarlar (aşağıda)
@@ -42,6 +46,20 @@ tests/              Playwright testleri (e2e/), SQL testleri (sql/), test sunucu
 docs/               ürün sözleşmesi, açılış içerik kiti, yol haritası, devir el kitabı
 DESIGN.md           tasarım ve ürün kararları, tarihleriyle
 ```
+
+## Stiller: hangi dosya neyi belirler
+
+Sıra önemlidir; sonra gelen öncekini ezer.
+
+| Dosya | Görevi |
+|---|---|
+| `assets/ud.css` | Tasarım belirteçleri (renk, yazı, boşluk) ve bütün bileşenlerin temel hali |
+| `assets/bilesen.css` | Yönetim bileşenleri (alan, rozet, tablo, sekme, panel…) |
+| `assets/stil/oyuncu.css` | Varsayılan görünüm "Oyuncu": belirteçleri ve yalnız görünüşü ezer (kenarlık, gölge, hover). Davranış ve yerleşim ud.css'te kalır |
+| `assets/anlatim.css` | Yalnız Vakalar, Fikirler, Hikâye animasyonları |
+| sayfanın kendi `<style>`'ı | O sayfaya özgü yerleşim |
+
+Bir bileşenin görünüşünü değiştirmek için önce `oyuncu.css`'e, yapısını değiştirmek için `ud.css`'e bakın.
 
 ## Yerelde çalıştırma
 
@@ -66,7 +84,7 @@ yerel deneme şifresiyle girilir (`assets/veri.js`). Doluysa Supabase'e bağlan�
 | `yasal` | `true` olunca KVKK ve koşullar alt bilgide ve formlarda görünür |
 | `yayin` | Perşembe yayınının adresi; doluyken "Yayına git" çıkar |
 
-Ticari oranlar (ücret, gün, paylar, eşik, yayın saati) `assets/ud.js` içindeki `TERMS` sabitinde, tek yerde.
+Ticari oranlar (ücret, gün, paylar, eşik, yayın saati) `assets/ud/temel.js` içindeki `TERMS` sabitinde, tek yerde.
 
 ## Veritabanı
 

@@ -10,9 +10,9 @@
   const SB_SURUM = '2.45.4';
   const ADMINLER = (AYAR.adminler || []).map(e => String(e).trim().toLowerCase());
   const LS = 'udv-v1';
-  const SITE_LS = 'ud-store-v1';   // sitenin fikir deposu, yalnız okunur (bkz. ud.js Store)
+  const SITE_LS = 'ud-store-v1';   // sitenin fikir deposu, yalnız okunur (bkz. assets/ud/depo.js Store)
   const CAT = 'Vaka 01 · Cıvata';
-  const MAKS_FIYAT = 100000;       // ud.js TERMS.maxPrice ile aynı
+  const MAKS_FIYAT = 100000;       // assets/ud/temel.js TERMS.maxPrice ile aynı
 
   const DURUMLAR = ['taslak','acik','degerlendirme','kazanan','uretim','kapali'];
   const DURUM_ADI = { taslak:'Taslak', acik:'Açık', degerlendirme:'Değerlendirmede', kazanan:'Kazanan seçildi', uretim:'Üretimde', kapali:'Kapandı' };
@@ -79,7 +79,7 @@
     }));
     return out;
   }
-  // sitenin yalnız yöneticiye giden kayıtları (başvuru, mesaj, bildirim) yerelde udv-<tablo> altında (ud.js Store.kaydet)
+  // sitenin yalnız yöneticiye giden kayıtları (başvuru, mesaj, bildirim) yerelde udv-<tablo> altında (assets/ud/depo.js Store.kaydet)
   function kayitOku(tablo){ try { return JSON.parse(localStorage.getItem('udv-' + tablo) || '{}') || {}; } catch(e){ return {}; } }
   const yerel = {
     liste: async () => Object.values(oku().vakalar),
@@ -91,7 +91,7 @@
     gecmis: async id => (oku().gecmis[id] || []).slice().sort((a,b) => Date.parse(a.zaman) - Date.parse(b.zaman)),
     fikirler: async vakaId => yerelFikirler(vakaId),
     gizle: async (id, gizli) => { const d = oku(); if (gizli) d.gizli[id] = true; else delete d.gizli[id]; yaz(d); },
-    // "Vakanı aç" başvuruları: sitenin formu yerelde buraya yazar (ud.js Store.basvur)
+    // "Vakanı aç" başvuruları: sitenin formu yerelde buraya yazar (assets/ud/depo.js Store.basvur)
     kayitlar: async tablo => Object.values(kayitOku(tablo)).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman))),
     kayitDurum: async (tablo, id, durum) => { const d = kayitOku(tablo); if (!d[id]) throw new Error('Kayıt bulunamadı'); d[id].durum = durum; try { localStorage.setItem('udv-' + tablo, JSON.stringify(d)); } catch(e){} }
   };
@@ -153,7 +153,7 @@
     oturum = o;
     if (JSON.stringify(o) !== eski) bildir();
   }
-  // ud.js aynı sayfadaysa onun istemcisi kullanılır (window.UD_SB): tek istemci, tek oturum.
+  // assets/ud aynı sayfadaysa onun istemcisi kullanılır (window.UD_SB): tek istemci, tek oturum.
   function sbYukle(){
     if (window.UD_SB) return window.UD_SB();
     return new Promise((ok, no) => {

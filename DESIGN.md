@@ -434,3 +434,20 @@ birden seçemiyordu. Artık iki sıra var:
   yine gönderir).
 - Veri: `caseId` vaka, `cat` kategori; kategorisiz vaka fikri eskisi gibi vakanın etiketini kategori olarak taşır.
 - Kartta ve pencerede tek etiket: "Vaka 01 · Boltun · Fitness" (`etiket()`).
+
+## Dış inceleme sonrası iyileştirmeler (26 Ekim 2026)
+
+- **Safari:** eskizden temiz çizgiye geçiş CSS `d:` dönüşümüyle yapılıyordu (WebKit tam desteklemiyor). Artık her eskiz
+  çizgisinin temiz bir ikizi var; "Ortak tasarım"da eskiz söner, temiz çizgi belirir (yalnız opacity, her tarayıcıda aynı).
+- **Arka plana atılan sekme:** animasyon oynarken sekme gizlenirse zamanlayıcılar kısılıyor, adımlar kayıyordu. Artık iki
+  motor da (ana sayfa ve anlatıcılar) sayacı durdurup son kareyi gösteriyor.
+- **Telefonda çizim yazıları:** en küçüğü 9,9 px'ten 11,4 px'e (ölçüldü); kutudaki süs yazısı 8 px.
+- **Sessiz hatalar:** veri yüklenemezse altta "Veriler şu an yüklenemedi · Yeniden dene" şeridi; "alırdım", puan, yorum
+  kaydedilemezse kısa bir bildirim (günlük sınırda veritabanının kendi cümlesi). Yorumlar yüklenemezse sonsuz "yükleniyor"
+  yerine aynı şerit. Tarayıcı deposu hataları bilinçli olarak sessiz (gizli pencere).
+- **XSS testi:** fikir, ad, yorum, mesaj ve başvuruya `<img onerror>`, `<script>`, `<svg onload>` yazılıp herkese açık
+  sayfalar ve yönetim tabloları açılır; betik çalışmamalı, metin olarak görünmeli. Pencere başlığındaki `esc()` bilerek
+  kaldırılınca test kırıldı.
+- **Okunan bloklar sakin:** Oyuncu'da "nasıl ilerler" ve "her şey açıkta" kartları ince çizgi, sert gölge yok; düğmeler ve
+  fikir kartları cesur kalır.
+- Doğru olmayanlar: mobil LCP ve boş kolonlar Faz 1'de çözülmüştü; sayfa geçişleri (View Transitions) zaten vardı.

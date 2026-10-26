@@ -79,7 +79,9 @@ a.thu:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);borde
 .slot,.empty{border:2px dashed var(--ink-2)}
 .disc b{font-weight:800}
 .disc a:hover b{color:var(--accent)}
-.how3 li,.open3 div,.case,.after,.arena aside div{border:2px solid var(--ink);box-shadow:var(--hard)}
+.case,.after,.arena aside div{border:2px solid var(--ink);box-shadow:var(--hard)}
+/* blocks you read rather than press stay quiet: a thin line, no hard shadow, so long pages don't tire the eye */
+.how3 li,.open3 div{border:1px solid var(--line-2);box-shadow:none;background:var(--bg-2)}
 .mission{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink);background:var(--bg-2)}
 dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 .foot{border-top:2px solid var(--ink)}

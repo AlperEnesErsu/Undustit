@@ -702,5 +702,8 @@ UD_METIN.ekle('tr', {
  "ud.akis.boy": "boy",
  "ud.form.vaka": "Vaka",
  "ud.form.vaka.not": "bir firmanın fazla stoğu için mi?",
- "ud.form.vaka.yok": "Vakadan bağımsız"
+ "ud.form.vaka.yok": "Vakadan bağımsız",
+ "ud.hata.yukleme": "Veriler şu an yüklenemedi.",
+ "ud.hata.tekrar": "Yeniden dene",
+ "ud.hata.kayit": "Kaydedilemedi. Bağlantını kontrol edip bir daha dene."
 });

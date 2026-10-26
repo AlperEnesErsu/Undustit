@@ -263,6 +263,13 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .hedef::before{content:"→ ";color:var(--accent)}
 .hedef.aday{color:var(--ok)}
 .hedef.aday::before{content:"★ ";color:var(--ok)}
+/* something went wrong: a brief notice, or a strip with a retry while the data cannot load */
+.ud-toast,.veri-uyari{position:fixed;left:50%;bottom:16px;z-index:60;max-width:min(92vw,520px);display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--r-md);background:var(--ink);color:var(--bg);font-size:14px;box-shadow:var(--shadow);transform:translateX(-50%)}
+.ud-toast{opacity:0;transform:translate(-50%,12px);transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out)}
+.ud-toast.in{opacity:1;transform:translateX(-50%)}
+.veri-uyari button{flex:none;min-height:34px;padding:0 14px;border:1px solid var(--bg);border-radius:999px;background:transparent;color:var(--bg);font:inherit;cursor:pointer}
+.veri-uyari button:hover{background:var(--bg);color:var(--ink)}
+.veri-uyari button:focus-visible{outline:2px solid var(--bg);outline-offset:2px}
 .buy-ex{max-width:16ch;font-size:11.5px;line-height:1.3;color:var(--ink-2);text-align:center}
 .buy-f{display:flex;gap:6px;align-items:center}
 .buy-f input{width:104px;min-height:38px;border:1px solid var(--accent);border-radius:var(--r-sm);padding:0 10px;background:var(--bg-2);font-family:var(--f-mono);font-size:14px}
@@ -346,22 +353,17 @@ a.thu:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .pc-draw{position:absolute;right:0;bottom:5%;width:76%}
 .pc-draw svg{display:block;width:100%;height:auto;overflow:visible}
 .pc-draw text{font-family:var(--f-mono);font-size:9.5px}
-.dw-sk{fill:none;stroke:var(--ink-2);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1100ms var(--ease-io),d 900ms var(--ease-io),stroke 500ms ease,stroke-width 500ms ease,fill 600ms ease}
+.dw-sk{fill:none;stroke:var(--ink-2);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1100ms var(--ease-io),opacity 500ms var(--ease-out)}
+/* the clean drawing is its own path, faded in over the sketch (a CSS d: morph is not supported everywhere, Safari) */
+.dw-tm{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity 600ms var(--ease-out) 150ms,fill 600ms ease}
 .proc.s1 .dw-sk{stroke-dashoffset:0}
 .proc.s1 .m2{transition-delay:120ms}.proc.s1 .m3,.proc.s1 .m4{transition-delay:200ms}
 .proc.s1 .m5{transition-delay:300ms}.proc.s1 .m6{transition-delay:520ms}.proc.s1 .m7{transition-delay:640ms}
 .dw-hatch path{fill:none;stroke:var(--muted);stroke-width:.9;stroke-linecap:round;opacity:0;transition:opacity 400ms ease}
 .proc.s1 .dw-hatch path{opacity:.7;transition-delay:900ms}
 /* co-design: the same strokes straighten (CSS d), the pencil hatching lifts away */
-.proc.s3 .dw-sk{stroke:var(--ink);stroke-width:1.4;transition-delay:200ms}
-.proc.s3 .m1{d:path("M20 170 C 113 170 207 170 300 170")}
-.proc.s3 .m2{d:path("M20 200 C 113 200 207 200 300 200")}
-.proc.s3 .m3{d:path("M20 170 C 20 180 20 190 20 200")}
-.proc.s3 .m4{d:path("M300 170 C 300 180 300 190 300 200")}
-/* a plain object: a body with a domed top, a side face and a dial; the wobbly sketch settles into these lines */
-.proc.s3 .m5{d:path("M120 170 C 120 140 120 112 122 94 C 140 86 180 86 198 94 C 200 112 200 140 200 170")}
-.proc.s3 .m6{d:path("M198 94 C 202 91 205 89 208 87 C 209 115 209 143 208 165")}
-.proc.s3 .m7{d:path("M146 124 C 146 116 152 110 160 110 C 168 110 174 116 174 124 C 174 132 168 138 160 138 C 152 138 146 132 146 124")}
+.proc.s3 .dw-sk{opacity:0}
+.proc.s3 .dw-tm{opacity:1}
 .proc.s3 .dw-hatch path{opacity:0;transition-delay:300ms}
 /* prototype: wood, grain, hinges, dimensions, and the fold it makes */
 .proc.s4 .dw-board{fill:#BFE3DA}
@@ -564,6 +566,8 @@ dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
 #proc:empty{aspect-ratio:25/22}
 .thu:empty{min-height:38px;min-width:240px}
 @media (max-width:640px){#form:empty{min-height:170px}#proc:empty{aspect-ratio:375/560}}
+/* phones: the drawing's labels stay readable (at least ~11px on screen at 390px; measured) */
+@media (max-width:640px){.pc-draw text{font-size:10.5px}.dw-label .by{font-size:8px}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important;animation-iteration-count:1!important}

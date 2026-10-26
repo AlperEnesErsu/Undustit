@@ -141,6 +141,25 @@ function mountChrome(){
   }
 }
 
+// =========================================================== telling the visitor something went wrong
+// A load that fails leaves a strip with a retry; a write that fails says so briefly (the database's own
+// reason when it is a daily limit). Nothing fails silently.
+function toast(msg){
+  const t = el('div', { class:'ud-toast', role:'status', text:msg });
+  document.body.append(t);
+  requestAnimationFrame(() => t.classList.add('in'));
+  setTimeout(() => { t.classList.remove('in'); setTimeout(() => t.remove(), 300); }, 4200);
+}
+const yazmaHatasi = err => toast(err && err.code === 'P0001' && err.message ? err.message : T('ud.hata.kayit'));
+let uyariEl = null;
+function veriUyari(on, yeniden){
+  if (!on){ if (uyariEl){ uyariEl.remove(); uyariEl = null; } return; }
+  if (uyariEl) return;
+  uyariEl = el('div', { class:'veri-uyari', role:'status' }, [el('span', { text:T('ud.hata.yukleme') }),
+    el('button', { type:'button', text:T('ud.hata.tekrar'), onclick(){ this.disabled = true; yeniden(); } })]);
+  document.body.append(uyariEl);
+}
+
 // =========================================================== store
 // One Supabase client per page, shared with veri.js (window.UD_SB), so the visitor and the admin
 // panel never run two auth sessions side by side. The library loads on first use only.
@@ -210,7 +229,7 @@ const Store = (function(){
           agg:{ buyers:num(r.alici), avg:num(r.ort_fiyat), raters:num(r.puanci), crit:{ d:num(r.puan_d), m:num(r.puan_m), u:num(r.puan_u) }, notes:num(r.yorum) } }); });
       (t.data || []).forEach(r => { if (keyOf[r.fikir_id]) mine.buy[keyOf[r.fikir_id]] = r.fiyat; });
       (p.data || []).forEach(r => { const x = keyOf[r.fikir_id]; if (x) mine.rate[x] = { ...(mine.rate[x] || {}), [r.olcut]: r.puan }; });
-      S.ideas = ideas; S.votes = me ? { [me]: mine } : {}; emit();
+      S.ideas = ideas; S.votes = me ? { [me]: mine } : {}; veriUyari(false); emit();
       return;
     }
     const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => sb.from(t).select('*').limit(5000)));
@@ -225,12 +244,12 @@ const Store = (function(){
     y.forEach(r => { if (keyOf[r.fikir_id]) (notes[r.uye] = notes[r.uye] || { items:[] }).items.push({ k:r.id, idea:keyOf[r.fikir_id], kind:r.tur, text:r.metin, handle:r.ad, at:r.zaman }); });
     S.ideas = ideas; S.votes = votes; S.notes = notes; emit();
   }
-  const sbReload = () => sbLoad().catch(() => {});
+  const sbReload = () => sbLoad().then(() => veriUyari(false)).catch(() => veriUyari(true, sbReload));
   // an idea's comments, read when its window opens (summary mode keeps only their count in the list)
   const noteCache = {};
   async function sbNotes(key){
     const r = await sb.from('yorumlar').select('id,tur,metin,ad,zaman,uye').eq('fikir_id', idOf(key)).order('zaman', { ascending:true }).limit(500);
-    if (r.error) return;
+    if (r.error){ veriUyari(true, () => sbNotes(key).then(() => veriUyari(false))); return; }
     noteCache[key] = r.data.map(n => ({ k:n.id, idea:key, kind:n.tur, text:n.metin, handle:n.ad, at:n.zaman, owner:n.uye }));
     emit();
   }
@@ -277,7 +296,7 @@ const Store = (function(){
       }, () => {});
     });
     emit();
-  })().catch(() => {}).finally(badge));
+  })().catch(() => { if (S.mode === 'supabase') veriUyari(true, sbReload); }).finally(badge));
   document.addEventListener('DOMContentLoaded', badge);
 
   // Open and past cases (drafts never). Without the database: the admin panel's local copy, else Vaka 01.
@@ -449,7 +468,7 @@ const Store = (function(){
     basvur(data){ return this.kaydet('vaka_basvurulari', data); },
     // the database wants the idea's own id; the local preview keeps the full key (that is what it hides)
     bildir(key, neden, aciklama){ return this.kaydet('fikir_bildirimleri', { fikir_id: S.mode === 'supabase' ? idOf(key) : key, neden, aciklama }); },
-    loadNotes(key){ if (S.mode === 'supabase' && summary) start().then(() => sbNotes(key)).catch(() => {}); },
+    loadNotes(key){ if (S.mode === 'supabase' && summary) start().then(() => sbNotes(key)).catch(() => veriUyari(true, () => sbNotes(key))); },
     addNote(idea, kind, text, handle){
       if (S.mode === 'supabase') return sbDo(() => sb.from('yorumlar').insert({ fikir_id:idOf(idea), uye:S.uid, tur:kind, metin:text, ad:handle || '' })).then(r => { if (summary) sbNotes(idea); return r; });
       return write('notes', { items: myItems('notes').concat([{ k:key(), idea, kind, text, handle, at:new Date().toISOString() }]).slice(-200) });
@@ -758,20 +777,20 @@ function buyCtl(i){
     const inp = el('input', { type:'text', inputmode:'decimal', placeholder:T('ud.al.ipucu'), 'aria-label':T('ud.al.aria'), value: i.myPrice ? String(i.myPrice) : '' });
     const ok = el('button', { type:'submit', class:'btn sig sm', text:T('ud.al.kaydet') });
     const no = el('button', { type:'button', class:'buy-x', 'aria-label': i.mine ? T('ud.al.geri.aria') : T('ud.al.vazgec'), text: i.mine ? T('ud.al.geri') : T('ud.al.vazgec') });
-    no.onclick = () => { if (i.mine) Store.setBuy(i.key, 0).catch(()=>{}); else paint(); };
+    no.onclick = () => { if (i.mine) Store.setBuy(i.key, 0).catch(yazmaHatasi); else paint(); };
     f.onsubmit = e => {
       e.preventDefault();
       const n = Math.round(parseFloat(LANG === 'en' ? inp.value.replace(/,/g,'') : inp.value.replace(/\./g,'').replace(',', '.')));
       if (!(n > 0) || n > TERMS.maxPrice){ inp.focus(); inp.setAttribute('aria-invalid','true'); inp.placeholder = T('ud.al.fiyatyaz'); return; }
       justBought = i.key;
       olcu('Alırdım', { yol:'yazarak' });
-      Store.setBuy(i.key, n).catch(()=>{});
+      Store.setBuy(i.key, n).catch(yazmaHatasi);
     };
     f.append(inp, ok, no);
     // one tap: three prices around what others already said (or typical ones), typing stays possible
     const q = el('div', { class:'buy-q', role:'group', 'aria-label':T('ud.al.hizli') });
     quickPrices(i).forEach(n => q.append(el('button', { type:'button', class:'chip', text:tl(n), 'aria-pressed': String(n === i.myPrice),
-      onclick(){ justBought = i.key; olcu('Alırdım', { yol:'hazır fiyat' }); Store.setBuy(i.key, n).catch(()=>{}); } })));
+      onclick(){ justBought = i.key; olcu('Alırdım', { yol:'hazır fiyat' }); Store.setBuy(i.key, n).catch(yazmaHatasi); } })));
     box.append(q, f);
     // a price button gets the focus, so a phone does not open its keyboard unasked
     q.firstChild.focus();
@@ -904,10 +923,10 @@ function openIdea(key, push=true){
       if (own.dataset.sure){ Store.removeIdea(key).then(() => dlg.close()).catch(() => { own.textContent = T('ud.pencere.gerial.hata'); }); return; }
       own.dataset.sure = '1'; own.textContent = T('ud.pencere.gerial.emin');
     };
-    $$('.stars button', dlg).forEach(b => b.onclick = () => Store.rate(key, b.dataset.c, Number(b.dataset.n)).catch(()=>{}));
+    $$('.stars button', dlg).forEach(b => b.onclick = () => Store.rate(key, b.dataset.c, Number(b.dataset.n)).catch(yazmaHatasi));
     let kind = 'yorum';
     $$('.note-form .chip', dlg).forEach(b => b.onclick = () => { kind = b.dataset.k; $$('.note-form .chip', dlg).forEach(x => x.setAttribute('aria-pressed', String(x === b))); });
-    $('.note-form', dlg).onsubmit = e => { e.preventDefault(); const t = e.target.t.value.trim(); if (t.length < 3) return; Store.addNote(key, kind, t, handleGet()).catch(()=>{}); };
+    $('.note-form', dlg).onsubmit = e => { e.preventDefault(); const t = e.target.t.value.trim(); if (t.length < 3) return; Store.addNote(key, kind, t, handleGet()).catch(yazmaHatasi); };
   };
   let unsub = Store.sub(() => { if (dlg.open){ const a = document.activeElement; const sel = a && a.matches && a.matches('.note-form textarea') ? a.value : null; paint(); if (sel != null){ const ta = $('.note-form textarea', dlg); ta.value = sel; } } });
   paint();
@@ -951,15 +970,15 @@ function mountProc(host, opts={}){
     <div class="pc-draw" aria-hidden="true"><svg viewBox="0 0 320 240">
       <g class="dw-shelf"><path d="M8 170 H312"/><path d="M40 170 v14 h10 M270 170 v14 h10"/></g>
       <g class="dw-counter">
-        <path class="dw-sk m1" pathLength="1" d="M18 171 C 100 166 210 175 302 168"/>
-        <path class="dw-sk m2" pathLength="1" d="M22 201 C 110 198 200 204 298 199"/>
-        <path class="dw-sk m3" pathLength="1" d="M19 170 C 19 180 21 190 21 201"/>
-        <path class="dw-sk m4" pathLength="1" d="M301 168 C 300 180 299 190 299 199"/>
+        <path class="dw-sk m1" pathLength="1" d="M18 171 C 100 166 210 175 302 168"/><path class="dw-tm m1t" d="M20 170 C 113 170 207 170 300 170"/>
+        <path class="dw-sk m2" pathLength="1" d="M22 201 C 110 198 200 204 298 199"/><path class="dw-tm m2t" d="M20 200 C 113 200 207 200 300 200"/>
+        <path class="dw-sk m3" pathLength="1" d="M19 170 C 19 180 21 190 21 201"/><path class="dw-tm m3t" d="M20 170 C 20 180 20 190 20 200"/>
+        <path class="dw-sk m4" pathLength="1" d="M301 168 C 300 180 299 190 299 199"/><path class="dw-tm m4t" d="M300 170 C 300 180 300 190 300 200"/>
       </g>
       <g class="dw-product">
-        <path class="dw-sk dw-board m5" pathLength="1" d="M118 171 C 117 139 122 113 119 95 C 141 84 177 89 199 92 C 202 113 197 141 202 171"/>
-        <path class="dw-sk dw-edge m6" pathLength="1" d="M199 92 C 203 90 206 87 210 85 C 211 116 207 142 210 166"/>
-        <path class="dw-sk dw-slot m7" pathLength="1" d="M147 126 C 144 115 153 109 161 111 C 170 108 176 117 173 125 C 175 133 167 140 159 137 C 151 139 145 131 147 126"/>
+        <path class="dw-sk m5" pathLength="1" d="M118 171 C 117 139 122 113 119 95 C 141 84 177 89 199 92 C 202 113 197 141 202 171"/><path class="dw-tm dw-board m5t" d="M120 170 C 120 140 120 112 122 94 C 140 86 180 86 198 94 C 200 112 200 140 200 170"/>
+        <path class="dw-sk m6" pathLength="1" d="M199 92 C 203 90 206 87 210 85 C 211 116 207 142 210 166"/><path class="dw-tm dw-edge m6t" d="M198 94 C 202 91 205 89 208 87 C 209 115 209 143 208 165"/>
+        <path class="dw-sk m7" pathLength="1" d="M147 126 C 144 115 153 109 161 111 C 170 108 176 117 173 125 C 175 133 167 140 159 137 C 151 139 145 131 147 126"/><path class="dw-tm dw-slot m7t" d="M146 124 C 146 116 152 110 160 110 C 168 110 174 116 174 124 C 174 132 168 138 160 138 C 152 138 146 132 146 124"/>
         <g class="dw-hatch"><path d="M130 150 l14 -14 M140 162 l20 -20 M176 160 l16 -16"/></g>
         <g class="dw-grain"><path d="M136 152 H184 M136 159 H184"/></g>
         <g class="dw-hinge"><rect x="130" y="168" width="20" height="6" rx="1.5"/><rect x="170" y="168" width="20" height="6" rx="1.5"/></g>
@@ -990,11 +1009,18 @@ function mountProc(host, opts={}){
     host.classList.add(...S); txt.textContent = text; n.textContent = text.length + ' / 140';
     pn.textContent = PRE + ' / ' + PRE; step(5);
   }
+  // a tab sent to the background throttles timers while CSS stops: rather than resume out of step, finish
+  let playing = false;
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden || !playing) return;
+    timers.forEach(t => { clearTimeout(t); cancelAnimationFrame(t); }); timers = []; playing = false; finalState();
+  });
   function play(){
     timers.forEach(t => { clearTimeout(t); cancelAnimationFrame(t); }); timers = [];
+    playing = true;
     host.classList.remove(...S); txt.textContent = ''; n.textContent = '0 / 140'; pn.textContent = '0 / ' + PRE;
     void host.offsetWidth;
-    if (reduce.matches){ finalState(); return; }
+    if (reduce.matches){ playing = false; finalState(); return; }
     host.classList.add('s1'); step(0);
     const per = 950 / text.length;
     for (let c = 1; c <= text.length; c++) at(c*per, () => { txt.textContent = text.slice(0, c); n.textContent = c + ' / 140'; });
@@ -1004,7 +1030,7 @@ function mountProc(host, opts={}){
     at(5200, () => { host.classList.add('s5'); step(4); count(pn, PRE, 1100, v => v + ' / ' + PRE); });
     at(5900, () => host.classList.add('s5b'));
     at(6600, () => { host.classList.add('s6'); step(5); });
-    at(7500, () => { host.classList.add('end'); try { sessionStorage.setItem('ud-proc-seen', '1'); } catch(e){} });
+    at(7500, () => { host.classList.add('end'); playing = false; try { sessionStorage.setItem('ud-proc-seen', '1'); } catch(e){} });
   }
   $('.pc-replay', host).onclick = play;
   if (opts.manual) return { play };

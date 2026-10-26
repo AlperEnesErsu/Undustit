@@ -147,3 +147,11 @@
   .sekmeler .sekme,.sekmeler [role="tab"],.anahtar input,.anahtar input::after{transition:none}
 }
 .istatlar + .panel{margin-top:clamp(20px,3vw,32px)}
+
+/* ürün görseli alanı (vaka formu): önizleme, yükle ve kaldır */
+.gorsel-alan{display:grid;grid-template-columns:minmax(0,220px) auto;gap:16px;align-items:end}
+.gorsel-alan .foy-gorsel{max-width:220px}
+.gorsel-dugme{display:flex;flex-wrap:wrap;gap:8px}
+.gorsel-dugme label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:560px){.gorsel-alan{grid-template-columns:minmax(0,1fr)}}
+.b-gorsel{display:block;width:72px;height:54px;object-fit:cover;border:1px solid var(--line);border-radius:6px;background:var(--bg-2)}

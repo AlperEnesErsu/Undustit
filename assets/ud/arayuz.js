@@ -3,7 +3,7 @@
    Each file shares its top-level names on window.UD_IC and takes what it needs from there. */
 (function(){
 'use strict';
-const { $, $$, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, fmtDay, homeHref, html, inCase, liveNow, nextLive, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
+const { $, $$, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, katOf, vakaOf, fmtDay, homeHref, html, inCase, liveNow, nextLive, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
 // =========================================================== nav + footer
 // The legal pages (kvkk/, kosullar/) stay unlinked drafts until ayar.js sets yasal: true.
 const YASAL = !!(window.UD_AYAR || {}).yasal;
@@ -333,7 +333,8 @@ function buyCtl(i){
 function card(i, ix, opts={}){
   const voting = i.left > 0;
   const meta = el('div', { class:'m' }, [
-    el('span', { class:'c', text:etiket(i) }),
+    vakaOf(i) ? el('span', { class:'vk', text:catName(vakaOf(i).short) }) : null,
+    katOf(i) ? el('span', { class:'c', text:catName(katOf(i)) }) : null,
     i.ex ? el('span', { class:'ex', text:T('ud.kart.ornek') }) : el('span', { text: voting ? T('ud.kart.kaldi', { n:i.left }) : T('ud.kart.bitti') }),
     !i.ex && i.buyers ? el('span', { class:'p', text:T('ud.kart.ort', { fiyat:tl(i.avg) }) }) : null,
     !i.ex && i.noteCount ? el('span', { text: T('ud.kart.yorum', { n:i.noteCount }) }) : null,

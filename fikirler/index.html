@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title data-t="fikirler.title.1">Fikirler · Undustit</title>
 <meta name="description" content="Talep toplayan fikirler. Alırdım de ve fiyat yaz, tasarım, pazar ve uygulanabilirlik açısından puanla, iyileştirme öner ya da endişeni yaz." data-ta="content:fikirler.attr.1">
-<meta name="theme-color" content="#FFF6E9">
+<meta name="theme-color" content="#FCF9F3">
 <link rel="canonical" href="https://alperenesersu.github.io/Undustit/fikirler/">
 <link rel="alternate" hreflang="tr" href="https://alperenesersu.github.io/Undustit/fikirler/">
 <link rel="alternate" hreflang="en" href="https://alperenesersu.github.io/Undustit/fikirler/?dil=en">
@@ -35,6 +35,10 @@
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .cat-f{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:100%}
 .cat-f .chip{flex:none}
+.filtre{display:grid;gap:8px;min-width:0;max-width:100%}
+.f-sat{display:flex;align-items:center;gap:12px;min-width:0}
+.f-ad{flex:none;width:68px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:560px){.f-sat{display:grid;gap:6px}.f-ad{width:auto}}
 .arena{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,3fr);gap:clamp(24px,4vw,56px);align-items:start}
 .arena aside{display:grid;gap:16px;position:sticky;top:150px;font-size:14px;color:var(--ink-2)}
 .arena aside div{padding:18px;border:1px solid var(--line);border-radius:var(--r-md);display:grid;gap:8px}
@@ -61,7 +65,10 @@
   </div>
   <div class="bar">
     <div class="seg" role="group" aria-label="Sıralama" data-ta="aria-label:fikirler.attr.5"><button type="button" data-s="top" aria-pressed="true" data-t="fikirler.button.1">En çok talep</button><button type="button" data-s="new" aria-pressed="false" data-t="fikirler.button.2">En yeni</button></div>
-    <div class="cat-f chips" role="group" aria-label="Kategori" id="cats" data-ta="aria-label:fikirler.attr.6"></div>
+    <div class="filtre">
+      <div class="f-sat" role="group" aria-labelledby="fv-ad" id="vaka-sat" hidden><span class="f-ad" id="fv-ad" data-t="fikirler.f.vaka">Vaka</span><div class="cat-f chips" id="vakalar"></div></div>
+      <div class="f-sat" role="group" aria-labelledby="fk-ad"><span class="f-ad" id="fk-ad" data-t="fikirler.f.kat">Kategori</span><div class="cat-f chips" id="cats"></div></div>
+    </div>
   </div>
   <div class="arena">
     <div id="board"></div>
@@ -81,16 +88,28 @@
 <script src="../assets/anlatim.js"></script>
 <script>UD.mountStory(document.querySelector('.phead .ph-art'), 'fikir');</script>
 <script>
-let sort = 'top', cat = null;
-// a chip is a category name or a case (a case also holds the ideas sent with its id)
-const board = UD.mountBoard(document.getElementById('board'), { dialog:true, sort:() => sort, filter:i => !cat || (typeof cat === 'string' ? i.cat === cat : UD.inCase(i, cat)) });
+let sort = 'top', vaka = null, kat = null;
+// two filters that work together: which case (or none) and which category
+const board = UD.mountBoard(document.getElementById('board'), { dialog:true, sort:() => sort, filter:i => {
+  const vk = UD.vakaOf(i);
+  if (vaka === 'yok' ? vk : vaka && !(vk && vk.id === vaka.id)) return false;
+  return !kat || UD.katOf(i) === kat;
+} });
 document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { sort = b.dataset.s; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); });
-const cats = document.getElementById('cats');
-UD.Store.cases().then(() => [null].concat(UD.CASES, UD.CATS).forEach((c, ix) => {
-  const b = UD.el('button', { type:'button', class:'chip', 'aria-pressed': String(ix === 0), text: ix === 0 ? UD.T('fikirler.js.tumu') : UD.catName(typeof c === 'string' ? c : c.short) });
-  b.onclick = () => { cat = c; cats.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); };
-  cats.append(b);
-}));
+function chips(row, values, text, set, cls){
+  values.forEach((v, ix) => {
+    const b = UD.el('button', { type:'button', class:'chip' + (cls && cls(v) ? ' case' : ''), 'aria-pressed': String(ix === 0), text:text(v) });
+    b.onclick = () => { set(v); row.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); board.render(); };
+    row.append(b);
+  });
+}
+chips(document.getElementById('cats'), [null].concat(UD.CATS), c => c ? UD.catName(c) : UD.T('fikirler.js.tumu'), c => { kat = c; });
+UD.Store.cases().then(() => {
+  if (!UD.CASES.length) return;
+  document.getElementById('vaka-sat').hidden = false;
+  chips(document.getElementById('vakalar'), [null].concat(UD.CASES, 'yok'),
+    c => !c ? UD.T('fikirler.js.tumu') : c === 'yok' ? UD.T('fikirler.f.bagimsiz') : UD.catName(c.short), c => { vaka = c; }, c => c && c !== 'yok');
+});
 UD.mountThu(document.getElementById('thu'));
 UD.openShared();
 </script>

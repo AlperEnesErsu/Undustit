@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#FFF6E9">
+<meta name="theme-color" content="#FCF9F3">
 <title>Yönetim · Undustit</title>
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
@@ -142,15 +142,22 @@ var KAYITLAR = [
     // "Fikir gizlendi" fikri sitede gizler; başka bir duruma dönmek gizliliği kaldırır
     degisince:function(id, durum, sec){ var fid = sec.dataset.fikir; return fid ? UDV.fikirler.gizle(fid, durum === 'gizlendi') : null; } },
   { id:'basvurular', tur:'basvurular', baslik:'Vaka başvuruları', ad:'başvuru', bos:'Henüz başvuru yok.', tamam:'Başvuru durumu kaydedildi.',
-    kolon:['Firma','Stok','Adet','İletişim','Not','Tarih'],
+    kolon:['Firma','Stok','Adet','Görsel','İletişim','Not','Tarih'],
     etiket:function(b){ return b.firma; },
-    satir:function(b){ return ['<b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : ''), esc(b.stok), esc(b.adet || '—'),
+    satir:function(b){ return ['<b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : ''), esc(b.stok), esc(b.adet || '—'), gorselHucre(b.gorsel),
       posta(b.eposta) + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : ''), esc(b.notlar || '—'), tarih(b.zaman)]; } },
   { id:'mesajlar', tur:'mesajlar', baslik:'İletişim mesajları', ad:'mesaj', bos:'Henüz mesaj yok.', tamam:'Mesaj durumu kaydedildi.',
     kolon:['Kimden','Konu','Mesaj','Tarih'],
     etiket:function(b){ return b.eposta; },
     satir:function(b){ return [(b.ad ? '<b>' + esc(b.ad) + '</b><br>' : '') + posta(b.eposta), esc(KONU[b.konu] || b.konu), esc(b.mesaj), tarih(b.zaman)]; } }
 ];
+// a company's photo: a small preview, opening the full image when it is a web address
+function gorselHucre(u){
+  var g = UD.gorselAdresi(u);
+  if (!g) return '—';
+  var img = '<img class="b-gorsel" src="' + esc(g) + '" alt="Başvuru görseli" loading="lazy">';
+  return /^https:/.test(g) ? '<a href="' + esc(g) + '" target="_blank" rel="noopener">' + img + '</a>' : img;
+}
 function panelHtml(k){
   var n = k.kolon.length + 1;
   return '<section class="panel" id="' + k.id + '" aria-labelledby="' + k.id + '-b">' +

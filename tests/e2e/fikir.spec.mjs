@@ -36,7 +36,18 @@ test('vaka ve kategori ayrı seçilir; kart ikisini de gösterir', async ({ page
   const kayit = await page.evaluate(() => JSON.parse(localStorage.getItem('ud-store-v1')).ideas.local.items[0]);
   expect([kayit.caseId, kayit.cat]).toEqual(['vaka-01', 'Fitness']);
   await page.goto('/fikirler/');
-  await expect(page.locator('.icard .m .c').first()).toHaveText('Vaka 01 · Boltun · Fitness');
+  const kart = page.locator('#board .icard', { hasText:'halter rafı' });
+  await expect(kart.locator('.m .vk')).toHaveText('Vaka 01 · Boltun');
+  await expect(kart.locator('.m .c')).toHaveText('Fitness');
+  // the two filters work together: case, then category
+  await page.locator('#vakalar .chip', { hasText:'Vakadan bağımsız' }).click();
+  await expect(kart).toHaveCount(0);
+  await page.locator('#vakalar .chip', { hasText:'Boltun' }).click();
+  await expect(kart).toHaveCount(1);
+  await page.locator('#cats .chip', { hasText:'Mutfak' }).click();
+  await expect(kart).toHaveCount(0);
+  await page.locator('#cats .chip', { hasText:'Fitness' }).click();
+  await expect(kart).toHaveCount(1);
 });
 
 test('vaka sayfasında vaka sırası görünmez, kategori isteğe bağlıdır', async ({ page }) => {

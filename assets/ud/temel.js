@@ -52,7 +52,7 @@ const ICON = {
 };
 
 // =========================================================== model constants
-// Draft business terms from the first meeting (Quirky model). Change them here only.
+// Draft business terms from the first meeting. Change them here only.
 const TERMS = {
   fee: { first: 99, next: 10, cur: '₺', charged: false },
   voteDays: 30, maxPrice: 100000,
@@ -68,10 +68,12 @@ const CATS = ['Mutfak','Ev & dekor','Fitness','Ofis & masa','Dış mekân','Tekn
 // Vaka 01 keeps its hand-made page and its translated text; every other case lives at vaka/?id=<id>.
 const CASES = [];
 const V01 = { id:'vaka-01', name:T('ud.vaka1.ad'), tag:T('ud.vaka1.etiket'), short:'Vaka 01 · Cıvata', href:'vaka-01/', durum:'acik', adet:1e6 };
+// a case photo: an https address (Supabase Storage) or, in the local preview, a data URL
+const gorselAdresi = u => /^(https:\/\/|data:image\/(jpeg|png|webp);base64,)/i.test(u || '') ? u : '';
 function caseOf(v){
-  if (v.id === V01.id) return { ...V01, durum:v.durum };
+  if (v.id === V01.id) return { ...V01, durum:v.durum, gorsel:gorselAdresi(v.gorsel) };
   return { id:v.id, name:v.baslik, tag:v.olcu || v.stok || '', short:String(v.baslik).slice(0, 40), href:'vaka/?id=' + encodeURIComponent(v.id),
-    durum:v.durum, ozet:v.ozet || '', adet:Number(v.adet) || 0, olcu:v.olcu || '', sinif:v.sinif || '' };
+    durum:v.durum, gorsel:gorselAdresi(v.gorsel), ozet:v.ozet || '', adet:Number(v.adet) || 0, olcu:v.olcu || '', sinif:v.sinif || '' };
 }
 const openCases = () => CASES.filter(c => c.durum === 'acik');
 // an idea belongs to a case by its vaka_id; older ideas only carry the case's label as their category
@@ -81,7 +83,7 @@ const catName = c => { const v = METIN.al('ud.kat.' + c); return v == null ? c :
 const CRIT = [['d',T('ud.olcut.d')],['m',T('ud.olcut.m')],['u',T('ud.olcut.u')]];
 const EXAMPLES = [
   { key:'ex:1', ex:true, title:T('ud.ornek.1.baslik'), cat:'Mutfak', problem:T('ud.ornek.1.problem'), solution:T('ud.ornek.1.cozum'), feats:[T('ud.ornek.1.oz1'),T('ud.ornek.1.oz2')], at:null },
-  { key:'ex:2', ex:true, title:T('ud.ornek.2.baslik'), cat:'Vaka 01 · Cıvata', problem:T('ud.ornek.2.problem'), solution:T('ud.ornek.2.cozum'), feats:[T('ud.ornek.2.oz1'),T('ud.ornek.2.oz2')], at:null },
+  { key:'ex:2', ex:true, title:T('ud.ornek.2.baslik'), cat:'Fitness', caseId:'vaka-01', problem:T('ud.ornek.2.problem'), solution:T('ud.ornek.2.cozum'), feats:[T('ud.ornek.2.oz1'),T('ud.ornek.2.oz2')], at:null },
   { key:'ex:3', ex:true, title:T('ud.ornek.3.baslik'), cat:'Evcil hayvan', problem:T('ud.ornek.3.problem'), solution:T('ud.ornek.3.cozum'), feats:[T('ud.ornek.3.oz1'),T('ud.ornek.3.oz2')], at:null }
 ];
 
@@ -159,14 +161,14 @@ function olcu(ad, props){ if (ANALITIK && window.plausible) window.plausible(ad,
 
 // =========================================================== shared helpers
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-// an idea's label: its case (when it has one), then its own category; older case ideas carry only the case
-function etiket(i){
-  const vk = i.caseId && (CASES.find(c => c.id === i.caseId) || (i.caseId === V01.id ? V01 : null));
-  const parts = [];
-  if (vk) parts.push(catName(vk.short));
-  if (i.cat && (!vk || i.cat !== vk.short)) parts.push(catName(i.cat));
-  return parts.join(' · ');
+// an idea's case (by its vaka_id; older case ideas carry only the case's label as their category) and its own category
+function vakaOf(i){
+  const byId = i.caseId && (CASES.find(c => c.id === i.caseId) || (i.caseId === V01.id ? V01 : null));
+  return byId || (i.cat && (CASES.find(c => c.short === i.cat) || (i.cat === V01.short ? V01 : null))) || null;
 }
+function katOf(i){ const vk = vakaOf(i); return i.cat && (!vk || i.cat !== vk.short) ? i.cat : ''; }
+// one line for both: "Vaka 01 · Boltun · Fitness"
+function etiket(i){ const vk = vakaOf(i), k = katOf(i); return [vk && catName(vk.short), k && catName(k)].filter(Boolean).join(' · '); }
 function sortIdeas(list, by){
   const c = list.slice();
   if (by === 'new') c.sort((a,b) => String(b.at).localeCompare(String(a.at)));
@@ -177,5 +179,5 @@ function sortIdeas(list, by){
 const pct = v => LANG === 'en' ? v + '%' : '%' + v;
 const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
 
-window.UD_IC = { html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, nextLive, liveNow, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
+window.UD_IC = { gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, nextLive, liveNow, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
 })();

@@ -120,7 +120,7 @@ const ALANLAR = {
   taban_fiyat:  { etiket:'Taban fiyat (₺)', tur:'sayi', min:0, adim:'any', ipucu:'Boş bırakılabilir' },
   deneme_adedi: { etiket:'Deneme partisi', tur:'sayi', min:0, adim:1, ipucu:'Kaç adet üretilecek' },
   sure_gun:     { etiket:'Fikir süresi', tur:'sayi', min:1, max:365, adim:1, ipucu:'Gün' },
-  gorsel:       { etiket:'Görsel adresi', tur:'url', ipucu:'http:// ya da https:// ile başlayan bağlantı' }
+  gorsel:       { etiket:'Ürün görseli', tur:'gorsel', ipucu:'Teknik föyde görünür. JPEG, PNG ya da WebP; site küçültüp yükler' }
 };
 // satırda yan yana duran alanlar
 const GRUPLAR = [['baslik'], ['ozet'], ['aciklama'], ['firma', 'stok'], ['adet', 'olcu'], ['sinif', 'taban_fiyat'], ['deneme_adedi', 'sure_gun'], ['gorsel']];
@@ -130,6 +130,15 @@ function alanHtml(ad, deger){
   const id = 'f-' + ad, hid = id + '-h';
   const deg = deger == null ? '' : String(deger);
   let kontrol;
+  if (a.tur === 'gorsel'){
+    // the address lives in a hidden field; the buttons upload a new photo or clear it (gorselBagla)
+    return '<div class="alan" role="group" aria-labelledby="' + id + '-e"><span id="' + id + '-e">' + esc(a.etiket) + ' <small>' + esc(a.ipucu) + '</small></span>' +
+      '<div class="gorsel-alan"><figure class="foy-gorsel' + (deg ? '' : ' yok') + '" data-onizleme>' + (deg ? '<img src="' + esc(deg) + '" alt="Ürün görseli">' : '<figcaption>Görsel yok</figcaption>') + '</figure>' +
+      '<input type="hidden" name="gorsel" value="' + esc(deg) + '">' +
+      '<div class="gorsel-dugme"><label class="btn alt sm"><span data-gorsel-yazi>' + (deg ? 'Değiştir' : 'Görsel yükle') + '</span><input type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" id="' + id + '" aria-describedby="' + hid + '"></label>' +
+      '<button type="button" class="btn alt sm" data-gorsel-sil' + (deg ? '' : ' hidden') + '>Kaldır</button></div></div>' +
+      '<em class="alan-hata" id="' + hid + '" hidden></em></div>';
+  }
   if (a.tur === 'uzun'){
     kontrol = '<textarea id="' + id + '" name="' + ad + '" rows="' + (a.satir || 3) + '" aria-describedby="' + hid + '">' + esc(deg) + '</textarea>';
   } else {
@@ -148,6 +157,31 @@ function formCiz(kap, vaka){
     const html = g.map(ad => alanHtml(ad, v[ad])).join('');
     return g.length > 1 ? '<div class="alan-iki">' + html + '</div>' : html;
   }).join('');
+  gorselBagla(kap);
+}
+
+// the photo field: pick a file, the site shrinks and uploads it (UD.Store.gorselYukle), the preview follows
+function gorselBagla(kap){
+  const gizli = kap.querySelector('[name="gorsel"]');
+  if (!gizli) return;
+  const fig = kap.querySelector('[data-onizleme]'), dosya = kap.querySelector('#f-gorsel'), sil = kap.querySelector('[data-gorsel-sil]');
+  const yazi = kap.querySelector('[data-gorsel-yazi]'), em = kap.querySelector('#f-gorsel-h');
+  const goster = url => {
+    gizli.value = url;
+    fig.classList.toggle('yok', !url);
+    fig.innerHTML = url ? '<img src="' + esc(url) + '" alt="Ürün görseli">' : '<figcaption>Görsel yok</figcaption>';
+    sil.hidden = !url; yazi.textContent = url ? 'Değiştir' : 'Görsel yükle';
+  };
+  const hata = m => { em.textContent = m || ''; em.hidden = !m; };
+  dosya.addEventListener('change', () => {
+    const f = dosya.files && dosya.files[0];
+    if (!f) return;
+    hata(''); yazi.textContent = 'Yükleniyor…'; dosya.disabled = true;
+    UD.Store.gorselYukle(f, 'vaka').then(goster)
+      .catch(e => { hata((e && e.message) || 'Görsel yüklenemedi.'); goster(gizli.value); })
+      .finally(() => { dosya.disabled = false; dosya.value = ''; });
+  });
+  sil.addEventListener('click', () => { goster(''); dosya.focus(); });
 }
 
 // form: alanları içeren form elemanı. Sayı alanları boşsa null, metinler kırpılmış string.
@@ -172,7 +206,7 @@ function formDogrula(v){
   if (v.taban_fiyat != null && (!isFinite(v.taban_fiyat) || v.taban_fiyat < 0)) h.taban_fiyat = 'Taban fiyat 0 veya daha büyük olmalı.';
   if (v.deneme_adedi != null && (!Number.isInteger(v.deneme_adedi) || v.deneme_adedi < 0)) h.deneme_adedi = 'Deneme adedi 0 veya daha büyük bir tam sayı olmalı.';
   if (v.sure_gun == null || !Number.isInteger(v.sure_gun) || v.sure_gun < 1 || v.sure_gun > 365) h.sure_gun = '1 ile 365 gün arasında bir tam sayı olmalı.';
-  if (v.gorsel && !/^https?:\/\/\S+$/i.test(v.gorsel)) h.gorsel = 'Görsel adresi http:// ya da https:// ile başlamalı.';
+  if (v.gorsel && !UD.gorselAdresi(v.gorsel)) h.gorsel = 'Görsel yüklenemedi; yeniden seçin.';
   return h;
 }
 

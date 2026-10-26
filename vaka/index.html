@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title data-t="vakasayfa.title.1">Vaka · Undustit</title>
 <meta name="description" content="Undustit vakası: bir üretici, bir stok ve bir soru. Fikrini yaz, talebi birlikte ölçelim." data-ta="content:vakasayfa.attr.1">
-<meta name="theme-color" content="#FFF6E9">
+<meta name="theme-color" content="#FCF9F3">
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
 <link rel="stylesheet" href="../assets/bilesen.css">
@@ -21,15 +21,14 @@
 .vaka-bilgi dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .vaka-bilgi dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .vaka-metin{max-width:68ch;display:grid;gap:12px;color:var(--ink-2);font-weight:300}
-.vaka-gorsel{margin:0;max-width:420px}
-.vaka-gorsel img{display:block;width:100%;height:auto;border-radius:var(--r-md);border:1px solid var(--line)}
 .vaka-detay{margin-top:clamp(32px,4vw,56px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .vaka-detay summary{list-style:none;cursor:pointer;padding:18px 0;font-weight:500;display:flex;justify-content:space-between;gap:12px}
 .vaka-detay summary::-webkit-details-marker{display:none}
 .vaka-detay summary::after{content:"+";font-family:var(--f-mono);font-size:22px;line-height:1;color:var(--accent)}
 .vaka-detay[open] summary::after{content:"–"}
 .vaka-detay summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-.vaka-detay-in{display:grid;gap:20px;padding-bottom:24px}
+.vaka-detay-in{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(20px,4vw,56px);align-items:start;padding-bottom:24px}
+@media (max-width:820px){.vaka-detay-in{grid-template-columns:minmax(0,1fr)}}
 .vaka-sayfa .phead{padding-top:0}
 .vaka-yaz{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,72px);align-items:start}
 .vaka-yaz > div{display:grid;gap:16px;align-content:start}
@@ -77,7 +76,7 @@ function ciz(v){
   var vaka = { id: v.id, short: String(v.baslik).slice(0, 40) };
   document.title = v.baslik + ' · Undustit';
   var paragraflar = String(v.aciklama || '').split(/\n\s*\n/).map(function(p){ return p.trim(); }).filter(Boolean);
-  var gorsel = /^https?:\/\//i.test(v.gorsel || '') ? v.gorsel : '';
+  var gorsel = UD.gorselAdresi(v.gorsel);
 
   kap.innerHTML =
     '<section class="phead" aria-labelledby="vb">' +
@@ -97,11 +96,13 @@ function ciz(v){
       (acik ? '<div><span class="eyebrow">' + T('vakasayfa.js.sira') + '</span><div id="form"></div></div>' : '') +
       '<div><span class="eyebrow">' + T('vakasayfa.js.fikirler') + '</span><div id="board"></div></div>' +
     '</section>' +
-    // the long description and the photo come after the form, folded
-    (gorsel || paragraflar.length ? '<details class="vaka-detay"><summary>' + T('vakasayfa.js.detay') + '</summary><div class="vaka-detay-in">' +
-      (gorsel ? '<figure class="vaka-gorsel"><img src="' + esc(gorsel) + '" alt="' + esc(v.baslik) + '" loading="lazy"></figure>' : '') +
+    // the technical sheet comes after the form, folded: the product photo (an empty frame until the admin adds one)
+    // and the long description
+    '<details class="vaka-detay"><summary>' + T('vakasayfa.js.detay') + '</summary><div class="vaka-detay-in">' +
+      (gorsel ? '<figure class="foy-gorsel"><img src="' + esc(gorsel) + '" alt="' + esc(v.baslik) + '" loading="lazy" decoding="async"></figure>'
+        : '<figure class="foy-gorsel yok"><figcaption>' + T('vaka.foy.yok') + '</figcaption></figure>') +
       (paragraflar.length ? '<div class="vaka-metin">' + paragraflar.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' : '') +
-    '</div></details>' : '');
+    '</div></details>';
 
   if (acik) UD.mountForm(document.getElementById('form'), { caseId: v.id });
   UD.mountBoard(document.getElementById('board'), { filter: function(i){ return UD.inCase(i, vaka); }, examples: false,

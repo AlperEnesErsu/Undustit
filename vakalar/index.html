@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title data-t="vakalar.title.1">Vakalar · Undustit</title>
 <meta name="description" content="Firmaların fazla stokları için açılan fikir çağrıları. Her vakanın kendi sayfası ve paylaşılabilir bağlantısı var." data-ta="content:vakalar.attr.1">
-<meta name="theme-color" content="#FFF6E9">
+<meta name="theme-color" content="#FCF9F3">
 <link rel="canonical" href="https://alperenesersu.github.io/Undustit/vakalar/">
 <link rel="alternate" hreflang="tr" href="https://alperenesersu.github.io/Undustit/vakalar/">
 <link rel="alternate" hreflang="en" href="https://alperenesersu.github.io/Undustit/vakalar/?dil=en">
@@ -51,6 +51,8 @@
 .basvuru .onay{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
 .basvuru .onay input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent)}
 .basvuru .durum{font-size:14px;min-height:1.4em}
+.basvuru input[type=file]{font-size:14px;padding:8px 0}
+.basvuru .b-not{color:var(--muted);font-size:12.5px}
 .basvuru .durum.bad{color:var(--err)}
 .basvuru-tamam{display:grid;gap:6px;padding:16px;border:1px solid var(--ok);border-radius:var(--r-md);background:var(--ok-soft)}
 @media (max-width:560px){.basvuru .iki{grid-template-columns:minmax(0,1fr)}}
@@ -151,6 +153,7 @@ ac.onclick = () => {
     `<div class="iki">${alan('adet', T('vakalar.js.b.adet'), 'text', false, T('vakalar.js.b.adet.ipucu'))}${alan('kisi', T('vakalar.js.b.kisi'), 'text', false)}</div>` +
     `<div class="iki">${alan('eposta', T('vakalar.js.b.eposta'), 'email', true)}${alan('telefon', T('vakalar.js.b.telefon'), 'tel', false)}</div>` +
     alan('notlar', T('vakalar.js.b.not'), 'text', false, T('vakalar.js.b.not.ipucu'), true) +
+    `<label class="if-field"><span>${T('vakalar.js.b.gorsel')} <small>${T('ud.form.istege')}</small></span><input name="gorsel" type="file" accept="image/jpeg,image/png,image/webp"><small class="b-not">${T('vakalar.js.b.gorsel.not')}</small></label>` +
     `<label class="onay"><input type="checkbox" name="onay" required><span>${T('vakalar.js.b.onay')}${UD.kvkkLink()}</span></label>` +
     `<div><button type="submit" class="btn sig">${T('vakalar.js.b.gonder')} ${ICON.arrow}</button></div>` +
     `<p class="durum" role="status" aria-live="polite"></p>` });
@@ -166,13 +169,17 @@ ac.onclick = () => {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('eposta'))) return fail(T('vakalar.js.b.hata.eposta'), 'eposta');
     if (!f.onay.checked) return fail(T('vakalar.js.b.hata.onay'), 'onay');
     const gonder = f.querySelector('[type=submit]'); gonder.disabled = true; say(T('vakalar.js.b.gidiyor'));
-    UD.Store.basvur({ firma:v('firma'), stok:v('stok'), adet:v('adet'), kisi:v('kisi'), eposta:v('eposta'), telefon:v('telefon'), notlar:v('notlar') })
+    // the photo goes up first; if it cannot, the application waits so nothing is lost silently
+    const dosya = f.gorsel.files && f.gorsel.files[0];
+    const kayit = { firma:v('firma'), stok:v('stok'), adet:v('adet'), kisi:v('kisi'), eposta:v('eposta'), telefon:v('telefon'), notlar:v('notlar') };
+    (dosya ? UD.Store.gorselYukle(dosya, 'basvuru').then(url => { kayit.gorsel = url; }, e => { e.gorsel = true; throw e; }) : Promise.resolve())
+      .then(() => UD.Store.basvur(kayit))
       .then(() => {
         UD.olcu('Vaka başvurusu');
         kutu.innerHTML = `<div class="basvuru-tamam" tabindex="-1"><b>${T('vakalar.js.b.tamam')}</b><p>${T('vakalar.js.b.tamam.not', { eposta:esc(v('eposta')) })}</p></div>`;
         kutu.firstChild.focus();
       })
-      .catch(err => { gonder.disabled = false; say(err && err.code === 'P0001' ? T('vakalar.js.b.hata.sinir') : T('vakalar.js.b.hata.genel'), true); });
+      .catch(err => { gonder.disabled = false; say(err && err.gorsel ? T('vakalar.js.b.hata.gorsel') : err && err.code === 'P0001' ? T('vakalar.js.b.hata.sinir') : T('vakalar.js.b.hata.genel'), true); });
   };
 };
 

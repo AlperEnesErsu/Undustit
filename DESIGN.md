@@ -463,3 +463,17 @@ vaka bandı, paylaş, bildir), `hareket.js` (eskizden rafa, kaydırma; `window.U
 - **Bölme denetimi:** her özgün satır tam bir kez yerleşti (betikle sayıldı); 72 test bölünmüş kodda geçiyor.
 - **CSS katmanları (`@layer`) bilerek yapılmadı:** katmanlanınca sayfaların kendi `<style>` blokları hepsini ezer, testler
   görünüşü denetlemez; risk kazançtan büyük. Yerine README'de "hangi dosya neyi belirler" tablosu.
+
+## Vaka/kategori filtresi, metinler, ürün görseli, açık zemin (27 Ekim 2026)
+
+- **Fikirler'de iki filtre:** "Vaka" (Tümü, her vaka, Vakadan bağımsız) ve "Kategori" ayrı satırlar, birlikte çalışır.
+  Kartta vaka küçük çerçeveli bir etiket, kategori düz yazı; vaka artık kategori gibi okunmuyor. Örnek fikir de
+  "Vaka 01 · Boltun" + "Fitness" taşıyor.
+- **Nasıl işler yeniden yazıldı:** daha kısa, düz cümleler; başka bir şirkete gönderme yok (Quirky metinden ve kod
+  yorumlarından çıktı). Hikâye'deki "Neden varız" dört paragraftan ikiye indi.
+- **Teknik föyde ürün görseli:** vaka satırındaki `gorsel` alanı artık bağlantı değil yükleme. Yönetici görseli seçer,
+  site tarayıcıda küçültür (uzun kenar 1600 px, JPEG) ve Supabase Storage'a koyar; görsel yokken föyde kesik çizgili
+  boş çerçeve durur. Firma da "Vakanı aç" başvurusuna bir fotoğraf ekleyebilir; yönetimde küçük önizlemesiyle görünür.
+  Kurallar `supabase/6-gorsel.sql`'de, SQL testleri sahte bir Storage şemasıyla denetler.
+- **Zemin açıldı:** Oyuncu kremi `#FFF6E9` → `#FCF9F3` (daha az sarı), çizgi ve ikincil yüzeyler aynı yönde. Uzun
+  okumada göz yormaması için; sarı artık yalnız vurguda.

@@ -1,11 +1,11 @@
-/* Oyuncu: Quirky's own mood. Cream paper, a heavy grotesque, ink outlines with hard offset shadows,
+/* Oyuncu: the default look. Light warm paper (easy on the eyes for long reading), a heavy grotesque, ink outlines with hard offset shadows,
    violet for anything you act on, a yellow marker for emphasis, things that bounce a little.
    Contrast on --bg: ink 16.4, ink-2 10.3, muted 6.0, accent 6.0 (white on accent 6.4), ok 5.0. */
 @import url("../fonts/oyuncu.css");
 @font-face{font-family:"Bricolage Fallback";font-weight:100 900;src:local("Arial Bold"),local("Arial-BoldMT"),local("Arial");size-adjust:91.58%;ascent-override:101.56%;descent-override:29.48%;line-gap-override:0%}
 
 :root{
-  --bg:#FFF6E9; --bg-2:#FFFFFF; --bg-3:#FFEBD1; --line:#EADCC6; --line-2:#1B1530;
+  --bg:#FCF9F3; --bg-2:#FFFFFF; --bg-3:#F5EEE2; --line:#E6DFD2; --line-2:#1B1530;
   --ink:#1B1530; --ink-2:#3F3856; --muted:#625B78; --hint:#7A738E;
   --accent:#5B2EFF; --accent-hover:#4A1FE6; --accent-active:#3A14C2; --accent-ink:#FFFFFF;
   --accent-soft:rgba(91,46,255,.08); --accent-line:rgba(91,46,255,.4);
@@ -45,7 +45,7 @@ h2 em,.cb-h em{font-style:normal}
 .chip.case[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--ink)}
 
 /* surfaces */
-.nav{background:rgba(255,246,233,.9);border-bottom:2px solid var(--ink)}
+.nav{background:rgba(252,249,243,.92);border-bottom:2px solid var(--ink)}
 .iform{border:2px solid var(--ink);box-shadow:var(--shadow)}
 .iform:focus-within{border-color:var(--ink);box-shadow:8px 8px 0 var(--accent)}
 .if-field textarea,.if-field input{border:2px solid var(--line)}
@@ -63,9 +63,9 @@ h2 em,.cb-h em{font-style:normal}
 .vote[aria-pressed="true"]{border-color:var(--ink)}
 .case-band{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 .cb-tag{background:#DFF5EA;border:2px solid var(--ok)}
-.cb-art{--art-bg:#FFF0D6;border:2px solid var(--ink);background-color:#FFF0D6;background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:20px 20px}
+.cb-art{--art-bg:#FBF4E8;border:2px solid var(--ink);background-color:#FBF4E8;background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:20px 20px}
 .cb-art figcaption{font-weight:800}
-.pc-stage{border:2px solid var(--ink);box-shadow:var(--shadow);background:#FFF0D6}
+.pc-stage{border:2px solid var(--ink);box-shadow:var(--shadow);background:#FBF4E8}
 .pc-stage::before{background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:22px 22px;opacity:.18}
 .pc-card,.pc-pay{border:2px solid var(--ink);box-shadow:var(--hard)}
 .pc-pay{background:#DFF5EA}

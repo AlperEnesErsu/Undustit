@@ -79,6 +79,14 @@ const Store = (function(){
     noteCache[key] = r.data.map(n => ({ k:n.id, idea:key, kind:n.tur, text:n.metin, handle:n.ad, at:n.zaman, owner:n.uye }));
     emit();
   }
+  // long side at most `uzun` px, JPEG on white (a transparent PNG would turn black)
+  async function kucult(file, uzun){
+    let img; try { img = await createImageBitmap(file); } catch(e){ throw new Error(T('ud.gorsel.tur')); }
+    const k = Math.min(1, uzun / Math.max(img.width, img.height));
+    const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    return new Promise((ok, no) => c.toBlob(b => b ? ok(b) : no(new Error(T('ud.gorsel.tur'))), 'image/jpeg', .85));
+  }
   async function sbUser(){
     const { data } = await sb.auth.getSession();
     if (data && data.session) return (S.uid = data.session.user.id);
@@ -131,7 +139,7 @@ const Store = (function(){
     let rows = null;
     if (AYAR.supabaseUrl){
       const c = await sbClient();
-      const r = await c.from('vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
+      const r = await c.from('vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,gorsel,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
       if (!r.error) rows = r.data;
     } else if (!(window.claude && window.claude.use)){
       try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null'); if (d && d.vakalar) rows = Object.values(d.vakalar).filter(v => v.durum !== 'taslak').sort((a,b) => String(b.olusturma).localeCompare(String(a.olusturma))); } catch(e){}
@@ -290,6 +298,19 @@ const Store = (function(){
       let d = {}; try { d = JSON.parse(localStorage.getItem('udv-' + tablo) || '{}') || {}; } catch(e){}
       const id = key(); d[id] = { id, ...data, durum: tablo === 'fikir_bildirimleri' ? 'acik' : 'yeni', zaman:new Date().toISOString() };
       try { localStorage.setItem('udv-' + tablo, JSON.stringify(d)); } catch(e){}
+    },
+    // A product photo: shrunk in the browser first, then stored in the public "gorseller" bucket under
+    // <klasor>/<uid>/ (supabase/6-gorsel.sql says who may write where). The local preview keeps a small data URL.
+    async gorselYukle(file, klasor){
+      if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error(T('ud.gorsel.tur'));
+      if (file.size > 20e6) throw new Error(T('ud.gorsel.buyuk'));
+      const blob = await kucult(file, AYAR.supabaseUrl ? 1600 : 800);
+      if (!AYAR.supabaseUrl) return new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(blob); });
+      sb = sb || await sbClient();
+      const yol = klasor + '/' + await sbUser() + '/' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) + '.jpg';
+      const r = await sb.storage.from('gorseller').upload(yol, blob, { contentType:'image/jpeg', cacheControl:'31536000' });
+      if (r.error) throw r.error;
+      return sb.storage.from('gorseller').getPublicUrl(yol).data.publicUrl;
     },
     basvur(data){ return this.kaydet('vaka_basvurulari', data); },
     // the database wants the idea's own id; the local preview keeps the full key (that is what it hides)

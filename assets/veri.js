@@ -191,7 +191,8 @@
     if (!sayi(v.taban_fiyat, 0)) throw new Error('Taban fiyat 0 ya da daha büyük olmalı');
     if (!(sayi(v.deneme_adedi, 0) && tam(v.deneme_adedi))) throw new Error('Deneme adedi 0 ya da daha büyük bir tam sayı olmalı');
     if (!(sayi(v.sure_gun, 1) && tam(v.sure_gun))) throw new Error('Fikir süresi en az 1 gün olmalı');
-    if (v.gorsel && !/^https?:\/\//.test(v.gorsel)) throw new Error('Görsel adresi http ya da https ile başlamalı');
+    // https in the database; the local preview stores the uploaded photo itself as a data URL
+    if (v.gorsel && !(/^https:\/\//.test(v.gorsel) || (!SB_URL && /^data:image\/(jpeg|png|webp);base64,/.test(v.gorsel)))) throw new Error('Görsel adresi https ile başlamalı');
   }
   // URL'e uygun kimlik: Türkçe harfleri sadeleştir, harf/rakam dışını '-' yap.
   function slug(s){

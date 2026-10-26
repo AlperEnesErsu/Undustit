@@ -82,6 +82,8 @@ h2 em,.cb-h em{font-style:normal}
 dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 .foot{border-top:2px solid var(--ink)}
 .link{text-decoration-color:var(--accent);text-decoration-thickness:2px}
+.ben{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);transition:transform 180ms var(--pop),box-shadow 180ms var(--pop),background-color 120ms ease}
+.ben:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);border-color:var(--ink)}
 .link{transition:color 120ms ease,text-decoration-thickness 160ms var(--pop),text-underline-offset 160ms var(--pop),background-color 120ms ease;border-radius:4px}
 .link:hover{color:var(--accent);text-decoration-thickness:3px;text-underline-offset:6px;background:var(--accent-soft)}
 /* the bar: the page you are on wears an ink outline; any link under the pointer fills violet */

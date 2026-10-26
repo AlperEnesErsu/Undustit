@@ -64,6 +64,8 @@ main{min-height:calc(100svh - 64px)}
 .btn:disabled:hover{background:var(--accent);border-color:var(--accent)}
 .link{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent-line);text-underline-offset:4px;transition:color var(--dur-fast) var(--ease-out),text-decoration-color var(--dur-fast) var(--ease-out)}
 .link:hover{color:var(--accent);text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:6px}
+/* a button that reads as a link: no frame of its own */
+button.link{background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left}
 /* standalone links get a 24px tap height */
 a.link:hover{transform:translateY(-1px)}
 a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color var(--dur-fast) var(--ease-out),text-decoration-color var(--dur-fast) var(--ease-out),text-underline-offset var(--dur-base) var(--ease-out)}
@@ -92,6 +94,12 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .nav-links a[aria-current="page"]{color:var(--ink);background:var(--bg-3)}
 .menu-t{display:none;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--line-2);border-radius:999px;background:transparent}
 .menu-t svg{width:20px;height:20px}
+/* "Benim": the person's own page, one icon in the bar */
+.ben{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;flex:none;border:1px solid var(--line-2);border-radius:999px;color:var(--ink);transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out)}
+.ben svg{width:18px;height:18px}
+.ben:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.ben[aria-current="page"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.ben:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .menu-t .i-close,.nav.open .menu-t .i-open{display:none}
 .nav.open .menu-t .i-close{display:block}
 @media (max-width:900px){
@@ -250,6 +258,11 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .bildir-f .row{display:flex;gap:14px;align-items:center}
 .bildir-d{font-size:13px;color:var(--err)}
 .bildir-tamam{font-size:13.5px;color:var(--ok)}
+/* how close to Thursday */
+.hedef{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.02em;color:var(--ink-2)}
+.hedef::before{content:"→ ";color:var(--accent)}
+.hedef.aday{color:var(--ok)}
+.hedef.aday::before{content:"★ ";color:var(--ok)}
 .buy-ex{max-width:16ch;font-size:11.5px;line-height:1.3;color:var(--ink-2);text-align:center}
 .buy-f{display:flex;gap:6px;align-items:center}
 .buy-f input{width:104px;min-height:38px;border:1px solid var(--accent);border-radius:var(--r-sm);padding:0 10px;background:var(--bg-2);font-family:var(--f-mono);font-size:14px}

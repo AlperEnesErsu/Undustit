@@ -124,6 +124,9 @@
 /* ---------- admin shell: header, side menu, main. Side menu moves to a top strip on phones */
 .yonetim{background:var(--bg)}
 .y-bas{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:10px var(--gut);background:var(--bg-2);border-bottom:1px solid var(--line)}
+/* the name and "Yönetim" keep their width; the e-mail on the right is what shrinks (ellipsis) */
+.y-kimlik{flex:none}
+.y-kimlik + div{flex:1 1 0;justify-content:flex-end}
 .y-govde{display:grid;grid-template-columns:minmax(180px,220px) minmax(0,1fr);min-height:calc(100svh - 60px)}
 .y-yan{position:sticky;top:60px;align-self:start;display:flex;flex-direction:column;gap:2px;max-height:calc(100svh - 60px);overflow-y:auto;padding:16px 12px;border-right:1px solid var(--line)}
 .y-yan a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:var(--r-sm);font-size:14.5px;color:var(--ink-2);text-decoration:none;transition:background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}

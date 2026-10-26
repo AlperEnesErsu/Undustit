@@ -269,7 +269,7 @@ UD_METIN.ekle('tr', {
  "ud.kat.Teknoloji aksesuarı": "Teknoloji aksesuarı",
  "ud.kat.Çocuk": "Çocuk",
  "ud.kat.Evcil hayvan": "Evcil hayvan",
- "ud.kat.Vaka 01 · Cıvata": "Vaka 01 · Cıvata",
+ "ud.kat.Vaka 01 · Cıvata": "Vaka 01 · Boltun",
  "ud.ornek.1.baslik": "Tezgâh kenarına takılan, katlanınca rafa dönen kesme tahtası.",
  "ud.ornek.1.problem": "Dar mutfakta kesme tahtası tezgâhı kaplıyor.",
  "ud.ornek.1.cozum": "Menteşeli tabla tezgâh kenarına kelepçeyle takılır, kullanılmayınca dikey rafa döner.",

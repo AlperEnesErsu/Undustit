@@ -913,19 +913,21 @@ function openShared(){
 // then into a kraft box, boxes stack as pre-sales fill, and the box lands on a shelf with the payout.
 // Plays once when seen, replay at the end; reduced motion shows the last frame.
 function mountProc(host, opts={}){
-  const text = T('ud.ornek.1.baslik');
+  // a general story, not one product: "your idea", a dot row for demand (no figures that read as real data),
+  // and a plain object that goes from a wobbly sketch to a clean drawing, a box and a shelf
+  const text = T('ud.akis.cumle');
   const steps = [1,2,3,4,5,6].map(n => T('ud.akis.adim' + n));
-  const BUYERS = 312, AVG = 240, PRE = 300;
+  const PRE = TERMS.presale[0];
   const tag = (x, y, w, label, val, lx, ly, tx, ty, i) => `<g class="dw-tag" style="--i:${i}"><path class="dw-lead" pathLength="1" d="M${lx} ${ly} L${tx} ${ty}"/><circle class="dw-pin" cx="${tx}" cy="${ty}" r="2.2"/><rect x="${x}" y="${y}" width="${w}" height="17" rx="8.5"/><text x="${x + 9}" y="${y + 11.6}">${label} <tspan>${val}</tspan></text></g>`;
-  const bub = (x, y, v, i) => `<g class="dw-bub" style="--i:${i}"><rect x="${x}" y="${y}" width="38" height="17" rx="8.5"/><text x="${x + 19}" y="${y + 11.8}" text-anchor="middle">₺${v}</text></g>`;
+  const bub = (x, y, i) => `<g class="dw-bub" style="--i:${i}"><rect x="${x}" y="${y}" width="38" height="17" rx="8.5"/><text x="${x + 19}" y="${y + 11.8}" text-anchor="middle">₺…</text></g>`;
   host.classList.add('proc');
   host.innerHTML = `
-  <p class="sr">${T('ud.akis.sr', { kisi:BUYERS, ort:AVG, on:PRE, az:TERMS.shareRetail, cok:TERMS.shareDirect })}</p>
+  <p class="sr">${T('ud.akis.sr', { az:TERMS.shareRetail, cok:TERMS.shareDirect })}</p>
   <div class="pc-stage">
     <div class="pc-card" aria-hidden="true">
-      <div class="h"><span class="tag">${catName('Mutfak')}</span><span class="pc-n">0 / 140</span></div>
+      <div class="h"><span class="tag">${T('ud.akis.senin')}</span><span class="pc-n">0 / 140</span></div>
       <p class="pc-txt"></p>
-      <div class="pc-buy"><span>${T('ud.akis.dedi', { n:'<b class="pc-bn">0</b>' })}</span><span>${T('ud.akis.ort', { n:'<b class="pc-avg">0</b>' })}</span></div>
+      <div class="pc-buy"><span class="pc-meter">${Array.from({ length:12 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}</span><span>${T('ud.akis.talep')}</span></div>
     </div>
     <div class="pc-pay" aria-hidden="true"><span class="eb">${T('ud.akis.pay')}</span><b><em>${pct(TERMS.shareRetail + '–' + TERMS.shareDirect)}</em></b><span>${T('ud.akis.paykime')}</span></div>
     <div class="pc-draw" aria-hidden="true"><svg viewBox="0 0 320 240">
@@ -937,19 +939,17 @@ function mountProc(host, opts={}){
         <path class="dw-sk m4" pathLength="1" d="M301 168 C 300 180 299 190 299 199"/>
       </g>
       <g class="dw-product">
-        <path class="dw-ghost" d="M120 166 L200 166 L214 156 L134 156 Z"/>
-        <path class="dw-arc" pathLength="1" d="M206 154 Q 246 120 214 66"/><path class="dw-arch" d="M207 72 l7 -7 3 10"/>
-        <path class="dw-sk dw-board m5" pathLength="1" d="M118 170 C 117 130 121 95 119 64 C 140 59 170 62 201 60 C 203 95 198 130 202 171"/>
-        <path class="dw-sk dw-edge m6" pathLength="1" d="M201 60 C 204 58 207 57 209 55 C 210 95 208 135 210 166"/>
-        <path class="dw-sk dw-slot m7" pathLength="1" d="M146 76 C 158 73 166 75 174 77 C 175 82 173 84 172 86 C 160 87 152 85 147 85 C 144 82 145 79 146 76"/>
-        <g class="dw-hatch"><path d="M130 120 l14 -14 M136 140 l22 -22 M150 152 l26 -26 M168 158 l20 -20"/></g>
-        <g class="dw-grain"><path d="M128 104 C 150 99 176 108 194 102 M128 126 C 154 121 172 131 194 125 M128 148 C 150 144 178 152 194 147"/></g>
-        <g class="dw-hinge"><rect x="134" y="168" width="18" height="7" rx="1.5"/><rect x="168" y="168" width="18" height="7" rx="1.5"/></g>
+        <path class="dw-sk dw-board m5" pathLength="1" d="M118 171 C 117 139 122 113 119 95 C 141 84 177 89 199 92 C 202 113 197 141 202 171"/>
+        <path class="dw-sk dw-edge m6" pathLength="1" d="M199 92 C 203 90 206 87 210 85 C 211 116 207 142 210 166"/>
+        <path class="dw-sk dw-slot m7" pathLength="1" d="M147 126 C 144 115 153 109 161 111 C 170 108 176 117 173 125 C 175 133 167 140 159 137 C 151 139 145 131 147 126"/>
+        <g class="dw-hatch"><path d="M130 150 l14 -14 M140 162 l20 -20 M176 160 l16 -16"/></g>
+        <g class="dw-grain"><path d="M136 152 H184 M136 159 H184"/></g>
+        <g class="dw-hinge"><rect x="130" y="168" width="20" height="6" rx="1.5"/><rect x="170" y="168" width="20" height="6" rx="1.5"/></g>
       </g>
-      <g class="dw-dims"><path pathLength="1" d="M120 46 H200 M120 41 v10 M200 41 v10"/><text x="160" y="40" text-anchor="middle">38 cm</text>
-        <path pathLength="1" d="M104 60 V170 M99 60 h10 M99 170 h10"/><text x="96" y="118" text-anchor="end">26 cm</text></g>
-      <g class="dw-bubs">${bub(30, 70, 240, 0)}${bub(226, 92, 260, 1)}${bub(52, 128, 220, 2)}${bub(240, 140, 300, 3)}</g>
-      <g class="dw-tags">${tag(8, 118, 86, T('ud.akis.isim'), T('ud.akis.ad'), 94, 126, 121, 126, 0)}${tag(222, 98, 96, T('ud.akis.renk'), T('ud.akis.renk.v'), 222, 106, 196, 112, 1)}${tag(216, 30, 98, T('ud.akis.ambalaj'), T('ud.akis.ambalaj.v'), 216, 38, 206, 58, 2)}</g>
+      <g class="dw-dims"><path pathLength="1" d="M120 74 H200 M120 69 v10 M200 69 v10"/><text x="160" y="66" text-anchor="middle">${T('ud.akis.en')}</text>
+        <path pathLength="1" d="M104 94 V170 M99 94 h10 M99 170 h10"/><text x="96" y="135" text-anchor="end">${T('ud.akis.boy')}</text></g>
+      <g class="dw-bubs">${bub(222, 56, 0)}${bub(250, 92, 1)}${bub(224, 128, 2)}${bub(48, 150, 3)}</g>
+      <g class="dw-tags">${tag(8, 146, 70, T('ud.akis.isim'), '✓', 78, 154, 120, 154, 0)}${tag(230, 112, 72, T('ud.akis.renk'), '✓', 230, 120, 202, 124, 1)}${tag(222, 40, 92, T('ud.akis.ambalaj'), '✓', 222, 48, 198, 92, 2)}</g>
       <g class="dw-boxes">
         <g class="dw-box b3"><path class="side" d="M246 120 L258 111 L258 160 L246 170 Z"/><path class="front" d="M190 120 H246 V170 H190 Z"/><path class="lid" d="M190 120 L202 111 L258 111 L246 120 Z"/></g>
         <g class="dw-box b2"><path class="side" d="M118 120 L130 111 L130 160 L118 170 Z"/><path class="front" d="M62 120 H118 V170 H62 Z"/><path class="lid" d="M62 120 L74 111 L130 111 L118 120 Z"/></g>
@@ -962,7 +962,7 @@ function mountProc(host, opts={}){
     <button type="button" class="pc-replay">${ICON.replay}${T('ud.akis.tekrar')}</button>
   </div>
   <ol class="pc-steps">${steps.map(s => `<li>${s}</li>`).join('')}</ol>`;
-  const txt = $('.pc-txt', host), n = $('.pc-n', host), bn = $('.pc-bn', host), avg = $('.pc-avg', host), pn = $('.pc-pn', host), lis = $$('.pc-steps li', host);
+  const txt = $('.pc-txt', host), n = $('.pc-n', host), pn = $('.pc-pn', host), lis = $$('.pc-steps li', host);
   let timers = [];
   const at = (ms, fn) => timers.push(setTimeout(fn, ms));
   const count = (node, to, ms, fmt) => { const t0 = performance.now(); const f = now => { const p = Math.min(1, (now - t0)/ms); node.textContent = fmt(Math.round(to * (1 - Math.pow(1-p, 3)))); if (p < 1) timers.push(requestAnimationFrame(f)); }; requestAnimationFrame(f); };
@@ -970,17 +970,17 @@ function mountProc(host, opts={}){
   const S = ['s1','s2','s3','s4','s5','s5b','s6','end'];
   function finalState(){
     host.classList.add(...S); txt.textContent = text; n.textContent = text.length + ' / 140';
-    bn.textContent = String(BUYERS); avg.textContent = String(AVG); pn.textContent = PRE + ' / ' + PRE; step(5);
+    pn.textContent = PRE + ' / ' + PRE; step(5);
   }
   function play(){
     timers.forEach(t => { clearTimeout(t); cancelAnimationFrame(t); }); timers = [];
-    host.classList.remove(...S); txt.textContent = ''; n.textContent = '0 / 140'; bn.textContent = '0'; avg.textContent = '0'; pn.textContent = '0 / ' + PRE;
+    host.classList.remove(...S); txt.textContent = ''; n.textContent = '0 / 140'; pn.textContent = '0 / ' + PRE;
     void host.offsetWidth;
     if (reduce.matches){ finalState(); return; }
     host.classList.add('s1'); step(0);
     const per = 950 / text.length;
     for (let c = 1; c <= text.length; c++) at(c*per, () => { txt.textContent = text.slice(0, c); n.textContent = c + ' / 140'; });
-    at(1700, () => { host.classList.add('s2'); step(1); count(bn, BUYERS, 1000, v => String(v)); count(avg, AVG, 1000, v => String(v)); });
+    at(1700, () => { host.classList.add('s2'); step(1); });
     at(2900, () => { host.classList.add('s3'); step(2); });
     at(4100, () => { host.classList.add('s4'); step(3); });
     at(5200, () => { host.classList.add('s5'); step(4); count(pn, PRE, 1100, v => v + ' / ' + PRE); });

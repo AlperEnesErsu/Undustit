@@ -702,5 +702,8 @@ UD_METIN.ekle('en', {
  "ud.akis.boy": "height",
  "ud.form.vaka": "Case",
  "ud.form.vaka.not": "for a company's surplus stock?",
- "ud.form.vaka.yok": "Not for a case"
+ "ud.form.vaka.yok": "Not for a case",
+ "ud.hata.yukleme": "The data could not be loaded right now.",
+ "ud.hata.tekrar": "Try again",
+ "ud.hata.kayit": "Could not save. Check your connection and try again."
 });

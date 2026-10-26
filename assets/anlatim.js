@@ -131,13 +131,20 @@ function mountStory(host, name){
   let timers = [];
   const step = s => lis.forEach((li, ix) => { li.classList.toggle('on', ix === s); li.classList.toggle('past', ix < s); });
   const last = () => { box.classList.add(...classes); step(n - 1); };
+  // a tab sent to the background throttles timers while CSS stops: rather than resume out of step, finish
+  let playing = false;
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden || !playing) return;
+    timers.forEach(clearTimeout); timers = []; playing = false; last();
+  });
   function play(){
     timers.forEach(clearTimeout); timers = [];
+    playing = true;
     box.classList.remove(...classes); step(-1);
     void box.offsetWidth;
-    if (reduce.matches){ last(); return; }
+    if (reduce.matches){ playing = false; last(); return; }
     S.at.forEach((ms, i) => timers.push(setTimeout(() => { box.classList.add('a' + (i + 1)); step(i); }, ms)));
-    timers.push(setTimeout(() => { box.classList.add('end'); try { sessionStorage.setItem(SEEN, '1'); } catch(e){} }, S.end));
+    timers.push(setTimeout(() => { box.classList.add('end'); playing = false; try { sessionStorage.setItem(SEEN, '1'); } catch(e){} }, S.end));
   }
   box.querySelector('.pc-replay').onclick = play;
   let seen = false; try { seen = sessionStorage.getItem(SEEN) === '1'; } catch(e){}

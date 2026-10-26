@@ -24,7 +24,7 @@
     ekle: function(l, o){ for (var k in o) this[l][k] = o[k]; },
     al: function(k){ var d = this[dil]; return k in d ? d[k] : this.tr[k]; }
   };
-  // where shared data lives (empty URL = this browser only); ud.js reads it
+  // where shared data lives (empty URL = this browser only); assets/ud reads it
   document.write('<script src="' + base + 'assets/ayar.js"><\/script>');
   document.write('<script src="' + base + 'assets/metin/tr.js"><\/script>');
   if (dil !== 'tr') document.write('<script src="' + base + 'assets/metin/' + dil + '.js"><\/script>');

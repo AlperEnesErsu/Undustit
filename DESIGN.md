@@ -299,3 +299,16 @@ takım M10 × 90, 8.8 flanşlı cıvata + somun, 1.000 adetlik deneme partisi. S
   sayfası ve `nasil/#vaka-pay` oradan okur. Genel fikirlerdeki %10–30 (satıştan) değişmedi. Bu, 22 Ekim'de
   "%40 taşınmadı" kararını vakalar için geri alır.
 - **Taban fiyat** (takım başına $0,20) bilerek sitede gösterilmiyor.
+
+## Renk rolleri: Oyuncu sadeleşti (26 Ekim 2026)
+
+Sarı 21 yerde beş iş yapıyordu (başlık vurgusu, rozet, hover, gölge, tablo başlığı…), bir ekranda altı renk
+vardı. Oyuncu korunarak her renge tek görev verildi:
+- **Mor:** tıklanan her şey ve üzerine gelme (düğme, çip, dil, sekme, yönetim menüsü hover'ı `--accent-soft`),
+  açık anahtar, ilerleme çubuğu.
+- **Sarı (`--sun`):** sayfa başına bir vurgu: h1 vurgusu ve üstündeki etiket. Hikâye'de misyon cümlesi,
+  bir de "Alırdım" damgası ve açıkça `.rozet.sari`. h2 vurguları, vaka kartı gölgesi, tablo başlığı,
+  diyalog başlığı, zaman çizelgesi noktaları sarıdan çıktı.
+- **Yeşil:** para ve "açık / kazanan / üretimde" durumu. **Kırmızı-turuncu:** logo ve canlı yayın noktası.
+- **Pembe (`--pink`)** kaldırıldı; "Üretimde" rozeti yeşil çerçeveli.
+- Gölgeler hep mürekkep.

@@ -9,7 +9,7 @@
   --ink:#1B1530; --ink-2:#3F3856; --muted:#625B78; --hint:#7A738E;
   --accent:#5B2EFF; --accent-hover:#4A1FE6; --accent-active:#3A14C2; --accent-ink:#FFFFFF;
   --accent-soft:rgba(91,46,255,.08); --accent-line:rgba(91,46,255,.4);
-  --brand:#E8462A; --sun:#FFD23F; --pink:#FF8FC2;
+  --brand:#E8462A; --sun:#FFD23F;
   --ok:#0A7A4E; --ok-soft:rgba(10,122,78,.08); --warn:#8A5A00; --err:#B42318;
   --f-serif:"Bricolage Grotesque","Bricolage Fallback","Geist",system-ui,sans-serif;
   --r-sm:12px; --r-md:20px; --r-lg:28px;
@@ -18,7 +18,9 @@
   --shadow:6px 6px 0 var(--ink);
 }
 h1,h2,h3{font-weight:800;letter-spacing:-.035em}
-h1 em,h2 em,.cb-h em{font-style:normal;background:linear-gradient(transparent 58%,var(--sun) 58%,var(--sun) 92%,transparent 92%);padding-inline:.06em}
+/* yellow marks one thing per page: the headline's highlight (and the sticker label above it) */
+h1 em{font-style:normal;background:linear-gradient(transparent 58%,var(--sun) 58%,var(--sun) 92%,transparent 92%);padding-inline:.06em}
+h2 em,.cb-h em{font-style:normal}
 .hero h1,.phead h1,.case-head h1{line-height:.92}
 .brand b{font-family:var(--f-serif);font-weight:800;letter-spacing:-.04em}
 .brand b i{font-style:normal}
@@ -33,11 +35,11 @@ h1 em,h2 em,.cb-h em{font-style:normal;background:linear-gradient(transparent 58
 .btn.sig{border-color:var(--ink)}
 .btn.sig:hover{background:var(--accent-hover);border-color:var(--ink);box-shadow:6px 6px 0 var(--ink)}
 .btn.alt{background:var(--bg-2)}
-.btn.alt:hover{background:var(--sun);color:var(--ink)}
+.btn.alt:hover{background:var(--accent-soft);color:var(--accent)}
 .chip{border-width:2px;border-color:var(--ink);color:var(--ink);font-weight:500}
-.chip:hover{background:var(--sun);border-color:var(--ink)}
+.chip:hover{background:var(--accent-soft);border-color:var(--ink)}
 .lang{border:2px solid var(--ink)}
-.lang a:hover{background:var(--sun)}
+.lang a:hover{background:var(--accent-soft)}
 .lang a[aria-current="true"]:hover{background:var(--ink);color:#fff}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff}
 .chip.case[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--ink)}
@@ -52,7 +54,7 @@ h1 em,h2 em,.cb-h em{font-style:normal;background:linear-gradient(transparent 58
 .icard .rank{font-family:var(--f-serif);font-weight:800}
 .vote{border:2px solid var(--ink);border-radius:14px}
 .vote[aria-pressed="true"]{border-color:var(--ink)}
-.case-band{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--sun),10px 10px 0 2px var(--ink)}
+.case-band{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 .cb-tag{background:#DFF5EA;border:2px solid var(--ok)}
 .cb-art{border:2px solid var(--ink);background-color:#FFF0D6;background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:20px 20px}
 .cb-art figcaption{font-weight:800}
@@ -69,7 +71,7 @@ h1 em,h2 em,.cb-h em{font-style:normal;background:linear-gradient(transparent 58
 .disc b{font-weight:800}
 .disc a:hover b{color:var(--accent)}
 .how3 li,.open3 div,.case,.after,.arena aside div{border:2px solid var(--ink);box-shadow:var(--hard)}
-.mission{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--sun),10px 10px 0 2px var(--ink);background:var(--bg-2)}
+.mission{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink);background:var(--bg-2)}
 dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 .foot{border-top:2px solid var(--ink)}
 .link{text-decoration-color:var(--accent);text-decoration-thickness:2px}
@@ -80,8 +82,7 @@ dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 /* motion: things drop in a little tilted and bounce into place; the highlighter is swiped across */
 :root{--in-y:34px;--in-rot:-1.6deg;--in-dur:760ms;--in-ease:cubic-bezier(.34,1.56,.64,1);--in-step:90ms}
 @media (prefers-reduced-motion:no-preference){
-  h1 em,.seen h2 em,.cb-h em{background-size:0% 100%;background-repeat:no-repeat;animation:hl-swipe 700ms cubic-bezier(.65,0,.35,1) 450ms forwards}
-  .seen h2 em,.seen .cb-h em{animation-delay:300ms}
+  h1 em{background-size:0% 100%;background-repeat:no-repeat;animation:hl-swipe 700ms cubic-bezier(.65,0,.35,1) 450ms forwards}
   .hero-l > .eyebrow,.phead > .eyebrow{animation:sticker 700ms cubic-bezier(.34,1.56,.64,1) both}
   .hero-l > .eyebrow:hover,.phead > .eyebrow:hover{transform:rotate(3deg) scale(1.05);transition:transform 260ms var(--pop)}
 }
@@ -101,22 +102,22 @@ html[lang="en"] .buy.just::after{content:"I'D BUY!"}
 @media (prefers-reduced-motion:reduce){.buy.just .vote,.buy.just::after{animation:none}.buy.just::after{display:none}}
 .vote[aria-pressed="true"]{box-shadow:3px 3px 0 var(--ink)}
 
-/* the mission is a sunny poster, not a lavender gradient (html: these beat the page's own inline styles) */
-html .mission{background:var(--sun);border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
-html .mission q em{font-style:normal;background:linear-gradient(transparent 60%,var(--bg-2) 60%,var(--bg-2) 92%,transparent 92%)}
+/* the mission is a white poster whose quote carries the page's yellow marker (html: beats the page's inline styles) */
+html .mission{background:var(--bg-2);border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
+html .mission q em{font-style:normal;background:linear-gradient(transparent 60%,var(--sun) 60%,var(--sun) 92%,transparent 92%)}
 html .mission .eyebrow{color:var(--ink)}
 /* essay drop cap in the action violet, heavy */
 html .essay .body p:first-child::first-letter{font-weight:800;color:var(--accent);padding-right:10px}
 
-/* how-it-works numbers are fat, outlined and turn sunny on hover */
+/* how-it-works numbers are fat, outlined and turn violet on hover */
 html .steps > li::before{font-weight:800;color:transparent;-webkit-text-stroke:2px var(--ink);transition:color 220ms var(--pop),transform 220ms var(--pop)}
-html .steps li:hover::before{color:var(--sun);transform:rotate(-4deg) scale(1.06)}
+html .steps li:hover::before{color:var(--accent);transform:rotate(-4deg) scale(1.06)}
 html .fig{border:2px solid var(--ink);font-weight:500;background:var(--bg-2)}
 
 /* the four doors at the bottom of the home page are tiles you can press */
 .disc{gap:16px;border-top:0}
 .disc a,.disc a + a{padding:22px 22px 24px;border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg-2);box-shadow:var(--hard);transition:transform 220ms var(--pop),box-shadow 220ms var(--pop),background-color 160ms ease}
-.disc a:hover{transform:translate(-2px,-2px) rotate(-.6deg);box-shadow:6px 6px 0 var(--ink);background:var(--sun)}
+.disc a:hover{transform:translate(-2px,-2px) rotate(-.6deg);box-shadow:6px 6px 0 var(--ink);background:var(--accent-soft)}
 .disc a:hover b,.disc a:hover .go{color:var(--ink)}
 @media (max-width:900px){.disc{grid-template-columns:repeat(2,minmax(0,1fr))}.disc a:nth-child(3){padding-inline-start:22px;border-inline-start:2px solid var(--ink)}}
 @media (max-width:560px){.disc{grid-template-columns:minmax(0,1fr)}}
@@ -133,16 +134,16 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 .alan-hata{font-weight:500}
 .anahtar input{border:2px solid var(--ink);background:var(--bg-2);box-shadow:var(--hard);transition:background-color 220ms var(--pop),transform 220ms var(--pop)}
 .anahtar input::after{top:2px;left:2px;background:var(--ink);box-shadow:none;transition:transform 300ms var(--pop),background-color 200ms ease}
-.anahtar input:checked{background:var(--sun);border-color:var(--ink)}
-.anahtar input:checked::after{background:var(--ink);transform:translateX(18px)}
+.anahtar input:checked{background:var(--accent);border-color:var(--ink)}
+.anahtar input:checked::after{background:var(--bg-2);transform:translateX(18px)}
 .anahtar:hover input{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
 .anahtar input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .rozet{border:2px solid var(--ink);font-weight:500;box-shadow:2px 2px 0 var(--ink)}
 .rozet[data-durum="taslak"]{background:var(--bg-2);color:var(--ink-2);border-style:dashed}
 .rozet[data-durum="acik"]{background:var(--accent);color:#fff;border-color:var(--ink)}
-.rozet[data-durum="degerlendirme"]{background:var(--sun);color:var(--ink)}
+.rozet[data-durum="degerlendirme"]{background:var(--bg-2);color:var(--warn)}
 .rozet[data-durum="kazanan"]{background:var(--ok);color:#fff}
-.rozet[data-durum="uretim"]{background:var(--pink);color:var(--ink)}
+.rozet[data-durum="uretim"]{background:var(--bg-2);color:var(--ok);border-color:var(--ok)}
 .rozet[data-durum="kapali"]{background:var(--bg-3);color:var(--ink-2);border-style:solid;box-shadow:none}
 .rozet.gri{background:var(--bg-3);color:var(--ink-2)}
 .rozet.yesil{background:var(--bg-2);color:var(--ok);border-color:var(--ok)}
@@ -150,7 +151,7 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 .rozet.kirmizi{background:var(--err);color:#fff;border-color:var(--ink)}
 .rozet.mor{background:var(--accent-soft);color:var(--accent)}
 .tablo-kap{border:2px solid var(--ink);border-radius:var(--r-md);box-shadow:var(--hard);background:var(--bg-2)}
-.tablo th{background:var(--sun);color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--ink)}
+.tablo th{background:var(--bg-3);color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--ink)}
 .tablo th,.tablo td{border-bottom-color:var(--line)}
 .tablo tbody tr:hover td{background:var(--bg-3)}
 .tablo td.sayi{font-weight:500}
@@ -159,7 +160,7 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 .arac-cubugu .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--ink);color:#fff}
 .sekmeler{border-bottom:2px solid var(--ink)}
 .sekmeler .sekme,.sekmeler [role="tab"]{font-weight:500;border-radius:var(--r-sm) var(--r-sm) 0 0;transition:transform 220ms var(--pop),background-color 160ms ease,color 160ms ease}
-.sekmeler .sekme:hover,.sekmeler [role="tab"]:hover{background:var(--sun);color:var(--ink);transform:translateY(-2px)}
+.sekmeler .sekme:hover,.sekmeler [role="tab"]:hover{background:var(--accent-soft);color:var(--accent);transform:translateY(-2px)}
 .sekmeler .sekme[aria-selected="true"],.sekmeler [role="tab"][aria-selected="true"]{background:var(--accent);color:#fff;border:2px solid var(--ink);border-bottom:2px solid var(--accent);margin-bottom:-2px}
 .panel{border:2px solid var(--ink);border-radius:var(--r-md);box-shadow:var(--hard)}
 .panel-bas{background:var(--bg-2);border-bottom:2px solid var(--ink)}
@@ -169,7 +170,7 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 .istat:nth-child(3n+2){background:var(--bg-3)}
 .istat b{font-family:var(--f-serif);font-weight:800}
 .ilerleme{border:2px solid var(--ink);border-radius:999px;background:var(--bg-2);height:14px}
-.ilerleme i{background:repeating-linear-gradient(-45deg,var(--sun) 0 8px,var(--ink) 8px 10px);border-right:2px solid var(--ink)}
+.ilerleme i{background:repeating-linear-gradient(-45deg,var(--accent) 0 8px,var(--accent-active) 8px 10px);border-right:2px solid var(--ink)}
 .bildirim{border:2px solid var(--ink);border-left-width:10px;box-shadow:var(--shadow);font-weight:500;animation:bildirim-zipla 520ms var(--pop) both}
 .bildirim.ok{border-left-color:var(--ok)}
 .bildirim.hata{border-left-color:var(--err)}
@@ -178,12 +179,12 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 .bos{border:2px dashed var(--ink);border-radius:var(--r-md);background:var(--bg-2);box-shadow:var(--hard)}
 .bos b{font-family:var(--f-serif);font-weight:800;font-size:20px;letter-spacing:-.02em}
 .zaman-cizelgesi{border-inline-start:2px solid var(--ink)}
-.zaman-cizelgesi li::before{border:2px solid var(--ink);background:var(--sun);transition:transform 260ms var(--pop)}
+.zaman-cizelgesi li::before{border:2px solid var(--ink);background:var(--bg-2);transition:transform 260ms var(--pop)}
 .zaman-cizelgesi li:last-child::before{background:var(--accent)}
 .zaman-cizelgesi li:hover::before{transform:scale(1.25) rotate(-8deg)}
 .zaman-cizelgesi b{font-weight:700}
 .diyalog{border:2px solid var(--ink);border-radius:var(--r-lg);box-shadow:10px 10px 0 var(--ink)}
-.diyalog > header{background:var(--sun);border-bottom:2px solid var(--ink)}
+.diyalog > header{background:var(--bg-3);border-bottom:2px solid var(--ink)}
 .diyalog > header h2{font-family:var(--f-serif);font-weight:800;font-size:21px;letter-spacing:-.02em}
 .diyalog > footer{border-top:2px solid var(--ink);background:var(--bg-2)}
 .diyalog[open]{animation:dlg-zipla 420ms var(--pop)}
@@ -192,12 +193,12 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 .y-bas .brand b{font-family:var(--f-serif);font-weight:800}
 .y-yan{border-right:2px solid var(--ink)}
 .y-yan a{border:2px solid transparent;font-weight:500;transition:transform 200ms var(--pop),background-color 160ms ease,border-color 160ms ease}
-.y-yan a:hover{background:var(--sun);border-color:var(--ink);color:var(--ink);transform:translate(-2px,-2px);box-shadow:var(--hard)}
+.y-yan a:hover{background:var(--accent-soft);border-color:var(--ink);color:var(--accent);transform:translate(-2px,-2px);box-shadow:var(--hard)}
 .y-yan a[aria-current="page"]{background:var(--accent);color:#fff;border-color:var(--ink);box-shadow:var(--hard)}
 @media (max-width:800px){.y-yan{border-right:0;border-bottom:2px solid var(--ink)}}
 .damga{border:2.5px solid var(--ink);border-radius:8px;background:var(--sun);color:var(--ink);font-weight:800;box-shadow:var(--hard);font-size:13px;letter-spacing:.06em;padding:4px 10px}
 @media (prefers-reduced-motion:reduce){.bildirim,.diyalog[open],.bildirim.ok,.zaman-cizelgesi li::before{animation:none;transition:none}.istat:hover,.y-yan a:hover,.sekmeler .sekme:hover,.sekmeler [role="tab"]:hover,.anahtar:hover input{transform:none}}
 
-/* one accent family: violet acts, sun highlights, green only means "open / paid". Example labels are grey,
+/* one job per colour: violet acts (and hovers), sun marks one highlight per page, green only means "open / paid". Example labels are grey,
    not warning orange, so orange is left for real warnings. */
 .icard .m .ex{color:var(--muted)}

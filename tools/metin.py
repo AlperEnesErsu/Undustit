@@ -5,6 +5,7 @@
   python tools/metin.py yaz        write tr.js back into the pages' HTML, so the static Turkish (what search
                                    engines and no-JS visitors read) matches the dictionary after an edit
   python tools/metin.py denetle    list keys missing from en.js, keys no page or script uses, empty values
+                                   (--kati: exit 1 when anything is listed, for CI)
 
 Keys are <page>.<tag>.<n>; text the scripts build (ud.js, page scripts) uses hand-named keys such as ud.nav.ideas.
 """
@@ -185,11 +186,16 @@ def denetle():
     pre = {k for k in used if k.endswith(('.', 'adim', 'basla')) or k == 'key'}
     used -= pre
     used |= {k for k in tr if any(k.startswith(p) for p in pre if p != 'key') or k.startswith(('ud.kat.', 'ud.ornek.'))}
-    print('missing in en:', sorted(k for k in tr if k not in en) or 'none')
-    print('only in en:', sorted(k for k in en if k not in tr) or 'none')
-    print('unused:', sorted(k for k in tr if k not in used and not k.startswith('ud.dyn')) or 'none')
-    print('used but missing in tr:', sorted(k for k in used if k not in tr) or 'none')
-    print('empty:', sorted(k for d in (tr, en) for k, v in d.items() if not str(v).strip()) or 'none')
+    checks = {
+        'missing in en': sorted(k for k in tr if k not in en),
+        'only in en': sorted(k for k in en if k not in tr),
+        'unused': sorted(k for k in tr if k not in used and not k.startswith('ud.dyn')),
+        'used but missing in tr': sorted(k for k in used if k not in tr),
+        'empty': sorted(k for d in (tr, en) for k, v in d.items() if not str(v).strip()),
+    }
+    for name, keys in checks.items(): print(name + ':', keys or 'none')
+    # --kati (CI): any finding fails the run
+    if '--kati' in sys.argv and any(checks.values()): sys.exit(1)
 
 
 if __name__ == '__main__':

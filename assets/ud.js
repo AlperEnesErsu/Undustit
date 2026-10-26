@@ -535,7 +535,8 @@ function mountForm(host, opts={}){
       <button type="button" class="btn sig if-next" aria-controls="${id}-more" aria-expanded="false">${T('ud.form.devam')} ${ICON.arrow}</button>
     </div>
     <div class="if-more" id="${id}-more"><div><div class="if-body">
-      <div class="if-field" role="group" aria-labelledby="${id}-cl"><span id="${id}-cl">${T('ud.form.kategori')}</span><div class="chips if-cats"></div></div>
+      <div class="if-field if-vaka-alan" role="group" aria-labelledby="${id}-vl" hidden><span id="${id}-vl">${T('ud.form.vaka')} <small>${T('ud.form.vaka.not')}</small></span><div class="chips if-vaka"></div></div>
+      <div class="if-field" role="group" aria-labelledby="${id}-cl"><span id="${id}-cl">${T('ud.form.kategori')} <small class="if-cat-not"></small></span><div class="chips if-cats"></div></div>
       <details class="if-detay"><summary>${T('ud.form.detay')} <small>${T('ud.form.detay.not')}</small></summary><div class="if-detay-in">
       <div class="if-two">
         <label class="if-field"><span>${T('ud.form.problem')} <small>${T('ud.form.kisa')}</small></span><textarea name="problem" maxlength="400" placeholder="${T('ud.form.problem.ipucu')}"></textarea></label>
@@ -551,21 +552,29 @@ function mountForm(host, opts={}){
     <div class="if-done" tabindex="-1"></div>
   </form>`;
   const f = $('form', host), pitch = $('.if-pitch', f), count = $('.if-count', f), next = $('.if-next', f), status = $('.if-status', f);
-  let cat = '';
-  const cats = $('.if-cats', f);
-  const pick = c => { cat = c; $$('.chip', cats).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c))); };
-  // open cases arrive from the database; the chips are drawn again then, keeping what was picked
-  const paintCats = () => {
-    cats.replaceChildren();
-    openCases().map(c => [c.short, true]).concat(CATS.map(c => [c, false])).forEach(([c, isCase]) =>
-      cats.append(el('button', { type:'button', class:'chip' + (isCase ? ' case' : ''), 'aria-pressed': String(c === cat), 'data-cat':c, text:catName(c), onclick(){ pick(c); } })));
+  // Two separate questions: which case it is for (or none), and what kind of product it is. A case idea
+  // needs no category (the case groups it), so on a case page the sentence alone is enough.
+  let cat = '', vaka = opts.caseId || '';
+  const cats = $('.if-cats', f), vakalar = $('.if-vaka', f), vakaAlan = $('.if-vaka-alan', f), catNot = $('.if-cat-not', f);
+  const chip = (row, key, value, text, on, cls) => row.append(el('button', { type:'button', class:'chip' + (cls ? ' ' + cls : ''), 'aria-pressed': String(on), ['data-' + key]: value, text, onclick(){
+    if (key === 'cat') pickCat(value); else pickVaka(value); } }));
+  const mark = (row, key, v) => $$('.chip', row).forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v)));
+  const pickCat = c => { cat = c; mark(cats, 'cat', c); };
+  const pickVaka = v => { vaka = v; mark(vakalar, 'vaka', v); catNot.textContent = vaka ? T('ud.form.istege') : ''; };
+  const paint = () => {
+    cats.replaceChildren(); CATS.forEach(c => chip(cats, 'cat', c, catName(c), c === cat));
+    // the case row: only while a case is open, and not on a case's own page (the case is already known)
+    const acik = openCases();
+    // drop a chosen case only once the list has arrived and it is really not open
+    if (vaka && acik.length && !acik.some(c => c.id === vaka)) vaka = '';
+    vakaAlan.hidden = !acik.length || !!opts.caseId;
+    vakalar.replaceChildren();
+    acik.forEach(c => chip(vakalar, 'vaka', c.id, catName(c.short), c.id === vaka, 'case'));
+    chip(vakalar, 'vaka', '', T('ud.form.vaka.yok'), !vaka);
+    catNot.textContent = vaka ? T('ud.form.istege') : '';
   };
-  paintCats();
-  Store.cases().then(() => {
-    const pre = opts.caseId && openCases().find(c => c.id === opts.caseId);
-    if (pre && !cat) cat = pre.short;
-    paintCats();
-  });
+  paint();
+  Store.cases().then(paint);
   f.handle.value = handleGet();
   const paintFee = () => { $('.if-fee', f).innerHTML = feeLine(); };
   Store.sub(paintFee);
@@ -576,9 +585,9 @@ function mountForm(host, opts={}){
     count.classList.toggle('near', n > 120 && n <= 140); count.classList.toggle('over', n > 140);
   };
   pitch.addEventListener('input', () => { len(); if (pitch.value.trim().length >= 3 && opts.autoOpen !== false) open(); });
-  // only the sentence and a category are needed: with a category already picked (a case page), Enter sends
+  // only the sentence plus a case or a category is needed: on a case page Enter sends right away
   const toCat = () => ($('.chip[aria-pressed="true"]', cats) || $('.chip', cats)).focus();
-  pitch.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); open(); if (cat && pitch.value.trim().length >= 10) f.requestSubmit(); else toCat(); } });
+  pitch.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); open(); if ((cat || vaka) && pitch.value.trim().length >= 10) f.requestSubmit(); else toCat(); } });
   next.onclick = () => { open(); if (pitch.value.trim().length < 10) pitch.focus(); else toCat(); };
   if (opts.open) open();
   const say = (t, bad) => { status.textContent = t; status.classList.toggle('bad', !!bad); };
@@ -588,13 +597,14 @@ function mountForm(host, opts={}){
     const fail = (msg, node) => { say(msg, true); open(); node && node.focus(); };
     if (title.length < 10) return fail(T('ud.form.hata.kisa'), pitch);
     if (title.length > 140) return fail(T('ud.form.hata.uzun'), pitch);
-    if (!cat) return fail(T('ud.form.hata.kategori'), $('.chip', cats));
+    if (!cat && !vaka) return fail(T('ud.form.hata.kategori'), $('.chip', cats));
     if (!Store.canWrite) return fail(T('ud.form.hata.izin'));
     const handle = f.handle.value.trim(); handleSet(handle);
     say(T('ud.form.gonderiliyor'));
     $('[type=submit]', f).disabled = true;
-    const isCase = openCases().find(c => c.short === cat);
-    Store.addIdea({ title, cat, caseId: isCase ? isCase.id : null, problem:f.problem.value.trim(), solution:f.solution.value.trim(), feats, handle }).then(k => {
+    const isCase = openCases().find(c => c.id === vaka);
+    // a case idea without a category keeps the case's label as its category, as older ideas do
+    Store.addIdea({ title, cat: cat || (isCase ? isCase.short : ''), caseId: isCase ? isCase.id : null, problem:f.problem.value.trim(), solution:f.solution.value.trim(), feats, handle }).then(k => {
       const end = new Date(Date.now() + TERMS.voteDays*DAY);
       const done = $('.if-done', f);
       done.innerHTML = `<span class="eyebrow k">${T('ud.gonderildi.etiket')}</span><h3>${esc(title)}</h3>
@@ -605,7 +615,7 @@ function mountForm(host, opts={}){
       const sh = $('.share', done); sh.onclick = () => { olcu('Paylaş', { yer:'gönderim' }); shareIdea(title, k, sh); };
       done.append(haberForm(k, 'fikrim'));
       olcu('Fikir gönderildi', { vaka: isCase ? isCase.id : 'yok' });
-      $('.again', done).onclick = () => { f.reset(); $('.if-detay', f).open = false; f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
+      $('.again', done).onclick = () => { f.reset(); pickCat(''); $('.if-detay', f).open = false; f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
       opts.onSent && opts.onSent(k);
     }).catch(err => {
       $('[type=submit]', f).disabled = false;
@@ -615,7 +625,7 @@ function mountForm(host, opts={}){
   if (opts.focus) setTimeout(() => pitch.focus({ preventScroll:true }), 50);
   const useCase = id => {
     const c = openCases().find(x => x.id === id); if (!c) return;
-    pick(c.short);
+    pickVaka(c.id);
     open(); f.scrollIntoView({ block:'center', behavior: reduce.matches ? 'auto' : 'smooth' }); pitch.focus({ preventScroll:true });
   };
   return { focus: () => pitch.focus(), open, useCase };
@@ -656,6 +666,14 @@ function mountCase(host, opts={}){
     if (opts.form) a.addEventListener('click', e => { e.preventDefault(); opts.form.useCase(c.id); });
     Store.sub(() => { $('.cb-n', host).textContent = String(Store.ideas().filter(i => inCase(i, c)).length); });
   });
+}
+// an idea's label: its case (when it has one), then its own category; older case ideas carry only the case
+function etiket(i){
+  const vk = i.caseId && (CASES.find(c => c.id === i.caseId) || (i.caseId === V01.id ? V01 : null));
+  const parts = [];
+  if (vk) parts.push(catName(vk.short));
+  if (i.cat && (!vk || i.cat !== vk.short)) parts.push(catName(i.cat));
+  return parts.join(' · ');
 }
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
@@ -764,7 +782,7 @@ function buyCtl(i){
 function card(i, ix, opts={}){
   const voting = i.left > 0;
   const meta = el('div', { class:'m' }, [
-    el('span', { class:'c', text:catName(i.cat) }),
+    el('span', { class:'c', text:etiket(i) }),
     i.ex ? el('span', { class:'ex', text:T('ud.kart.ornek') }) : el('span', { text: voting ? T('ud.kart.kaldi', { n:i.left }) : T('ud.kart.bitti') }),
     !i.ex && i.buyers ? el('span', { class:'p', text:T('ud.kart.ort', { fiyat:tl(i.avg) }) }) : null,
     !i.ex && i.noteCount ? el('span', { text: T('ud.kart.yorum', { n:i.noteCount }) }) : null,
@@ -855,7 +873,7 @@ function openIdea(key, push=true){
   const paint = () => {
     const it = Store.ideas().find(x => x.key === key); if (!it) return;
     const mine = Store.myRate(key);
-    dlg.innerHTML = `<header><span class="eyebrow">${esc(catName(it.cat))} · ${it.left > 0 ? T('ud.pencere.topluyor', { n:it.left }) : T('ud.kart.bitti')}</span><span class="hd-r"><button type="button" class="btn alt sm sh">${T('ud.paylas')}</button><button type="button" class="x" aria-label="${T('ud.kapat')}">${ICON.x}</button></span></header>
+    dlg.innerHTML = `<header><span class="eyebrow">${esc(etiket(it))} · ${it.left > 0 ? T('ud.pencere.topluyor', { n:it.left }) : T('ud.kart.bitti')}</span><span class="hd-r"><button type="button" class="btn alt sm sh">${T('ud.paylas')}</button><button type="button" class="x" aria-label="${T('ud.kapat')}">${ICON.x}</button></span></header>
     <div class="in">
       <div style="display:grid;gap:14px"><h2 id="idlg-h">${esc(it.title)}</h2>
         <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center"><span class="dv"></span>

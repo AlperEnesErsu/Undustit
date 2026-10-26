@@ -379,3 +379,20 @@ Yol haritası: `docs/yol-haritasi.md`. Jüri 4. tur: eleştirmen 7,0 (`.jury/127
 - **Ana sayfa ve fikirlerdeki Perşembe hapı** artık bu sayfaya giden bir bağlantı.
 - **Fikir başına paylaşım önizlemesi** (WhatsApp/LinkedIn başlık ve görsel) alan adına ertelendi: GitHub Pages sunucu
   çalıştırmaz, Supabase Edge Function ise kendi alanında HTML'i düz metin olarak döndürür.
+
+## Anlatıcı animasyonlar: Vakalar, Fikirler, Hikâye (26 Ekim 2026)
+
+Sitenin mantığını okumadan anlatan üç kısa çizim, sayfa başlığındaki sabit çizimin yerinde (`assets/anlatim.js`,
+`assets/anlatim.css`; yalnız bu üç sayfada yüklenir). Motor ana sayfadaki "eskizden rafa" ile aynı: ekrana girince
+bir kez, altında adımlar, sonda "Tekrar oynat", hareketi azaltta ya da aynı oturumda ikinci ziyarette son kare.
+- **Vakalar (6 adım, ~7 sn):** stok bekliyor → "VAKA 01" etiketi → üç fikir balonu → talep çubukları, en çok istenen
+  dolar → deneme partisi (1.000 adet) → raf ve "%40 fikir sahibine" kartı.
+- **Fikirler (4 adım, ~6 sn):** altı fikir satırı → "alırdım" sayıları ve fiyat etiketleri → liste talebe göre yeniden
+  dizilir → ilk beş "Perşembe adayları" bölgesinde, altıncı geri çekilir.
+- **Hikâye (5 adım, ~6 sn):** tozlu defter (fikir) → tozlu kasa (stok) → bez geçer, "un · dust · it" → ikisi aynı
+  masada → rafta bir ürün, "fikir + stok = ürün".
+- **Dil:** çizimdeki her öğe hangi adımda geleceğini (`data-a`), gideceğini (`data-x`) ya da çizileceğini (`data-d`)
+  kendisi söyler; CSS'te adım başına tek kural var, hikâyeye özgü hareketler (sıralama, bez, masa) ayrıca.
+  Girişler `--ease-out`, ekranda yer değiştirme `--ease-io`; yalnız `transform`, `opacity`, çizgi çizimi.
+- **Telefon:** "Tekrar oynat" köşede yalnız simge (yazısı ekran okuyucu için duruyor), çizimin son satırını örtmesin diye.
+- **Erişilebilirlik:** çizim `aria-hidden`; her hikâyenin bir cümlelik metin karşılığı `.sr` içinde.

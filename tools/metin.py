@@ -179,6 +179,8 @@ def denetle():
         for spec in re.findall(r'data-ta="([^"]+)"', s): used |= {p.split(':')[1] for p in spec.split(';')}
         used |= set(re.findall(r"\bT\('([^']+)'", s))
     used |= set(re.findall(r"\bT\('([^']+)'", read('assets/ud.js')))
+    # the explainer stories name their keys as plain strings ('anl.vaka.s1', ...)
+    used |= set(re.findall(r"'(anl\.[\w.]+)'", read('assets/anlatim.js')))
     # keys built in code ('ud.akis.adim' + n, 'ud.not.' + kind) count as prefixes
     pre = {k for k in used if k.endswith(('.', 'adim', 'basla')) or k == 'key'}
     used -= pre

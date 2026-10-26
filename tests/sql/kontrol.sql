@@ -1,4 +1,4 @@
--- Checks for supabase/*.sql: run after the five migrations (tests/sql/calistir.sh). Every block raises an
+-- Checks for supabase/*.sql: run after the six migrations (tests/sql/calistir.sh). Every block raises an
 -- error when a rule does not hold, so psql -v ON_ERROR_STOP=1 fails the run. Users: A writes, B and C visit,
 -- D is an admin. Supabase grants table rights to these roles itself; plain Postgres needs it here.
 grant select, insert, update, delete on all tables in schema public to anon, authenticated;
@@ -78,6 +78,31 @@ end $$;
 -- changing a price you already gave is not a new demand; the daily cap counts only new rows
 insert into public.talepler (fikir_id, uye, fiyat) values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000c', 350)
   on conflict (fikir_id, uye) do update set fiyat = excluded.fiyat;
+
+-- photos: a visitor stores only in basvuru/<own id>/, five a day; only the admin stores case photos
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000c';
+insert into storage.objects (bucket_id, name) select 'gorseller', 'basvuru/00000000-0000-0000-0000-00000000000c/' || n || '.jpg' from generate_series(1, 5) n;
+do $$ begin
+  begin
+    insert into storage.objects (bucket_id, name) values ('gorseller', 'basvuru/00000000-0000-0000-0000-00000000000c/6.jpg');
+    raise exception 'günlük görsel sınırı çalışmıyor';
+  exception when insufficient_privilege then null; end;
+  begin
+    insert into storage.objects (bucket_id, name) values ('gorseller', 'basvuru/00000000-0000-0000-0000-00000000000b/x.jpg');
+    raise exception 'ziyaretçi başkasının klasörüne görsel koyabiliyor';
+  exception when insufficient_privilege then null; end;
+  begin
+    insert into storage.objects (bucket_id, name) values ('gorseller', 'vaka/00000000-0000-0000-0000-00000000000c/x.jpg');
+    raise exception 'ziyaretçi vaka görseli yükleyebiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000a';
+do $$ begin
+  insert into public.vaka_basvurulari (firma, eposta, stok, gorsel) values ('Görselli', 'g@example.com', 'stok', 'javascript:alert(1)');
+  raise exception 'başvuruya https olmayan görsel adresi girilebiliyor';
+exception when check_violation then null; end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+insert into storage.objects (bucket_id, name) values ('gorseller', 'vaka/00000000-0000-0000-0000-00000000000d/v.jpg');
 
 -- the admin reads everything and can hide an idea; then visitors no longer see it
 set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';

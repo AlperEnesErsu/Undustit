@@ -40,7 +40,7 @@ assets/anlatim.js   Vakalar, Fikirler, Hikâye sayfalarındaki anlatıcı animas
 assets/ayar.js      ayarlar (aşağıda)
 assets/metin/       tr.js ve en.js: sitedeki her yazı (anahtar → metin)
 assets/stil/        görünümler (Oyuncu varsayılan, Kâğıt ?stil=kagit); stil.js seçer
-supabase/           şema ve migration'lar (sırayla 1–5), Edge Function, KURULUM.md
+supabase/           şema ve migration'lar (sırayla 1–6), Edge Function, KURULUM.md
 tools/metin.py      metin aracı (etiketle, yaz, denetle)
 tests/              Playwright testleri (e2e/), SQL testleri (sql/), test sunucusu
 docs/               ürün sözleşmesi, açılış içerik kiti, yol haritası, devir el kitabı
@@ -89,7 +89,7 @@ Ticari oranlar (ücret, gün, paylar, eşik, yayın saati) `assets/ud/temel.js` 
 ## Veritabanı
 
 `supabase/KURULUM.md` adım adım anlatır. Sıra: `sema.sql`, `2-fikirler.sql`, `3-hiz.sql`, `4-acilis.sql`,
-`5-guven.sql` (hepsi yeniden çalıştırılabilir). Ziyaretçi anonim oturumla yazar; satır düzeyinde güvenlik (RLS)
+`5-guven.sql`, `6-gorsel.sql` (hepsi yeniden çalıştırılabilir). Ürün görselleri Supabase Storage'da, `gorseller` kovasında. Ziyaretçi anonim oturumla yazar; satır düzeyinde güvenlik (RLS)
 herkesin yalnız kendi satırlarını değiştirmesine izin verir, günlük sınırlar trigger'larla. E-posta bildirimi:
 `supabase/functions/haber-gonder` (Resend).
 

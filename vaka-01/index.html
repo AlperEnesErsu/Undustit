@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title data-t="vaka.title.1">Vaka 01 · Boltun: Bir milyon cıvata · Undustit</title>
 <meta name="description" content="Bir fabrikanın deposunda bir milyon M10 × 90 cıvata bekliyor. Onları kullanan bir ürün fikri yaz; kazanan fikirle 1.000 adet üretilir." data-ta="content:vaka.attr.1">
-<meta name="theme-color" content="#FFF6E9">
+<meta name="theme-color" content="#FCF9F3">
 <link rel="canonical" href="https://alperenesersu.github.io/Undustit/vaka-01/">
 <link rel="alternate" hreflang="tr" href="https://alperenesersu.github.io/Undustit/vaka-01/">
 <link rel="alternate" hreflang="en" href="https://alperenesersu.github.io/Undustit/vaka-01/?dil=en">
@@ -123,6 +123,7 @@
       <div class="spec">
       <div style="display:grid;gap:16px;align-content:start">
         <p class="lead" style="font-size:16px" data-t="vaka.p.6">Değerler EN 1993-1-8 Tablo 3.4'e göre hesaplandı. Kendi projende kendi kontrolünü yap.</p>
+        <figure class="foy-gorsel yok" id="foy-gorsel"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 8h20v6H14z"/><path d="M18 14v26M30 14v26M18 40h12"/><path d="M18 20l12 4M18 26l12 4M18 32l12 4"/></svg><figcaption data-t="vaka.foy.yok">Ürün fotoğrafı yakında</figcaption></figure>
       </div>
       <dl>
         <dt data-t="vaka.dt.5">Tip</dt><dd data-t="vaka.dd.3">Flanşlı cıvata + flanşlı somun</dd>
@@ -168,6 +169,11 @@ starters.forEach(([l, t]) => host.append(UD.el('button', { type:'button', class:
   const p = document.querySelector('#form .if-pitch'); p.value = t; p.dispatchEvent(new Event('input')); form.useCase(CASE.id); p.setSelectionRange(t.length, t.length);
 } })));
 UD.mountBoard(document.getElementById('board'), { filter:i => UD.inCase(i, CASE), examples:false, emptyTitle:UD.T('vaka.js.bos'), emptyNote:UD.T('vaka.js.bos.not') });
+// the product photo comes from the case row (yonetim/ adds it); until then the frame stays empty
+UD.Store.cases().then(cs => {
+  const v = cs.find(c => c.id === CASE.id), fig = document.getElementById('foy-gorsel');
+  if (v && v.gorsel){ fig.classList.remove('yok'); fig.replaceChildren(UD.el('img', { src:v.gorsel, alt:UD.T('vaka.foy.alt'), loading:'lazy', decoding:'async' })); }
+});
 UD.Store.sub(() => { document.getElementById('n-ideas').textContent = String(UD.Store.ideas().filter(i => UD.inCase(i, CASE)).length); });
 </script>
 </body>

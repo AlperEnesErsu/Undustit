@@ -130,6 +130,14 @@ döner (fikirleri, fiyatları, yorumları onda kalır). Başka cihazda aynı e-p
    bağlantıya tıklayın: sayfa "… ile girdin" demeli ve fikir hâlâ "Fikirlerin" altında olmalı. Sonra başka bir
    tarayıcıda "Giriş yap" ile aynı e-postaya bağlantı isteyin.
 
+## 11. Ürün görselleri
+
+`6-gorsel.sql`'i SQL Editor'da bir kez çalıştırın. Herkese açık `gorseller` kovasını (en çok 5 MB, JPEG/PNG/WebP)
+ve kuralları kurar: vaka görselini yalnız yönetici yükler (yönetim > vaka > Bilgiler > Ürün görseli), "Vakanı aç"
+başvurusu tek bir ürün fotoğrafı ekleyebilir (kişi başı günde en çok 5). Site fotoğrafı yüklemeden önce tarayıcıda
+küçültür (uzun kenar 1600 px). Kontrol: **Storage** altında `gorseller` görünmeli; bir vakaya görsel yükleyip
+vaka sayfasındaki "Teknik föy"e bakın.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

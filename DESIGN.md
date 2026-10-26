@@ -407,3 +407,19 @@ bir kez, altında adımlar, sonda "Tekrar oynat", hareketi azaltta ya da aynı o
 - **Çizim:** ahşap tahta ve katlanma hareketi yerine sade bir nesne (kubbeli gövde, yan yüz, kadran). Titrek
   eskizden temiz çizgiye, mint renge, "en / boy" ölçülerine. Etiketler "İsim ✓ / Renk ✓ / Ambalaj ✓", kutuda "Ürünün".
 - Ön satış eşiği `TERMS.presale[0]`'dan okunur.
+
+## Faz 4: devredilebilirlik (26 Ekim 2026)
+
+- **Uçtan uca testler** (`tests/e2e/`, Playwright 1.64): 15 sayfanın açılması (başlık, JS hatası yok, yatay taşma yok),
+  fikir akışı (vaka sayfasında cümle + Enter, kategorisiz Enter), hazır fiyatla "alırdım", "Benim" ve Perşembe'ye
+  uzaklık, örnek kart notu, pencere ve `?f=`, bildir → yönetim → gizle, iletişim, vaka başvurusu, Perşembe sayacı
+  ve canlı durumu (saat sabitlenerek), hareketi azaltta son kareler. Masaüstü ve telefonda 64 test, ~7 sn.
+  Testler `ayar.js`'i tarayıcıda yerel moda çevirir; canlı veritabanına dokunmaz. Akış testleri hareketi azaltla
+  koşar (kaydırınca beliren bloklar tıklamayı geciktirmesin).
+- **SQL testleri** (`tests/sql/`): Supabase'in `auth` şemasının taklidi, beş migration (4 ve 5 iki kez), sonra
+  görünüm toplamları, gizli fikir, RLS (başvuru, mesaj, e-posta, bildirim), tekil bildirim, günlük sınırlar,
+  yönetici gizlemesi. Bir kural bozulunca hata verir (denendi).
+- **CI** (`.github/workflows/kontrol.yml`): her PR'da ve `main`'e her push'ta metin denetimi (`--kati`), SQL
+  (Postgres 15) ve Playwright.
+- **Belgeler:** `README.md` (İngilizce özetli), `docs/devir.md` (varlıklar, gizli bilgiler, maliyet, devir adımları).
+- Playwright 1.48 Node 24'te test dosyalarını yüklerken takılıyordu; 1.64.0'a geçildi.

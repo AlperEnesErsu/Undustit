@@ -50,6 +50,9 @@ testler) ve bunları kimin nasıl yönettiği. "Basit görünüyor" hissinin as�
 4. **Yönetim raporları:** gelir, dönüşüm, vaka bazında talep tutarı. Alıcıya gösterilecek tablo bu.
 
 ## Faz 4: Devredilebilirlik (yaklaşık 1 hafta)
+
+> Durum (26 Ekim 2026): testler, CI, README ve devir el kitabı yapıldı. Kalan: `ud.js`'in modüllere bölünmesi
+> ve derleme adımı, hata izleme (Sentry hesabı gerekir), staging ortamı.
 - Kodun düzenlenmesi: `ud.js` modüllere bölünür, küçük bir derleme adımı (Vite) eklenir, kodda tek bir
   ayar kaynağı olur.
 - Testler: ana akışlar için Playwright uçtan uca testleri (fikir yaz, alırdım, başvuru, yönetim). Her PR'da

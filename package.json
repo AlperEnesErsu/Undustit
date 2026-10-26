@@ -1,0 +1,13 @@
+{
+  "name": "undustit",
+  "private": true,
+  "description": "Undustit: a community product workshop (static site + Supabase). The site needs no build; this file only runs the checks.",
+  "scripts": {
+    "test": "playwright test",
+    "test:metin": "python tools/metin.py denetle --kati",
+    "sunucu": "node tests/sunucu.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0"
+  }
+}

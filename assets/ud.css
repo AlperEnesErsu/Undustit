@@ -239,6 +239,15 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 /* while a price is being picked the control takes its own row under the title */
 .icard:has(.buy-f){grid-template-columns:auto minmax(0,1fr)}.icard:has(.buy-f) .buy{grid-column:2;justify-items:start;gap:8px}
 .buy-q{display:flex;flex-wrap:wrap;gap:6px}
+/* "haber ver": one optional e-mail field under a sent idea or a backed one */
+.haber{display:grid;gap:8px;padding-top:14px;border-top:1px dashed var(--line-2)}
+.haber p{font-size:14px;color:var(--ink-2)}
+.haber-r{display:flex;flex-wrap:wrap;gap:8px}
+.haber input{flex:1 1 200px;min-width:0;min-height:40px;border:1px solid var(--line-2);border-radius:var(--r-sm);padding:0 12px;background:var(--bg);font-size:15px}
+.haber input:focus{outline:none;border-color:var(--accent)}
+.haber input[aria-invalid="true"]{border-color:var(--err)}
+.haber-d{font-size:13px;color:var(--err);min-height:1em}
+.haber-tamam{font-size:14px;color:var(--ok)}
 .buy-q .chip{min-height:38px;font-family:var(--f-mono);font-size:14px}
 .vote.pop svg{animation:pop .4s var(--ease-out)}
 @keyframes pop{40%{transform:translateY(-5px) scale(1.2)}}

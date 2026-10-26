@@ -79,6 +79,8 @@
     }));
     return out;
   }
+  const BASVURU_LS = 'udv-basvuru';
+  function basvuruOku(){ try { return JSON.parse(localStorage.getItem(BASVURU_LS) || '{}') || {}; } catch(e){ return {}; } }
   const yerel = {
     liste: async () => Object.values(oku().vakalar),
     al: async id => oku().vakalar[id] || null,
@@ -88,7 +90,10 @@
     gecmisEkle: async (id, satir) => { const d = oku(); (d.gecmis[id] = d.gecmis[id] || []).push(satir); yaz(d); },
     gecmis: async id => (oku().gecmis[id] || []).slice().sort((a,b) => Date.parse(a.zaman) - Date.parse(b.zaman)),
     fikirler: async vakaId => yerelFikirler(vakaId),
-    gizle: async (id, gizli) => { const d = oku(); if (gizli) d.gizli[id] = true; else delete d.gizli[id]; yaz(d); }
+    gizle: async (id, gizli) => { const d = oku(); if (gizli) d.gizli[id] = true; else delete d.gizli[id]; yaz(d); },
+    // "Vakanı aç" başvuruları: sitenin formu yerelde buraya yazar (ud.js Store.basvur)
+    basvurular: async () => Object.values(basvuruOku()).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman))),
+    basvuruDurum: async (id, durum) => { const d = basvuruOku(); if (!d[id]) throw new Error('Başvuru bulunamadı'); d[id].durum = durum; try { localStorage.setItem(BASVURU_LS, JSON.stringify(d)); } catch(e){} }
   };
 
   // ----------------------------------------------------------- supabase depo
@@ -122,7 +127,15 @@
     gizle: async (id, gizli) => {
       const r = await sorgu(istemci().from('fikirler').update({ gizli }).eq('id', id).select('id'));
       if (!r || !r.length) throw new Error('Fikir bulunamadı ya da yetkiniz yok');
-    }
+    },
+    basvurular: async () => {
+      const q = istemci().from('vaka_basvurulari').select('*').order('zaman', { ascending:false }).limit(200);
+      const { data, error } = await q;
+      if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // 4-acilis.sql henüz çalışmadı
+      if (error) throw hata(error);
+      return data;
+    },
+    basvuruDurum: async (id, durum) => { await sorgu(istemci().from('vaka_basvurulari').update({ durum }).eq('id', id)); }
   };
   const depo = SB_URL ? uzak : yerel;
 
@@ -329,6 +342,17 @@
         alici += fs.reduce((t, f) => t + f.alici, 0);
       }
       return { vaka:{ toplam:liste.length, acik:liste.filter(v => v.durum === 'acik').length }, fikir, alici };
+    },
+
+    basvurular: {
+      DURUMLAR: ['yeni','incelendi','kabul','red'],
+      DURUM_ADI: { yeni:'Yeni', incelendi:'İncelendi', kabul:'Kabul', red:'Ret' },
+      async liste(){ yetkiTest(); return depo.basvurular(); },
+      async durum(id, durum){
+        yetkiTest();
+        if (!UDV.basvurular.DURUMLAR.includes(durum)) throw new Error('Bilinmeyen durum');
+        await depo.basvuruDurum(str(id), durum);
+      }
     },
 
     async csv(vakaId){

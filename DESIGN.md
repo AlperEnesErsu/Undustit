@@ -368,3 +368,14 @@ Yol haritası: `docs/yol-haritasi.md`. Jüri 4. tur: eleştirmen 7,0 (`.jury/127
 - **Perşembe'ye uzaklık (`hedef`):** adaylar açık fikirlerin "alırdım"a göre ilk 5'i (ana sayfanın 2. turu). Aday
   olmayana "n kişi daha alırdım derse adaylara girer"; fikir penceresinde ve "Benim"de görünür.
 - Gerçek ziyaretçiye e-posta için özel SMTP şart (KURULUM 10).
+
+## Faz 2, 2. bölüm: Perşembe sayfası (26 Ekim 2026)
+
+- **`persembe/`:** sonraki yayın (tarih ve sayaç), "Yayına git" (`ayar.js` `yayin` doluyken), "Takvime ekle" (haftalık
+  .ics, UTC 17:00–18:30: İstanbul'da yaz saati olmadığı için hep 20:00–21:30) ve Google Takvim; bu haftanın beş
+  adayı (ana sayfanın 2. turuyla aynı); yayının üç adımı.
+- **Canlı durum:** `liveNow()` başlangıçtan `TERMS.liveMinutes` (90) dakika boyunca doğru. Sayaç ve sayfa "Şimdi canlı"
+  der, turuncuya döner.
+- **Ana sayfa ve fikirlerdeki Perşembe hapı** artık bu sayfaya giden bir bağlantı.
+- **Fikir başına paylaşım önizlemesi** (WhatsApp/LinkedIn başlık ve görsel) alan adına ertelendi: GitHub Pages sunucu
+  çalıştırmaz, Supabase Edge Function ise kendi alanında HTML'i düz metin olarak döndürür.

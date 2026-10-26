@@ -117,6 +117,24 @@ table.split{width:100%;border-collapse:collapse;font-size:15px}
     </div>
   </section>
 
+  <section class="sec" id="vaka-pay" aria-labelledby="vp-h">
+    <div class="wrap pay">
+      <div style="display:grid;gap:18px;align-content:start">
+        <span class="eyebrow" data-t="nasil.vp.etiket">Vakalarda</span>
+        <h2 id="vp-h" data-t="nasil.vp.baslik">Fazla stokta <em>pay.</em></h2>
+        <p class="lead" style="font-size:16px" data-t="nasil.vp.metin">Vakada malzeme hazır, fiyatı da belli: firmanın açık taban fiyatı. Satış fiyatının bu tabanın üstünde kalan kısmı, yani kâr bölünür. Ürünü değiştirmek için masraf yapıldıysa, bölüşmeden önce o masraf ödeyene geri döner.</p>
+        <div class="big2"><div><b id="vp-m"></b><span data-t="nasil.vp.mucit">Fikir sahibine</span></div><div><b id="vp-s"></b><span data-t="nasil.vp.slot">İsim, görünüm, ambalaj ve satış kanalı önerisi seçilenlere</span></div></div>
+      </div>
+      <div style="display:grid;gap:18px">
+        <table class="split">
+          <caption data-t="nasil.vp.ornek">Örnek: 1.000 adet satıldı, her birinde taban fiyatın üstünde 50 ₺ kaldı.</caption>
+          <thead><tr><th scope="col" data-t="nasil.th.1">Katkı</th><th scope="col" data-t="nasil.vp.th">Kârdan</th><th scope="col" data-t="nasil.th.3">Örnek</th></tr></thead>
+          <tbody id="vp-split"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <section class="sec" aria-labelledby="o-h">
     <div class="wrap">
       <h2 id="o-h" data-t="nasil.h2.3">Her şey <em>açıkta.</em></h2>
@@ -140,6 +158,13 @@ const pool = 1000 * 400 * T.shareDirect / 100;
 const rows = [['sahip',50],['tasarim',15],['isim',10],['ambalaj',10],['kanal',10],['slogan',5]].map(([k,p]) => [UD.T('nasil.js.pay.' + k), UD.T('nasil.js.pay.' + k + '.not'), p]);
 const tb = document.getElementById('split');
 rows.forEach(([a,b,p]) => tb.insertAdjacentHTML('beforeend', `<tr><th scope="row">${a}<small>${b}</small></th><td>${UD.pct(p)}</td><td>${UD.tl(pool*p/100)}</td></tr>`));
+// cases split the profit above the stock's floor price (UD.TERMS.caseShare), the rest stays with Undustit
+const CS = T.caseShare, slot = Object.values(CS.slots).reduce((a, b) => a + b, 0), kar = 1000 * 50;
+document.getElementById('vp-m').textContent = UD.pct(CS.inventor);
+document.getElementById('vp-s').textContent = UD.pct(slot);
+const vp = document.getElementById('vp-split');
+[['sahip', CS.inventor], ...Object.entries(CS.slots), ['undustit', 100 - CS.inventor - slot]].forEach(([k, p]) =>
+  vp.insertAdjacentHTML('beforeend', `<tr><th scope="row">${UD.T('nasil.js.pay.' + k)}<small>${UD.T('nasil.js.pay.' + k + '.not')}</small></th><td>${UD.pct(p)}</td><td>${UD.tl(kar*p/100)}</td></tr>`));
 UD.mountProc(document.getElementById('proc'));
 </script>
 </body>

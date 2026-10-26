@@ -86,9 +86,7 @@ UD.Store.cases().then(() => [null].concat(UD.CASES, UD.CATS).forEach((c, ix) => 
   cats.append(b);
 }));
 UD.mountThu(document.getElementById('thu'));
-// a shared link (?f=<idea>) opens that idea; the live store can take a moment to arrive
-const f = new URLSearchParams(location.search).get('f');
-if (f){ let tries = 0; const t = setInterval(() => { if (UD.openIdea(f, false) || ++tries > 40) clearInterval(t); }, 250); }
+UD.openShared();
 </script>
 </body>
 </html>

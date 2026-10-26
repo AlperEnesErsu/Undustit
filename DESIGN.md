@@ -196,7 +196,7 @@ görünüm değişir. Her stil ayrı bir site gibi açılır:
     Tek başına duran bağlantılar 24 px dokunma yüksekliği alır.
   - Hover: seçili çip ve sıralama düğmeleri, "Alırdım", "Tekrar oynat", "Bağlantıyı kopyala" ve
     bağlantılar artık yalnız renk değiştirmiyor (kalkma, dolgu, kalınlaşan alt çizgi).
-  - Kayma: başlık yazı tipleri `display=block` ve ölçülmüş yedeklerle yüklenir (`size-adjust`,
+  - Kayma: başlık yazı tipleri ölçülmüş yedeklerle yüklenir (26 Ekim 2026'dan beri `display=swap`: yavaş mobilde büyük başlık saniyelerce görünmez kalıyordu; yedekler ölçülü olduğu için kayma küçük) (`size-adjust`,
     `ascent/descent-override`; Instrument Serif→Georgia %76,73, Bricolage→Arial Bold %91,58,
     Plex Condensed→Arial Bold %88,44, Nunito→Arial %101,08 / Arial Bold %101,51; iki kalın yazı tipi ilk ölçümde %13 yanlıştı, gerçek başlıklarla yeniden ölçüldü). JS'in doldurduğu
     form ve animasyon alanına baştan yer ayrılır; `main` en az bir ekran boyu, alt bilgi ilk ekranda
@@ -275,3 +275,27 @@ Fontlar: Instrument Serif (başlıklar, büyük rakamlar), Geist (gövde), Geist
 - Her hareketin `prefers-reduced-motion` karşılığı var. Sayfalar arası geçiş `@view-transition` ile.
 - 404 sayfası köke göre bağlanır; GitHub Pages'te (`/Undustit/`) kökü kendisi bulur.
 - Sayfalar Türkçe ve İngilizce (`?dil=en`); metinler `assets/metin/` sözlüklerinde.
+
+## Daha az tıklama (26 Ekim 2026)
+
+- **Kısa form:** zorunlu olan yalnız tek cümle ve kategori. Problem, çözüm ve özellikler "Detay ekle"
+  altında, isteğe bağlı. Kategori zaten seçiliyken (vaka sayfası) cümleden sonra Enter fikri gönderir.
+- **Hazır fiyatlar:** "Alırdım"a dokununca üç fiyat düğmesi çıkar (diğerlerinin ortalamasının %75/100/125'i,
+  yuvarlanmış; talep yoksa 150/300/500 ₺). Tek dokunuş kaydeder; elle yazmak duruyor. Odak ilk düğmeye
+  gider, telefon klavyesi kendiliğinden açılmaz.
+- **Ana sayfada pencere:** kart başlığı fikri aynı sayfada pencerede açar; `?f=` bağlantısı ana sayfada da çalışır.
+- **Paylaş:** gönderimden sonra ana düğme "Paylaş, alıcı bul"; fikir penceresinde de "Paylaş". Telefonda
+  paylaşım menüsü, değilse bağlantı panoya.
+- **Vaka sayfaları:** form ilk ekranda (Vaka 01'de 1.147 px'ten 635 px'e, telefonda 707 px). Nasıl ilerler,
+  teknik föy ve SSS katlanır bölümlerde; dinamik vakada açıklama ve görsel "Vaka ayrıntıları" altında.
+
+## İlk gerçek vaka: Vaka 01 · Boltun (26 Ekim 2026)
+
+Vaka 01 örnek değil, ilk gerçek vaka (claude.ai'deki "undust · Case #001 Boltun" sayfası): 1.000.000
+takım M10 × 90, 8.8 flanşlı cıvata + somun, 1.000 adetlik deneme partisi. Sitede "Boltun" adıyla geçer.
+- **Pay (vakalara özel):** satış fiyatının taban fiyatın üstünde kalan kısmı bölünür: fikir sahibine %40,
+  isim / görünüm / ambalaj / satış kanalı önerisi seçilenlere %10 (3 + 3 + 2 + 2), kalan %50 Undustit.
+  Değişiklik masrafı bölüşmeden önce ödeyene döner. Oranlar `ud.js` `TERMS.caseShare` içinde; Vaka 01
+  sayfası ve `nasil/#vaka-pay` oradan okur. Genel fikirlerdeki %10–30 (satıştan) değişmedi. Bu, 22 Ekim'de
+  "%40 taşınmadı" kararını vakalar için geri alır.
+- **Taban fiyat** (takım başına $0,20) bilerek sitede gösterilmiyor.

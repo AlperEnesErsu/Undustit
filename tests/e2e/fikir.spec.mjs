@@ -25,6 +25,27 @@ test('kategorisiz cümle Enter ile gönderilmez, kategoriye gider', async ({ pag
   await expect(page.locator('#form .if-cats .chip').first()).toBeFocused();
 });
 
+test('vaka ve kategori ayrı seçilir; kart ikisini de gösterir', async ({ page }) => {
+  await hazirla(page);
+  await page.goto('/fikir/');
+  await page.locator('#form .if-pitch').fill('Cıvatalarla kurulan duvara monte halter rafı');
+  await page.locator('#form .if-vaka .chip', { hasText:'Boltun' }).click();
+  await page.locator('#form .if-cats .chip', { hasText:'Fitness' }).click();
+  await page.locator('#form [type=submit]').click();
+  await expect(page.locator('#form .if-done')).toBeVisible();
+  const kayit = await page.evaluate(() => JSON.parse(localStorage.getItem('ud-store-v1')).ideas.local.items[0]);
+  expect([kayit.caseId, kayit.cat]).toEqual(['vaka-01', 'Fitness']);
+  await page.goto('/fikirler/');
+  await expect(page.locator('.icard .m .c').first()).toHaveText('Vaka 01 · Boltun · Fitness');
+});
+
+test('vaka sayfasında vaka sırası görünmez, kategori isteğe bağlıdır', async ({ page }) => {
+  await hazirla(page);
+  await page.goto('/vaka-01/');
+  await page.locator('#form .if-pitch').fill('x'.repeat(3));
+  await expect(page.locator('#form .if-vaka-alan')).toBeHidden();
+});
+
 test('alırdım: hazır fiyat tek dokunuşta kaydeder, Perşembe uzaklığı görünür', async ({ page }) => {
   await hazirla(page, tohum({ benimkiler:['Kablo düğümünü önleyen masa altı makarası'] }));
   await page.goto('/fikirler/');

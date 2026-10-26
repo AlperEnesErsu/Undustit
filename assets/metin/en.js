@@ -699,5 +699,8 @@ UD_METIN.ekle('en', {
  "ud.akis.cumle": "One sentence that fixes an everyday annoyance.",
  "ud.akis.talep": "“I'd buy” + price",
  "ud.akis.en": "width",
- "ud.akis.boy": "height"
+ "ud.akis.boy": "height",
+ "ud.form.vaka": "Case",
+ "ud.form.vaka.not": "for a company's surplus stock?",
+ "ud.form.vaka.yok": "Not for a case"
 });

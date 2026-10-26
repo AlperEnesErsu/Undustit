@@ -423,3 +423,14 @@ bir kez, altında adımlar, sonda "Tekrar oynat", hareketi azaltta ya da aynı o
   (Postgres 15) ve Playwright.
 - **Belgeler:** `README.md` (İngilizce özetli), `docs/devir.md` (varlıklar, gizli bilgiler, maliyet, devir adımları).
 - Playwright 1.48 Node 24'te test dosyalarını yüklerken takılıyordu; 1.64.0'a geçildi.
+
+## Formda vaka ve kategori ayrıldı (26 Ekim 2026)
+
+Vaka (hangi stok için) ile kategori (ne tür bir ürün) aynı çip sırasındaydı; Boltun'a yazılan bir fitness fikri ikisini
+birden seçemiyordu. Artık iki sıra var:
+- **Vaka:** açık vakalar + "Vakadan bağımsız" (varsayılan). Yalnız açık vaka varken ve vakanın kendi sayfası dışında görünür;
+  vaka sayfasında vaka zaten seçili, sıra gizli.
+- **Kategori:** yalnız ürün türleri. Vakasız fikirde zorunlu, vaka fikrinde isteğe bağlı (vaka sayfasında cümle + Enter
+  yine gönderir).
+- Veri: `caseId` vaka, `cat` kategori; kategorisiz vaka fikri eskisi gibi vakanın etiketini kategori olarak taşır.
+- Kartta ve pencerede tek etiket: "Vaka 01 · Boltun · Fitness" (`etiket()`).

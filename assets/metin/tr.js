@@ -699,5 +699,8 @@ UD_METIN.ekle('tr', {
  "ud.akis.cumle": "Günlük bir derdi çözen, tek cümlelik fikrin.",
  "ud.akis.talep": "“alırdım” + fiyat",
  "ud.akis.en": "en",
- "ud.akis.boy": "boy"
+ "ud.akis.boy": "boy",
+ "ud.form.vaka": "Vaka",
+ "ud.form.vaka.not": "bir firmanın fazla stoğu için mi?",
+ "ud.form.vaka.yok": "Vakadan bağımsız"
 });

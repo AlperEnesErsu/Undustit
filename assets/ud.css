@@ -229,6 +229,28 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .vote:disabled{opacity:.5;cursor:default}
 .buy{position:relative;z-index:2;display:grid;justify-items:center;gap:4px}
 .buy-mine{font-family:var(--f-mono);font-size:11px;color:var(--accent);white-space:nowrap}
+/* live numbers on the home page */
+.sayilar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sayilar > div{display:grid;gap:4px;padding:18px 18px 18px 0}
+.sayilar > div + div{padding-inline-start:18px;border-inline-start:1px solid var(--line)}
+.sayilar b{font-family:var(--f-serif);font-size:clamp(32px,3.6vw,52px);line-height:1;font-variant-numeric:tabular-nums}
+.sayilar span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:720px){.sayilar{grid-template-columns:repeat(2,minmax(0,1fr))}.sayilar > div:nth-child(3){padding-inline-start:0;border-inline-start:0}.sayilar > div:nth-child(n+3){border-top:1px solid var(--line)}}
+/* "Bildir": a quiet link under an idea, a short form when opened */
+.bildir{padding-top:14px;border-top:1px dashed var(--line-2)}
+.bildir-ac{font-size:13px;color:var(--muted)}
+.bildir-f{display:grid;gap:10px}
+.bildir-f fieldset{border:0;margin:0;padding:0;display:grid;gap:8px}
+.bildir-f legend{font-size:14px;font-weight:500;padding:0;margin-bottom:8px}
+.bildir-n{position:relative;cursor:pointer}
+.bildir-n input{position:absolute;opacity:0;pointer-events:none}
+.bildir-n:has(input:checked){background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bildir-n:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.bildir-f textarea{width:100%;min-height:60px;border:1px solid var(--line-2);border-radius:var(--r-sm);padding:9px 12px;background:var(--bg);font-size:14px}
+.bildir-f .row{display:flex;gap:14px;align-items:center}
+.bildir-d{font-size:13px;color:var(--err)}
+.bildir-tamam{font-size:13.5px;color:var(--ok)}
+.buy-ex{max-width:16ch;font-size:11.5px;line-height:1.3;color:var(--ink-2);text-align:center}
 .buy-f{display:flex;gap:6px;align-items:center}
 .buy-f input{width:104px;min-height:38px;border:1px solid var(--accent);border-radius:var(--r-sm);padding:0 10px;background:var(--bg-2);font-family:var(--f-mono);font-size:14px}
 .buy-f input:focus{outline:none;box-shadow:0 0 0 4px rgba(35,55,198,.14)}
@@ -418,7 +440,11 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .cb-d path{fill:none;stroke:var(--ink-2);stroke-width:.8}
 .cb-d text{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
 .cb-art figcaption{font-family:var(--f-serif);font-size:clamp(28px,3vw,40px);line-height:1;color:var(--ink)}
-@media (max-width:900px){.case-band{grid-template-columns:minmax(0,1fr)}.cb-art{order:-1}}
+/* labels sit on a patch of the drawing's own paper, so the grid never runs through the letters */
+.cb-art{--art-bg:var(--bg)}
+.cb-art svg text{paint-order:stroke;stroke:var(--art-bg);stroke-width:5px;stroke-linejoin:round}
+.cb-art figcaption{background:var(--art-bg);padding:2px 10px;border-radius:8px}
+@media (max-width:900px){.case-band{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:480px){.cb-txt dl{grid-template-columns:minmax(0,1fr)}.cb-txt dl div + div{padding-inline-start:0;border-inline-start:0;border-top:1px solid var(--line)}}
 
 /* ---------- discover strip: the deeper pages, one line each */
@@ -433,6 +459,14 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .disc a:hover .go svg{transform:translateX(4px)}
 @media (max-width:900px){.disc{grid-template-columns:repeat(2,minmax(0,1fr))}.disc a:nth-child(3){padding-inline-start:0;border-inline-start:0}}
 @media (max-width:560px){.disc{grid-template-columns:minmax(0,1fr)}.disc a + a{padding-inline-start:0;border-inline-start:0}}
+/* phones: the rank leaves its column and sits on the card's top edge, so titles keep the width */
+@media (max-width:560px){
+  .icard{grid-template-columns:minmax(0,1fr) auto}
+  .icard .rank:not(:empty){position:absolute;top:-10px;left:14px;width:auto;padding:1px 8px;border:1px solid var(--line-2);border-radius:999px;background:var(--bg-2);font:500 11.5px/1.4 var(--f-mono);color:var(--ink-2)}
+  .icard .rank:not(:empty)::before{content:"#"}
+  .icard .rank:empty{display:none}
+  .icard:has(.buy-f){grid-template-columns:minmax(0,1fr)}.icard:has(.buy-f) .buy{grid-column:1}
+}
 
 /* ---------- idea detail dialog */
 dialog.idlg{width:min(720px,100% - 24px);max-height:min(88vh,920px);padding:0;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2);color:var(--ink);box-shadow:0 40px 120px -30px rgba(22,24,29,.3)}
@@ -472,6 +506,7 @@ dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
 
 /* ---------- motion: entrance, scroll reveal, drawings. Styles tune it with these properties. */
 :root{--in-y:22px;--in-x:0px;--in-scale:1;--in-rot:0deg;--in-blur:0px;--in-dur:800ms;--in-ease:cubic-bezier(.22,1,.36,1);--in-step:80ms;--draw-dur:1400ms}
+@keyframes ud-in-h{from{transform:translate(var(--in-x),var(--in-y)) scale(var(--in-scale)) rotate(var(--in-rot))}}
 @keyframes ud-in{from{clip-path:inset(0 0 100% 0);transform:translate(var(--in-x),var(--in-y)) scale(var(--in-scale)) rotate(var(--in-rot));filter:blur(var(--in-blur))}to{clip-path:inset(-20% -20% -20% -20%)}}
 @media (prefers-reduced-motion:no-preference){
   .hero-l > *,.phead > *,.case-head .txt > *,.compose-l > *,.mast > *,.show > *{animation:ud-in var(--in-dur) var(--in-ease) both}
@@ -480,6 +515,8 @@ dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
   .hero-l > :nth-child(4),.phead > :nth-child(4),.case-head .txt > :nth-child(4),.compose-l > :nth-child(4),.mast > :nth-child(4){animation-delay:calc(var(--in-step) * 3)}
   .hero-l > :nth-child(n+5),.phead > :nth-child(n+5),.case-head .txt > :nth-child(n+5),.compose-l > :nth-child(n+5){animation-delay:calc(var(--in-step) * 4)}
   .hero #proc,.intro #proc,.case-head .cb-art,.compose .after{animation:ud-in calc(var(--in-dur) * 1.2) var(--in-ease) calc(var(--in-step) * 3) both}
+  /* the page title only rises in: a clipped start would hide it from the browser's first paint (LCP) */
+  :is(.hero-l,.phead,.case-head .txt,.compose-l,.mast) > :is(h1,:has(h1)){animation-name:ud-in-h}
   .rv{clip-path:inset(0 0 100% 0);transform:translate(var(--in-x),var(--in-y)) scale(var(--in-scale)) rotate(var(--in-rot));filter:blur(var(--in-blur));transition:clip-path var(--in-dur) var(--in-ease) var(--d,0ms),transform var(--in-dur) var(--in-ease) var(--d,0ms),filter var(--in-dur) var(--in-ease) var(--d,0ms)}
   .rv.in{clip-path:inset(-20% -20% -20% -20%);transform:none;filter:none}
   .rv-jump .rv{transition:none!important}

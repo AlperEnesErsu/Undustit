@@ -105,6 +105,9 @@ const STIL = window.UD_STIL || { list:{}, current:'oyuncu', withStil: h => h };
 const withStil = h => STIL.withStil(h);
 
 // =========================================================== nav + footer
+// The legal pages (kvkk/, kosullar/) stay unlinked drafts until ayar.js sets yasal: true.
+const YASAL = !!(window.UD_AYAR || {}).yasal;
+const kvkkLink = () => YASAL ? ` <a class="link" href="${ROOT}kvkk/" target="_blank" rel="noopener">${T('ud.kvkk.oku')}</a>` : '';
 // TR / EN switch in the bar: a link to the same page in the other language (keeps style and edit mode)
 function langSwitch(extra=''){
   return `<span class="lang${extra}" role="group" aria-label="${T('ud.menu.dil')}">${Object.keys(STIL.langs || { tr:1 }).map(l =>
@@ -130,7 +133,7 @@ function mountChrome(){
   if (foot){
     foot.className = 'foot';
     foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>${T('ud.alt.prototip')} <span class="mode-badge" id="mode-badge"><i></i>${T('ud.alt.baglaniyor')}</span></span>
-      <nav aria-label="${T('ud.alt.menu')}"><a href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${links.map(([k,l,h]) => `<a href="${ROOT+h}">${l}</a>`).join('')}</nav></div>
+      <nav aria-label="${T('ud.alt.menu')}"><a href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${links.map(([k,l,h]) => `<a href="${ROOT+h}">${l}</a>`).join('')}<a href="${ROOT}iletisim/">${T('ud.menu.iletisim')}</a>${YASAL ? `<a href="${ROOT}kvkk/">${T('ud.menu.kvkk')}</a><a href="${ROOT}kosullar/">${T('ud.menu.kosullar')}</a>` : ''}</nav></div>
       ${showStilBar ? `<div class="wrap stil-bar"><span>${T('ud.alt.stil')}</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${STIL.withStil(location.pathname, k)}"${k === STIL.current ? ' aria-current="true"' : ''}>${T('ud.stil.' + k)}</a>`).join('')}<a href="${ROOT}stiller/">${T('ud.alt.hepsi')}</a></div>` : ''}`;
   }
 }
@@ -378,19 +381,23 @@ const Store = (function(){
       d = d.filter(x => !(x.key === key && x.tur === tur)).concat([{ eposta, key, tur, at:new Date().toISOString() }]);
       try { localStorage.setItem('ud-haber', JSON.stringify(d)); } catch(e){}
     },
-    // "Vakanı aç": a company's application; only admins can read it back (supabase/4-acilis.sql)
-    async basvur(data){
+    // A row only admins read back: "Vakanı aç" applications, contact messages, idea reports
+    // (vaka_basvurulari, iletisim_mesajlari, fikir_bildirimleri). The local preview keeps them under
+    // udv-<table>, where the admin panel's local store (veri.js) reads them.
+    async kaydet(tablo, data){
       if (S.mode === 'supabase'){
         await start(); await sbUser();
-        const r = await sb.from('vaka_basvurulari').insert(data);
+        const r = await sb.from(tablo).insert(data);
         if (r.error) throw r.error;
         return;
       }
-      // local preview: its own key, read by the admin panel's local store (veri.js)
-      let d = {}; try { d = JSON.parse(localStorage.getItem('udv-basvuru') || '{}') || {}; } catch(e){}
-      const id = key(); d[id] = { id, ...data, durum:'yeni', zaman:new Date().toISOString() };
-      try { localStorage.setItem('udv-basvuru', JSON.stringify(d)); } catch(e){}
+      let d = {}; try { d = JSON.parse(localStorage.getItem('udv-' + tablo) || '{}') || {}; } catch(e){}
+      const id = key(); d[id] = { id, ...data, durum: tablo === 'fikir_bildirimleri' ? 'acik' : 'yeni', zaman:new Date().toISOString() };
+      try { localStorage.setItem('udv-' + tablo, JSON.stringify(d)); } catch(e){}
     },
+    basvur(data){ return this.kaydet('vaka_basvurulari', data); },
+    // the database wants the idea's own id; the local preview keeps the full key (that is what it hides)
+    bildir(key, neden, aciklama){ return this.kaydet('fikir_bildirimleri', { fikir_id: S.mode === 'supabase' ? idOf(key) : key, neden, aciklama }); },
     loadNotes(key){ if (S.mode === 'supabase' && summary) start().then(() => sbNotes(key)).catch(() => {}); },
     addNote(idea, kind, text, handle){
       if (S.mode === 'supabase') return sbDo(() => sb.from('yorumlar').insert({ fikir_id:idOf(idea), uye:S.uid, tur:kind, metin:text, ad:handle || '' })).then(r => { if (summary) sbNotes(idea); return r; });
@@ -599,6 +606,36 @@ function mountCase(host, opts={}){
 }
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
+// =========================================================== live numbers
+// Ideas, "alırdım", the money behind them and open cases, from the live data. Hidden below `min` real
+// ideas, so a young site never advertises tiny numbers; the figures count up once when first shown.
+function mountStats(host, opts={}){
+  const min = opts.min || 5;
+  const box = host.closest('section') || host;
+  box.hidden = true;
+  let shown = false;
+  const paint = () => {
+    const list = Store.ideas();
+    if (list.length < min){ box.hidden = true; return; }
+    const alici = list.reduce((t, i) => t + i.buyers, 0);
+    const tutar = list.reduce((t, i) => t + i.buyers * i.avg, 0);
+    const rows = [[list.length, T('ud.sayi.fikir'), String], [alici, T('ud.sayi.alirdim'), String], [tutar, T('ud.sayi.tutar'), tl], [openCases().length, T('ud.sayi.vaka'), String]];
+    host.className = 'sayilar';
+    host.innerHTML = rows.map(([n, l]) => `<div><b data-n="${Math.round(n)}">0</b><span>${l}</span></div>`).join('');
+    const bs = $$('b', host);
+    box.hidden = false;
+    rows.forEach(([n, , fmt], ix) => {
+      const to = Math.round(n), b = bs[ix];
+      if (shown || reduce.matches){ b.textContent = fmt === tl ? tl(to) : to.toLocaleString(LOCALE); return; }
+      const t0 = performance.now(), ms = 1100;
+      const f = now => { const p = Math.min(1, (now - t0) / ms), v = Math.round(to * (1 - Math.pow(1 - p, 3))); b.textContent = fmt === tl ? tl(v) : v.toLocaleString(LOCALE); if (p < 1) requestAnimationFrame(f); };
+      requestAnimationFrame(f);
+    });
+    shown = true;
+  };
+  Store.cases().then(() => Store.sub(paint));
+}
+
 // =========================================================== boards
 function sortIdeas(list, by){
   const c = list.slice();
@@ -625,9 +662,10 @@ function buyCtl(i){
     box.replaceChildren();
     // the accessible name starts with the visible text ("3 alırdım") and adds the context after it
     const more = i.ex ? ' ' + T('ud.al.ornek') : i.mine ? ': ' + T('ud.al.benim', { baslik:esc(i.title), fiyat:tl(i.myPrice) }) : `: ${esc(i.title)}`;
-    const btn = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: i.ex || !voting || !Store.canWrite,
+    // an example looks like the real control; a tap says what it is instead of doing nothing
+    const btn = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: !i.ex && (!voting || !Store.canWrite),
       html:`<b>${i.ex ? '–' : i.buyers}</b> <span>${T('ud.al.alirdim')}</span><span class="sr">${more}</span>` });
-    btn.onclick = edit;
+    btn.onclick = i.ex ? () => { if (!$('.buy-ex', box)) box.append(el('small', { class:'buy-ex', role:'status', text:T('ud.al.ornek.not') })); } : edit;
     box.append(btn);
     if (i.mine) box.append(el('small', { class:'buy-mine', text:T('ud.al.sen', { fiyat:tl(i.myPrice) }) }));
     if (justBought === i.key){ box.classList.add('just'); justBought = null; }
@@ -680,6 +718,7 @@ function mountBoard(host, opts={}){
     if (opts.filter) list = list.filter(opts.filter);
     list = sortIdeas(list, opts.sort ? opts.sort() : 'top');
     if (opts.limit) list = list.slice(0, opts.limit);
+    if (opts.onCount) opts.onCount(list.length);
     host.replaceChildren();
     const box = el('div', { class:'ideas' });
     if (!list.length && opts.examples === false){
@@ -696,6 +735,44 @@ function mountBoard(host, opts={}){
   };
   Store.sub(render);
   return { render };
+}
+
+// =========================================================== "Bildir"
+// A quiet link at the foot of an idea: a reason, an optional note, sent once per person per idea.
+// The open state and what was already sent survive the window's repaints (the store refreshes it).
+const bildirildi = new Set();
+let bildirAcik = null;
+const NEDENLER = ['spam','uygunsuz','kopya','yaniltici','diger'];
+function bildirCtl(key){
+  const box = el('div', { class:'bildir' });
+  if (bildirildi.has(key)){ box.append(el('p', { class:'bildir-tamam', text:T('ud.bildir.tamam') })); return box; }
+  if (bildirAcik !== key){
+    box.append(el('button', { type:'button', class:'link bildir-ac', text:T('ud.bildir.ac'), onclick(){ bildirAcik = key; box.replaceWith(bildirCtl(key)); $('.bildir input', dlg).focus(); } }));
+    return box;
+  }
+  const f = el('form', { class:'bildir-f', novalidate:true, 'aria-label':T('ud.bildir.ac') });
+  f.innerHTML = `<fieldset><legend>${T('ud.bildir.neden')}</legend><div class="chips">${NEDENLER.map(n =>
+    `<label class="chip bildir-n"><input type="radio" name="neden" value="${n}"> ${T('ud.bildir.n.' + n)}</label>`).join('')}</div></fieldset>
+    <textarea name="aciklama" maxlength="300" placeholder="${T('ud.bildir.not')}" aria-label="${T('ud.bildir.not')}"></textarea>
+    <div class="row"><button type="submit" class="btn sm">${T('ud.bildir.gonder')}</button><button type="button" class="link bildir-x">${T('ud.al.vazgec')}</button></div>
+    <small class="bildir-d" role="status"></small>`;
+  $('.bildir-x', f).onclick = () => { bildirAcik = null; box.replaceWith(bildirCtl(key)); };
+  f.onsubmit = e => {
+    e.preventDefault();
+    const n = f.neden.value, d = $('.bildir-d', f);
+    if (!n){ d.textContent = T('ud.bildir.hata.neden'); f.querySelector('input').focus(); return; }
+    $('[type=submit]', f).disabled = true;
+    Store.bildir(key, n, f.aciklama.value.trim()).then(() => {
+      bildirildi.add(key); bildirAcik = null; olcu('Bildir', { neden:n });
+      box.replaceWith(bildirCtl(key));
+    }).catch(err => {
+      $('[type=submit]', f).disabled = false;
+      if (err && err.code === '23505'){ bildirildi.add(key); bildirAcik = null; box.replaceWith(bildirCtl(key)); return; }
+      d.textContent = err && err.code === 'P0001' ? T('ud.bildir.hata.sinir') : T('ud.bildir.hata.genel');
+    });
+  };
+  box.append(f);
+  return box;
 }
 
 // =========================================================== idea dialog (arena)
@@ -731,11 +808,13 @@ function openIdea(key, push=true){
           <div class="row"><div class="chips" role="group" aria-label="${T('ud.not.tur')}">${[['yorum',T('ud.not.yorum')],['oneri',T('ud.not.oneri')],['endise',T('ud.not.endise')]].map(([k,l],x) => `<button type="button" class="chip" data-k="${k}" aria-pressed="${x===0}">${l}</button>`).join('')}</div>
           <button type="submit" class="btn sm" ${Store.canWrite ? '' : 'disabled'}>${T('ud.not.ekle')}</button></div></form>
       </section>
+      ${it.owner !== Store.uid ? '<div class="bildir-yer"></div>' : ''}
     </div>`;
     $('.x', dlg).onclick = () => dlg.close();
     const sh = $('.sh', dlg); sh.onclick = () => { olcu('Paylaş', { yer:'pencere' }); shareIdea(it.title, it.key, sh); };
     $('.dv', dlg).replaceWith(buyCtl(it));
     const hy = $('.haber-yer', dlg); if (hy) hy.replaceWith(haberForm(it.key, 'alirdim'));
+    const by = $('.bildir-yer', dlg); if (by) by.replaceWith(bildirCtl(it.key));
     const own = $('.own-x', dlg);
     if (own) own.onclick = () => {
       if (own.dataset.sure){ Store.removeIdea(key).then(() => dlg.close()).catch(() => { own.textContent = T('ud.pencere.gerial.hata'); }); return; }
@@ -880,6 +959,12 @@ function mountMotion(){
     }
   }, { passive:true });
   addEventListener('beforeprint', () => $$('.rv').forEach(n => n.classList.add('in')));
+  // keyboard focus never waits for a reveal: the focused element's block shows at once, ring included
+  addEventListener('focusin', e => {
+    const r = e.target.closest && e.target.closest('.rv:not(.in)'); if (!r) return;
+    html.classList.add('rv-jump'); clearTimeout(jumpT); jumpT = setTimeout(() => html.classList.remove('rv-jump'), 700);
+    r.classList.add('in', 'seen');
+  });
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
     const n = e.target; io.unobserve(n);
@@ -906,5 +991,5 @@ function mountMotion(){
 applyText();
 mountChrome();
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT };
+window.UD = { T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, nextLive, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
 })();

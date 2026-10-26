@@ -79,8 +79,8 @@
     }));
     return out;
   }
-  const BASVURU_LS = 'udv-basvuru';
-  function basvuruOku(){ try { return JSON.parse(localStorage.getItem(BASVURU_LS) || '{}') || {}; } catch(e){ return {}; } }
+  // sitenin yalnız yöneticiye giden kayıtları (başvuru, mesaj, bildirim) yerelde udv-<tablo> altında (ud.js Store.kaydet)
+  function kayitOku(tablo){ try { return JSON.parse(localStorage.getItem('udv-' + tablo) || '{}') || {}; } catch(e){ return {}; } }
   const yerel = {
     liste: async () => Object.values(oku().vakalar),
     al: async id => oku().vakalar[id] || null,
@@ -92,8 +92,8 @@
     fikirler: async vakaId => yerelFikirler(vakaId),
     gizle: async (id, gizli) => { const d = oku(); if (gizli) d.gizli[id] = true; else delete d.gizli[id]; yaz(d); },
     // "Vakanı aç" başvuruları: sitenin formu yerelde buraya yazar (ud.js Store.basvur)
-    basvurular: async () => Object.values(basvuruOku()).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman))),
-    basvuruDurum: async (id, durum) => { const d = basvuruOku(); if (!d[id]) throw new Error('Başvuru bulunamadı'); d[id].durum = durum; try { localStorage.setItem(BASVURU_LS, JSON.stringify(d)); } catch(e){} }
+    kayitlar: async tablo => Object.values(kayitOku(tablo)).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman))),
+    kayitDurum: async (tablo, id, durum) => { const d = kayitOku(tablo); if (!d[id]) throw new Error('Kayıt bulunamadı'); d[id].durum = durum; try { localStorage.setItem('udv-' + tablo, JSON.stringify(d)); } catch(e){} }
   };
 
   // ----------------------------------------------------------- supabase depo
@@ -128,14 +128,15 @@
       const r = await sorgu(istemci().from('fikirler').update({ gizli }).eq('id', id).select('id'));
       if (!r || !r.length) throw new Error('Fikir bulunamadı ya da yetkiniz yok');
     },
-    basvurular: async () => {
-      const q = istemci().from('vaka_basvurulari').select('*').order('zaman', { ascending:false }).limit(200);
-      const { data, error } = await q;
-      if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // 4-acilis.sql henüz çalışmadı
+    kayitlar: async tablo => {
+      // bildirimler fikrin başlığıyla gelir (fikir_id yabancı anahtarı üzerinden)
+      const secim = tablo === 'fikir_bildirimleri' ? '*, fikirler(baslik)' : '*';
+      const { data, error } = await istemci().from(tablo).select(secim).order('zaman', { ascending:false }).limit(200);
+      if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // tablonun migration'ı henüz çalışmadı
       if (error) throw hata(error);
       return data;
     },
-    basvuruDurum: async (id, durum) => { await sorgu(istemci().from('vaka_basvurulari').update({ durum }).eq('id', id)); }
+    kayitDurum: async (tablo, id, durum) => { await sorgu(istemci().from(tablo).update({ durum }).eq('id', id)); }
   };
   const depo = SB_URL ? uzak : yerel;
 
@@ -207,6 +208,19 @@
     let s = x == null ? '' : typeof x === 'number' ? String(x).replace('.', ',') : String(x);
     if (typeof x !== 'number' && /^[=+\-@]/.test(s)) s = "'" + s;
     return /[";\r\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }
+
+  function kayitTuru(tablo, adlar){
+    const o = {
+      DURUMLAR: Object.keys(adlar), DURUM_ADI: Object.freeze(Object.assign({}, adlar)),
+      async liste(){ yetkiTest(); return depo.kayitlar(tablo); },
+      async durum(id, durum){
+        yetkiTest();
+        if (!o.DURUMLAR.includes(durum)) throw new Error('Bilinmeyen durum');
+        await depo.kayitDurum(tablo, str(id), durum);
+      }
+    };
+    return o;
   }
 
   // ----------------------------------------------------------- genel arayüz
@@ -344,16 +358,10 @@
       return { vaka:{ toplam:liste.length, acik:liste.filter(v => v.durum === 'acik').length }, fikir, alici };
     },
 
-    basvurular: {
-      DURUMLAR: ['yeni','incelendi','kabul','red'],
-      DURUM_ADI: { yeni:'Yeni', incelendi:'İncelendi', kabul:'Kabul', red:'Ret' },
-      async liste(){ yetkiTest(); return depo.basvurular(); },
-      async durum(id, durum){
-        yetkiTest();
-        if (!UDV.basvurular.DURUMLAR.includes(durum)) throw new Error('Bilinmeyen durum');
-        await depo.basvuruDurum(str(id), durum);
-      }
-    },
+    // Sitenin yalnız yöneticiye giden kayıtları: aynı liste ve durum arayüzü, farklı tablo ve durumlar
+    basvurular: kayitTuru('vaka_basvurulari', { yeni:'Yeni', incelendi:'İncelendi', kabul:'Kabul', red:'Ret' }),
+    mesajlar: kayitTuru('iletisim_mesajlari', { yeni:'Yeni', yanitlandi:'Yanıtlandı', kapandi:'Kapandı' }),
+    bildirimler: kayitTuru('fikir_bildirimleri', { acik:'Açık', gizlendi:'Fikir gizlendi', yok_sayildi:'Yok sayıldı' }),
 
     async csv(vakaId){
       yetkiTest();

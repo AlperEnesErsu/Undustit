@@ -52,11 +52,18 @@ h2 em,.cb-h em{font-style:normal}
 .icard{border:2px solid var(--ink);box-shadow:var(--hard);transition:transform 220ms var(--pop),box-shadow 220ms var(--pop)}
 .icard:hover{transform:translate(-2px,-2px) rotate(-.4deg);box-shadow:6px 6px 0 var(--ink);background:var(--bg-2)}
 .icard .rank{font-family:var(--f-serif);font-weight:800}
-.vote{border:2px solid var(--ink);border-radius:14px}
+.vote{border:2px solid var(--ink);border-radius:14px;background:var(--bg-2);box-shadow:3px 3px 0 var(--ink);transition:transform 180ms var(--pop),box-shadow 180ms var(--pop),background-color 120ms ease}
+/* "alırdım" is the site's main act: violet label, ink outline, hard shadow; it fills and lifts under the pointer */
+.vote span{color:var(--accent);font-weight:500}
+.vote:hover:not(:disabled){background:var(--accent);border-color:var(--ink);transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.vote:hover:not(:disabled) b,.vote:hover:not(:disabled) span{color:var(--accent-ink)}
+.vote:active:not(:disabled){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.vote:disabled{opacity:1;border-style:dashed;box-shadow:none;background:transparent}
+.vote:disabled span{color:var(--muted)}
 .vote[aria-pressed="true"]{border-color:var(--ink)}
 .case-band{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 .cb-tag{background:#DFF5EA;border:2px solid var(--ok)}
-.cb-art{border:2px solid var(--ink);background-color:#FFF0D6;background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:20px 20px}
+.cb-art{--art-bg:#FFF0D6;border:2px solid var(--ink);background-color:#FFF0D6;background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:20px 20px}
 .cb-art figcaption{font-weight:800}
 .pc-stage{border:2px solid var(--ink);box-shadow:var(--shadow);background:#FFF0D6}
 .pc-stage::before{background-image:radial-gradient(var(--ink) 1px,transparent 1.6px);background-size:22px 22px;opacity:.18}
@@ -75,6 +82,15 @@ h2 em,.cb-h em{font-style:normal}
 dialog.idlg{border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink)}
 .foot{border-top:2px solid var(--ink)}
 .link{text-decoration-color:var(--accent);text-decoration-thickness:2px}
+.link{transition:color 120ms ease,text-decoration-thickness 160ms var(--pop),text-underline-offset 160ms var(--pop),background-color 120ms ease;border-radius:4px}
+.link:hover{color:var(--accent);text-decoration-thickness:3px;text-underline-offset:6px;background:var(--accent-soft)}
+/* the bar: the page you are on wears an ink outline; any link under the pointer fills violet */
+@media (min-width:901px){
+  .nav-links a{transition:background-color 120ms ease,color 120ms ease,transform 180ms var(--pop)}
+  .nav-links a:hover{background:var(--accent-soft);color:var(--accent);transform:translateY(-1px)}
+  .nav-links a[aria-current="page"]{background:var(--bg-2);box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)}
+  .nav-links a[aria-current="page"]:hover{background:var(--accent-soft);color:var(--accent)}
+}
 
 /* phones: a slimmer payout card so it clears the pre-sale row */
 @media (max-width:640px){.pc-pay{padding:12px 14px;gap:4px}.pc-pay b{font-size:30px}.pc-pay span{font-size:12px}}
@@ -202,3 +218,11 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 /* one job per colour: violet acts (and hovers), sun marks one highlight per page, green only means "open / paid". Example labels are grey,
    not warning orange, so orange is left for real warnings. */
 .icard .m .ex{color:var(--muted)}
+
+/* moving between pages: the old page tips away, the new one drops in a little tilted and settles (like the cards) */
+@media (prefers-reduced-motion:no-preference){
+  ::view-transition-old(root){animation:vt-out-o 240ms var(--ease-io) both}
+  ::view-transition-new(root){animation:vt-in-o 520ms var(--pop) 60ms both}
+}
+@keyframes vt-out-o{to{opacity:0;transform:translateY(-12px) rotate(-.5deg) scale(.985)}}
+@keyframes vt-in-o{from{opacity:0;transform:translateY(26px) rotate(.7deg)}}

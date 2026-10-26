@@ -117,8 +117,11 @@ function caseCard(c, ix){
     <h2>${v01 ? T('vakalar.h2.1') : esc(c.name)}</h2>
     ${v01 ? `<p>${T('vakalar.p.2')}</p>` : c.ozet ? `<p>${esc(c.ozet)}</p>` : ''}
     <dl><div><dt>${T('vakalar.dt.1')}</dt><dd>${n(c.adet)}</dd></div><div><dt>${T('vakalar.dt.2')}</dt><dd>${v01 ? T('vakalar.dd.1') : esc([c.olcu, c.sinif].filter(Boolean).join(' · ') || '–')}</dd></div><div><dt>${T('vakalar.js.gelen')}</dt><dd class="n">0</dd></div></dl>
-    <div class="acts">${open ? `<a class="btn sig" href="${UD_STIL.withStil(ROOT + 'fikir/?vaka=' + encodeURIComponent(c.id))}">${T('vakalar.a.2')} ${ICON.arrow}</a>` : ''}<a class="btn alt" href="${href}">${T('vakalar.a.3')}</a></div>
+    <div class="acts">${open ? `<a class="btn sig" data-yaz>${T('vakalar.a.2')} ${ICON.arrow}</a>` : ''}<a class="btn alt" data-git>${T('vakalar.a.3')}</a></div>
     <div class="share"><code id="${link}"></code><button type="button" data-copy="${link}">${T('vakalar.button.1')}</button></div>` });
+  // links are set here, not inside the template text, so crawlers never read a half-built URL from the script
+  const yaz = a.querySelector('[data-yaz]'); if (yaz) yaz.href = UD_STIL.withStil(ROOT + 'fikir/?vaka=' + encodeURIComponent(c.id));
+  a.querySelector('[data-git]').href = href;
   a.querySelector('code').textContent = new URL(href, location.href).href;
   copyBtn(a.querySelector('[data-copy]'));
   UD.Store.sub(() => { a.querySelector('.n').textContent = String(UD.Store.ideas().filter(i => UD.inCase(i, c)).length); });
@@ -142,7 +145,7 @@ ac.onclick = () => {
     `<div class="iki">${alan('adet', T('vakalar.js.b.adet'), 'text', false, T('vakalar.js.b.adet.ipucu'))}${alan('kisi', T('vakalar.js.b.kisi'), 'text', false)}</div>` +
     `<div class="iki">${alan('eposta', T('vakalar.js.b.eposta'), 'email', true)}${alan('telefon', T('vakalar.js.b.telefon'), 'tel', false)}</div>` +
     alan('notlar', T('vakalar.js.b.not'), 'text', false, T('vakalar.js.b.not.ipucu'), true) +
-    `<label class="onay"><input type="checkbox" name="onay" required><span>${T('vakalar.js.b.onay')}</span></label>` +
+    `<label class="onay"><input type="checkbox" name="onay" required><span>${T('vakalar.js.b.onay')}${UD.kvkkLink()}</span></label>` +
     `<div><button type="submit" class="btn sig">${T('vakalar.js.b.gonder')} ${ICON.arrow}</button></div>` +
     `<p class="durum" role="status" aria-live="polite"></p>` });
   kutu.replaceChildren(f);

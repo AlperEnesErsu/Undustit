@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="iletisim">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title data-t="iletisim.title.1">İletişim · Undustit</title>
+<meta name="description" content="Undustit ekibine yaz: soru, iş birliği, basın ya da yatırım. Fazla stoğu olan firmalar için ayrı bir vaka başvurusu var." data-ta="content:iletisim.attr.1">
+<meta name="theme-color" content="#FFF6E9">
+<link rel="canonical" href="https://alperenesersu.github.io/Undustit/iletisim/">
+<link rel="alternate" hreflang="tr" href="https://alperenesersu.github.io/Undustit/iletisim/">
+<link rel="alternate" hreflang="en" href="https://alperenesersu.github.io/Undustit/iletisim/?dil=en">
+<link rel="alternate" hreflang="x-default" href="https://alperenesersu.github.io/Undustit/iletisim/">
+<meta property="og:url" content="https://alperenesersu.github.io/Undustit/iletisim/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Undustit">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi." data-ta="content:iletisim.attr.2">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
+<meta property="og:title" content="İletişim · Undustit" data-ta="content:iletisim.attr.3">
+<meta property="og:description" content="Undustit ekibine yaz." data-ta="content:iletisim.attr.4">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/fonts/base.css">
+<link rel="stylesheet" href="../assets/ud.css">
+<script src="../assets/stil.js"></script>
+<style>
+.ilet{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:clamp(56px,8vw,112px)}
+.ilet-kart{display:grid;gap:18px;padding:clamp(22px,3vw,36px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2)}
+.ilet-kart h2{font-size:clamp(28px,3vw,40px)}
+.ilet-yan{display:grid;gap:14px}
+.ilet-yan > div{display:grid;gap:6px;padding:18px 20px;border:1px dashed var(--line-2);border-radius:var(--r-md)}
+.ilet-yan p{color:var(--ink-2);font-size:14.5px;font-weight:300}
+.ilet-f{display:grid;gap:14px}
+.ilet-f .iki{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ilet-f select{width:100%;min-height:44px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--bg);padding:0 12px;font-size:15px}
+.ilet-f select:focus{outline:none;border-color:var(--accent)}
+.ilet-f .onay{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
+.ilet-f .onay input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent)}
+.ilet-f .durum{font-size:14px;min-height:1.4em}
+.ilet-f .durum.bad{color:var(--err)}
+.ilet-tamam{display:grid;gap:6px;padding:18px;border:1px solid var(--ok);border-radius:var(--r-md);background:var(--ok-soft)}
+@media (max-width:900px){.ilet{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.ilet-f .iki{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-t="iletisim.a.1">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="wrap">
+  <div class="phead">
+    <span class="eyebrow" data-t="iletisim.span.1">İletişim</span>
+    <h1 data-t="iletisim.h1.1">Bize <em>yaz.</em></h1>
+    <p class="lead" data-t="iletisim.p.1">Soru, iş birliği, basın ya da yatırım. Mesajın doğrudan ekibe gelir; okuyup e-postayla dönüyoruz.</p>
+  </div>
+  <div class="ilet">
+    <section class="ilet-kart" aria-labelledby="f-h">
+      <h2 id="f-h" data-t="iletisim.h2.1">Mesaj gönder</h2>
+      <div id="iletisim-form"></div>
+    </section>
+    <aside class="ilet-yan" aria-label="Diğer yollar" data-ta="aria-label:iletisim.attr.5">
+      <div id="eposta-kutu" hidden><b data-t="iletisim.b.1">E-posta</b><p><a class="link" id="eposta-a"></a></p></div>
+      <div><b data-t="iletisim.b.2">Deponda bekleyen stok mu var?</b><p data-t="iletisim.p.2">Firmalar için ayrı, kısa bir vaka başvurusu var.</p><a class="link" href="../vakalar/#vakani-ac" data-t="iletisim.a.2">Vakanı aç</a></div>
+      <div><b data-t="iletisim.b.3">Aklında bir ürün mü var?</b><p data-t="iletisim.p.3">Fikirler için mesaj gerekmez, doğrudan yaz.</p><a class="link" href="../fikir/" data-t="iletisim.a.3">Fikrini yaz</a></div>
+    </aside>
+  </div>
+</main>
+<footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
+<script src="../assets/ud.js"></script>
+<script>
+// Messages reach only the admin panel (supabase/5-guven.sql). The public address shows once ayar.js has one.
+const { T, el, esc, ICON } = UD;
+const mail = (window.UD_AYAR || {}).iletisim;
+if (mail){ const a = document.getElementById('eposta-a'); a.href = 'mailto:' + mail; a.textContent = mail; document.getElementById('eposta-kutu').hidden = false; }
+const kutu = document.getElementById('iletisim-form');
+const KONU = [['genel', T('iletisim.js.konu.genel')], ['ortaklik', T('iletisim.js.konu.ortaklik')], ['basin', T('iletisim.js.konu.basin')], ['yatirim', T('iletisim.js.konu.yatirim')]];
+const f = el('form', { class:'ilet-f', novalidate:true, 'aria-labelledby':'f-h', html:
+  `<div class="iki"><label class="if-field"><span>${T('iletisim.js.ad')} <small>${T('ud.form.istege')}</small></span><input name="ad" maxlength="80" autocomplete="name"></label>
+   <label class="if-field"><span>${T('iletisim.js.eposta')}</span><input name="eposta" type="email" maxlength="160" autocomplete="email" required></label></div>
+   <label class="if-field"><span>${T('iletisim.js.konu')}</span><select name="konu">${KONU.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label>
+   <label class="if-field"><span>${T('iletisim.js.mesaj')}</span><textarea name="mesaj" maxlength="2000" required placeholder="${T('iletisim.js.mesaj.ipucu')}"></textarea></label>
+   <label class="onay"><input type="checkbox" name="onay" required><span>${T('iletisim.js.onay')}${UD.kvkkLink()}</span></label>
+   <div><button type="submit" class="btn sig">${T('iletisim.js.gonder')} ${ICON.arrow}</button></div>
+   <p class="durum" role="status" aria-live="polite"></p>` });
+kutu.append(f);
+const say = (t, bad) => { const d = f.querySelector('.durum'); d.textContent = t; d.classList.toggle('bad', !!bad); };
+f.onsubmit = e => {
+  e.preventDefault();
+  const v = n => f[n].value.trim();
+  const fail = (t, n) => { say(t, true); f[n].focus(); };
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('eposta'))) return fail(T('iletisim.js.hata.eposta'), 'eposta');
+  if (v('mesaj').length < 10) return fail(T('iletisim.js.hata.mesaj'), 'mesaj');
+  if (!f.onay.checked) return fail(T('iletisim.js.hata.onay'), 'onay');
+  const b = f.querySelector('[type=submit]'); b.disabled = true; say(T('iletisim.js.gidiyor'));
+  UD.Store.kaydet('iletisim_mesajlari', { ad:v('ad'), eposta:v('eposta'), konu:v('konu'), mesaj:v('mesaj') })
+    .then(() => {
+      UD.olcu('İletişim mesajı', { konu:v('konu') });
+      kutu.innerHTML = `<div class="ilet-tamam" tabindex="-1"><b>${T('iletisim.js.tamam')}</b><p>${T('iletisim.js.tamam.not', { eposta:esc(v('eposta')) })}</p></div>`;
+      kutu.firstChild.focus();
+    })
+    .catch(err => { b.disabled = false; say(err && err.code === 'P0001' ? T('iletisim.js.hata.sinir') : T('iletisim.js.hata.genel'), true); });
+};
+</script>
+</body>
+</html>

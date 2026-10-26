@@ -14,7 +14,7 @@ from html.parser import HTMLParser
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGES = {'index.html': 'anasayfa', 'fikir/index.html': 'fikir', 'fikirler/index.html': 'fikirler', 'nasil/index.html': 'nasil',
          'vakalar/index.html': 'vakalar', 'vaka-01/index.html': 'vaka', 'hikaye/index.html': 'hikaye', 'stiller/index.html': 'stiller',
-         '404.html': 'yok', 'vaka/index.html': 'vakasayfa'}
+         '404.html': 'yok', 'vaka/index.html': 'vakasayfa', 'iletisim/index.html': 'iletisim'}
 UNIT = {'title', 'h1', 'h2', 'h3', 'p', 'li', 'dt', 'dd', 'b', 'strong', 'span', 'a', 'button', 'label', 'figcaption', 'q', 'th', 'td',
         'small', 'text', 'summary', 'option', 'div', 'em', 'i', 'tspan', 'caption'}
 VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr'}

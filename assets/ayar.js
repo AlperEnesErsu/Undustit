@@ -7,5 +7,10 @@ window.UD_AYAR = {
   supabaseAnon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amR3ZXludWttd3h5d2RmZXdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4NTc5ODcsImV4cCI6MjEwODQzMzk4N30.WmoNnRWTC5LPg-hFiUv3AdKl54CwTGaKEo4QS4RzwnE',
   adminler: ['alperenesersu.b@gmail.com'],
   // Çerezsiz ölçüm (Plausible): plausible.io'da eklenen sitenin alan adı, ör. 'alperenesersu.github.io'. Boşken hiçbir şey yüklenmez.
-  analitik: ''
+  analitik: '',
+  // Herkese açık iletişim adresi (iletisim/ sayfasında görünür). Boşken yalnız form.
+  iletisim: '',
+  // KVKK ve kullanım koşulları sayfaları: veri sorumlusu bilgileri girilip avukat okuyunca true yapın.
+  // true olunca alt bilgide bağlantılar ve formlardaki onayın yanında "Aydınlatma metni" görünür.
+  yasal: false
 };

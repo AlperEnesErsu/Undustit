@@ -45,6 +45,13 @@
 .round .icard .rank{display:none}
 .round .icard:has(.buy-f){grid-template-columns:minmax(0,1fr)}.round .icard:has(.buy-f) .buy{grid-column:1}
 .round .icard .t{font-size:15.5px}
+/* before the first candidates: demand gets the full width, the two later rounds wait as slim strips */
+.rounds.erken{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rounds.erken > .round:first-child{grid-column:1 / -1}
+.rounds.erken > .round:first-child .ideas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rounds.erken > .round:not(:first-child) :is(.empty,.slot){padding:10px 14px;font-size:13.5px;min-height:0}
+.rounds.erken > .round:not(:first-child) .empty p{display:none}
+@media (max-width:980px){.rounds.erken{grid-template-columns:minmax(0,1fr)}.rounds.erken > .round:first-child .ideas{grid-template-columns:minmax(0,1fr)}}
 .slot{padding:22px 18px;border:1px dashed var(--line-2);border-radius:var(--r-md);color:var(--muted);font-size:14px;line-height:1.5}
 .slot b{display:block;color:var(--ink-2);font-weight:500;margin-bottom:4px}
 @media (max-width:980px){.hero,.rounds{grid-template-columns:minmax(0,1fr)}}
@@ -64,6 +71,8 @@
     </div>
     <div id="proc"></div>
   </section>
+
+  <section class="wrap" aria-label="Canlı sayılar" data-ta="aria-label:anasayfa.attr.7" style="padding-bottom:clamp(32px,4vw,56px)"><div id="sayilar"></div></section>
 
   <section class="wrap" aria-label="Açık vaka" style="padding-bottom:clamp(56px,7vw,96px)" data-ta="aria-label:anasayfa.attr.5"><div id="case"></div></section>
 
@@ -97,11 +106,12 @@
 <script>
 const form = UD.mountForm(document.getElementById('form'), { focus:false });
 UD.mountCase(document.getElementById('case'), { form });
+UD.mountStats(document.getElementById('sayilar'));
 UD.mountProc(document.getElementById('proc'), { delay:500 });
 UD.mountThu(document.getElementById('thu'));
 // round 1: newest collecting demand; round 2: the five with the most "alırdım"
 UD.mountBoard(document.getElementById('r1'), { dialog:true, limit:4, sort:() => 'new', filter:i => i.left > 0, rank:false, emptyNote:UD.T('anasayfa.js.ornek') });
-UD.mountBoard(document.getElementById('r2'), { dialog:true, limit:5, filter:i => i.left > 0 && i.buyers > 0, rank:false, examples:false, emptyNote:UD.T('anasayfa.js.aday') });
+UD.mountBoard(document.getElementById('r2'), { dialog:true, onCount:n => document.querySelector('.rounds').classList.toggle('erken', !n), limit:5, filter:i => i.left > 0 && i.buyers > 0, rank:false, examples:false, emptyNote:UD.T('anasayfa.js.aday') });
 UD.openShared();
 </script>
 </body>

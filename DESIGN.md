@@ -327,3 +327,31 @@ vardı. Oyuncu korunarak her renge tek görev verildi:
 - **Ölçüm:** Plausible, `ayar.js` `analitik` boşken hiç yüklenmez. Olaylar: Fikir gönderildi, Alırdım,
   Paylaş, Haber ver, Vaka başvurusu.
 - **İçerik kuralı:** açılış fikirleri gerçek kişilerden, kendi adlarıyla (`docs/acilis-icerik.md`).
+
+## Faz 1: "gerçek şirket" görünümü (26 Ekim 2026)
+
+Yol haritası: `docs/yol-haritasi.md`. Jüri 4. tur: eleştirmen 7,0 (`.jury/127.0.0.1-4400/scorecard.md`).
+- **Jüri düzeltmeleri:**
+  - **Alırdım:** Oyuncu'da birincil eylem gibi (mor etiket, mürekkep kenar, sert gölge, hover'da mor dolgu). Örnek kartlarda pasif değil; dokununca "bu bir örnek" der.
+  - **Başlık animasyonu:** başlık artık kırpılarak girmiyor, yalnız yükseliyor (`ud-in-h`); kırpık başlangıç onu LCP'den saklıyordu (nasil mobilde 9,8 sn).
+  - **Ana sayfa turları:** aday yokken "Talep topluyor" tam genişlik, diğer iki tur ince şerit (`.rounds.erken`).
+  - **Şablon bağlantıları:** `href="${…}"` şablonları satır içi betikten çıktı.
+  - **Çizim etiketleri:** nokta ızgarası etiketlerin altından geçmiyor (`--art-bg`).
+  - **Hover:** nav ve metin içi bağlantılara gerçek hover.
+  - **Odak:** klavye odağı gizli bloğu hemen açar.
+  - **Mobil:** sıra numarası kart kenarında rozet; başlık her sayfada çizimden önce.
+  - **404:** stiller `<base>`'den sonra yazılıyor.
+  - **Sayfa geçişi:** Oyuncu'ya özgü sayfa geçişi.
+  - **Uzun tireler** sayı aralıklarında (%10–30) doğru yazım olduğu için bırakıldı.
+- **Hikâye:** "Neden varız" yeniden yazıldı, Quirky çıkarıldı (kullanıcının isteği; "Nasıl işler"deki karşılaştırma duruyor).
+  Ekip bölümü yok.
+- **İletişim (`iletisim/`):** form `iletisim_mesajlari` tablosuna (yalnız yönetici okur, günde 5). Herkese açık adres
+  `ayar.js` `iletisim` dolunca görünür.
+- **Yasal (`kvkk/`, `kosullar/`):** taslak metinler, sarı yer tutucularla. `noindex`, hiçbir yerden bağlantı yok.
+  `ayar.js` `yasal: true` olunca alt bilgide bağlantılar ve formlardaki onayın yanında "Aydınlatma metni" çıkar,
+  taslak uyarısı kalkar. Yayından önce avukat okumalı.
+- **Canlı sayılar:** ana sayfada fikir, "alırdım", toplam talep (₺), açık vaka. En az 5 gerçek fikir olmadan görünmez.
+- **Bildir:** fikir penceresinin altında; neden + not, kişi başı fikir başına bir kez, günde 20 (`fikir_bildirimleri`).
+  Yönetim Özet'te "Bildirilen fikirler": "Fikir gizlendi" fikri sitede gizler.
+- **Yönetim:** başvurular, mesajlar ve bildirimler aynı tablo bileşeniyle (`KAYITLAR`); veri tarafında `kayitTuru`.
+- SQL: `supabase/5-guven.sql` (mesajlar, bildirimler).

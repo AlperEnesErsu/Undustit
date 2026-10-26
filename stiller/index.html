@@ -122,7 +122,8 @@ function render(){
     card.innerHTML = `<header><h2>${name}</h2><span class="eyebrow">${pageName}</span></header>
       <button type="button" class="thumb" aria-label="${UD.T('stiller.js.buyut', { stil:name, sayfa:pageName })}"><iframe src="${href}" title="${UD.T('stiller.js.onizleme', { stil:name })}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></button>
       <p>${about}</p>
-      <div class="acts"><a class="link" data-stil-link href="${href}" target="_blank" rel="noopener">${UD.T('stiller.js.yeni')}</a></div>`;
+      <div class="acts"><a class="link" data-stil-link target="_blank" rel="noopener">${UD.T('stiller.js.yeni')}</a></div>`;
+    card.querySelector('.acts a').href = href;
     card.querySelector('.thumb').onclick = () => openView(k, name, pageName, href);
     host.append(card);
   });

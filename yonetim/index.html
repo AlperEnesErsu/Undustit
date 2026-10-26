@@ -92,24 +92,19 @@ function ciz(o, a){
         '</table></div>' +
       '</div>' +
     '</section>' +
-    '<section class="panel" id="basvurular" aria-labelledby="bv-b">' +
-      '<header class="panel-bas"><h2 id="bv-b">Vaka başvuruları</h2><span class="sayac" id="bv-sayac"></span></header>' +
-      '<div class="panel-ic"><div class="tablo-kap"><table class="tablo">' +
-        '<caption class="sr-only">Vakanı aç formundan gelen başvurular</caption>' +
-        '<thead><tr><th scope="col">Firma</th><th scope="col">Stok</th><th scope="col">Adet</th>' +
-        '<th scope="col">İletişim</th><th scope="col">Not</th><th scope="col">Tarih</th><th scope="col">Durum</th></tr></thead>' +
-        '<tbody id="bv-tbody"></tbody>' +
-      '</table></div></div>' +
-    '</section>';
+    KAYITLAR.map(panelHtml).join('');
 
-  ana.querySelector('#bv-tbody').addEventListener('change', function(e){
-    var s = e.target.closest('select[data-bv]');
-    if (!s) return;
-    s.disabled = true;
-    UDV.basvurular.durum(s.dataset.bv, s.value)
-      .then(function(){ YON.toast('Başvuru durumu kaydedildi.', 'ok'); })
-      .catch(function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); basvuruYenile(); })
-      .then(function(){ s.disabled = false; });
+  KAYITLAR.forEach(function(k){
+    ana.querySelector('#' + k.id + '-tbody').addEventListener('change', function(e){
+      var sec = e.target.closest('select[data-kayit]');
+      if (!sec) return;
+      sec.disabled = true;
+      Promise.resolve(k.degisince ? k.degisince(sec.dataset.kayit, sec.value, sec) : null)
+        .then(function(){ return UDV[k.tur].durum(sec.dataset.kayit, sec.value); })
+        .then(function(){ YON.toast(k.tamam, 'ok'); })
+        .catch(function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); kayitYenile(k); })
+        .then(function(){ sec.disabled = false; });
+    });
   });
 
   ana.querySelector('.chipler').addEventListener('click', function(e){
@@ -129,28 +124,52 @@ function ciz(o, a){
 
   istatYenile();
   yenile();
-  basvuruYenile();
+  KAYITLAR.forEach(kayitYenile);
 }
 
-// "Vakanı aç" formundan gelenler: yeni olanlar üstte, durum satırdan değişir
-function basvuruYenile(){
-  var tb = ana.querySelector('#bv-tbody');
-  tb.innerHTML = '<tr><td colspan="7">Yükleniyor…</td></tr>';
-  return Promise.resolve().then(function(){ return UDV.basvurular.liste(); }).then(function(liste){
-    ana.querySelector('#bv-sayac').textContent = liste.length + ' başvuru';
-    if (!liste.length){ tb.innerHTML = '<tr><td colspan="7">Henüz başvuru yok.</td></tr>'; return; }
-    var B = UDV.basvurular;
+// Sitenin yalnız yöneticiye gelen kayıtları: başvurular, mesajlar, bildirimler. Yeni olanlar üstte, durum satırdan değişir.
+var KONU = { genel:'Genel', ortaklik:'İş birliği', basin:'Basın', yatirim:'Yatırım' };
+var NEDEN = { spam:'Spam', uygunsuz:'Uygunsuz', kopya:'Kopya', yaniltici:'Yanıltıcı', diger:'Diğer' };
+function posta(e){ return '<a class="link" href="mailto:' + encodeURIComponent(e).replace(/%40/g, '@') + '">' + esc(e) + '</a>'; }
+var KAYITLAR = [
+  { id:'bildirimler', tur:'bildirimler', baslik:'Bildirilen fikirler', ad:'bildirim', bos:'Bildirilen fikir yok.', tamam:'Bildirim kaydedildi.',
+    kolon:['Fikir','Neden','Açıklama','Tarih'],
+    etiket:function(b){ return (b.fikirler && b.fikirler.baslik) || 'Fikir'; },
+    satir:function(b){ return ['<b>' + esc((b.fikirler && b.fikirler.baslik) || b.fikir_id) + '</b>', esc(NEDEN[b.neden] || b.neden), esc(b.aciklama || '—'), tarih(b.zaman)]; },
+    // "Fikir gizlendi" fikri sitede gizler; başka bir duruma dönmek gizliliği kaldırır
+    degisince:function(id, durum, sec){ var fid = sec.dataset.fikir; return fid ? UDV.fikirler.gizle(fid, durum === 'gizlendi') : null; } },
+  { id:'basvurular', tur:'basvurular', baslik:'Vaka başvuruları', ad:'başvuru', bos:'Henüz başvuru yok.', tamam:'Başvuru durumu kaydedildi.',
+    kolon:['Firma','Stok','Adet','İletişim','Not','Tarih'],
+    etiket:function(b){ return b.firma; },
+    satir:function(b){ return ['<b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : ''), esc(b.stok), esc(b.adet || '—'),
+      posta(b.eposta) + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : ''), esc(b.notlar || '—'), tarih(b.zaman)]; } },
+  { id:'mesajlar', tur:'mesajlar', baslik:'İletişim mesajları', ad:'mesaj', bos:'Henüz mesaj yok.', tamam:'Mesaj durumu kaydedildi.',
+    kolon:['Kimden','Konu','Mesaj','Tarih'],
+    etiket:function(b){ return b.eposta; },
+    satir:function(b){ return [(b.ad ? '<b>' + esc(b.ad) + '</b><br>' : '') + posta(b.eposta), esc(KONU[b.konu] || b.konu), esc(b.mesaj), tarih(b.zaman)]; } }
+];
+function panelHtml(k){
+  var n = k.kolon.length + 1;
+  return '<section class="panel" id="' + k.id + '" aria-labelledby="' + k.id + '-b">' +
+    '<header class="panel-bas"><h2 id="' + k.id + '-b">' + k.baslik + '</h2><span class="sayac" id="' + k.id + '-sayac"></span></header>' +
+    '<div class="panel-ic"><div class="tablo-kap"><table class="tablo"><caption class="sr-only">' + k.baslik + '</caption>' +
+    '<thead><tr>' + k.kolon.map(function(c){ return '<th scope="col">' + c + '</th>'; }).join('') + '<th scope="col">Durum</th></tr></thead>' +
+    '<tbody id="' + k.id + '-tbody" data-n="' + n + '"></tbody></table></div></div></section>';
+}
+function kayitYenile(k){
+  var tb = ana.querySelector('#' + k.id + '-tbody'), n = tb.dataset.n, T = UDV[k.tur];
+  tb.innerHTML = '<tr><td colspan="' + n + '">Yükleniyor…</td></tr>';
+  return Promise.resolve().then(function(){ return T.liste(); }).then(function(liste){
+    ana.querySelector('#' + k.id + '-sayac').textContent = liste.length + ' ' + k.ad;
+    if (!liste.length){ tb.innerHTML = '<tr><td colspan="' + n + '">' + k.bos + '</td></tr>'; return; }
     tb.innerHTML = liste.map(function(b){
-      return '<tr><td><b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : '') + '</td>' +
-        '<td>' + esc(b.stok) + '</td><td>' + esc(b.adet || '—') + '</td>' +
-        '<td><a class="link" href="mailto:' + encodeURIComponent(b.eposta).replace(/%40/g, '@') + '">' + esc(b.eposta) + '</a>' + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : '') + '</td>' +
-        '<td>' + esc(b.notlar || '—') + '</td><td>' + tarih(b.zaman) + '</td>' +
-        '<td><select data-bv="' + esc(b.id) + '" aria-label="' + esc(b.firma) + ' başvurusunun durumu">' +
-          B.DURUMLAR.map(function(d){ return '<option value="' + d + '"' + (d === b.durum ? ' selected' : '') + '>' + B.DURUM_ADI[d] + '</option>'; }).join('') +
+      return '<tr>' + k.satir(b).map(function(h){ return '<td>' + h + '</td>'; }).join('') +
+        '<td><select data-kayit="' + esc(b.id) + '"' + (b.fikir_id ? ' data-fikir="' + esc(b.fikir_id) + '"' : '') + ' aria-label="' + esc(k.etiket(b)) + ': durum">' +
+          T.DURUMLAR.map(function(d){ return '<option value="' + d + '"' + (d === b.durum ? ' selected' : '') + '>' + T.DURUM_ADI[d] + '</option>'; }).join('') +
         '</select></td></tr>';
     }).join('');
   }).catch(function(err){
-    tb.innerHTML = '<tr><td colspan="7">' + esc(err.message || 'Başvurular yüklenemedi.') + '</td></tr>';
+    tb.innerHTML = '<tr><td colspan="' + n + '">' + esc(err.message || 'Yüklenemedi.') + '</td></tr>';
   });
 }
 

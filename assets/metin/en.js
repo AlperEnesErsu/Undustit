@@ -269,7 +269,7 @@ UD_METIN.ekle('en', {
  "ud.kat.Teknoloji aksesuarı": "Tech accessories",
  "ud.kat.Çocuk": "Kids",
  "ud.kat.Evcil hayvan": "Pets",
- "ud.kat.Vaka 01 · Cıvata": "Case 01 · Bolts",
+ "ud.kat.Vaka 01 · Cıvata": "Case 01 · Boltun",
  "ud.ornek.1.baslik": "A chopping board that clips to the counter edge and folds up into a shelf.",
  "ud.ornek.1.problem": "In a small kitchen the chopping board takes over the counter.",
  "ud.ornek.1.cozum": "A hinged board clamps to the counter edge and folds up into a vertical shelf when not in use.",

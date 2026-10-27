@@ -232,3 +232,40 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 }
 @keyframes vt-out-o{to{opacity:0;transform:translateY(-12px) rotate(-.5deg) scale(.985)}}
 @keyframes vt-in-o{from{opacity:0;transform:translateY(26px) rotate(.7deg)}}
+
+/* ===================================================================== sakin katman (27 Ekim 2026)
+   Oyun hissi yalnız dokunulan yerde kalır. Kalın mürekkep çerçeve + sert gölge: birincil düğme, "alırdım",
+   sayfanın tek kahraman görseli (vaka bandı, misyon). Okunan ve göz gezdirilen her şey (panel, tablo, sayı
+   kutusu, menü, kart, ikincil düğme, çip) ince çizgi ve gölgesiz; gölge yalnız üzerine gelince belirir.
+   Böylece her ekranda göz tek bir yere çekilir, gerisi dinlendirir. Bu blok silinince eski yüksek ses döner. */
+.btn.alt,.btn.google{border-width:1px;border-color:var(--line-2);box-shadow:none}
+.btn.alt:hover{background:var(--bg-3);color:var(--ink);box-shadow:none;transform:none}
+.chip,.arac-cubugu .chip{border-width:1px;border-color:var(--line-2)}
+.chip:hover{background:var(--bg-3);border-color:var(--ink)}
+.chip[aria-pressed="true"],.arac-cubugu .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chip.case[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+/* cards in a list: quiet until you point at one */
+.icard{border:1px solid var(--line-2);box-shadow:none}
+@media (hover:hover) and (pointer:fine){.icard:hover{box-shadow:4px 4px 0 var(--ink);transform:translate(-2px,-2px);background:var(--bg-2)}}
+.case,.after,.arena aside div,.disc a,.disc a + a{border:1px solid var(--line);box-shadow:none}
+.case.open{border-color:var(--line-2)}
+.ben,a.thu{border-width:1px;box-shadow:none}
+.case-band,.mission,html .mission{box-shadow:6px 6px 0 var(--ink)}
+.bos,.slot,.empty{border:1px dashed var(--line-2);box-shadow:none}
+/* panels, tables, numbers: reading surfaces */
+.panel,.tablo-kap,.istat{border:1px solid var(--line);box-shadow:none}
+.panel-bas{border-bottom:1px solid var(--line)}
+.panel-bas h2{font-weight:700;font-size:17px}
+.tablo th{font-weight:500;color:var(--muted);box-shadow:inset 0 -1px 0 var(--line)}
+.istat:hover{transform:none;box-shadow:none}
+.istat:nth-child(3n+2){background:var(--bg-2)}
+.istat b{font-weight:700}
+/* the admin and company chrome: a tool, not a stage */
+.y-bas{border-bottom:1px solid var(--line)}
+.y-yan{border-right:1px solid var(--line)}
+.y-yan a{border:0}
+.y-yan a:hover{transform:none;box-shadow:none;background:var(--bg-3);color:var(--ink)}
+.y-yan a[aria-current="page"]{background:var(--bg-3);color:var(--ink);box-shadow:inset 3px 0 0 var(--accent);font-weight:600}
+@media (max-width:800px){.y-yan{border-bottom:1px solid var(--line)}.y-yan a[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--accent)}}
+.anahtar input{border-width:1px;box-shadow:none}
+.alan input:not([type]),.alan input[type="text"],.alan input[type="email"],.alan input[type="url"],.alan input[type="number"],.alan input[type="password"],.alan input[type="search"],.alan input[type="date"],.alan textarea,.alan select,.arac-cubugu input[type="search"],.arac-cubugu select,.y-ara{border-width:1px;border-color:var(--line-2)}

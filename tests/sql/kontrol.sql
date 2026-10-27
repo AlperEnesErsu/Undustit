@@ -4,6 +4,7 @@
 -- column rights of 8-gizli.sql are applied again on top of that blanket grant.
 grant select, insert, update, delete on all tables in schema public to anon, authenticated;
 \i supabase/8-gizli.sql
+\i supabase/10-hata.sql
 
 insert into auth.users (id) values
   ('00000000-0000-0000-0000-00000000000a'), ('00000000-0000-0000-0000-00000000000b'),
@@ -198,6 +199,35 @@ end $$;
 update public.vakalar set taban_fiyat = 3 where id = 'vaka-01';
 do $$ begin
   if (select taban_fiyat from public.vaka_tam('vaka-01')) <> 3 then raise exception 'yönetici taban fiyatı değiştiremiyor'; end if;
+end $$;
+reset role;
+-- error log: anyone writes (a visitor without a session too), only the admin reads; nobody sets the state
+reset role;
+set role anon;
+reset request.jwt.claim.sub;
+insert into public.hata_kayitlari (sayfa, mesaj) values ('/fikirler/', 'TypeError: x is undefined');
+do $$ begin
+  begin
+    perform 1 from public.hata_kayitlari;
+    raise exception 'ziyaretçi hata kayıtlarını okuyabiliyor';
+  exception when insufficient_privilege then null; end;
+  begin
+    insert into public.hata_kayitlari (mesaj, durum) values ('x', 'cozuldu');
+    raise exception 'ziyaretçi hata durumunu belirleyebiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+do $$ begin
+  if (select count(*) from public.hata_kayitlari) <> 0 then raise exception 'üye hata kayıtlarını görüyor'; end if;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+do $$ begin
+  if (select count(*) from public.hata_kayitlari) <> 1 then raise exception 'yönetici hata kayıtlarını göremiyor'; end if;
+end $$;
+update public.hata_kayitlari set durum = 'cozuldu';
+do $$ begin
+  if (select durum from public.hata_kayitlari limit 1) <> 'cozuldu' then raise exception 'yönetici hatayı çözüldü yapamıyor'; end if;
 end $$;
 reset role;
 select 'sql kontrolleri tamam' as sonuc;

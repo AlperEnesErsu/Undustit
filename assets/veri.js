@@ -547,6 +547,7 @@
     basvurular: kayitTuru('vaka_basvurulari', { yeni:'Yeni', incelendi:'İncelendi', kabul:'Kabul', red:'Ret' }),
     mesajlar: kayitTuru('iletisim_mesajlari', { yeni:'Yeni', yanitlandi:'Yanıtlandı', kapandi:'Kapandı' }),
     bildirimler: kayitTuru('fikir_bildirimleri', { acik:'Açık', gizlendi:'Fikir gizlendi', yok_sayildi:'Yok sayıldı' }),
+    hatalar: kayitTuru('hata_kayitlari', { yeni:'Yeni', cozuldu:'Çözüldü' }),
 
     async csv(vakaId){
       yetkiTest();

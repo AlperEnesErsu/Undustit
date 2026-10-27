@@ -155,8 +155,22 @@ var KAYITLAR = [
   { id:'mesajlar', tur:'mesajlar', baslik:'İletişim mesajları', ad:'mesaj', bos:'Henüz mesaj yok.', tamam:'Mesaj durumu kaydedildi.',
     kolon:['Kimden','Konu','Mesaj','Tarih'],
     etiket:function(b){ return b.eposta; },
-    satir:function(b){ return [(b.ad ? '<b>' + esc(b.ad) + '</b><br>' : '') + posta(b.eposta), esc(KONU[b.konu] || b.konu), esc(b.mesaj), tarih(b.zaman)]; } }
+    satir:function(b){ return [(b.ad ? '<b>' + esc(b.ad) + '</b><br>' : '') + posta(b.eposta), esc(KONU[b.konu] || b.konu), esc(b.mesaj), tarih(b.zaman)]; } },
+  // browser errors the site reported (supabase/10-hata.sql); "Çözüldü" once fixed
+  { id:'hatalar', tur:'hatalar', baslik:'Site hataları', ad:'hata', bos:'Kayıtlı hata yok.', tamam:'Hata durumu kaydedildi.',
+    kolon:['Sayfa','Hata','Kaynak','Tarayıcı','Tarih'],
+    etiket:function(b){ return b.mesaj; },
+    satir:function(b){ return ['<code>' + esc(b.sayfa || '/') + '</code>', esc(b.mesaj), '<small>' + esc((b.kaynak || '—') + (b.satir ? ':' + b.satir : '')) + '</small>',
+      '<small>' + esc(tarayiciAdi(b.tarayici)) + '</small>', tarih(b.zaman)]; } }
 ];
+// "Chrome 130 · Android" instead of the whole user-agent string
+function tarayiciAdi(ua){
+  ua = String(ua || '');
+  var t = (ua.match(/(Edg|OPR|Firefox|CriOS|Chrome|Version)\/(\d+)/) || [])[0] || '';
+  t = t.replace('Edg', 'Edge').replace('OPR', 'Opera').replace('CriOS', 'Chrome').replace('Version', 'Safari').replace('/', ' ');
+  var s = /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : /Windows/.test(ua) ? 'Windows' : /Mac OS/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : '';
+  return [t, s].filter(Boolean).join(' · ') || '—';
+}
 // a company's photo: a small preview, opening the full image when it is a web address
 function gorselHucre(u){
   var g = UD.gorselAdresi(u);

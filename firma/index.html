@@ -81,6 +81,16 @@ function girisCiz(not){
       '<p class="durum" role="status" aria-live="polite">' + esc(not || '') + '</p></form>' +
     '<p style="color:var(--muted);font-size:14px">Henüz vakanız yok mu? <a class="link" href="../vakalar/#vakani-ac">Vakanı aç</a></p></div>';
   var f = ana.querySelector('form'), d = f.querySelector('.durum');
+  // a company on Google Workspace signs in with one button (when Google is switched on in Supabase)
+  UD.Store.googleAcik().then(function(acik){
+    if (!acik) return;
+    var g = UD.el('button', { type:'button', class:'btn alt', text:'Google ile gir' });
+    g.onclick = function(){
+      g.disabled = true;
+      UD.Store.google(location.origin + location.pathname, true).catch(function(){ g.disabled = false; d.textContent = 'Google ile giriş başlatılamadı.'; d.classList.add('bad'); });
+    };
+    f.before(UD.el('div', {}, [g]), UD.el('small', { style:'color:var(--muted)', text:'ya da e-postanızla:' }));
+  });
   f.addEventListener('submit', function(e){
     e.preventDefault();
     var b = f.querySelector('[type=submit]'); b.disabled = true; d.classList.remove('bad'); d.textContent = 'Gönderiliyor…';

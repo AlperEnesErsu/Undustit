@@ -4,8 +4,13 @@
                                    the Turkish found there to assets/metin/tr.js (keys that exist are kept)
   python tools/metin.py yaz        write tr.js back into the pages' HTML, so the static Turkish (what search
                                    engines and no-JS visitors read) matches the dictionary after an edit
-  python tools/metin.py denetle    list keys missing from en.js, keys no page or script uses, empty values
-                                   (--kati: exit 1 when anything is listed, for CI)
+  python tools/metin.py denetle    list keys no page or script uses, keys used but missing, empty values
+                                   (--kati: exit 1 on those, for CI). English is never a blocker: a missing
+                                   English text shows the Turkish one, and "to translate" is only reported
+  python tools/metin.py cevir      write assets/metin/cevrilecek.json: every key whose English is missing or
+                                   older than its Turkish, as key -> Turkish. Translate the values in one go
+  python tools/metin.py cevir-yaz  read that file back (values now English) into en.js and remember the
+                                   Turkish each one was made from (assets/metin/ceviri-kaynak.json)
 
 Keys are <page>.<tag>.<n>; text the scripts build (assets/ud/*.js, page scripts) uses hand-named keys such as ud.nav.ideas.
 """
@@ -15,7 +20,7 @@ from html.parser import HTMLParser
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGES = {'index.html': 'anasayfa', 'fikir/index.html': 'fikir', 'fikirler/index.html': 'fikirler', 'nasil/index.html': 'nasil',
          'vakalar/index.html': 'vakalar', 'vaka-01/index.html': 'vaka', 'hikaye/index.html': 'hikaye', 'stiller/index.html': 'stiller',
-         '404.html': 'yok', 'vaka/index.html': 'vakasayfa', 'iletisim/index.html': 'iletisim', 'benim/index.html': 'benim', 'persembe/index.html': 'persembe'}
+         '404.html': 'yok', 'vaka/index.html': 'vakasayfa', 'iletisim/index.html': 'iletisim', 'benim/index.html': 'benim', 'persembe/index.html': 'persembe', 'giris/index.html': 'giris'}
 UNIT = {'title', 'h1', 'h2', 'h3', 'p', 'li', 'dt', 'dd', 'b', 'strong', 'span', 'a', 'button', 'label', 'figcaption', 'q', 'th', 'td',
         'small', 'text', 'summary', 'option', 'div', 'em', 'i', 'tspan', 'caption'}
 VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr'}
@@ -188,16 +193,49 @@ def denetle():
     used -= pre
     used |= {k for k in tr if any(k.startswith(p) for p in pre if p != 'key') or k.startswith(('ud.kat.', 'ud.ornek.'))}
     checks = {
-        'missing in en': sorted(k for k in tr if k not in en),
-        'only in en': sorted(k for k in en if k not in tr),
         'unused': sorted(k for k in tr if k not in used and not k.startswith('ud.dyn')),
         'used but missing in tr': sorted(k for k in used if k not in tr),
         'empty': sorted(k for d in (tr, en) for k, v in d.items() if not str(v).strip()),
     }
     for name, keys in checks.items(): print(name + ':', keys or 'none')
-    # --kati (CI): any finding fails the run
+    # English is reported, never a failure: a missing English text shows the Turkish one (assets/stil.js)
+    print('to translate (en):', len(bekleyen(tr, en)), '(python tools/metin.py cevir)')
+    # --kati (CI): any finding above fails the run
     if '--kati' in sys.argv and any(checks.values()): sys.exit(1)
 
 
+KAYNAK = 'assets/metin/ceviri-kaynak.json'   # key -> the Turkish its English was made from
+BEKLEYEN = 'assets/metin/cevrilecek.json'
+
+
+def kaynak():
+    return json.loads(read(KAYNAK)) if os.path.exists(path(KAYNAK)) else {}
+
+
+def bekleyen(tr, en):
+    """keys whose English is missing, or was made from an older Turkish"""
+    k = kaynak()
+    return {key: v for key, v in tr.items() if key not in en or (key in k and k[key] != v)}
+
+
+def cevir():
+    b = bekleyen(load('tr'), load('en'))
+    write(BEKLEYEN, json.dumps(b, ensure_ascii=False, indent=1) + '\n')
+    print(len(b), 'texts to translate ->', BEKLEYEN)
+
+
+def cevir_yaz():
+    tr, en, k = load('tr'), load('en'), kaynak()
+    gelen = json.loads(read(BEKLEYEN))
+    for key, v in gelen.items():
+        if key in tr and str(v).strip():
+            en[key] = v
+            k[key] = tr[key]
+    save('en', en)
+    write(KAYNAK, json.dumps(dict(sorted(k.items())), ensure_ascii=False, indent=1) + '\n')
+    os.remove(path(BEKLEYEN))
+    print(len(gelen), 'translations written to en.js')
+
+
 if __name__ == '__main__':
-    {'etiketle': etiketle, 'yaz': yaz, 'denetle': denetle}[sys.argv[1] if len(sys.argv) > 1 else 'denetle']()
+    {'etiketle': etiketle, 'yaz': yaz, 'denetle': denetle, 'cevir': cevir, 'cevir-yaz': cevir_yaz}[sys.argv[1] if len(sys.argv) > 1 else 'denetle']()

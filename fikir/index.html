@@ -21,7 +21,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
 <meta property="og:title" content="Fikrini yaz · Undustit" data-ta="content:fikir.attr.3">
-<meta property="og:description" content="Tek cümlelik fikrin, yüzlerce meraklı göz." data-ta="content:fikir.attr.4">
+<meta property="og:description" content="Aklındaki ürünü bir cümleyle yaz, kaç kişinin alacağını gör." data-ta="content:fikir.attr.4">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
@@ -48,15 +48,15 @@
   <div class="compose">
     <div class="compose-l">
       <span class="eyebrow k" id="case-line" data-t="fikir.span.1">Yeni fikir</span>
-      <h1 data-t="fikir.h1.1">Kısa yaz. <em>Topluluk büyütsün.</em></h1>
-      <p class="lead" data-t="fikir.p.1">Sunum, iş planı, prototip yok. Bir cümle, bir kategori, çözdüğü dert, çözümü ve en çok üç özellik. Gerisini merak eden yüzlerce kişi ekler.</p>
+      <h1 data-t="fikir.h1.1">Aklındaki ürünü <em>bir cümleyle anlat.</em></h1>
+      <p class="lead" data-t="fikir.p.1">Sunum, çizim ya da iş planı gerekmez. Ne olduğunu bir cümleyle yaz ve kategorisini seç; istersen hangi derdi çözdüğünü ekle. 30 gün boyunca insanlar “alırdım” der ve kaça alacaklarını yazar.</p>
       <div id="form"></div>
     </div>
     <aside class="after" aria-label="Gönderdikten sonra" data-ta="aria-label:fikir.attr.5">
       <span class="eyebrow" data-t="fikir.span.2">Gönderdikten sonra</span>
       <ol>
         <li><span data-t="fikir.span.3"><b>30 gün talep.</b> Üyeler “alırdım” der ve kaça alacağını yazar; yorum, iyileştirme ya da endişe ekler.</span></li>
-        <li><span data-t="fikir.span.4"><b>Perşembe 20.00.</b> En çok istenenler canlı yayında tasarım, pazar ve uygulanabilirlik açısından didik didik edilir.</span></li>
+        <li><span data-t="fikir.span.4"><b>Perşembe 20.00.</b> En çok istenenler canlı yayında konuşulur; bir sonraki tura geçenler orada seçilir.</span></li>
         <li><span data-t="fikir.span.5"><b>Birlikte büyütme.</b> İsmi, rengi, kutusu ve sloganı topluluktan gelir.</span></li>
         <li><span data-t="fikir.span.6"><b>Ön satış ve üretim.</b> 300–750 sipariş toplanınca üretilir, satıştan pay alırsın.</span></li>
       </ol>
@@ -73,6 +73,7 @@
 <script>
 const q = new URLSearchParams(location.search).get('vaka');
 UD.mountForm(document.getElementById('form'), { open:true, caseId:q });
+
 // the case list comes from the database; the form picks the case itself once it arrives
 UD.Store.cases().then(() => { const c = UD.openCases().find(x => x.id === q); if (c) document.getElementById('case-line').textContent = UD.T('fikir.js.vaka', { vaka:c.name }); });
 </script>

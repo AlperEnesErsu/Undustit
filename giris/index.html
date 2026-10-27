@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="giris">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FCF9F3">
+<title data-t="giris.title.1">Giriş · Undustit</title>
+<link rel="stylesheet" href="../assets/fonts/base.css">
+<link rel="stylesheet" href="../assets/ud.css">
+<script src="../assets/stil.js"></script>
+<style>
+.g-ana{padding-block:clamp(40px,6vw,88px) clamp(56px,8vw,112px);display:grid;place-items:start center}
+.g-kart{width:min(460px,100%);display:grid;gap:18px;padding:clamp(22px,3vw,32px);border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2)}
+.g-kart h1{font-size:clamp(30px,3.6vw,42px);line-height:1.02}
+.g-kart > p{margin:0;color:var(--ink-2)}
+.g-sekme{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line-2);border-radius:999px;padding:3px}
+.g-sekme button{min-height:38px;border:0;border-radius:999px;background:transparent;font-size:14.5px;color:var(--ink-2)}
+.g-sekme button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.g-kart form{display:grid;gap:12px}
+.g-kart label{display:grid;gap:6px;font-size:14px;color:var(--ink-2)}
+.g-kart input{min-height:46px;border:1px solid var(--line-2);border-radius:var(--r-sm);padding:0 12px;background:var(--bg);font-size:15.5px;color:var(--ink)}
+.g-kart input:focus{outline:none;border-color:var(--accent)}
+.g-kart small{color:var(--muted);font-size:13px}
+.g-ya{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.g-ya::before,.g-ya::after{content:"";flex:1;border-top:1px solid var(--line)}
+.g-kart .btn{justify-content:center}
+.g-alt{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px}
+.durum{min-height:1.3em;font-size:14px;margin:0}
+.durum.bad{color:var(--err)}
+.durum.ok{color:var(--ok)}
+.g-yollar{display:grid;gap:8px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-t="giris.a.1">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" tabindex="-1" class="wrap g-ana">
+  <section class="g-kart" id="kart" aria-live="polite"><p data-t="giris.p.1">Yükleniyor…</p></section>
+</main>
+<footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
+<script src="../assets/ud/temel.js"></script>
+<script src="../assets/ud/depo.js"></script>
+<script src="../assets/ud/arayuz.js"></script>
+<script src="../assets/ud/hareket.js"></script>
+<script src="../assets/veri.js"></script>
+<script>
+// One door for everyone: sign up (e-mail + password, confirmed by e-mail), sign in, reset the password.
+// After signing in the admin goes to yonetim/, a company to firma/, everyone else to benim/.
+(function(){
+const { T, esc, el, ICON, ROOT, Store } = UD;
+const kart = document.getElementById('kart');
+const DONUS = location.origin + location.pathname;
+const adres = location.search + '&' + location.hash.slice(1);
+const isaret = new URLSearchParams(adres);
+// most people who press the icon already have an account: sign-in comes first, ?mod=kayit opens sign-up
+let mod = isaret.get('mod') === 'kayit' ? 'kayit' : 'giris';
+const gecerli = v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+const durumYaz = (t, k) => { const d = kart.querySelector('.durum'); if (d){ d.textContent = t; d.className = 'durum' + (k ? ' ' + k : ''); } };
+const hataMetni = err => {
+  const c = err && (err.code || ''), s = err && err.status;
+  if (s === 429 || c === 'over_email_send_rate_limit') return T('giris.hata.sik');
+  if (c === 'email_exists' || c === 'user_already_exists') return T('giris.hata.var');
+  if (c === 'weak_password') return T('giris.hata.zayif');
+  if (c === 'email_not_confirmed') return T('giris.hata.dogrulanmadi');
+  return (err && err.message === 'E-posta ya da şifre yanlış') ? T('giris.hata.yanlis') : T('giris.hata.genel');
+};
+
+// where a signed-in person belongs
+async function yer(){
+  const o = UDV.oturum();
+  if (o && o.rol === 'admin') return ROOT + 'yonetim/';
+  if ((await UDV.firma.vakalarim().catch(() => [])).length) return ROOT + 'firma/';
+  return ROOT + 'benim/';
+}
+
+function girdinCiz(o){
+  kart.innerHTML = `<h1>${T('giris.girdin.baslik')}</h1><p>${T('giris.girdin.metin', { eposta:'<b>' + esc(o.email) + '</b>' })}</p>
+    <div class="g-yollar"><a class="btn sig" id="git" href="${ROOT}benim/">${T('giris.devam')} ${ICON.arrow}</a></div>
+    <div class="g-alt"><button type="button" class="link" id="cikis">${T('benim.js.cikis')}</button></div>`;
+  yer().then(h => { kart.querySelector('#git').href = h; });
+  kart.querySelector('#cikis').onclick = () => UDV.cikis().then(() => formCiz());
+}
+
+function yeniSifreCiz(){
+  kart.innerHTML = `<h1>${T('giris.yeni.baslik')}</h1><p>${T('giris.yeni.metin')}</p>
+    <form novalidate><label>${T('giris.sifre')}<input type="password" name="s" autocomplete="new-password" minlength="8" required></label>
+    <button type="submit" class="btn sig">${T('giris.yeni.kaydet')}</button><p class="durum" role="status"></p></form>`;
+  const f = kart.querySelector('form'); f.s.focus();
+  f.onsubmit = e => {
+    e.preventDefault();
+    if (f.s.value.length < 8) return durumYaz(T('giris.hata.kisa'), 'bad');
+    f.querySelector('button').disabled = true;
+    Store.sifreKoy(f.s.value).then(async () => { location.href = await yer(); })
+      .catch(err => { f.querySelector('button').disabled = false; durumYaz(hataMetni(err), 'bad'); });
+  };
+}
+
+function gonderildiCiz(eposta, tur){
+  kart.innerHTML = `<h1>${T('giris.gonderildi.baslik')}</h1><p>${T('giris.gonderildi.metin', { eposta:'<b>' + esc(eposta) + '</b>' })}</p>
+    <div class="g-alt"><button type="button" class="link" id="yine">${T('giris.yine')}</button><button type="button" class="link" id="baska">${T('giris.baska')}</button></div><p class="durum" role="status"></p>`;
+  kart.querySelector('#yine').onclick = e => { e.target.disabled = true; Store.dogrulamaYenile(eposta, tur, DONUS).then(() => durumYaz(T('giris.yine.tamam'), 'ok'), err => { e.target.disabled = false; durumYaz(hataMetni(err), 'bad'); }); };
+  kart.querySelector('#baska').onclick = () => formCiz();
+}
+
+function formCiz(){
+  const kayit = mod === 'kayit', yerel = UDV.mod !== 'supabase';
+  kart.innerHTML = `<h1>${kayit ? T('giris.kayit.baslik') : T('giris.giris.baslik')}</h1>
+    <p>${kayit ? T('giris.kayit.metin') : T('giris.giris.metin')}</p>
+    <div class="g-sekme" role="tablist"><button type="button" role="tab" data-mod="giris" aria-selected="${!kayit}">${T('giris.sekme.giris')}</button><button type="button" role="tab" data-mod="kayit" aria-selected="${kayit}">${T('giris.sekme.kayit')}</button></div>
+    <div class="g-google" hidden><button type="button" class="btn google" style="width:100%">${ICON.google}<span>${T('benim.js.google')}</span></button><div class="g-ya" style="margin-top:14px">${T('giris.ya')}</div></div>
+    <form novalidate>
+      <label>${T('giris.eposta')}<input type="email" name="e" autocomplete="email" maxlength="160" required></label>
+      <label>${T('giris.sifre')}<input type="password" name="s" autocomplete="${kayit ? 'new-password' : 'current-password'}" minlength="${kayit ? 8 : 1}" required>${kayit ? `<small>${T('giris.sifre.not')}</small>` : ''}</label>
+      <button type="submit" class="btn sig">${kayit ? T('giris.kayit.dugme') : T('giris.giris.dugme')}</button>
+      <p class="durum" role="status" aria-live="polite">${yerel ? T('giris.yerel') : ''}</p>
+    </form>
+    ${kayit ? '' : `<div class="g-alt"><button type="button" class="link" id="baglanti">${T('giris.baglanti')}</button><button type="button" class="link" id="unuttum">${T('giris.unuttum')}</button></div>`}`;
+  kart.querySelectorAll('[data-mod]').forEach(b => b.onclick = () => { mod = b.dataset.mod; formCiz(); });
+  const f = kart.querySelector('form');
+  try { f.e.value = localStorage.getItem('ud-eposta') || ''; } catch(e){}
+  Store.googleAcik().then(acik => {
+    if (!acik) return;
+    const g = kart.querySelector('.g-google'); g.hidden = false;
+    g.querySelector('button').onclick = e => { e.currentTarget.disabled = true; Store.google(DONUS, !kayit).catch(() => { e.currentTarget.disabled = false; durumYaz(T('benim.js.hata.google'), 'bad'); }); };
+  });
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const v = f.e.value.trim(), s = f.s.value;
+    if (!gecerli(v)){ durumYaz(T('ud.haber.hata.eposta'), 'bad'); return f.e.focus(); }
+    if (kayit && s.length < 8){ durumYaz(T('giris.hata.kisa'), 'bad'); return f.s.focus(); }
+    if (!s){ durumYaz(T('giris.hata.sifre'), 'bad'); return f.s.focus(); }
+    const b = f.querySelector('[type=submit]'); b.disabled = true; durumYaz(T('benim.js.gidiyor'));
+    try { localStorage.setItem('ud-eposta', v); } catch(e){}
+    try {
+      if (kayit){
+        if (yerel) throw new Error('yerel');
+        const tur = await Store.kayitOl(v, s, DONUS);
+        UD.olcu('Kayıt');
+        return gonderildiCiz(v, tur);
+      }
+      // the local preview has no member accounts: the admin signs in with the preview password, a company by e-mail
+      if (yerel){ try { await UDV.giris(v, s); } catch(err){ await UDV.firma.giris(v); } }
+      else await UDV.giris(v, s);
+      location.href = await yer();
+    } catch(err){
+      b.disabled = false;
+      if (err && err.message === 'yerel') return durumYaz(T('giris.yerel'), 'bad');
+      durumYaz(hataMetni(err), 'bad');
+      if (err && err.code === 'email_not_confirmed'){
+        const y = el('button', { type:'button', class:'link', text:T('giris.yine') });
+        y.onclick = () => { y.disabled = true; Store.dogrulamaYenile(v, 'signup', DONUS).then(() => durumYaz(T('giris.yine.tamam'), 'ok'), er => durumYaz(hataMetni(er), 'bad')); };
+        kart.querySelector('.durum').append(' ', y);
+      }
+    }
+  };
+  // no password at hand: a one-time sign-in link to the address (only for accounts that exist)
+  const bl = kart.querySelector('#baglanti');
+  if (bl) bl.onclick = () => {
+    const v = f.e.value.trim();
+    if (!gecerli(v)){ durumYaz(T('giris.baglanti.not'), 'bad'); return f.e.focus(); }
+    if (yerel) return durumYaz(T('giris.yerel'), 'bad');
+    bl.disabled = true;
+    try { localStorage.setItem('ud-eposta', v); } catch(e){}
+    Store.girisBaglantisi(v, DONUS).then(() => durumYaz(T('giris.baglanti.tamam', { eposta:v }), 'ok'),
+      err => { bl.disabled = false; durumYaz(err && /signups? not allowed|not found/i.test(err.message || '') ? T('giris.baglanti.yok') : hataMetni(err), 'bad'); });
+  };
+  const u = kart.querySelector('#unuttum');
+  if (u) u.onclick = () => {
+    const v = f.e.value.trim();
+    if (!gecerli(v)){ durumYaz(T('giris.unuttum.not'), 'bad'); return f.e.focus(); }
+    if (yerel) return durumYaz(T('giris.yerel'), 'bad');
+    u.disabled = true;
+    Store.sifreSifirla(v, DONUS).then(() => durumYaz(T('giris.unuttum.tamam', { eposta:v }), 'ok'), err => { u.disabled = false; durumYaz(hataMetni(err), 'bad'); });
+  };
+}
+
+// coming back from an e-mail: a password reset, or a confirmed sign-up that may still need its password
+Promise.resolve(UDV.hazir).then(() => {
+  if (isaret.get('type') === 'recovery') return yeniSifreCiz();
+  const o = UDV.oturum();
+  let sonra = false; try { sonra = localStorage.getItem('ud-sifre-sonra') === '1'; } catch(e){}
+  if (o && o.email && sonra) return yeniSifreCiz();
+  if (o && o.email){
+    // a fresh confirmation link lands here signed in: go straight on
+    if (isaret.get('type') === 'signup' || isaret.get('type') === 'email_change' || isaret.get('access_token')) return yer().then(h => { location.href = h; });
+    return girdinCiz(o);
+  }
+  if (isaret.get('error_code')) mod = 'giris';
+  formCiz();
+  if (isaret.get('error_code')) durumYaz(T('giris.hata.baglanti'), 'bad');
+});
+})();
+</script>
+</body>
+</html>

@@ -319,6 +319,8 @@
     async giris(email, sifre){
       if (SB_URL){
         const { data, error } = await istemci().auth.signInWithPassword({ email: str(email), password: String(sifre || '') });
+        // an unconfirmed address is the one failure worth naming: the person can ask for the link again
+        if (error && error.code === 'email_not_confirmed') throw Object.assign(new Error('E-posta henüz doğrulanmadı'), { code: error.code });
         if (error || !data.session) throw new Error(YANLIS);
         await oturumYukle(data.session);
         return UDV.oturum();

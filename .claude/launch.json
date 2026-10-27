@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "better",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4317", "--bind", "127.0.0.1"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tests/sunucu.mjs", "4317"],
       "port": 4317
     }
   ]

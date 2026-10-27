@@ -1,6 +1,6 @@
 // What reaches only the admin: a report, a contact message, a case application (with its photo); hiding a
 // reported idea; and the case photo the admin uploads, shown in the technical sheet.
-import { test, expect, hazirla, tohum, yoneticiGiris } from './yardim.mjs';
+import { test, expect, hazirla, tohum, yoneticiGiris, ADMIN, ADMIN_SIFRE } from './yardim.mjs';
 
 // a 1×1 PNG: enough for the browser to decode, shrink and re-encode
 const FOTO = { name:'urun.png', mimeType:'image/png',
@@ -104,6 +104,40 @@ test('yönetici firma ekler; firma panelde kendi vakasını, talepleri ve fiyat 
   await expect(page.locator('#foto img')).toHaveAttribute('src', /^data:image\/jpeg/);
   await page.goto('/vaka-01/');
   await expect(page.locator('#foy-gorsel img')).toHaveAttribute('src', /^data:image\/jpeg/);
+});
+
+test('kişi simgesi giriş sayfasını açar; yönetici yönetime, firma firma paneline geçer', async ({ page }) => {
+  await hazirla(page);
+  await page.goto('/');
+  await page.locator('header a.ben').click();
+  await expect(page).toHaveURL(/\/giris\/$/);
+  // sign-in is the first tab; sign-up is one tap away
+  await expect(page.locator('#kart h1')).toHaveText('Tekrar hoş geldin.');
+  await expect(page.locator('#kart [role=tab]').first()).toHaveText('Giriş yap');
+  await page.locator('[data-mod=kayit]').click();
+  await expect(page.locator('#kart h1')).toHaveText('Hesabını aç.');
+  // the local preview opens no member accounts and says so
+  await page.fill('#kart [name=e]', 'uye@ornek.test');
+  await page.fill('#kart [name=s]', 'uzunbirsifre');
+  await page.locator('#kart [type=submit]').click();
+  await expect(page.locator('#kart .durum')).toContainText('Yerel önizlemede');
+  await page.locator('[data-mod=giris]').click();
+  await page.fill('#kart [name=e]', ADMIN);
+  await page.fill('#kart [name=s]', 'yanlis');
+  await page.locator('#kart [type=submit]').click();
+  await expect(page.locator('#kart .durum')).toHaveClass(/bad/);
+  await page.fill('#kart [name=s]', ADMIN_SIFRE);
+  await page.locator('#kart [type=submit]').click();
+  await expect(page).toHaveURL(/\/yonetim\/$/);
+  // a company: the admin adds its e-mail, then it signs in from the same door
+  await page.evaluate(() => UDV.firma.ekle('vaka-01', 'satis@firma.test'));
+  await page.evaluate(() => UDV.cikis());
+  await page.goto('/giris/?mod=giris');
+  await page.fill('#kart [name=e]', 'satis@firma.test');
+  await page.fill('#kart [name=s]', 'herhangi');
+  await page.locator('#kart [type=submit]').click();
+  await expect(page).toHaveURL(/\/firma\/$/);
+  await expect(page.locator('main h1')).toHaveText('Bir milyon cıvata');
 });
 
 test('rapor toplamları, vaka satırları ve en çok istenen fikri verir', async ({ page }) => {

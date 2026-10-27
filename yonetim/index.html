@@ -23,6 +23,11 @@
 .tablo td a:hover{text-decoration-color:var(--ink)}
 .tablo td.bosluk{padding:0}
 .tablo .bos{margin:0;border:0}
+.bos-panel thead{display:none}
+.bos-panel .tablo-kap{border:0;background:transparent;box-shadow:none}
+.bos-panel .tablo{min-width:0}
+.bos-panel .tablo td{padding:2px 0;color:var(--muted)}
+.bos-panel .tablo tbody tr:hover td{background:transparent}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media (max-width:640px){.y-ust{align-items:stretch}.y-ust .btn{width:100%}}
 </style>
@@ -172,6 +177,8 @@ function kayitYenile(k){
   tb.innerHTML = '<tr><td colspan="' + n + '">Yükleniyor…</td></tr>';
   return Promise.resolve().then(function(){ return T.liste(); }).then(function(liste){
     ana.querySelector('#' + k.id + '-sayac').textContent = liste.length + ' ' + k.ad;
+    // nothing waiting: the panel shrinks to one quiet line instead of an empty table
+    tb.closest('.panel').classList.toggle('bos-panel', !liste.length);
     if (!liste.length){ tb.innerHTML = '<tr><td colspan="' + n + '">' + k.bos + '</td></tr>'; return; }
     tb.innerHTML = liste.map(function(b){
       return '<tr>' + k.satir(b).map(function(h){ return '<td>' + h + '</td>'; }).join('') +

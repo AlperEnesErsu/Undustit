@@ -76,11 +76,15 @@ test('yönetici firma ekler; firma panelde kendi vakasını, talepleri ve fiyat 
   const veri = tohum({ benimkiler:['Cıvatalı bisiklet askısı'] });
   veri.votes.v0.buy['local:m0'] = 250; veri.votes.v1.buy['local:m0'] = 400;
   await hazirla(page, veri);
-  // a stranger cannot get in
+  // the panel sends a stranger to the one sign-in door, and that door does not let an unknown address in
   await page.goto('/firma/');
-  await page.fill('main [name=eposta]', 'kimse@firma.test');
-  await page.locator('main [type=submit]').click();
-  await expect(page.locator('main .durum')).toHaveText('Bu e-postaya bağlı vaka yok');
+  await page.locator('main a.btn.sig').click();
+  await expect(page).toHaveURL(/\/giris\/\?mod=giris$/);
+  await page.fill('#kart [name=e]', 'kimse@firma.test');
+  await page.fill('#kart [name=s]', 'herhangi');
+  await page.locator('#kart [type=submit]').click();
+  await expect(page.locator('#kart .durum')).toHaveClass(/bad/);
+  await expect(page).toHaveURL(/\/giris\//);
   await yoneticiGiris(page);
   await page.goto('/yonetim/vaka/?id=vaka-01');
   await page.locator('#t-firma').click();
@@ -88,9 +92,11 @@ test('yönetici firma ekler; firma panelde kendi vakasını, talepleri ve fiyat 
   await page.locator('#firma-form [type=submit]').click();
   await expect(page.locator('#firmalar')).toContainText('satis@firma.test');
   await page.evaluate(() => UDV.cikis());
-  await page.goto('/firma/');
-  await page.fill('main [name=eposta]', 'satis@firma.test');
-  await page.locator('main [type=submit]').click();
+  await page.goto('/giris/?mod=giris');
+  await page.fill('#kart [name=e]', 'satis@firma.test');
+  await page.fill('#kart [name=s]', 'herhangi');
+  await page.locator('#kart [type=submit]').click();
+  await expect(page).toHaveURL(/\/firma\/$/);
   await expect(page.locator('main h1')).toHaveText('Bir milyon cıvata');
   const istat = ad => page.locator('.istat', { has: page.locator('span', { hasText: new RegExp('^' + ad + '$') }) }).locator('b');
   await expect(istat('Fikir')).toHaveText('1');

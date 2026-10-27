@@ -15,6 +15,16 @@ for (const yol of SAYFALAR){
   });
 }
 
+// English is complete where people sign in: no Turkish word left on the sign-in page or the company panel's door
+test('giriş sayfası ve firma paneli İngilizcede tamamen İngilizce', async ({ page }) => {
+  for (const yol of ['/giris/?dil=en', '/giris/?dil=en&mod=kayit', '/firma/?dil=en']){
+    await page.goto(yol);
+    await expect(page.locator('main h1')).not.toHaveText(/Yükleniyor/);
+    const metin = await page.locator('main').innerText();
+    expect(metin, yol).not.toMatch(/[ğışçöüĞİŞÇÖÜ]|Giriş|Kayıt|Firma|vaka/);
+  }
+});
+
 test('İngilizce sayfa metni İngilizce', async ({ page }) => {
   await page.goto('/vakalar/?dil=en');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');

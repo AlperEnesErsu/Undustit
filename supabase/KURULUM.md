@@ -138,6 +138,15 @@ başvurusu tek bir ürün fotoğrafı ekleyebilir (kişi başı günde en çok 5
 küçültür (uzun kenar 1600 px). Kontrol: **Storage** altında `gorseller` görünmeli; bir vakaya görsel yükleyip
 vaka sayfasındaki "Teknik föy"e bakın.
 
+## 12. Firma paneli
+
+`7-firma.sql`'i SQL Editor'da bir kez çalıştırın. Sonra yönetim > vaka > **Firma erişimi** sekmesinde firmanın
+e-postasını ekleyin. Firma `firma/` sayfasında bu e-postayı yazar, gelen bağlantıyla girer ve yalnız kendi vakasını
+görür (taslakken de): fikirler, "alırdım"lar, fiyat dağılımı, CSV. Tek değiştirebildiği şey vakanın ürün fotoğrafı.
+
+İki şart: e-postaların gerçekten gitmesi için §10'daki SMTP (Resend) ayarı, ve **Authentication > Sign In / Up >
+Confirm email açık** olmalı. Kapalıyken biri hesabına başka birinin e-postasını yazıp o firmanın panelini açabilir.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

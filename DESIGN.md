@@ -488,3 +488,15 @@ vaka bandı, paylaş, bildir), `hareket.js` (eskizden rafa, kaydırma; `window.U
 - **Vakalara göre** ve **en çok istenen 20 fikir**; bütün fikirler CSV olarak indirilir (Excel'de Türkçe açılır).
 - Hesap tek yerde, `UDV.rapor()` (assets/veri.js); iki depo yalnız ham satırları verir. Gelir satırları ödeme
   (Faz 3.1–3.2) gelince eklenecek.
+## Firma paneli (27 Ekim 2026)
+
+`/firma/`: vakayı açan firmanın kendi vakasına bakışı (yol haritası Faz 3.3, ilk adım).
+- **Kimlik:** yönetici vakaya firmanın e-postasını ekler (vaka > Firma erişimi). Firma o e-postayla sihirli bağlantıyla
+  girer; şifre yok. Kural veritabanında: `vaka_firmalari` tablosu ve `firma_mi()`; e-posta hesaptakinden okunur, bu
+  yüzden Supabase'de "Confirm email" açık olmalı.
+- **Ne görür:** toplamlar (fikir, alırdım, talep tutarı, ortalama fiyat, deneme partisine doluluk, yorum), fiyat
+  dağılımı (hangi fiyattan kaç kişi), talebe göre sıralı fikirler ve CSV. Taslak vakasını da görür. Gizlenen
+  fikirler görünmez.
+- **Ne değiştirir:** yalnız ürün fotoğrafı, `firma_gorsel()` üzerinden (https adres, başka vaka olmaz). Başlık,
+  durum, kazanan yönetimde kalır.
+- Sayfa şimdilik yalnız Türkçe (ilk firmalar Türkiye'den); İngilizcesi sözlüğe taşınınca gelir.

@@ -151,6 +151,7 @@ UD_METIN.ekle('tr', {
  "vakalar.li.1": "Stoğu, adedini ve taban fiyatını bize yaz.",
  "vakalar.li.2": "Vaka sayfası ve kendi bağlantısı hazırlanır.",
  "vakalar.li.3": "Topluluk fikir yazar, “alırdım” der ve fiyat yazar; en çok talep gören fikirle deneme partisi yapılır.",
+ "vakalar.firma": "Vakası açılmış firmalar fikirleri ve talepleri <a class=\"link\" href=\"../firma/\">firma panelinde</a> görür.",
  "vakalar.p.3": "Formu doldur; stoğuna bakıp sana e-postayla dönelim.",
  "vakalar.attr.1": "Firmaların fazla stokları için açılan fikir çağrıları. Her vakanın kendi sayfası ve paylaşılabilir bağlantısı var.",
  "vakalar.attr.2": "Undustit: fikrini yaz, birlikte üretelim. Bir milyon cıvatanın teknik çizimi.",

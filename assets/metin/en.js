@@ -151,6 +151,7 @@ UD_METIN.ekle('en', {
  "vakalar.li.1": "Tell us the stock, how many units and the floor price.",
  "vakalar.li.2": "We set up a case page with its own link.",
  "vakalar.li.3": "The community writes ideas, says “I’d buy it” and names a price; the most wanted idea gets a trial batch.",
+ "vakalar.firma": "Companies with an open case see its ideas and demand in the <a class=\"link\" href=\"../firma/\">company panel</a>.",
  "vakalar.p.3": "Fill in the form; we look at your stock and reply by e-mail.",
  "vakalar.attr.1": "Open calls for ideas for companies’ surplus stock. Every case has its own page and a link you can share.",
  "vakalar.attr.2": "Undustit: write your idea, we make it together. A technical drawing of a million bolts.",

@@ -72,6 +72,40 @@ test('yönetici vaka görseli yükler, teknik föyde görünür', async ({ page 
   await expect(page.locator('#foy-gorsel')).not.toHaveClass(/yok/);
 });
 
+test('yönetici firma ekler; firma panelde kendi vakasını, talepleri ve fiyat dağılımını görür, fotoğraf yükler', async ({ page }) => {
+  const veri = tohum({ benimkiler:['Cıvatalı bisiklet askısı'] });
+  veri.votes.v0.buy['local:m0'] = 250; veri.votes.v1.buy['local:m0'] = 400;
+  await hazirla(page, veri);
+  // a stranger cannot get in
+  await page.goto('/firma/');
+  await page.fill('main [name=eposta]', 'kimse@firma.test');
+  await page.locator('main [type=submit]').click();
+  await expect(page.locator('main .durum')).toHaveText('Bu e-postaya bağlı vaka yok');
+  await yoneticiGiris(page);
+  await page.goto('/yonetim/vaka/?id=vaka-01');
+  await page.locator('#t-firma').click();
+  await page.fill('#firma-form [name=eposta]', 'Satis@Firma.test');
+  await page.locator('#firma-form [type=submit]').click();
+  await expect(page.locator('#firmalar')).toContainText('satis@firma.test');
+  await page.evaluate(() => UDV.cikis());
+  await page.goto('/firma/');
+  await page.fill('main [name=eposta]', 'satis@firma.test');
+  await page.locator('main [type=submit]').click();
+  await expect(page.locator('main h1')).toHaveText('Bir milyon cıvata');
+  const istat = ad => page.locator('.istat', { has: page.locator('span', { hasText: new RegExp('^' + ad + '$') }) }).locator('b');
+  await expect(istat('Fikir')).toHaveText('1');
+  await expect(istat('Alırdım')).toHaveText('2');
+  await expect(istat('Ortalama fiyat')).toHaveText('325 ₺');
+  await expect(page.locator('#dagilim tbody tr')).toHaveCount(2);
+  await expect(page.locator('#fikirler tbody tr').first()).toContainText('Cıvatalı bisiklet askısı');
+  // only the other ideas' owners' case is untouched: the six non-case ideas are not listed
+  await expect(page.locator('#fikirler tbody tr')).toHaveCount(1);
+  await page.locator('#f-foto').setInputFiles(FOTO);
+  await expect(page.locator('#foto img')).toHaveAttribute('src', /^data:image\/jpeg/);
+  await page.goto('/vaka-01/');
+  await expect(page.locator('#foy-gorsel img')).toHaveAttribute('src', /^data:image\/jpeg/);
+});
+
 test('rapor toplamları, vaka satırları ve en çok istenen fikri verir', async ({ page }) => {
   // tohum: altı fikir, n. fikre 2+n kişi 100+20n ₺ der → 27 alırdım, 7 kişi, 4.400 ₺; benim fikrim Vaka 01'de
   await hazirla(page, tohum({ benimkiler:['Cıvatalı bisiklet askısı'] }));

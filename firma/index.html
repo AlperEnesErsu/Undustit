@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="tr" data-root="../" data-page="firma">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FCF9F3">
+<title>Firma paneli · Undustit</title>
+<meta name="description" content="Vaka açan firmalar için: vakanıza gelen fikirler, talepler ve fiyat dağılımı.">
+<link rel="stylesheet" href="../assets/fonts/base.css">
+<link rel="stylesheet" href="../assets/ud.css">
+<link rel="stylesheet" href="../assets/bilesen.css">
+<script src="../assets/stil.js"></script>
+<style>
+/* Firma paneli: vakayı açan firmanın kendi vakasına bakışı. Bileşenler bilesen.css'ten gelir. */
+.f-ana{padding-block:clamp(32px,5vw,64px) clamp(48px,7vw,96px);display:grid;gap:20px;align-content:start}
+.f-ust{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+.f-ust > div:first-child{display:grid;gap:8px;justify-items:start;min-width:0}
+.f-ust h1{font-size:clamp(30px,4vw,52px);line-height:1.04;letter-spacing:-.02em;margin:0;overflow-wrap:anywhere}
+.f-ust .meta{color:var(--ink-2);font-size:14.5px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.f-eylem{display:flex;flex-wrap:wrap;gap:8px}
+.f-giris{max-width:520px;display:grid;gap:16px;align-content:start}
+.f-giris form{display:grid;gap:12px}
+.f-giris .durum{min-height:1.4em;font-size:14px}
+.f-giris .durum.bad{color:var(--err)}
+.f-iki{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px;align-items:start}
+.f-iki > .panel{margin:0}
+@media (min-width:900px){#istatlar{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cubuk{display:flex;align-items:center;gap:10px;min-width:120px}
+.cubuk .iz{flex:1;min-width:0;display:block}
+.cubuk i{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--accent);min-width:2px}
+.cubuk b{font-weight:500;font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.f-foto{display:grid;gap:12px;justify-items:start}
+.f-foto .foy-gorsel{max-width:340px}
+.f-foto label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.f-foto .alan-hata{color:var(--err);font-size:13px;font-style:normal}
+.tablo td small{display:block;color:var(--muted);font-size:12.5px;max-width:52ch}
+.tablo td a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2)}
+.chipler{display:flex;flex-wrap:wrap;gap:6px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:900px){.f-iki{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header data-ud-nav></header>
+<main id="main" class="wrap f-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
+<footer data-ud-foot></footer>
+<script src="../assets/ayar.js"></script>
+<script src="../assets/ud/temel.js"></script>
+<script src="../assets/ud/depo.js"></script>
+<script src="../assets/ud/arayuz.js"></script>
+<script src="../assets/ud/hareket.js"></script>
+<script src="../assets/veri.js"></script>
+<script>
+(function(){
+'use strict';
+var ana = document.getElementById('main');
+var esc = UD.esc;
+var secili = new URLSearchParams(location.search).get('vaka') || '';
+var sayi = function(n){ return Number(n || 0).toLocaleString('tr-TR'); };
+var tl = function(n){ return sayi(Math.round(n || 0)) + ' ₺'; };
+var DURUM = { taslak:'Taslak (henüz yayında değil)', acik:'Açık, fikir topluyor', degerlendirme:'Değerlendirmede', kazanan:'Kazanan seçildi', uretim:'Üretimde', kapali:'Kapandı' };
+var son = null;
+
+function istat(ad, deger, alt){ return '<div class="istat"><span>' + ad + '</span><b>' + deger + '</b>' + (alt ? '<small>' + alt + '</small>' : '') + '</div>'; }
+function kalanGun(v){
+  if (v.durum !== 'acik' || !v.acilis) return null;
+  return Math.max(0, Math.ceil((Date.parse(v.acilis) + (v.sure_gun || 30) * 864e5 - Date.now()) / 864e5));
+}
+function sayfasi(v){ return v.id === 'vaka-01' ? '../vaka-01/' : '../vaka/?id=' + encodeURIComponent(v.id); }
+
+// ----------------------------------------------------------- giriş
+function girisCiz(not){
+  ana.innerHTML =
+    '<div class="f-giris"><span class="eyebrow">Firma paneli</span><h1 style="margin:0;font-size:clamp(30px,4vw,48px);line-height:1.05">Vakanıza gelen fikirler, <em>tek yerde.</em></h1>' +
+    '<p class="lead" style="font-size:16px">Vakanızı açarken bize verdiğiniz e-postayı yazın. ' +
+      (UDV.mod === 'supabase' ? 'Şifre yok: e-postanıza bir giriş bağlantısı gelir.' : 'Yerel önizlemede bağlantı gönderilmez, doğrudan girilir.') + '</p>' +
+    '<form novalidate><label class="alan"><span>E-posta</span><input type="email" name="eposta" autocomplete="email" required></label>' +
+      '<div><button class="btn sig" type="submit">' + (UDV.mod === 'supabase' ? 'Giriş bağlantısı gönder' : 'Gir') + '</button></div>' +
+      '<p class="durum" role="status" aria-live="polite">' + esc(not || '') + '</p></form>' +
+    '<p style="color:var(--muted);font-size:14px">Henüz vakanız yok mu? <a class="link" href="../vakalar/#vakani-ac">Vakanı aç</a></p></div>';
+  var f = ana.querySelector('form'), d = f.querySelector('.durum');
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var b = f.querySelector('[type=submit]'); b.disabled = true; d.classList.remove('bad'); d.textContent = 'Gönderiliyor…';
+    UDV.firma.giris(f.eposta.value).then(function(){
+      if (UDV.mod === 'supabase') d.textContent = 'Bağlantı gönderildi. E-postanızdaki bağlantıya tıklayınca bu sayfaya döneceksiniz.';
+    }).catch(function(err){ d.textContent = (err && err.message) || 'Gönderilemedi.'; d.classList.add('bad'); })
+      .then(function(){ b.disabled = false; });
+  });
+}
+function vakaYokCiz(eposta){
+  ana.innerHTML = '<div class="f-giris"><span class="eyebrow">Firma paneli</span><h1 style="margin:0;font-size:clamp(28px,3.4vw,40px)">Bu e-postaya bağlı vaka yok</h1>' +
+    '<p class="lead" style="font-size:16px"><b>' + esc(eposta) + '</b> ile girdiniz. Vakanızı açarken başka bir adres verdiyseniz çıkıp onunla girin ya da bize yazın.</p>' +
+    '<div class="f-eylem"><button class="btn alt" type="button" data-cikis>Çıkış</button><a class="btn alt" href="../iletisim/">İletişim</a></div></div>';
+}
+
+// ----------------------------------------------------------- panel
+function panelCiz(vakalar){
+  var v = vakalar.find(function(x){ return x.id === secili; }) || vakalar[0];
+  secili = v.id;
+  var gun = kalanGun(v);
+  ana.innerHTML =
+    '<div class="f-ust"><div><span class="eyebrow">Firma paneli · ' + esc(v.firma || UDV.firma.eposta()) + '</span><h1>' + esc(v.baslik) + '</h1>' +
+      '<div class="meta"><span>' + esc(DURUM[v.durum] || v.durum) + '</span>' + (gun != null ? '<span>Fikir toplamaya ' + gun + ' gün kaldı</span>' : '') +
+      (v.durum !== 'taslak' ? '<a class="link" href="' + sayfasi(v) + '">Vaka sayfası</a>' : '') + '</div></div>' +
+      '<div class="f-eylem"><button class="btn alt sm" type="button" data-csv>Fikirleri CSV indir</button><button class="btn alt sm" type="button" data-cikis>Çıkış</button></div></div>' +
+    (vakalar.length > 1 ? '<div class="chipler" role="group" aria-label="Vaka seç">' + vakalar.map(function(x){
+      return '<button type="button" class="chip" data-vaka="' + esc(x.id) + '" aria-pressed="' + (x.id === v.id) + '">' + esc(x.baslik) + '</button>'; }).join('') + '</div>' : '') +
+    '<div class="istatlar" id="istatlar" aria-live="polite"></div>' +
+    '<div class="f-iki">' +
+      '<section class="panel" aria-labelledby="d-b"><header class="panel-bas"><h2 id="d-b">Fiyat dağılımı</h2></header><div class="panel-ic" id="dagilim"></div></section>' +
+      '<section class="panel" aria-labelledby="g-b"><header class="panel-bas"><h2 id="g-b">Ürün fotoğrafı</h2></header><div class="panel-ic f-foto" id="foto"></div></section>' +
+    '</div>' +
+    '<section class="panel" aria-labelledby="f-b"><header class="panel-bas"><h2 id="f-b">Fikirler</h2><span class="sayac" id="f-sayac"></span></header><div class="panel-ic" id="fikirler"><p class="lead">Yükleniyor…</p></div></section>';
+  fotoCiz(v);
+  return UDV.firma.panel(v.id).then(function(p){
+    var t = p.toplam;
+    ana.querySelector('#istatlar').innerHTML =
+      istat('Fikir', sayi(t.fikir)) +
+      istat('Alırdım', sayi(t.talep), 'her biri bir fiyatla') +
+      istat('Talep tutarı', tl(t.tutar), 'her alırdım bir adet sayılır') +
+      istat('Ortalama fiyat', t.talep ? tl(t.ortFiyat) : '—') +
+      istat('Deneme partisi', t.doluluk == null ? '—' : '%' + String(t.doluluk).replace('.', ','), v.deneme_adedi ? sayi(t.talep) + ' / ' + sayi(v.deneme_adedi) + ' adet' : 'adet belirlenmedi') +
+      istat('Yorum', sayi(t.yorum));
+    var en = Math.max.apply(null, p.dagilim.map(function(d){ return d.n; }).concat([0]));
+    ana.querySelector('#dagilim').innerHTML = p.dagilim.length
+      ? '<div class="tablo-kap"><table class="tablo" style="min-width:0"><caption class="sr-only">Alırdım fiyatlarının dağılımı</caption>' +
+        '<thead><tr><th scope="col">Fiyat</th><th scope="col">Kişi</th></tr></thead><tbody>' +
+        p.dagilim.map(function(d){
+          var ad = d.ust === Infinity ? sayi(d.alt) + ' ₺ ve üstü' : sayi(d.alt) + '–' + sayi(d.ust) + ' ₺';
+          return '<tr><td style="white-space:nowrap">' + ad + '</td><td><div class="cubuk" title="' + esc(ad + ': ' + d.n + ' kişi') + '"><span class="iz"><i style="width:' +
+            (d.n ? Math.max(2, Math.round(d.n / en * 100)) : 0) + '%"></i></span><b>' + sayi(d.n) + '</b></div></td></tr>';
+        }).join('') + '</tbody></table></div>'
+      : '<p class="lead" style="font-size:15px">Henüz “alırdım” yok. İlk talepler geldikçe insanların hangi fiyata alacağı burada görünür.</p>';
+    ana.querySelector('#f-sayac').textContent = sayi(p.fikirler.length) + ' fikir';
+    ana.querySelector('#fikirler').innerHTML = p.fikirler.length
+      ? '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">Vakaya gelen fikirler, talebe göre</caption>' +
+        '<thead><tr><th scope="col" class="sayi">#</th><th scope="col">Fikir</th><th scope="col">Kimden</th><th scope="col" class="sayi">Alırdım</th><th scope="col" class="sayi">Ort. fiyat</th><th scope="col" class="sayi">Yorum</th></tr></thead><tbody>' +
+        p.fikirler.map(function(f, i){
+          var bag = v.durum !== 'taslak' && f.anahtar ? '<a href="../fikirler/?f=' + encodeURIComponent(f.anahtar) + '">' + esc(f.baslik) + '</a>' : esc(f.baslik);
+          return '<tr><td class="sayi">' + (i + 1) + '</td><td>' + bag + (f.problem ? '<small>' + esc(f.problem) + '</small>' : '') + '</td><td>' + esc(f.ad || '—') +
+            '</td><td class="sayi">' + sayi(f.alici) + '</td><td class="sayi">' + (f.alici ? tl(f.ortFiyat) : '—') + '</td><td class="sayi">' + sayi(f.yorum) + '</td></tr>';
+        }).join('') + '</tbody></table></div>'
+      : '<p class="lead" style="font-size:15px">' + (v.durum === 'taslak' ? 'Vaka yayına girince gelen fikirler burada sıralanır.' : 'Henüz fikir gelmedi. Vaka sayfasını paylaştıkça ilk fikirler burada görünür.') + '</p>';
+  }).catch(function(err){ UD.toast((err && err.message) || 'Panel yüklenemedi.'); });
+}
+
+// ürün fotoğrafı: seç, site küçültüp yükler, vaka satırına yazılır (UDV.firma.gorsel)
+function fotoCiz(v){
+  var kap = ana.querySelector('#foto');
+  var url = UD.gorselAdresi(v.gorsel);
+  kap.innerHTML = '<figure class="foy-gorsel' + (url ? '' : ' yok') + '">' + (url ? '<img src="' + esc(url) + '" alt="Ürün fotoğrafı">' : '<figcaption>Fotoğraf yok</figcaption>') + '</figure>' +
+    '<p style="color:var(--ink-2);font-size:14px;margin:0">Vaka sayfasındaki teknik föyde görünür. Tek, net bir ürün fotoğrafı yeter.</p>' +
+    '<label class="btn alt sm"><span data-yazi>' + (url ? 'Değiştir' : 'Fotoğraf yükle') + '</span><input type="file" class="sr-only" accept="image/jpeg,image/png,image/webp" id="f-foto"></label>' +
+    '<em class="alan-hata" role="status" aria-live="polite"></em>';
+  var inp = kap.querySelector('#f-foto'), yazi = kap.querySelector('[data-yazi]'), em = kap.querySelector('.alan-hata');
+  inp.addEventListener('change', function(){
+    var file = inp.files && inp.files[0];
+    if (!file) return;
+    em.textContent = ''; yazi.textContent = 'Yükleniyor…'; inp.disabled = true;
+    UD.Store.gorselYukle(file, 'vaka').then(function(adres){
+      return UDV.firma.gorsel(v.id, adres).then(function(){ v.gorsel = adres; fotoCiz(v); UD.toast('Fotoğraf kaydedildi.'); });
+    }).catch(function(err){ em.textContent = (err && err.message) || 'Fotoğraf yüklenemedi.'; yazi.textContent = url ? 'Değiştir' : 'Fotoğraf yükle'; inp.disabled = false; inp.value = ''; });
+  });
+}
+
+function csvIndir(){
+  UDV.firma.csv(secili).then(function(metin){
+    var u = URL.createObjectURL(new Blob([metin], { type:'text/csv;charset=utf-8' }));
+    var a = document.createElement('a'); a.href = u; a.download = secili + '-fikirler.csv'; document.body.append(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
+  }).catch(function(err){ UD.toast((err && err.message) || 'CSV hazırlanamadı.'); });
+}
+
+ana.addEventListener('click', function(e){
+  if (e.target.closest('[data-cikis]')){ UDV.cikis().then(function(){ son = null; girisCiz(); }); return; }
+  if (e.target.closest('[data-csv]')) return csvIndir();
+  var c = e.target.closest('[data-vaka]');
+  if (c){ secili = c.dataset.vaka; history.replaceState(null, '', '?vaka=' + encodeURIComponent(secili)); ciz(); }
+});
+
+var vakaListesi = [];
+function ciz(){ return panelCiz(vakaListesi); }
+UDV.onOturum(function(o){
+  var eposta = UDV.firma.eposta();
+  if (eposta === son) return;
+  son = eposta;
+  if (!eposta) return girisCiz();
+  ana.innerHTML = '<p class="lead">Yükleniyor…</p>';
+  UDV.firma.vakalarim().then(function(l){
+    vakaListesi = l.slice().sort(function(a, b){ return String(b.olusturma).localeCompare(String(a.olusturma)); });
+    if (!vakaListesi.length) return vakaYokCiz(eposta);
+    ciz();
+  }).catch(function(err){ girisCiz((err && err.message) || 'Vakalar yüklenemedi.'); });
+});
+})();
+</script>
+</body>
+</html>

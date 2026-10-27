@@ -117,4 +117,47 @@ do $$ begin
   if (select count(*) from public.fikir_kart) <> 0 then raise exception 'gizlenen fikir hâlâ görünüyor'; end if;
 end $$;
 reset role;
+
+-- the company panel: A's account carries a company e-mail the admin added to a draft case. A reads that draft and
+-- sets its photo (https only, through firma_gorsel); B reads neither; nobody else's case is touched.
+update auth.users set email = 'Satis@Firma.example' where id = '00000000-0000-0000-0000-00000000000a';
+insert into public.vakalar (id, baslik, adet, durum) values ('vaka-taslak', 'Taslak bir vaka', 100, 'taslak');
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+do $$ begin
+  begin
+    insert into public.vaka_firmalari (vaka_id, eposta) values ('vaka-taslak', 'satis@firma.example');
+    raise exception 'ziyaretçi firma erişimi ekleyebiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+insert into public.vaka_firmalari (vaka_id, eposta) values ('vaka-taslak', 'satis@firma.example');
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000a';
+do $$ begin
+  if (select count(*) from public.vakalar where id = 'vaka-taslak') <> 1 then raise exception 'firma kendi taslak vakasını göremiyor'; end if;
+  if (select count(*) from public.vaka_firmalari) <> 1 then raise exception 'firma kendi erişim satırını göremiyor'; end if;
+  perform public.firma_gorsel('vaka-taslak', 'https://ornek.example/foto.jpg');
+  if (select gorsel from public.vakalar where id = 'vaka-taslak') <> 'https://ornek.example/foto.jpg' then raise exception 'firma görseli kaydedilmedi'; end if;
+  begin
+    perform public.firma_gorsel('vaka-taslak', 'javascript:alert(1)');
+    raise exception 'firma https olmayan görsel girebiliyor';
+  exception when invalid_parameter_value then null; end;
+  begin
+    perform public.firma_gorsel('vaka-01', 'https://ornek.example/baska.jpg');
+    raise exception 'firma başka vakanın görselini değiştirebiliyor';
+  exception when insufficient_privilege then null; end;
+  update public.vakalar set baslik = 'Değişti' where id = 'vaka-taslak';
+  if (select baslik from public.vakalar where id = 'vaka-taslak') <> 'Taslak bir vaka' then raise exception 'firma vakayı doğrudan değiştirebiliyor'; end if;
+  insert into storage.objects (bucket_id, name) values ('gorseller', 'vaka/00000000-0000-0000-0000-00000000000a/f.jpg');
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+do $$ begin
+  if (select count(*) from public.vakalar where id = 'vaka-taslak') <> 0 then raise exception 'başkası taslak vakayı görüyor'; end if;
+  if (select count(*) from public.vaka_firmalari) <> 0 then raise exception 'başkası firma e-postalarını görüyor'; end if;
+  begin
+    perform public.firma_gorsel('vaka-taslak', 'https://ornek.example/kotu.jpg');
+    raise exception 'firma olmayan görsel değiştirebiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
 select 'sql kontrolleri tamam' as sonuc;

@@ -71,7 +71,7 @@
     Object.entries(s.ideas || {}).forEach(([owner, doc]) => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(it => {
       if (!it || !it.k || (it.caseId ? it.caseId !== vakaId : !(vakaId === 'vaka-01' && it.cat === CAT))) return;
       const id = owner + ':' + it.k, f = fiyatlar[id] || [];
-      out.push({ id, baslik: str(it.title), problem: str(it.problem), cozum: str(it.solution),
+      out.push({ id, anahtar: id, baslik: str(it.title), problem: str(it.problem), cozum: str(it.solution),
         ozellikler: (Array.isArray(it.feats) ? it.feats : []).map(x => str(x)).filter(Boolean), ad: str(it.handle),
         gizli: !!gizli[id], zaman: it.at || null,
         alici: f.length, ortFiyat: f.length ? Math.round(f.reduce((a,b) => a + b, 0) / f.length * 100) / 100 : 0,
@@ -108,6 +108,20 @@
       Object.values(s.notes || {}).forEach(doc => { yorum += doc && Array.isArray(doc.items) ? doc.items.length : 0; });
       return { fikirler, talepler, yorum };
     },
+    // firma erişimi: udv-v1.firmalar = { vakaId: [e-posta, ...] }
+    firmalar: async vakaId => ((oku().firmalar || {})[vakaId] || []).slice(),
+    firmaEkle: async (vakaId, eposta) => { const d = oku(); d.firmalar = d.firmalar || {}; const l = d.firmalar[vakaId] = d.firmalar[vakaId] || []; if (!l.includes(eposta)) l.push(eposta); yaz(d); },
+    firmaSil: async (vakaId, eposta) => { const d = oku(); if (d.firmalar && d.firmalar[vakaId]) d.firmalar[vakaId] = d.firmalar[vakaId].filter(e => e !== eposta); yaz(d); },
+    firmaVakalari: async eposta => { const d = oku(); return Object.keys(d.firmalar || {}).filter(id => d.firmalar[id].includes(eposta) && d.vakalar[id]).map(id => d.vakalar[id]); },
+    firmaGorsel: async (vakaId, adres) => { const d = oku(); if (!d.vakalar[vakaId]) throw new Error('Vaka bulunamadı'); d.vakalar[vakaId].gorsel = adres; d.vakalar[vakaId].guncelleme = simdi(); yaz(d); },
+    // bir vakanın fikirlerine yazılan fiyatlar (fiyat dağılımı için)
+    talepFiyatlari: async vakaId => {
+      const ids = new Set(yerelFikirler(vakaId).map(f => f.id)), out = [];
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
+      Object.values(s.votes || {}).forEach(v => Object.entries((v && v.buy) || {}).forEach(([k, p]) => { const n = Number(p); if (ids.has(k) && n > 0 && n <= MAKS_FIYAT) out.push({ fikirId:k, fiyat:n }); }));
+      return out;
+    },
     // "Vakanı aç" başvuruları: sitenin formu yerelde buraya yazar (assets/ud/depo.js Store.basvur)
     kayitlar: async tablo => Object.values(kayitOku(tablo)).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman))),
     kayitDurum: async (tablo, id, durum) => { const d = kayitOku(tablo); if (!d[id]) throw new Error('Kayıt bulunamadı'); d[id].durum = durum; try { localStorage.setItem('udv-' + tablo, JSON.stringify(d)); } catch(e){} }
@@ -137,7 +151,7 @@
         sorgu(istemci().from('fikir_ozet').select('*').eq('vaka_id', vakaId))
       ]);
       const o = {}; ozet.forEach(r => { o[r.fikir_id] = r; });
-      return satirlar.map(r => { const k = o[r.id] || {}; return { id:r.id, baslik:r.baslik, problem:r.problem || '', cozum:r.cozum || '',
+      return satirlar.map(r => { const k = o[r.id] || {}; return { id:r.id, anahtar:r.sahip + ':' + r.id, baslik:r.baslik, problem:r.problem || '', cozum:r.cozum || '',
         ozellikler:r.ozellikler || [], ad:r.ad || '', gizli:!!r.gizli, zaman:r.zaman,
         alici:Number(k.alici) || 0, ortFiyat:Math.round((Number(k.ort_fiyat) || 0) * 100) / 100, yorum:Number(k.yorum) || 0 }; });
     },
@@ -156,6 +170,22 @@
         talepler: t.map(r => ({ fikirId:r.fikir_id, uye:r.uye, fiyat:Number(r.fiyat), zaman:r.zaman })),
         yorum: y.count || 0
       };
+    },
+    firmalar: async vakaId => (await sorgu(istemci().from('vaka_firmalari').select('eposta').eq('vaka_id', vakaId).order('eklenme'))).map(r => r.eposta),
+    firmaEkle: async (vakaId, eposta) => { await sorgu(istemci().from('vaka_firmalari').upsert({ vaka_id:vakaId, eposta }, { onConflict:'vaka_id,eposta', ignoreDuplicates:true })); },
+    firmaSil: async (vakaId, eposta) => { await sorgu(istemci().from('vaka_firmalari').delete().eq('vaka_id', vakaId).eq('eposta', eposta)); },
+    firmaVakalari: async eposta => {
+      const { data, error } = await istemci().from('vaka_firmalari').select('vaka_id').eq('eposta', eposta);
+      if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // 7-firma.sql henüz çalışmadı
+      if (error) throw hata(error);
+      const ids = data.map(r => r.vaka_id);
+      return ids.length ? sorgu(istemci().from('vakalar').select('*').in('id', ids)) : [];
+    },
+    firmaGorsel: async (vakaId, adres) => { await sorgu(istemci().rpc('firma_gorsel', { v:vakaId, adres })); },
+    talepFiyatlari: async vakaId => {
+      const ids = (await sorgu(istemci().from('fikirler').select('id').eq('vaka_id', vakaId))).map(r => r.id);
+      if (!ids.length) return [];
+      return (await sorgu(istemci().from('talepler').select('fikir_id,fiyat').in('fikir_id', ids).limit(50000))).map(r => ({ fikirId:r.fikir_id, fiyat:Number(r.fiyat) }));
     },
     kayitlar: async tablo => {
       // bildirimler fikrin başlığıyla gelir (fikir_id yabancı anahtarı üzerinden)
@@ -434,6 +464,61 @@
       const satirlar = [['baslik','vaka','alirdim','ort_fiyat','talep_tutari','zaman']]
         .concat(r.fikirler.map(f => [f.baslik, f.vaka, f.talep, f.ortFiyat, f.tutar, f.zaman || '']));
       return '\ufeff' + satirlar.map(x => x.map(hucre).join(';')).join('\r\n');
+    },
+
+    // Firma paneli (firma/): yöneticinin vakaya eklediği e-postayla giren firma kendi vakasını görür.
+    firma: {
+      eposta(){ const o = mevcut(); return o && o.email ? kucuk(o.email) : ''; },
+      async liste(vakaId){ yetkiTest(); return depo.firmalar(str(vakaId)); },
+      async ekle(vakaId, eposta){
+        yetkiTest();
+        const e = kucuk(str(eposta));
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e) || e.length > 160) throw new Error('Geçerli bir e-posta yazın');
+        await depo.firmaEkle(str(vakaId), e);
+      },
+      async sil(vakaId, eposta){ yetkiTest(); await depo.firmaSil(str(vakaId), kucuk(str(eposta))); },
+      async vakalarim(){ const e = UDV.firma.eposta(); return e ? depo.firmaVakalari(e) : []; },
+      // yerel önizlemede e-posta gönderilmez: kayıtlı bir firma e-postasıyla doğrudan girilir
+      async giris(eposta){
+        const e = kucuk(str(eposta));
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('Geçerli bir e-posta yazın');
+        if (SB_URL) return UDV.baglantiGonder(e);
+        if (!(await depo.firmaVakalari(e)).length) throw new Error('Bu e-postaya bağlı vaka yok');
+        const d = oku(); d.oturum = { id:'yerel:' + e, email:e, rol:'uye' }; yaz(d); bildir();
+      },
+      // panelin bütün sayıları: vaka, fikirler (gizliler hariç), toplamlar ve fiyat dağılımı
+      async panel(vakaId){
+        const benim = (await UDV.firma.vakalarim()).find(v => v.id === vakaId);
+        if (!benim && !benAdmin()) throw new Error('Bu vakayı görme yetkin yok');
+        const v = benim || await depo.al(vakaId);
+        const fikirler = (await depo.fikirler(vakaId)).filter(f => !f.gizli);
+        const gorunur = new Set(fikirler.map(f => f.id));
+        const fiyatlar = (await depo.talepFiyatlari(vakaId)).filter(t => gorunur.has(t.fikirId));
+        const tutar = fiyatlar.reduce((a, t) => a + t.fiyat, 0);
+        const SINIR = [100, 200, 300, 500, 750, 1000, 2000, Infinity];
+        const dagilim = SINIR.map((ust, i) => ({ alt: i ? SINIR[i - 1] + 1 : 1, ust, n: fiyatlar.filter(t => t.fiyat <= ust && (!i || t.fiyat > SINIR[i - 1])).length }));
+        while (dagilim.length && !dagilim[dagilim.length - 1].n) dagilim.pop();
+        const ilk = dagilim.findIndex(d => d.n);
+        return {
+          vaka: v,
+          toplam: { fikir: fikirler.length, talep: fiyatlar.length, tutar, ortFiyat: fiyatlar.length ? Math.round(tutar / fiyatlar.length) : 0,
+            yorum: fikirler.reduce((a, f) => a + f.yorum, 0),
+            doluluk: v.deneme_adedi ? Math.round(fiyatlar.length / v.deneme_adedi * 1000) / 10 : null },
+          dagilim: ilk < 0 ? [] : dagilim.slice(ilk),
+          fikirler: fikirler.slice().sort((a, b) => b.alici - a.alici || b.ortFiyat - a.ortFiyat)
+        };
+      },
+      async gorsel(vakaId, adres){
+        if (adres && !(/^https:\/\//.test(adres) || (!SB_URL && /^data:image\/(jpeg|png|webp);base64,/.test(adres)))) throw new Error('Görsel adresi https ile başlamalı');
+        if (!benAdmin() && !(await UDV.firma.vakalarim()).some(v => v.id === vakaId)) throw new Error('Bu vakayı değiştirme yetkin yok');
+        await depo.firmaGorsel(str(vakaId), str(adres));
+      },
+      async csv(vakaId){
+        const p = await UDV.firma.panel(vakaId);
+        const satirlar = [['baslik','ad','alirdim','ort_fiyat','yorum','zaman']]
+          .concat(p.fikirler.map(f => [f.baslik, f.ad, f.alici, f.ortFiyat, f.yorum, f.zaman || '']));
+        return '﻿' + satirlar.map(r => r.map(hucre).join(';')).join('\r\n');
+      }
     },
 
     // Sitenin yalnız yöneticiye giden kayıtları: aynı liste ve durum arayüzü, farklı tablo ve durumlar

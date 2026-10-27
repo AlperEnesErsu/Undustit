@@ -550,6 +550,7 @@ UD_METIN.ekle('tr', {
  "giris.hata.sik": "Çok sık denendi. Birkaç dakika sonra tekrar dene.",
  "giris.hata.baglanti": "Bağlantının süresi dolmuş ya da kullanılmış. Yeniden iste.",
  "giris.hata.genel": "Şu an olmadı. Biraz sonra tekrar dene.",
+ "ud.captcha.hata": "Güvenlik doğrulaması geçilemedi. Sayfayı yenileyip tekrar dene.",
  "ud.paylas": "Paylaş",
  "ud.paylas.bul": "Fikrini paylaş, alıcı bul",
  "ud.paylas.metin": "Bunu alır mıydın? “{baslik}” Fiyatını yaz:",

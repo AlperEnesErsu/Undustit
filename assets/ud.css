@@ -680,3 +680,7 @@ dialog.paylas-dlg{width:min(860px,100% - 24px)}
 /* long words and addresses break instead of pushing out of their box (English words run longer) */
 code{overflow-wrap:anywhere}
 .pc-steps li{min-width:0;overflow-wrap:break-word;hyphens:auto}
+
+/* Turnstile: invisible unless Cloudflare wants a click, then a small box at the bottom of the screen */
+.ts-kutu{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:1000}
+.ts-kutu:empty{display:none}

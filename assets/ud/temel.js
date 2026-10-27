@@ -146,6 +146,32 @@ function sbClient(){
   return sbClient.p;
 }
 window.UD_SB = sbClient;
+
+// =========================================================== spam protection
+// Cloudflare Turnstile in front of every Supabase sign-in, the anonymous one too: every write (idea, "alırdım",
+// comment, application, message) needs a session, so this one gate guards them all, and Supabase checks the
+// token on its side (Auth > Attack Protection). ayar.js turnstile = the public site key; empty = off.
+// A fresh widget per call (tokens are single use); people mostly see nothing, a small box only when Cloudflare asks.
+const TURNSTILE = (window.UD_AYAR || {}).turnstile || '';
+let tsYukle = null;
+function captcha(){
+  if (!TURNSTILE) return Promise.resolve(undefined);
+  tsYukle = tsYukle || new Promise((ok, no) => {
+    const s = document.createElement('script');
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; s.async = true;
+    s.onload = () => window.turnstile ? ok(window.turnstile) : no(new Error(T('ud.captcha.hata')));
+    s.onerror = () => { tsYukle = null; no(new Error(T('ud.captcha.hata'))); };
+    document.head.append(s);
+  });
+  return tsYukle.then(ts => new Promise((ok, no) => {
+    const kutu = el('div', { class:'ts-kutu' }); document.body.append(kutu);
+    let id = null;
+    const bitir = (f, v) => { try { if (id != null) ts.remove(id); } catch(e){} kutu.remove(); f(v); };
+    const hata = () => bitir(no, Object.assign(new Error(T('ud.captcha.hata')), { code:'captcha' }));
+    id = ts.render(kutu, { sitekey:TURNSTILE, appearance:'interaction-only', language: LANG === 'en' ? 'en' : 'tr',
+      callback: t => bitir(ok, t), 'error-callback': hata, 'expired-callback': hata, 'timeout-callback': hata });
+  }));
+}
 // Live on claude.ai (db capability): ideas/<uid>, votes/<uid>, notes/<uid>, each person writes their own doc.
 // A vote is purchase intent, not a like: votes/<uid>.buy maps an idea to the price that person would pay.
 // Anywhere else it keeps the same shape in localStorage so the pages can be tried as a preview.
@@ -181,5 +207,5 @@ function sortIdeas(list, by){
 const pct = v => LANG === 'en' ? v + '%' : '%' + v;
 const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
 
-window.UD_IC = { gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, nextLive, liveNow, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
+window.UD_IC = { captcha, gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, nextLive, liveNow, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
 })();

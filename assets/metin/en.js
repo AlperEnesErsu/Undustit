@@ -506,6 +506,7 @@ UD_METIN.ekle('en', {
  "ud.kart.paylas.talep": "{n} people said “I’d buy it” · average {fiyat}",
  "ud.kart.paylas.ilk": "Be the first to say “I’d buy it”.",
  "ud.kart.paylas.nerede": "Find it on Undustit, name your price →",
+ "ud.captcha.hata": "The security check did not pass. Reload the page and try again.",
  "ud.paylas": "Share",
  "ud.paylas.bul": "Share your idea, find buyers",
  "ud.paylas.metin": "Would you buy this? “{baslik}” Name your price:",

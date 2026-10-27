@@ -477,3 +477,14 @@ vaka bandı, paylaş, bildir), `hareket.js` (eskizden rafa, kaydırma; `window.U
   Kurallar `supabase/6-gorsel.sql`'de, SQL testleri sahte bir Storage şemasıyla denetler.
 - **Zemin açıldı:** Oyuncu kremi `#FFF6E9` → `#FCF9F3` (daha az sarı), çizgi ve ikincil yüzeyler aynı yönde. Uzun
   okumada göz yormaması için; sarı artık yalnız vurguda.
+
+## Yönetim raporu (27 Ekim 2026)
+
+`/yonetim/rapor/`: alıcıya ve yatırımcıya gösterilecek ilk tablo (yol haritası Faz 3.4, talep tarafı).
+- **Toplamlar:** fikir ve yazan kişi, "alırdım" ve kişi, talep tutarı (her alırdım bir adet), ortalama fiyat, talep
+  gören fikir oranı, yorum. Gizlenen fikirler ve onların alırdımları sayılmaz.
+- **Son 8 hafta:** yeni fikir ve yeni alırdım, pazartesi 00.00 İstanbul'dan başlayan haftalar. İki ölçü ayrı ölçekte
+  (tek eksen yok); her çubuğun yanında sayısı yazar.
+- **Vakalara göre** ve **en çok istenen 20 fikir**; bütün fikirler CSV olarak indirilir (Excel'de Türkçe açılır).
+- Hesap tek yerde, `UDV.rapor()` (assets/veri.js); iki depo yalnız ham satırları verir. Gelir satırları ödeme
+  (Faz 3.1–3.2) gelince eklenecek.

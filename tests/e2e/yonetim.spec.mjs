@@ -71,3 +71,21 @@ test('yönetici vaka görseli yükler, teknik föyde görünür', async ({ page 
   await expect(page.locator('#foy-gorsel img')).toHaveAttribute('src', /^data:image\/jpeg/);
   await expect(page.locator('#foy-gorsel')).not.toHaveClass(/yok/);
 });
+
+test('rapor toplamları, vaka satırları ve en çok istenen fikri verir', async ({ page }) => {
+  // tohum: altı fikir, n. fikre 2+n kişi 100+20n ₺ der → 27 alırdım, 7 kişi, 4.400 ₺; benim fikrim Vaka 01'de
+  await hazirla(page, tohum({ benimkiler:['Cıvatalı bisiklet askısı'] }));
+  await yoneticiGiris(page);
+  await page.goto('/yonetim/rapor/');
+  const istat = ad => page.locator('.istat', { has: page.locator('span', { hasText: new RegExp('^' + ad + '$') }) });
+  await expect(istat('Fikir').locator('b')).toHaveText('7');
+  await expect(istat('Alırdım').locator('b')).toHaveText('27');
+  await expect(istat('Alırdım')).toContainText('7 kişi');
+  await expect(istat('Talep tutarı').locator('b')).toHaveText('4.400 ₺');
+  await expect(page.locator('#vakalar tbody tr', { hasText:'Bir milyon cıvata' }).locator('td').nth(1)).toHaveText('1');
+  await expect(page.locator('#vakalar tbody tr', { hasText:'Vakadan bağımsız' }).locator('td').nth(2)).toHaveText('27');
+  await expect(page.locator('#fikirler tbody tr').first()).toContainText('Başka bir fikir numara 5');
+  const indirme = page.waitForEvent('download');
+  await page.locator('[data-csv]').click();
+  expect((await indirme).suggestedFilename()).toMatch(/^undustit-fikirler-\d{4}-\d\d-\d\d\.csv$/);
+});

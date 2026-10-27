@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="tr" data-root="../../" data-page="yonetim">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FCF9F3">
+<title>Rapor · Yönetim · Undustit</title>
+<link rel="stylesheet" href="../../assets/fonts/base.css">
+<link rel="stylesheet" href="../../assets/ud.css">
+<link rel="stylesheet" href="../../assets/bilesen.css">
+<script src="../../assets/stil.js"></script>
+<style>
+/* Rapor: talep ve etkinlik özeti. Bileşenler bilesen.css'ten gelir. */
+.y-ust{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.y-ust h1{font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:8px 0 0}
+.y-ust p{margin:6px 0 0;color:var(--ink-2);font-size:14px;max-width:60ch}
+.panel{margin-top:20px}
+.not{color:var(--muted);font-size:13px;margin:10px 0 0}
+/* haftalık çubuklar: her sütun kendi ölçeğinde (iki ayrı ölçü, tek eksen yok) */
+.cubuk{display:flex;align-items:center;gap:10px;min-width:140px}
+.cubuk .iz{flex:1;min-width:0;display:block}
+.cubuk i{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--accent);min-width:2px}
+.cubuk i.sifir{background:var(--line);width:2px}
+.cubuk b{font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink);min-width:2ch}
+.tablo td .alt{display:block;color:var(--muted);font-size:12.5px}
+@media (min-width:900px){#istatlar{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:640px){.y-ust{align-items:stretch}.y-ust .btn{width:100%}}
+</style>
+</head>
+<body class="yonetim">
+<a class="skip" href="#main">İçeriğe geç</a>
+<header class="y-bas">
+  <div class="y-kimlik" style="display:flex;align-items:center;gap:12px;min-width:0">
+    <a class="link" href="../../" style="font-weight:500;color:var(--ink);text-decoration:none">Undustit</a>
+    <span style="color:var(--muted);font-size:14px">Yönetim</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;min-width:0">
+    <span data-y-kim style="font-size:14px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44vw"></span>
+    <button type="button" class="btn alt sm" data-y-cikis hidden>Çıkış</button>
+  </div>
+</header>
+<div class="y-govde">
+  <nav class="y-yan" aria-label="Yönetim menüsü">
+    <a href="../">Özet</a>
+    <a href="../#vakalar">Vakalar</a>
+    <a href="./" aria-current="page">Rapor</a>
+    <a href="../vaka/">Yeni vaka</a>
+    <a href="../../">Siteye dön</a>
+  </nav>
+  <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
+</div>
+
+<script src="../../assets/ayar.js"></script>
+<script src="../../assets/ud/temel.js"></script>
+<script src="../../assets/ud/depo.js"></script>
+<script src="../../assets/ud/arayuz.js"></script>
+<script src="../../assets/ud/hareket.js"></script>
+<script src="../../assets/veri.js"></script>
+<script src="../yonetim.js"></script>
+<script>
+(function(){
+'use strict';
+var YON = window.YONETIM;
+var esc = YON.esc, sayi = YON.sayi, tutar = YON.tutar;
+var ana = null;
+
+function istat(ad, deger, alt){
+  return '<div class="istat"><span>' + ad + '</span><b>' + deger + '</b>' + (alt ? '<small>' + alt + '</small>' : '') + '</div>';
+}
+function yuzde(a, b){ return b ? Math.round(a / b * 100) + '%' : '—'; }
+// "27 Eki" biçiminde haftanın pazartesisi
+function gun(iso){ return new Date(iso).toLocaleDateString('tr-TR', { day:'numeric', month:'short', timeZone:'Europe/Istanbul' }); }
+function cubuk(n, enCok, ne, hafta){
+  var w = enCok ? Math.round(n / enCok * 100) : 0;
+  return '<div class="cubuk" title="' + esc(hafta + ' haftası: ' + n + ' ' + ne) + '">' +
+    '<span class="iz"><i' + (n ? ' style="width:' + Math.max(w, 2) + '%"' : ' class="sifir"') + '></i></span><b>' + sayi(n) + '</b></div>';
+}
+
+function ciz(o, a){
+  ana = a;
+  ana.innerHTML =
+    '<div class="y-ust"><div><span class="eyebrow">Yönetim</span><h1>Rapor</h1>' +
+      '<p>Talep, katılım ve vaka bazında ilgi. Gizlenen fikirler ve onların “alırdım”ları sayılmaz.</p></div>' +
+      '<button class="btn alt sm" type="button" data-csv>Fikirleri CSV indir</button></div>' +
+    '<div class="istatlar" id="istatlar" aria-live="polite"></div>' +
+    '<section class="panel" aria-labelledby="h-b"><header class="panel-bas"><h2 id="h-b">Son 8 hafta</h2></header>' +
+      '<div class="panel-ic" id="haftalar"></div></section>' +
+    '<section class="panel" aria-labelledby="v-b"><header class="panel-bas"><h2 id="v-b">Vakalara göre</h2></header>' +
+      '<div class="panel-ic" id="vakalar"></div></section>' +
+    '<section class="panel" aria-labelledby="f-b"><header class="panel-bas"><h2 id="f-b">En çok istenen fikirler</h2><span class="sayac" id="f-sayac"></span></header>' +
+      '<div class="panel-ic" id="fikirler"></div></section>';
+  ana.querySelector('[data-csv]').addEventListener('click', csvIndir);
+  yukle();
+}
+
+function yukle(){
+  return Promise.resolve().then(function(){ return UDV.rapor(); }).then(function(r){
+    var t = r.toplam;
+    ana.querySelector('#istatlar').innerHTML =
+      istat('Fikir', sayi(t.fikir), sayi(t.yazar) + ' kişi yazdı' + (t.gizli ? ' · ' + sayi(t.gizli) + ' gizli' : '')) +
+      istat('Alırdım', sayi(t.talep), sayi(t.alici) + ' kişi') +
+      istat('Talep tutarı', tutar(t.tutar), 'her alırdım bir adet sayılır') +
+      istat('Ortalama fiyat', t.talep ? tutar(t.ortFiyat) : '—') +
+      istat('Talep gören fikir', yuzde(t.talepli, t.fikir), sayi(t.talepli) + ' / ' + sayi(t.fikir)) +
+      istat('Yorum', sayi(t.yorum));
+
+    var enF = Math.max.apply(null, r.haftalar.map(function(h){ return h.fikir; }));
+    var enT = Math.max.apply(null, r.haftalar.map(function(h){ return h.talep; }));
+    ana.querySelector('#haftalar').innerHTML =
+      '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">Haftalık yeni fikir ve alırdım</caption>' +
+      '<thead><tr><th scope="col">Hafta</th><th scope="col">Yeni fikir</th><th scope="col">Yeni alırdım</th></tr></thead><tbody>' +
+      r.haftalar.slice().reverse().map(function(h, i){
+        var ad = gun(h.bas) + (i === 0 ? ' (bu hafta)' : '');
+        return '<tr><td>' + esc(ad) + '</td><td>' + cubuk(h.fikir, enF, 'yeni fikir', gun(h.bas)) + '</td><td>' + cubuk(h.talep, enT, 'yeni alırdım', gun(h.bas)) + '</td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      (t.tarihsiz ? '<p class="not">' + sayi(t.tarihsiz) + ' alırdımın tarihi yok (yerel önizleme); haftalara girmedi.</p>' : '');
+
+    ana.querySelector('#vakalar').innerHTML =
+      '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">Vakalara göre talep</caption>' +
+      '<thead><tr><th scope="col">Vaka</th><th scope="col" class="sayi">Fikir</th><th scope="col" class="sayi">Alırdım</th>' +
+      '<th scope="col" class="sayi">Kişi</th><th scope="col" class="sayi">Talep tutarı</th><th scope="col">En çok istenen</th></tr></thead><tbody>' +
+      r.vakalar.map(function(v){
+        var ad = v.id ? '<a href="../vaka/?id=' + encodeURIComponent(v.id) + '">' + esc(v.baslik) + '</a>' + (v.durum ? '<span class="alt">' + esc(YON.durumAdi(v.durum)) + '</span>' : '') : esc(v.baslik);
+        return '<tr><td>' + ad + '</td><td class="sayi">' + sayi(v.fikir) + '</td><td class="sayi">' + sayi(v.talep) + '</td><td class="sayi">' + sayi(v.alici) +
+          '</td><td class="sayi">' + tutar(v.tutar) + '</td><td>' + esc(v.enIyi || '—') + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+
+    var ilk = r.fikirler.slice(0, 20);
+    ana.querySelector('#f-sayac').textContent = r.fikirler.length > 20 ? 'ilk 20 / ' + sayi(r.fikirler.length) : sayi(r.fikirler.length) + ' fikir';
+    ana.querySelector('#fikirler').innerHTML = ilk.length
+      ? '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">En çok istenen fikirler</caption>' +
+        '<thead><tr><th scope="col">Fikir</th><th scope="col">Vaka</th><th scope="col" class="sayi">Alırdım</th><th scope="col" class="sayi">Ort. fiyat</th><th scope="col" class="sayi">Talep tutarı</th></tr></thead><tbody>' +
+        ilk.map(function(f){
+          return '<tr><td>' + esc(f.baslik) + '</td><td>' + esc(f.vaka || '—') + '</td><td class="sayi">' + sayi(f.talep) + '</td><td class="sayi">' +
+            (f.talep ? tutar(f.ortFiyat) : '—') + '</td><td class="sayi">' + tutar(f.tutar) + '</td></tr>';
+        }).join('') + '</tbody></table></div>'
+      : '<p class="lead">Henüz fikir yok.</p>';
+  }).catch(function(err){
+    ana.querySelector('#istatlar').innerHTML = '';
+    YON.toast(err.message || 'Rapor yüklenemedi.', 'hata');
+  });
+}
+
+function csvIndir(){
+  Promise.resolve().then(function(){ return UDV.raporCsv(); }).then(function(metin){
+    var url = URL.createObjectURL(new Blob([metin], { type: 'text/csv;charset=utf-8' }));
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'undustit-fikirler-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    YON.toast('CSV indirildi.', 'ok');
+  }).catch(function(err){ YON.toast(err.message || 'CSV hazırlanamadı.', 'hata'); });
+}
+
+YON.guard(ciz);
+})();
+</script>
+</body>
+</html>

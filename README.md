@@ -24,7 +24,7 @@ Canlı: https://alperenesersu.github.io/Undustit/
 | Benim | `/benim/` | Kişinin fikirleri, talebi, "alırdım"ları, e-posta bağlama (isteğe bağlı hesap) |
 | Nasıl işler, Hikâye | `/nasil/`, `/hikaye/` | Model, paylar (genel %10–30, vakalarda kârın %40 + %10'u) |
 | İletişim, yasal | `/iletisim/`, `/kvkk/`, `/kosullar/` | Form; yasal metinler taslak, `ayar.js` ile açılır |
-| Yönetim | `/yonetim/` | Vakalar (oluştur, durum, kazanan, CSV), başvurular, mesajlar, bildirilen fikirler |
+| Yönetim | `/yonetim/`, `/yonetim/rapor/` | Vakalar (oluştur, durum, kazanan, görsel, CSV), başvurular, mesajlar, bildirilen fikirler; rapor: talep tutarı, haftalık etkinlik, vaka bazında ilgi |
 
 ## Klasörler
 

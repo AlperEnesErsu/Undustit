@@ -91,6 +91,23 @@
     gecmis: async id => (oku().gecmis[id] || []).slice().sort((a,b) => Date.parse(a.zaman) - Date.parse(b.zaman)),
     fikirler: async vakaId => yerelFikirler(vakaId),
     gizle: async (id, gizli) => { const d = oku(); if (gizli) d.gizli[id] = true; else delete d.gizli[id]; yaz(d); },
+    // rapor için ham satırlar: bütün fikirler (gizliler dahil) ve bütün "alırdım"lar. Yerelde talebin tarihi yok.
+    raporHam: async () => {
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
+      const gizli = oku().gizli, fikirler = [], talepler = [];
+      let yorum = 0;
+      Object.entries(s.ideas || {}).forEach(([sahip, doc]) => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(it => {
+        if (!it || !it.k) return;
+        const id = sahip + ':' + it.k;
+        fikirler.push({ id, vakaId: it.caseId || (it.cat === CAT ? 'vaka-01' : null), baslik: str(it.title), sahip, gizli: !!gizli[id], zaman: it.at || null });
+      }));
+      Object.entries(s.votes || {}).forEach(([uye, v]) => Object.entries((v && v.buy) || {}).forEach(([fikirId, p]) => {
+        const fiyat = Number(p); if (fiyat > 0 && fiyat <= MAKS_FIYAT) talepler.push({ fikirId, uye, fiyat, zaman: null });
+      }));
+      Object.values(s.notes || {}).forEach(doc => { yorum += doc && Array.isArray(doc.items) ? doc.items.length : 0; });
+      return { fikirler, talepler, yorum };
+    },
     // "Vakanı aç" başvuruları: sitenin formu yerelde buraya yazar (assets/ud/depo.js Store.basvur)
     kayitlar: async tablo => Object.values(kayitOku(tablo)).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman))),
     kayitDurum: async (tablo, id, durum) => { const d = kayitOku(tablo); if (!d[id]) throw new Error('Kayıt bulunamadı'); d[id].durum = durum; try { localStorage.setItem('udv-' + tablo, JSON.stringify(d)); } catch(e){} }
@@ -127,6 +144,18 @@
     gizle: async (id, gizli) => {
       const r = await sorgu(istemci().from('fikirler').update({ gizli }).eq('id', id).select('id'));
       if (!r || !r.length) throw new Error('Fikir bulunamadı ya da yetkiniz yok');
+    },
+    raporHam: async () => {
+      const [f, t, y] = await Promise.all([
+        sorgu(istemci().from('fikirler').select('id,vaka_id,kategori,baslik,sahip,gizli,zaman').limit(20000)),
+        sorgu(istemci().from('talepler').select('fikir_id,uye,fiyat,zaman').limit(100000)),
+        istemci().from('yorumlar').select('id', { count:'exact', head:true })
+      ]);
+      return {
+        fikirler: f.map(r => ({ id:r.id, vakaId: r.vaka_id || (r.kategori === CAT ? 'vaka-01' : null), baslik:r.baslik, sahip:r.sahip, gizli:!!r.gizli, zaman:r.zaman })),
+        talepler: t.map(r => ({ fikirId:r.fikir_id, uye:r.uye, fiyat:Number(r.fiyat), zaman:r.zaman })),
+        yorum: y.count || 0
+      };
     },
     kayitlar: async tablo => {
       // bildirimler fikrin başlığıyla gelir (fikir_id yabancı anahtarı üzerinden)
@@ -357,6 +386,54 @@
         alici += fs.reduce((t, f) => t + f.alici, 0);
       }
       return { vaka:{ toplam:liste.length, acik:liste.filter(v => v.durum === 'acik').length }, fikir, alici };
+    },
+
+    // Alıcıya gösterilecek tablo: toplamlar, son 8 hafta, vaka bazında talep, en çok istenen fikirler.
+    // Gizli fikirler ve onların talepleri sayılmaz (kaç fikrin gizlendiği ayrıca verilir).
+    async rapor(){
+      yetkiTest();
+      const [ham, vakalar] = await Promise.all([depo.raporHam(), depo.liste()]);
+      const gorunur = ham.fikirler.filter(f => !f.gizli), fikir = {};
+      gorunur.forEach(f => { fikir[f.id] = { ...f, talep:0, tutar:0 }; });
+      const talepler = ham.talepler.filter(t => fikir[t.fikirId]);
+      talepler.forEach(t => { const f = fikir[t.fikirId]; f.talep++; f.tutar += t.fiyat; });
+      const tutar = talepler.reduce((a, t) => a + t.fiyat, 0);
+      const toplam = {
+        fikir: gorunur.length, gizli: ham.fikirler.length - gorunur.length,
+        yazar: new Set(gorunur.map(f => f.sahip)).size,
+        talep: talepler.length, alici: new Set(talepler.map(t => t.uye)).size,
+        tutar, ortFiyat: talepler.length ? Math.round(tutar / talepler.length) : 0,
+        talepli: Object.values(fikir).filter(f => f.talep > 0).length, yorum: ham.yorum,
+        tarihsiz: talepler.filter(t => !t.zaman).length
+      };
+      // haftalar pazartesi 00.00 İstanbul (UTC+3, yaz saati yok) başlar; en eskiden yeniye
+      const GUN = 864e5, IST = 3 * 36e5;
+      const haftaBasi = ms => { const g = Math.floor((ms + IST) / GUN); return (g - ((g + 3) % 7)) * GUN - IST; };   // 1 Ocak 1970 perşembeydi
+      const bu = haftaBasi(Date.now());
+      const haftalar = Array.from({ length:8 }, (_, i) => ({ bas: new Date(bu - (7 - i) * 7 * GUN).toISOString(), fikir:0, talep:0 }));
+      const yerlestir = (z, alan) => { if (!z) return; const i = 7 - Math.round((bu - haftaBasi(Date.parse(z))) / (7 * GUN)); if (i >= 0 && i < 8) haftalar[i][alan]++; };
+      gorunur.forEach(f => yerlestir(f.zaman, 'fikir'));
+      talepler.forEach(t => yerlestir(t.zaman, 'talep'));
+      // vaka bazında; vakası olmayanlar ayrı satırda
+      const satir = (id, baslik, durum) => {
+        const fs = Object.values(fikir).filter(f => (f.vakaId || null) === id), ts = talepler.filter(t => (fikir[t.fikirId].vakaId || null) === id);
+        const en = fs.slice().sort((a, b) => b.talep - a.talep || b.tutar - a.tutar)[0];
+        return { id, baslik, durum, fikir:fs.length, talep:ts.length, alici:new Set(ts.map(t => t.uye)).size,
+          tutar:ts.reduce((a, t) => a + t.fiyat, 0), enIyi: en && en.talep ? en.baslik : '' };
+      };
+      const vakaSatirlari = vakalar.slice().sort((a, b) => String(b.olusturma).localeCompare(String(a.olusturma)))
+        .map(v => satir(v.id, v.baslik, v.durum)).concat([satir(null, 'Vakadan bağımsız', '')]);
+      const adi = {}; vakalar.forEach(v => { adi[v.id] = v.baslik; });
+      const liste = Object.values(fikir).sort((a, b) => b.talep - a.talep || b.tutar - a.tutar)
+        .map(f => ({ baslik:f.baslik, vaka: f.vakaId ? (adi[f.vakaId] || f.vakaId) : '', talep:f.talep, ortFiyat: f.talep ? Math.round(f.tutar / f.talep) : 0, tutar:f.tutar, zaman:f.zaman }));
+      return { toplam, haftalar, vakalar:vakaSatirlari, fikirler:liste };
+    },
+
+    async raporCsv(){
+      const r = await UDV.rapor();
+      const satirlar = [['baslik','vaka','alirdim','ort_fiyat','talep_tutari','zaman']]
+        .concat(r.fikirler.map(f => [f.baslik, f.vaka, f.talep, f.ortFiyat, f.tutar, f.zaman || '']));
+      return '\ufeff' + satirlar.map(x => x.map(hucre).join(';')).join('\r\n');
     },
 
     // Sitenin yalnız yöneticiye giden kayıtları: aynı liste ve durum arayüzü, farklı tablo ve durumlar

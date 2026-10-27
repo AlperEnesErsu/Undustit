@@ -269,3 +269,7 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 @media (max-width:800px){.y-yan{border-bottom:1px solid var(--line)}.y-yan a[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--accent)}}
 .anahtar input{border-width:1px;box-shadow:none}
 .alan input:not([type]),.alan input[type="text"],.alan input[type="email"],.alan input[type="url"],.alan input[type="number"],.alan input[type="password"],.alan input[type="search"],.alan input[type="date"],.alan textarea,.alan select,.arac-cubugu input[type="search"],.arac-cubugu select,.y-ara{border-width:1px;border-color:var(--line-2)}
+/* first screen: the form is the one loud thing; the explainer next to it is a picture, not a button */
+.pc-stage{border:1px solid var(--line-2);box-shadow:none}
+/* a board of nine cards reads as one list: light lines, the "alırdım" box carries the colour */
+.icard{border-color:var(--line)}

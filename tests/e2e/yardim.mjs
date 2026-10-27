@@ -9,7 +9,8 @@ const AYAR = `window.UD_AYAR = { supabaseUrl:'', supabaseAnon:'', adminler:['${A
 export const test = base.extend({
   page: async ({ page }, use) => {
     const hatalar = [];
-    page.on('pageerror', e => hatalar.push(String(e)));
+    // an error a test throws on purpose carries "[beklenen]" and does not count
+    page.on('pageerror', e => { if (!String(e).includes('[beklenen]')) hatalar.push(String(e)); });
     await page.route('**/assets/ayar.js', r => r.fulfill({ contentType:'text/javascript', body:AYAR }));
     await use(page);
     expect(hatalar, 'JS hatası').toEqual([]);

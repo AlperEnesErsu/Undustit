@@ -147,6 +147,29 @@ function sbClient(){
 }
 window.UD_SB = sbClient;
 
+// =========================================================== error log
+// An uncaught error goes to hata_kayitlari (supabase/10-hata.sql) so a broken page gets noticed; the admin reads
+// them in yonetim/. Each message once, five per page view at most, never what the visitor typed: the address
+// without its #fragment (sign-in tokens live there), the message, where it came from, the browser. A plain REST
+// insert, so it works without a session. Browser extensions' errors and the content-free "Script error." are skipped.
+(function(){
+  const A = window.UD_AYAR || {};
+  if (!A.supabaseUrl || !window.fetch) return;
+  const gorulen = new Set(); let kalan = 5;
+  const gonder = (mesaj, kaynak, satir) => {
+    mesaj = String(mesaj || '').trim().slice(0, 500); kaynak = String(kaynak || '');
+    if (!mesaj || mesaj === 'Script error.' || /^(chrome|moz|safari)-extension:/.test(kaynak) || gorulen.has(mesaj) || kalan <= 0) return;
+    gorulen.add(mesaj); kalan--;
+    fetch(A.supabaseUrl + '/rest/v1/hata_kayitlari', { method:'POST',
+      headers:{ apikey:A.supabaseAnon, Authorization:'Bearer ' + A.supabaseAnon, 'Content-Type':'application/json', Prefer:'return=minimal' },
+      body:JSON.stringify({ sayfa:(location.pathname + location.search).slice(0, 300), mesaj, kaynak:kaynak.slice(0, 300),
+        satir:Number(satir) || null, tarayici:navigator.userAgent.slice(0, 300) }) }).catch(() => {});
+  };
+  // the error's own message: the event's adds a browser-specific "Uncaught Error: " in front
+  addEventListener('error', e => { const m = (e.error && e.error.message) || e.message; if (m) gonder(m, e.filename, e.lineno); });
+  addEventListener('unhandledrejection', e => { const r = e.reason; gonder(r && (r.message || String(r)), r && r.stack ? String(r.stack).split('\n')[1] : '', null); });
+})();
+
 // =========================================================== spam protection
 // Cloudflare Turnstile in front of every Supabase sign-in, the anonymous one too: every write (idea, "alırdım",
 // comment, application, message) needs a session, so this one gate guards them all, and Supabase checks the

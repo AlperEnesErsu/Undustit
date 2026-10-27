@@ -507,3 +507,11 @@ Satır düzeyinde güvenlik sütun gizleyemediği için `8-gizli.sql` ziyaretçi
 `taban_fiyat`, `firma` ve `olusturan` kapalı. Yönetici ve vakanın firması tam satırı `vaka_tam()` ile okur. Site
 dosya çalışmadan önce de sonra da çalışır (fonksiyon yoksa eski yoldan okur). SQL testleri oturumsuz ziyaretçiyi,
 üyeyi, firmayı ve yöneticiyi ayrı ayrı dener.
+## "Google ile devam et" (27 Ekim 2026)
+
+Üyelik yalnız kişinin kendi fikirlerini takip etmesi için; site talep toplamak için var. Bu yüzden kayıt tek düğme:
+- **Benim:** anonim ziyaretçinin hesabı Google kimliğini alır (`linkIdentity`), kimlik aynı kalır, hiçbir katkı
+  kaybolmaz. O Google hesabı zaten bir Undustit hesabına bağlıysa dönüşte "O hesapla gir" çıkar.
+- **Firma paneli:** "Google ile gir" (Workspace kullanan firmalar için); panel yine e-postaya göre açılır.
+- Düğme yalnız Supabase'de Google açıkken görünür (`/auth/v1/settings`), kurulum bitmeden bozuk düğme olmaz.
+  E-postayla bağlantı yolu ikinci seçenek olarak duruyor.

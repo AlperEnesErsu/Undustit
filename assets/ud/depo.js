@@ -266,6 +266,24 @@ const Store = (function(){
       const r = await sb.auth.signInWithOtp({ email:eposta, options:{ shouldCreateUser:false, emailRedirectTo:donus } });
       if (r.error) throw r.error;
     },
+    // "Google ile devam et". Shown only when the Google provider is on in Supabase (its public settings say so).
+    googleAcik(){
+      if (!AYAR.supabaseUrl) return Promise.resolve(false);
+      return this._google || (this._google = fetch(AYAR.supabaseUrl + '/auth/v1/settings', { headers:{ apikey:AYAR.supabaseAnon } })
+        .then(r => r.ok ? r.json() : {}).then(s => !!(s.external && s.external.google)).catch(() => false));
+    },
+    // An anonymous visitor's account takes on the Google identity: same id, every idea, price and comment stays.
+    // giris: sign into the account that already owns this Google identity instead (this browser's anonymous
+    // contributions stay behind). Both leave the page for Google and come back to donus.
+    async google(donus, giris){
+      await start();
+      const { data } = await sb.auth.getSession();
+      const u = data && data.session && data.session.user;
+      const r = !giris && u && u.is_anonymous
+        ? await sb.auth.linkIdentity({ provider:'google', options:{ redirectTo:donus } })
+        : await sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:donus } });
+      if (r.error) throw r.error;
+    },
     async cikis(){ await start(); await sb.auth.signOut(); },
     // this person's "haber ver" requests, to see and cancel them
     async haberlerim(){

@@ -154,6 +154,22 @@ Confirm email açık** olmalı. Kapalıyken biri hesabına başka birinin e-post
 `vaka_tam()` ile tam okur. Kontrol: yönetimde bir vakayı açıp kaydedin (taban fiyat görünmeli); oturumsuz bir
 tarayıcıda vaka sayfası açılmalı.
 
+## 14. "Google ile devam et"
+
+Düğme (Benim sayfası ve firma paneli girişi) yalnız Google girişi açıkken görünür; kurulum bitince kendiliğinden çıkar.
+
+1. **Google Cloud Console** > APIs & Services > **OAuth consent screen**: uygulama adı "Undustit", destek e-postası,
+   alan adı geldiğinde gizlilik ve koşullar bağlantıları. Yayın durumu "In production".
+2. **Credentials** > Create credentials > **OAuth client ID** > Web application. "Authorized redirect URIs" altına:
+   `https://azjdweynukmwxywdfewb.supabase.co/auth/v1/callback`
+3. Supabase > **Authentication** > **Sign In / Providers** > **Google**: açın, Client ID ve Client Secret'ı yapıştırın.
+4. Supabase > **Authentication** > **Sign In / Providers** (üstteki genel ayarlar) > **Allow manual linking** açık
+   olmalı. Ziyaretçinin anonim hesabı Google'a bu sayede bağlanır; fikirleri, fiyatları, yorumları kaybolmaz.
+5. Yönlendirme adresleri §10'daki gibi (`.../Undustit/**`); ek bir şey gerekmez.
+
+Deneme: gizli pencerede bir fikre "alırdım" deyin, Benim > "Google ile devam et", hesabı seçin. Döndüğünüzde
+"… ile girdin" yazmalı ve "alırdım" yerinde durmalı.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

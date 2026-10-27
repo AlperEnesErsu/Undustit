@@ -45,6 +45,9 @@
 .hesap .durum.ok{color:var(--ok)}
 .hesap .ikinci{display:grid;gap:10px;padding-top:12px;border-top:1px dashed var(--line-2)}
 .hesap small{color:var(--muted);font-size:13px}
+.google-yer{display:grid;gap:10px;justify-items:start}
+.btn.google{background:#fff;color:#1f1f1f;border:1px solid #747775;gap:10px}
+.btn.google svg{width:18px;height:18px;flex:none}
 .blok{display:grid;gap:16px}
 .blok h2{font-size:clamp(26px,3vw,38px)}
 .haberler{display:grid;gap:8px;margin:0;padding:0;list-style:none}
@@ -79,7 +82,11 @@
 <script>
 // The person's own page: account, own ideas with their distance to Thursday, backed ideas, notices.
 const { T, el, esc, ICON, ROOT, Store, LOCALE } = UD;
-const DONUS = location.origin + location.pathname;   // the e-mail link comes back here
+const DONUS = location.origin + location.pathname;   // the e-mail link and Google come back here
+// Supabase reports a failed Google return in the address (?error_code=… or #error_code=…)
+const GOOGLE_HATA = new URLSearchParams(location.search + '&' + location.hash.slice(1)).get('error_code') || '';
+// Google's own mark, as its sign-in guidelines ask
+const GOOGLE_LOGO = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.2-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
 const benim = i => i.owner === Store.uid;
 
 UD.mountBoard(document.getElementById('fikirlerim'), { dialog:true, hedef:true, sort:() => 'new', filter:benim, examples:false,
@@ -125,6 +132,7 @@ function hesapCiz(){
     }
     if (h.bekleyen){ kap.innerHTML = `<p>${T('benim.js.bekliyor', { eposta:'<b>' + esc(h.bekleyen) + '</b>' })}</p>`; return; }
     kap.innerHTML = `<p>${h.var ? T('benim.js.anonim') : T('benim.js.yok')}</p>
+      <div class="google-yer" hidden><button type="button" class="btn google" id="google">${GOOGLE_LOGO}<span>${T('benim.js.google')}</span></button><small class="ya">${T('benim.js.ya')}</small></div>
       <form id="bagla" novalidate><input type="email" name="e" autocomplete="email" maxlength="160" placeholder="${T('ud.haber.ipucu')}" aria-label="${T('ud.haber.eposta')}"><button type="submit" class="btn sig sm">${T('benim.js.bagla')}</button></form>
       <p class="durum" role="status" aria-live="polite"></p>
       <div class="ikinci"><button type="button" class="link" id="baska">${T('benim.js.baska')}</button></div>`;
@@ -132,8 +140,21 @@ function hesapCiz(){
     const say = (t, k) => { durum.textContent = t; durum.className = 'durum' + (k ? ' ' + k : ''); };
     const gecerli = v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
     const hata = err => say(err && err.status === 429 ? T('benim.js.hata.sik') : T('benim.js.hata.genel'), 'bad');
+    // one button: Google, when it is switched on in Supabase. Coming back with "this Google account already has
+    // an account" offers to sign into that one instead.
+    Store.googleAcik().then(acik => {
+      if (!acik) return;
+      kap.querySelector('.google-yer').hidden = false;
+      const g = kap.querySelector('#google');
+      const git = giris => { g.disabled = true; say(T('benim.js.gidiyor')); UD.olcu('Google ile devam'); Store.google(DONUS, giris).catch(err => { g.disabled = false; say(T('benim.js.hata.google'), 'bad'); }); };
+      g.onclick = () => git(false);
+      if (GOOGLE_HATA === 'identity_already_exists'){
+        say(T('benim.js.google.bagli'), 'bad');
+        durum.append(' ', el('button', { type:'button', class:'link', text:T('benim.js.google.gir'), onclick(){ git(true); } }));
+      } else if (GOOGLE_HATA) say(T('benim.js.hata.google'), 'bad');
+    });
     const f = kap.querySelector('#bagla');
-    f.e.value = (() => { try { return localStorage.getItem('ud-eposta') || ''; } catch(e){ return ''; } })();
+    f.e.value =(() => { try { return localStorage.getItem('ud-eposta') || ''; } catch(e){ return ''; } })();
     f.onsubmit = e => {
       e.preventDefault();
       const v = f.e.value.trim();

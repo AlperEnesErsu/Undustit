@@ -147,6 +147,13 @@ görür (taslakken de): fikirler, "alırdım"lar, fiyat dağılımı, CSV. Tek d
 İki şart: e-postaların gerçekten gitmesi için §10'daki SMTP (Resend) ayarı, ve **Authentication > Sign In / Up >
 Confirm email açık** olmalı. Kapalıyken biri hesabına başka birinin e-postasını yazıp o firmanın panelini açabilir.
 
+## 13. Gizli vaka alanları
+
+`8-gizli.sql`'i SQL Editor'da bir kez çalıştırın. Ziyaretçiler vakanın yalnız açık alanlarını okur; `taban_fiyat`,
+`firma` ve `olusturan` (vakayı açan yöneticinin e-postası) kapanır. Yönetici bütün vakaları, firma kendi vakasını
+`vaka_tam()` ile tam okur. Kontrol: yönetimde bir vakayı açıp kaydedin (taban fiyat görünmeli); oturumsuz bir
+tarayıcıda vaka sayfası açılmalı.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

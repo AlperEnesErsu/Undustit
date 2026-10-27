@@ -69,6 +69,34 @@ test('alırdım: hazır fiyat tek dokunuşta kaydeder, Perşembe uzaklığı gö
   await expect(page.locator('#fikirlerim .hedef')).toContainText('kişi daha');
 });
 
+test('paylaş: görsel kart hazırlanır, ağ bağlantıları fikrin adresini taşır', async ({ page }, info) => {
+  await hazirla(page, tohum());
+  await page.goto('/fikirler/');
+  await page.locator('.icard', { hasText:'numara 5' }).locator('.t a').click();
+  await page.locator('dialog.idlg .sh').click();
+  const panel = page.locator('dialog.paylas-dlg');
+  await expect(panel).toBeVisible();
+  const gorsel = panel.locator('.pl-kart img');
+  await expect(gorsel).toHaveAttribute('src', /^blob:/);
+  // the card is a real 4:5 picture, not an empty canvas
+  expect(await gorsel.evaluate(i => i.decode().then(() => [i.naturalWidth, i.naturalHeight]))).toEqual([1080, 1350]);
+  await expect(panel.locator('.pl-indir')).toBeVisible();
+  // every network gets the idea's own address; the ones that take text also get the sentence
+  const href = async ag => decodeURIComponent(await panel.locator(`[data-ag=${ag}]`).getAttribute('href'));
+  const wa = await href('whatsapp'), x = await href('x'), li = await href('linkedin'), fb = await href('facebook');
+  expect(wa).toMatch(/^https:\/\/wa\.me\/\?text=Bunu alır mıydın\? “Başka bir fikir numara 5”.*fikirler\/\?f=/);
+  expect(x).toMatch(/^https:\/\/twitter\.com\/intent\/tweet\?text=.*numara 5.*&url=http.*fikirler\/\?f=/);
+  expect(li).toMatch(/^https:\/\/www\.linkedin\.com\/sharing\/share-offsite\/\?url=http.*fikirler\/\?f=/);
+  expect(fb).toMatch(/^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=http.*fikirler\/\?f=/);
+  expect(await href('reddit')).toMatch(/^https:\/\/www\.reddit\.com\/submit\?url=http.*fikirler\/\?f=.*&title=Bunu alır mıydın\? “Başka bir fikir numara 5” Fiyatını yaz$/);
+  for (const ag of ['whatsapp', 'x', 'linkedin', 'facebook', 'reddit']) await expect(panel.locator(`[data-ag=${ag}]`)).toHaveAttribute('target', '_blank');
+  // the link that is shared really opens this idea
+  const adres = await panel.locator('.pl-link input').inputValue();
+  await page.goto(adres);
+  await expect(page.locator('dialog.idlg h2')).toContainText('numara 5');
+  if (process.env.KART_GORSEL) await gorsel.screenshot({ path: process.env.KART_GORSEL + '-' + info.project.name + '.png' });
+});
+
 test('örnek kartta alırdım ne olduğunu söyler', async ({ page }) => {
   await hazirla(page);
   await page.goto('/');

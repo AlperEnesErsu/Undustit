@@ -170,6 +170,18 @@ Düğme (Benim sayfası ve firma paneli girişi) yalnız Google girişi açıkke
 Deneme: gizli pencerede bir fikre "alırdım" deyin, Benim > "Google ile devam et", hesabı seçin. Döndüğünüzde
 "… ile girdin" yazmalı ve "alırdım" yerinde durmalı.
 
+## 15. Kayıt ve giriş (`giris/`)
+
+Sitedeki kişi simgesi `giris/` sayfasını açar: e-posta + şifreyle kayıt, giriş ve şifre yenileme. Girişten sonra
+yönetici `yonetim/`, firma `firma/`, üye `benim/` sayfasına geçer.
+
+1. **Authentication > Sign In / Providers > Email**: açık; **Confirm email** açık (kayıt e-postayla doğrulanır,
+   doğrulanmamış hesap giremez).
+2. **SMTP** (§10): doğrulama ve şifre yenileme e-postalarının gerçek kişilere gitmesi için şart.
+3. **URL Configuration > Redirect URLs**: `http://localhost:4317/**` ve sitenin adresi (`.../**`) listede olmalı;
+   doğrulama ve şifre yenileme bağlantıları `giris/` sayfasına döner.
+4. İsteğe bağlı: **Password requirements** altında en az 8 karakter (site de 8 ister).
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

@@ -21,7 +21,7 @@ function mountChrome(){
     host.className = 'nav'; host.id = 'nav';
     host.innerHTML = `<div class="wrap"><a class="brand" lang="en" href="${homeHref()}" aria-label="${T('ud.menu.anasayfa')}"><b>Undust<i>it</i></b></a>
       <div class="nav-r"><nav class="nav-links" id="nav-links" aria-label="${T('ud.menu.ana')}">${links.map(([k,l,h])=>`<a href="${ROOT+h}"${k===cur?' aria-current="page"':''}>${l}</a>`).join('')}${langSwitch(' lang-m')}</nav>
-      <a class="btn sig sm" href="${ROOT}fikir/">${T('ud.menu.yaz')}</a><a class="ben" href="${ROOT}benim/" aria-label="${T('ud.menu.benim')}" title="${T('ud.menu.benim')}"${cur === 'benim' ? ' aria-current="page"' : ''}>${ICON.ben}</a>${langSwitch()}
+      <a class="btn sig sm" href="${ROOT}fikir/">${T('ud.menu.yaz')}</a><a class="ben" href="${ROOT}giris/" aria-label="${T('ud.menu.hesap')}" title="${T('ud.menu.hesap')}"${cur === 'benim' || cur === 'giris' ? ' aria-current="page"' : ''}>${ICON.ben}</a>${langSwitch()}
       <button type="button" class="menu-t" aria-expanded="false" aria-controls="nav-links" aria-label="${T('ud.menu.menu')}"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>`;
     const btn = $('.menu-t', host);
     const set = o => { host.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); };
@@ -52,14 +52,89 @@ function mountThu(node){
 }
 
 // =========================================================== share
-// An idea needs buyers, so its link is one tap away: the phone's share sheet, else the clipboard.
-function shareIdea(title, key, btn){
-  const url = new URL(withStil(ROOT + 'fikirler/?f=' + encodeURIComponent(key)), location.href).href;
-  if (navigator.share) return navigator.share({ title, text:T('ud.paylas.metin', { baslik:title }), url }).catch(() => {});
-  const back = btn.innerHTML;
-  (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
-    .then(() => { btn.textContent = T('ud.paylas.kopyalandi'); }, () => { btn.textContent = url; })
-    .then(() => setTimeout(() => { btn.innerHTML = back; }, 1800));
+// An idea needs buyers. "Paylaş" opens a panel: a ready image card (Instagram post or story, WhatsApp status),
+// each network's own share link, the phone's share sheet and the plain link. f = { title, key, label, buyers,
+// avg, benim }; benim: the writer is sharing their own idea, so the words are theirs ("Bir fikrim var").
+const ideaUrl = key => new URL(withStil(ROOT + 'fikirler/?f=' + encodeURIComponent(key)), location.href).href;
+
+// the card, drawn on a canvas in the site's look: 1080×1350 (4:5) fits a feed post and crops cleanly to a story
+async function shareCard(f){
+  const W = 1080, H = 1350, M = 92, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'), INK = '#1B1530', SERIF = '"Bricolage Grotesque", Arial, sans-serif', MONO = '"Geist Mono", ui-monospace, monospace', BODY = 'Geist, Arial, sans-serif';
+  try { await Promise.all(['800 96px "Bricolage Grotesque"', '400 30px "Geist Mono"', '500 34px Geist'].map(s => document.fonts.load(s))); } catch(e){}
+  x.fillStyle = '#FCF9F3'; x.fillRect(0, 0, W, H);
+  x.fillStyle = 'rgba(27,21,48,.09)';
+  for (let i = 30; i < W; i += 40) for (let j = 30; j < H; j += 40) { x.beginPath(); x.arc(i, j, 2, 0, 7); x.fill(); }
+  // wordmark
+  x.font = '800 54px ' + SERIF; x.textBaseline = 'alphabetic'; x.fillStyle = INK; x.fillText('Undust', M, M + 46);
+  x.fillStyle = '#E8462A'; x.fillText('it', M + x.measureText('Undust').width, M + 46);
+  // the eyebrow: whose idea, and its case or category
+  x.font = '400 28px ' + MONO; x.fillStyle = '#625B78';
+  x.fillText((f.benim ? T('ud.kart.paylas.benim') : T('ud.kart.paylas.fikir')).toLocaleUpperCase(LOCALE) + (f.label ? '  ·  ' + f.label.toLocaleUpperCase(LOCALE) : ''), M, 300);
+  // the sentence, as large as it fits (5 lines at most)
+  const satirlar = size => {
+    x.font = '800 ' + size + 'px ' + SERIF;
+    const out = []; let s = '';
+    for (const w of ('“' + f.title + '”').split(/\s+/)){ const t = s ? s + ' ' + w : w; if (x.measureText(t).width > W - 2 * M && s){ out.push(s); s = w; } else s = t; }
+    out.push(s); return out;
+  };
+  let size = 104, l = satirlar(size);
+  while ((l.length > 5 || l.length * size * 1.08 > 620) && size > 52) l = satirlar(size -= 6);
+  x.fillStyle = INK; l.forEach((s, i) => x.fillText(s, M, 380 + size + i * size * 1.08));
+  // the ask, in a box with the site's hard shadow
+  const by = 1010, bh = 200, bw = W - 2 * M, r = 28;
+  const kutu = (dx, fill) => { x.beginPath(); x.roundRect(M + dx, by + dx, bw, bh, r); x.fillStyle = fill; x.fill(); };
+  kutu(10, INK); kutu(0, '#FFFFFF'); x.lineWidth = 4; x.strokeStyle = INK; x.beginPath(); x.roundRect(M, by, bw, bh, r); x.stroke();
+  x.font = '800 52px ' + SERIF; x.fillStyle = INK; x.fillText(T('ud.kart.paylas.soru'), M + 40, by + 80);
+  x.font = '500 32px ' + BODY; x.fillStyle = '#3F3856';
+  x.fillText(f.buyers ? T('ud.kart.paylas.talep', { n:f.buyers.toLocaleString(LOCALE), fiyat:tl(f.avg) }) : T('ud.kart.paylas.ilk'), M + 40, by + 140);
+  // where to go
+  x.font = '400 28px ' + MONO; x.fillStyle = '#5B2EFF'; x.fillText(T('ud.kart.paylas.nerede'), M, H - 62);
+  return new Promise(ok => c.toBlob(ok, 'image/png'));
+}
+
+function shareIdea(f, yer){
+  const url = ideaUrl(f.key), metin = f.benim ? T('ud.paylas.metin.benim', { baslik:f.title }) : T('ud.paylas.metin', { baslik:f.title });
+  const enc = encodeURIComponent, tam = metin + ' ' + url;
+  const agi = [
+    ['whatsapp', 'WhatsApp', 'https://wa.me/?text=' + enc(tam)],
+    ['x', 'X', 'https://twitter.com/intent/tweet?text=' + enc(metin) + '&url=' + enc(url)],
+    ['linkedin', 'LinkedIn', 'https://www.linkedin.com/sharing/share-offsite/?url=' + enc(url)],
+    ['facebook', 'Facebook', 'https://www.facebook.com/sharer/sharer.php?u=' + enc(url)],
+    // Reddit takes a title and a link; the person picks the community (r/somebodymakethis, r/shutupandtakemymoney…)
+    ['reddit', 'Reddit', 'https://www.reddit.com/submit?url=' + enc(url) + '&title=' + enc(metin.replace(/:\s*$/, ''))]
+  ];
+  const d = el('dialog', { class:'idlg paylas-dlg', 'aria-labelledby':'pl-h' });
+  d.innerHTML = `<header><h2 id="pl-h">${f.benim ? T('ud.paylas.baslik.benim') : T('ud.paylas.baslik')}</h2><button type="button" class="x" aria-label="${T('ud.kapat')}">${ICON.x}</button></header>
+    <div class="pl-ic"><figure class="pl-kart"><span>${T('ud.paylas.hazirlaniyor')}</span></figure>
+      <div class="pl-yan"><p>${T('ud.paylas.not')}</p>
+        <div class="pl-dugme"><button type="button" class="btn sig pl-sistem" hidden>${T('ud.paylas.gorselle')}</button><a class="btn alt pl-indir" download="undustit-fikir.png" hidden>${T('ud.paylas.indir')}</a></div>
+        <div class="pl-agi">${agi.map(([k, ad, u]) => `<a class="btn alt sm" data-ag="${k}" href="${u}" target="_blank" rel="noopener">${ad}</a>`).join('')}</div>
+        <div class="pl-link"><input readonly value="${esc(url)}" aria-label="${T('ud.paylas.link')}"><button type="button" class="btn alt sm pl-kopya">${T('ud.paylas.kopyala')}</button></div>
+      </div></div>`;
+  document.body.append(d);
+  const kapat = () => d.close();
+  d.addEventListener('close', () => { const u = $('.pl-indir', d).href; if (u && u.startsWith('blob:')) URL.revokeObjectURL(u); d.remove(); });
+  $('.x', d).onclick = kapat;
+  d.addEventListener('click', e => { if (e.target === d) kapat(); });
+  d.querySelectorAll('[data-ag]').forEach(a => a.addEventListener('click', () => olcu('Paylaş', { yer, ag:a.dataset.ag })));
+  const kopya = $('.pl-kopya', d);
+  kopya.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+    .then(() => { kopya.textContent = T('ud.paylas.kopyalandi'); olcu('Paylaş', { yer, ag:'link' }); }, () => $('input', d).select());
+  d.showModal();
+  shareCard(f).then(blob => {
+    if (!blob) return;
+    const u = URL.createObjectURL(blob), fig = $('.pl-kart', d);
+    fig.replaceChildren(el('img', { src:u, alt:T('ud.paylas.gorsel.alt', { baslik:f.title }) }));
+    const ind = $('.pl-indir', d); ind.href = u; ind.hidden = false;
+    ind.addEventListener('click', () => olcu('Paylaş', { yer, ag:'görsel' }));
+    // phones: the share sheet takes the image itself, so it can go straight to Instagram or a story
+    const dosya = new File([blob], 'undustit-fikir.png', { type:'image/png' });
+    if (navigator.canShare && navigator.canShare({ files:[dosya] })){
+      const s = $('.pl-sistem', d); s.hidden = false;
+      s.onclick = () => navigator.share({ files:[dosya], text:tam }).then(() => olcu('Paylaş', { yer, ag:'sistem' })).catch(() => {});
+    }
+  });
 }
 
 // =========================================================== "haber ver"
@@ -93,6 +168,42 @@ function feeLine(){
   const f = TERMS.fee, n = Store.myCount();
   const now = tl(n ? f.next : f.first);
   return T('ud.form.ucret', { ilk:tl(f.first), sonra:tl(f.next), bu:now }) + (f.charged ? '' : ' ' + T('ud.form.odemeyok'));
+}
+// Quick sign-up in front of every idea form, for someone without an account: Google (when it is on in Supabase),
+// an e-mail link, or "continue without". Never a wall: the choice is remembered and the form opens right after.
+const KAYIT_GEC = 'ud-kayit-gec';
+function kayitAdimi(host, f, pitch){
+  try { if (localStorage.getItem(KAYIT_GEC) === '1') return; } catch(e){}
+  Store.hesap().then(h => {
+    if (!h || !h.anonim || h.bekleyen) return;   // preview mode, signed in, or the e-mail link is on its way
+    const kart = el('section', { class:'kayit', 'aria-label':T('fikir.kayit.baslik') });
+    kart.innerHTML = `<h2>${T('fikir.kayit.baslik')}</h2><p>${T('fikir.kayit.metin')}</p>
+      <div class="kayit-google" hidden><button type="button" class="btn google">${ICON.google}<span>${T('benim.js.google')}</span></button></div>
+      <form novalidate><input type="email" name="e" autocomplete="email" maxlength="160" placeholder="${T('fikir.kayit.ipucu')}" aria-label="${T('fikir.kayit.ipucu')}"><button type="submit" class="btn sig sm">${T('fikir.kayit.gonder')}</button></form>
+      <p class="durum" role="status" aria-live="polite"></p>
+      <button type="button" class="link kayit-gec">${T('fikir.kayit.gec')}</button>`;
+    host.prepend(kart); f.hidden = true;
+    const durum = $('.durum', kart), say = (t, k) => { durum.textContent = t; durum.className = 'durum' + (k ? ' ' + k : ''); };
+    const ac = odak => { kart.remove(); f.hidden = false; if (odak) pitch.focus(); };
+    $('.kayit-gec', kart).onclick = () => { try { localStorage.setItem(KAYIT_GEC, '1'); } catch(e){} ac(true); };
+    Store.googleAcik().then(acik => {
+      if (!acik) return;
+      const g = $('.btn.google', kart); g.parentNode.hidden = false;
+      g.onclick = () => { g.disabled = true; olcu('Google ile devam'); Store.google(location.href).catch(() => { g.disabled = false; say(T('benim.js.hata.google'), 'bad'); }); };
+    });
+    const ef = $('form', kart);
+    ef.onsubmit = e => {
+      e.preventDefault();
+      const v = ef.e.value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ say(T('ud.haber.hata.eposta'), 'bad'); ef.e.focus(); return; }
+      $('button', ef).disabled = true; say(T('benim.js.gidiyor'));
+      Store.epostaBagla(v, location.href).then(() => {
+        olcu('Hesap bağla'); mailSet(v);
+        // the link can wait; the idea is written now
+        ef.remove(); $('.kayit-gec', kart).remove(); say(T('fikir.kayit.gonderildi', { eposta:v }), 'ok'); f.hidden = false;
+      }).catch(err => { $('button', ef).disabled = false; say(err && err.status === 429 ? T('benim.js.hata.sik') : T('benim.js.hata.genel'), 'bad'); });
+    };
+  }).catch(() => {});
 }
 function mountForm(host, opts={}){
   const id ='f' + Math.random().toString(36).slice(2,7);
@@ -181,7 +292,7 @@ function mountForm(host, opts={}){
         <p class="lead" style="font-size:15px">${T('ud.gonderildi.not')}</p>
         <div class="acts"><button type="button" class="btn sig share">${T('ud.paylas.bul')} ${ICON.arrow}</button><a class="btn alt" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">${T('ud.gonderildi.gor')}</a><button type="button" class="btn alt again">${T('ud.gonderildi.yeni')}</button></div>`;
       f.classList.add('done'); done.focus();
-      const sh = $('.share', done); sh.onclick = () => { olcu('Paylaş', { yer:'gönderim' }); shareIdea(title, k, sh); };
+      const sh = $('.share', done); sh.onclick = () => { olcu('Paylaş', { yer:'gönderim' }); shareIdea({ title, key:k, label:catName(isCase ? isCase.short : cat), buyers:0, avg:0, benim:true }, 'gönderim'); };
       done.append(haberForm(k, 'fikrim'));
       olcu('Fikir gönderildi', { vaka: isCase ? isCase.id : 'yok' });
       $('.again', done).onclick = () => { f.reset(); pickCat(''); $('.if-detay', f).open = false; f.handle.value = handleGet(); pitch.value = ''; len(); f.classList.remove('done'); $('[type=submit]', f).disabled = false; say(''); pitch.focus(); };
@@ -192,6 +303,7 @@ function mountForm(host, opts={}){
     });
   });
   if (opts.focus) setTimeout(() => pitch.focus({ preventScroll:true }), 50);
+  kayitAdimi(host, f, pitch);
   const useCase = id => {
     const c = openCases().find(x => x.id === id); if (!c) return;
     pickVaka(c.id);
@@ -447,7 +559,7 @@ function openIdea(key, push=true){
       ${it.owner !== Store.uid ? '<div class="bildir-yer"></div>' : ''}
     </div>`;
     $('.x', dlg).onclick = () => dlg.close();
-    const sh = $('.sh', dlg); sh.onclick = () => { olcu('Paylaş', { yer:'pencere' }); shareIdea(it.title, it.key, sh); };
+    const sh = $('.sh', dlg); sh.onclick = () => { olcu('Paylaş', { yer:'pencere' }); shareIdea({ title:it.title, key:it.key, label:etiket(it), buyers:it.buyers, avg:it.avg, benim:it.owner === Store.uid }, 'pencere'); };
     $('.dv', dlg).replaceWith(buyCtl(it));
     const hy = $('.haber-yer', dlg); if (hy) hy.replaceWith(haberForm(it.key, 'alirdim'));
     const by = $('.bildir-yer', dlg); if (by) by.replaceWith(bildirCtl(it.key));
@@ -476,7 +588,7 @@ function openShared(){
   let tries = 0; const t = setInterval(() => { if (openIdea(f, false) || ++tries > 40) clearInterval(t); }, 250);
 }
 
-Object.assign(window.UD_IC, { YASAL, kvkkLink, langSwitch, mountChrome, mountThu, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, mountForm, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
+Object.assign(window.UD_IC, { YASAL, kvkkLink, langSwitch, mountChrome, mountThu, ideaUrl, shareCard, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, KAYIT_GEC, kayitAdimi, mountForm, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
 
 // =========================================================== boot
 applyText();

@@ -254,6 +254,9 @@ const Store = (function(){
     },
     async epostaBagla(eposta, donus){
       await start();
+      // no identity yet (quick sign-up before the first idea): take the anonymous one first, so the idea written
+      // while the link is on its way belongs to the same account the e-mail confirms
+      if (S.uid === 'anon') await sbUser();
       const { data } = await sb.auth.getSession();
       const u = data && data.session && data.session.user;
       const r = u && u.is_anonymous
@@ -266,6 +269,32 @@ const Store = (function(){
       const r = await sb.auth.signInWithOtp({ email:eposta, options:{ shouldCreateUser:false, emailRedirectTo:donus } });
       if (r.error) throw r.error;
     },
+    // ---- e-mail + password (giris/). Sign-up keeps the visitor's anonymous id when there is one, so what they
+    // wrote stays theirs; Supabase sends a confirmation link either way ("Confirm email" on). Returns which
+    // e-mail went out ('signup' or 'email_change'), for "send it again".
+    async kayitOl(eposta, sifre, donus){
+      await start();
+      const { data } = await sb.auth.getSession();
+      const u = data && data.session && data.session.user;
+      if (u && u.is_anonymous){
+        let r = await sb.auth.updateUser({ email:eposta, password:sifre }, { emailRedirectTo:donus });
+        if (r.error && r.error.status !== 429 && r.error.code !== 'email_exists'){
+          // some setups take the password only after the address is confirmed: ask for it on the way back
+          r = await sb.auth.updateUser({ email:eposta }, { emailRedirectTo:donus });
+          if (!r.error) try { localStorage.setItem('ud-sifre-sonra', '1'); } catch(e){}
+        }
+        if (r.error) throw r.error;
+        return 'email_change';
+      }
+      const r = await sb.auth.signUp({ email:eposta, password:sifre, options:{ emailRedirectTo:donus } });
+      if (r.error) throw r.error;
+      // an address that already has an account comes back with no identities (Supabase hides it on purpose)
+      if (r.data.user && Array.isArray(r.data.user.identities) && !r.data.user.identities.length) throw Object.assign(new Error('exists'), { code:'email_exists' });
+      return 'signup';
+    },
+    async dogrulamaYenile(eposta, tur, donus){ await start(); const r = await sb.auth.resend({ type:tur, email:eposta, options:{ emailRedirectTo:donus } }); if (r.error) throw r.error; },
+    async sifreSifirla(eposta, donus){ await start(); const r = await sb.auth.resetPasswordForEmail(eposta, { redirectTo:donus }); if (r.error) throw r.error; },
+    async sifreKoy(sifre){ await start(); const r = await sb.auth.updateUser({ password:sifre }); if (r.error) throw r.error; try { localStorage.removeItem('ud-sifre-sonra'); } catch(e){} },
     // "Google ile devam et". Shown only when the Google provider is on in Supabase (its public settings say so).
     googleAcik(){
       if (!AYAR.supabaseUrl) return Promise.resolve(false);

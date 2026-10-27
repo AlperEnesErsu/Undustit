@@ -3,7 +3,7 @@
    Each file shares its top-level names on window.UD_IC and takes what it needs from there. */
 (function(){
 'use strict';
-const { $, CASES, CRIT, T, TERMS, V01, caseOf, daysLeft, sbClient, veriUyari } = window.UD_IC;
+const { $, CASES, CRIT, T, TERMS, V01, captcha, caseOf, daysLeft, sbClient, veriUyari } = window.UD_IC;
 const Store = (function(){
   const subs = new Set();
   const S = { mode:'local', uid:'local', canWrite:true, ideas:{}, votes:{}, notes:{} };
@@ -90,7 +90,7 @@ const Store = (function(){
   async function sbUser(){
     const { data } = await sb.auth.getSession();
     if (data && data.session) return (S.uid = data.session.user.id);
-    const r = await sb.auth.signInAnonymously();
+    const r = await sb.auth.signInAnonymously({ options:{ captchaToken: await captcha() } });
     if (r.error) throw r.error;
     return (S.uid = r.data.user.id);
   }
@@ -261,12 +261,12 @@ const Store = (function(){
       const u = data && data.session && data.session.user;
       const r = u && u.is_anonymous
         ? await sb.auth.updateUser({ email:eposta }, { emailRedirectTo:donus })
-        : await sb.auth.signInWithOtp({ email:eposta, options:{ emailRedirectTo:donus } });
+        : await sb.auth.signInWithOtp({ email:eposta, options:{ emailRedirectTo:donus, captchaToken: await captcha() } });
       if (r.error) throw r.error;
     },
     async girisBaglantisi(eposta, donus){
       await start();
-      const r = await sb.auth.signInWithOtp({ email:eposta, options:{ shouldCreateUser:false, emailRedirectTo:donus } });
+      const r = await sb.auth.signInWithOtp({ email:eposta, options:{ shouldCreateUser:false, emailRedirectTo:donus, captchaToken: await captcha() } });
       if (r.error) throw r.error;
     },
     // ---- e-mail + password (giris/). Sign-up keeps the visitor's anonymous id when there is one, so what they
@@ -286,14 +286,14 @@ const Store = (function(){
         if (r.error) throw r.error;
         return 'email_change';
       }
-      const r = await sb.auth.signUp({ email:eposta, password:sifre, options:{ emailRedirectTo:donus } });
+      const r = await sb.auth.signUp({ email:eposta, password:sifre, options:{ emailRedirectTo:donus, captchaToken: await captcha() } });
       if (r.error) throw r.error;
       // an address that already has an account comes back with no identities (Supabase hides it on purpose)
       if (r.data.user && Array.isArray(r.data.user.identities) && !r.data.user.identities.length) throw Object.assign(new Error('exists'), { code:'email_exists' });
       return 'signup';
     },
-    async dogrulamaYenile(eposta, tur, donus){ await start(); const r = await sb.auth.resend({ type:tur, email:eposta, options:{ emailRedirectTo:donus } }); if (r.error) throw r.error; },
-    async sifreSifirla(eposta, donus){ await start(); const r = await sb.auth.resetPasswordForEmail(eposta, { redirectTo:donus }); if (r.error) throw r.error; },
+    async dogrulamaYenile(eposta, tur, donus){ await start(); const r = await sb.auth.resend({ type:tur, email:eposta, options:{ emailRedirectTo:donus, captchaToken: await captcha() } }); if (r.error) throw r.error; },
+    async sifreSifirla(eposta, donus){ await start(); const r = await sb.auth.resetPasswordForEmail(eposta, { redirectTo:donus, captchaToken: await captcha() }); if (r.error) throw r.error; },
     async sifreKoy(sifre){ await start(); const r = await sb.auth.updateUser({ password:sifre }); if (r.error) throw r.error; try { localStorage.removeItem('ud-sifre-sonra'); } catch(e){} },
     // "Google ile devam et". Shown only when the Google provider is on in Supabase (its public settings say so).
     googleAcik(){

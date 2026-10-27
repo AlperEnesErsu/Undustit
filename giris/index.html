@@ -64,6 +64,7 @@ const hataMetni = err => {
   if (c === 'email_exists' || c === 'user_already_exists') return T('giris.hata.var');
   if (c === 'weak_password') return T('giris.hata.zayif');
   if (c === 'email_not_confirmed') return T('giris.hata.dogrulanmadi');
+  if (c === 'captcha' || c === 'captcha_failed') return T('ud.captcha.hata');
   return (err && err.message === 'E-posta ya da şifre yanlış') ? T('giris.hata.yanlis') : T('giris.hata.genel');
 };
 

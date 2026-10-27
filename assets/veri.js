@@ -135,6 +135,8 @@
     if (e.code === '23505') return new Error('Bu kimlik zaten var');
     return new Error('Veri işlemi başarısız: ' + e.message);
   }
+  // spam protection token (assets/ud/temel.js captcha); undefined when Turnstile is off or assets/ud is not on the page
+  const tsJeton = () => window.UD && window.UD.captcha ? window.UD.captcha() : Promise.resolve(undefined);
   async function sorgu(q){ const { data, error } = await q; if (error) throw hata(error); return data; }
   // Ziyaretçinin okuyabildiği sütunlar (8-gizli.sql). firma, taban_fiyat ve olusturan yalnız vaka_tam() ile gelir:
   // yöneticiye hepsi, firmaya kendi vakası. 8-gizli.sql çalışmadan önce (fonksiyon yok) eski yoldan okunur.
@@ -318,7 +320,7 @@
     },
     async giris(email, sifre){
       if (SB_URL){
-        const { data, error } = await istemci().auth.signInWithPassword({ email: str(email), password: String(sifre || '') });
+        const { data, error } = await istemci().auth.signInWithPassword({ email: str(email), password: String(sifre || ''), options: { captchaToken: await tsJeton() } });
         // an unconfirmed address is the one failure worth naming: the person can ask for the link again
         if (error && error.code === 'email_not_confirmed') throw Object.assign(new Error('E-posta henüz doğrulanmadı'), { code: error.code });
         if (error || !data.session) throw new Error(YANLIS);
@@ -332,7 +334,7 @@
     },
     async baglantiGonder(email){
       if (!SB_URL) throw new Error('Yerel modda e-posta gönderilmez');
-      const { error } = await istemci().auth.signInWithOtp({ email: str(email), options: { emailRedirectTo: location.origin + location.pathname } });
+      const { error } = await istemci().auth.signInWithOtp({ email: str(email), options: { emailRedirectTo: location.origin + location.pathname, captchaToken: await tsJeton() } });
       if (error) throw new Error('Bağlantı gönderilemedi');
     },
     async cikis(){

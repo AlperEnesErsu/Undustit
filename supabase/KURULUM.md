@@ -182,6 +182,22 @@ yönetici `yonetim/`, firma `firma/`, üye `benim/` sayfasına geçer.
    doğrulama ve şifre yenileme bağlantıları `giris/` sayfasına döner.
 4. İsteğe bağlı: **Password requirements** altında en az 8 karakter (site de 8 ister).
 
+## 16. Spam koruması (Cloudflare Turnstile)
+
+Sitede her yazma (fikir, "alırdım", yorum, başvuru, mesaj) önce bir oturum açar; anonim ziyaretçi de. Turnstile bu
+oturum açılışlarının ve kayıt, giriş, e-posta bağlantısı, şifre yenileme isteklerinin önünde durur, jetonu Supabase
+kendi tarafında doğrular. Gerçek ziyaretçi çoğu zaman hiçbir şey görmez.
+
+**Sıra önemli:** önce site anahtarı sitede olmalı, sonra Supabase'de açılmalı. Tersi olursa siteye yazılamaz.
+
+1. **Cloudflare** (ücretsiz hesap) > **Turnstile** > **Add widget**: ad "Undustit"; **Hostname**: `localhost`,
+   `alperenesersu.github.io` ve alan adı gelince o; **Widget mode**: Managed. **Site Key** ve **Secret Key** çıkar.
+2. `assets/ayar.js` > `turnstile:` alanına **Site Key**'i yazın ve yayına alın.
+3. Supabase > **Authentication** > **Attack Protection** > **Enable CAPTCHA protection** > sağlayıcı **Turnstile** >
+   **Secret Key**'i yapıştırın > **Save**.
+4. Deneme: gizli pencerede bir fikre "alırdım" deyin; kaydolmalı. Konsolda `captcha` hatası varsa 1'deki hostname
+   listesine sitenin adresi eklenmemiştir.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

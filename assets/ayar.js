@@ -14,5 +14,8 @@ window.UD_AYAR = {
   // true olunca alt bilgide bağlantılar ve formlardaki onayın yanında "Aydınlatma metni" görünür.
   yasal: false,
   // Perşembe yayınının adresi (YouTube, Twitch…). Doluyken persembe/ sayfasında "Yayına git" çıkar.
-  yayin: ''
+  yayin: '',
+  // Spam koruması: Cloudflare Turnstile "site key" (herkese açık; gizli anahtar yalnız Supabase'e girilir).
+  // Önce bunu doldurun, sonra Supabase > Authentication > Attack Protection'da CAPTCHA'yı açın (KURULUM.md §16).
+  turnstile: ''
 };

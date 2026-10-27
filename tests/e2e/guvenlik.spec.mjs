@@ -56,6 +56,30 @@ test('kötü niyetli metin her yerde metin olarak kalır', async ({ page }) => {
   await temiz(page);
 });
 
+// Spam protection: the real Turnstile script with Cloudflare's published test keys (1x… always passes, 2x… always
+// fails). Supabase checks the token itself; here we check the site gets one, and says so when it can't.
+const turnstileAyar = key => r => r.fulfill({ contentType:'text/javascript',
+  body:`window.UD_AYAR = { supabaseUrl:'', supabaseAnon:'', adminler:['test@undustit.local'], analitik:'', iletisim:'', yasal:false, yayin:'', turnstile:'${key}' };` });
+test('Turnstile anahtarı varken jeton alınır, geçemezse anlaşılır hata verir', async ({ page }) => {
+  await page.route('**/assets/ayar.js', turnstileAyar('1x00000000000000000000AA'));
+  await page.goto('/fikirler/');
+  const jeton = await page.evaluate(() => UD.captcha());
+  expect(typeof jeton).toBe('string');
+  expect(jeton.length).toBeGreaterThan(10);
+  await expect(page.locator('.ts-kutu')).toHaveCount(0);   // the widget is gone once it answered
+  await page.route('**/assets/ayar.js', turnstileAyar('2x00000000000000000000AB'));
+  await page.goto('/fikirler/');
+  const hata = await page.evaluate(() => UD.captcha().then(() => 'geçti', e => e.code + ': ' + e.message));
+  expect(hata).toBe('captcha: Güvenlik doğrulaması geçilemedi. Sayfayı yenileyip tekrar dene.');
+});
+
+test('Turnstile anahtarı boşken hiçbir şey yüklenmez', async ({ page }) => {
+  await hazirla(page);
+  await page.goto('/fikirler/');
+  expect(await page.evaluate(() => UD.captcha())).toBeUndefined();
+  expect(await page.evaluate(() => [...document.scripts].some(s => s.src.includes('turnstile')))).toBe(false);
+});
+
 test('veri yüklenemezse görünür uyarı ve yeniden dene çıkar', async ({ page }) => {
   // a database address that refuses the connection (the client library still loads from its CDN)
   await page.route('**/assets/ayar.js', r => r.fulfill({ contentType:'text/javascript',

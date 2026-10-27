@@ -1,7 +1,9 @@
--- Checks for supabase/*.sql: run after the six migrations (tests/sql/calistir.sh). Every block raises an
+-- Checks for supabase/*.sql: run after the migrations (tests/sql/calistir.sh). Every block raises an
 -- error when a rule does not hold, so psql -v ON_ERROR_STOP=1 fails the run. Users: A writes, B and C visit,
--- D is an admin. Supabase grants table rights to these roles itself; plain Postgres needs it here.
+-- D is an admin. Supabase grants table rights to these roles itself; plain Postgres needs it here, and the
+-- column rights of 8-gizli.sql are applied again on top of that blanket grant.
 grant select, insert, update, delete on all tables in schema public to anon, authenticated;
+\i supabase/8-gizli.sql
 
 insert into auth.users (id) values
   ('00000000-0000-0000-0000-00000000000a'), ('00000000-0000-0000-0000-00000000000b'),
@@ -158,6 +160,44 @@ do $$ begin
     perform public.firma_gorsel('vaka-taslak', 'https://ornek.example/kotu.jpg');
     raise exception 'firma olmayan görsel değiştirebiliyor';
   exception when insufficient_privilege then null; end;
+end $$;
+
+-- private columns: visitors read the public ones but never the floor price, the company or the creator;
+-- vaka_tam() gives the full row to the admin (every case) and to the company (its own case only)
+do $$ begin
+  if (select baslik from public.vakalar where id = 'vaka-01') is null then raise exception 'ziyaretçi açık sütunları okuyamıyor'; end if;
+  if (select count(*) from public.vaka_tam()) <> 0 then raise exception 'ziyaretçi vaka_tam ile tam satır alıyor'; end if;
+  begin
+    perform taban_fiyat from public.vakalar where id = 'vaka-01';
+    raise exception 'ziyaretçi taban fiyatı okuyabiliyor';
+  exception when insufficient_privilege then null; end;
+  begin
+    perform olusturan from public.vakalar;
+    raise exception 'ziyaretçi vakayı açanın e-postasını okuyabiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+set role anon;
+reset request.jwt.claim.sub;
+do $$ begin
+  if (select count(*) from public.vakalar where id = 'vaka-01') <> 1 then raise exception 'oturumsuz ziyaretçi vakayı göremiyor'; end if;
+  begin
+    perform firma from public.vakalar;
+    raise exception 'oturumsuz ziyaretçi firma adını okuyabiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000a';
+do $$ begin
+  if (select count(*) from public.vaka_tam()) <> 1 or (select id from public.vaka_tam()) <> 'vaka-taslak' then raise exception 'firma yalnız kendi vakasının tam satırını almalı'; end if;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+do $$ begin
+  if (select count(*) from public.vaka_tam()) < 2 then raise exception 'yönetici bütün vakaları tam okuyamıyor'; end if;
+  if (select taban_fiyat from public.vaka_tam('vaka-01')) is null then raise exception 'yönetici taban fiyatı göremiyor'; end if;
+end $$;
+update public.vakalar set taban_fiyat = 3 where id = 'vaka-01';
+do $$ begin
+  if (select taban_fiyat from public.vaka_tam('vaka-01')) <> 3 then raise exception 'yönetici taban fiyatı değiştiremiyor'; end if;
 end $$;
 reset role;
 select 'sql kontrolleri tamam' as sonuc;

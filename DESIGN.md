@@ -500,3 +500,10 @@ vaka bandı, paylaş, bildir), `hareket.js` (eskizden rafa, kaydırma; `window.U
 - **Ne değiştirir:** yalnız ürün fotoğrafı, `firma_gorsel()` üzerinden (https adres, başka vaka olmaz). Başlık,
   durum, kazanan yönetimde kalır.
 - Sayfa şimdilik yalnız Türkçe (ilk firmalar Türkiye'den); İngilizcesi sözlüğe taşınınca gelir.
+## Taban fiyat veritabanında da gizli (27 Ekim 2026)
+
+Taban fiyat sitede hiç gösterilmiyordu ama açık vakaların satırında herkese okunuyordu (API'den bakan görürdü).
+Satır düzeyinde güvenlik sütun gizleyemediği için `8-gizli.sql` ziyaretçiye sütun bazında okuma hakkı veriyor:
+`taban_fiyat`, `firma` ve `olusturan` kapalı. Yönetici ve vakanın firması tam satırı `vaka_tam()` ile okur. Site
+dosya çalışmadan önce de sonra da çalışır (fonksiyon yoksa eski yoldan okur). SQL testleri oturumsuz ziyaretçiyi,
+üyeyi, firmayı ve yöneticiyi ayrı ayrı dener.

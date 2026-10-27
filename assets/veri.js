@@ -136,11 +136,29 @@
     return new Error('Veri işlemi başarısız: ' + e.message);
   }
   async function sorgu(q){ const { data, error } = await q; if (error) throw hata(error); return data; }
+  // Ziyaretçinin okuyabildiği sütunlar (8-gizli.sql). firma, taban_fiyat ve olusturan yalnız vaka_tam() ile gelir:
+  // yöneticiye hepsi, firmaya kendi vakası. 8-gizli.sql çalışmadan önce (fonksiyon yok) eski yoldan okunur.
+  const ACIK = 'id,baslik,ozet,aciklama,stok,adet,olcu,sinif,deneme_adedi,sure_gun,gorsel,durum,acilis,kapanis,kazanan,olusturma,guncelleme';
+  async function tam(v){
+    const r = await istemci().rpc('vaka_tam', v ? { v } : {});
+    if (r.error && r.error.code === 'PGRST202') return sorgu(v ? istemci().from('vakalar').select('*').eq('id', v) : istemci().from('vakalar').select('*'));
+    if (r.error) throw hata(r.error);
+    return r.data;
+  }
   const uzak = {
-    liste: async () => sorgu(istemci().from('vakalar').select('*')),
-    al: async id => sorgu(istemci().from('vakalar').select('*').eq('id', id).maybeSingle()),
-    ekle: async v => sorgu(istemci().from('vakalar').insert(v).select().single()),
-    guncelle: async (id, yama) => sorgu(istemci().from('vakalar').update(yama).eq('id', id).select().single()),
+    liste: async () => tam(),
+    // vaka sayfası ziyaretçiye de açık: oturumu olan (yönetici ya da firma) tam satırı, diğerleri açık sütunları okur
+    al: async id => {
+      const o = mevcut();
+      if (o && o.email){ const r = await tam(id).catch(() => []); if (r.length) return r[0]; }
+      return sorgu(istemci().from('vakalar').select(ACIK).eq('id', id).maybeSingle());
+    },
+    ekle: async v => { await sorgu(istemci().from('vakalar').insert(v)); return (await tam(v.id))[0]; },
+    guncelle: async (id, yama) => {
+      const r = await sorgu(istemci().from('vakalar').update(yama).eq('id', id).select('id'));
+      if (!r || !r.length) throw new Error('Vaka bulunamadı ya da yetkiniz yok');
+      return (await tam(id))[0];
+    },
     sil: async id => { await sorgu(istemci().from('vakalar').delete().eq('id', id)); },
     gecmisEkle: async (id, s) => { await sorgu(istemci().from('vaka_gecmis').insert({ vaka_id:id, durum:s.durum, not:s.not, kim:s.kim, zaman:s.zaman })); },
     gecmis: async id => (await sorgu(istemci().from('vaka_gecmis').select('*').eq('vaka_id', id).order('zaman', { ascending:true })))
@@ -179,7 +197,7 @@
       if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // 7-firma.sql henüz çalışmadı
       if (error) throw hata(error);
       const ids = data.map(r => r.vaka_id);
-      return ids.length ? sorgu(istemci().from('vakalar').select('*').in('id', ids)) : [];
+      return ids.length ? (await tam()).filter(v => ids.includes(v.id)) : [];
     },
     firmaGorsel: async (vakaId, adres) => { await sorgu(istemci().rpc('firma_gorsel', { v:vakaId, adres })); },
     talepFiyatlari: async vakaId => {

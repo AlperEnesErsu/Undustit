@@ -47,6 +47,7 @@ testler) ve bunları kimin nasıl yönettiği. "Basit görünüyor" hissinin as�
 2. **Gönderim ücreti** (99 ₺ / 10 ₺), yine ödeme altyapısıyla.
 3. **Firma tarafı gelir:** vaka açma paketi (ücretli vaka, öne çıkarma), firma paneli (kendi vakasının
    fikirlerini ve taleplerini görür). Fabrikalara hizmet satmak buradan başlar.
+   *Firma paneli yapıldı (27 Ekim 2026):* `/firma/`. Ücretli vaka ve öne çıkarma ödeme altyapısını bekliyor.
 4. **Yönetim raporları:** gelir, dönüşüm, vaka bazında talep tutarı. Alıcıya gösterilecek tablo bu.
    *Yapıldı (27 Ekim 2026):* `/yonetim/rapor/` talep tarafını gösteriyor; gelir satırları ödeme gelince eklenecek.
 

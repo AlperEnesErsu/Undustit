@@ -47,9 +47,13 @@ end $$;
 revoke all on function public.firma_gorsel(text, text) from public;
 grant execute on function public.firma_gorsel(text, text) to authenticated;
 
--- and the file itself: a company stores photos under vaka/<own id>/, within the same daily limit
+-- and the file itself: a company stores photos under vaka/<own id>/, within the same daily limit.
+-- The limit is defined again here (same body as in 6-gorsel.sql), so this file runs even where 6 did not finish.
 do $$ begin
   if to_regnamespace('storage') is null then return; end if;
+  create or replace function public.gorsel_hakki() returns boolean language sql stable security definer set search_path = public as $f$
+    select (select count(*) from storage.objects where owner = auth.uid() and created_at > now() - interval '1 day') < 5
+  $f$;
   drop policy if exists gorsel_firma on storage.objects;
   create policy gorsel_firma on storage.objects for insert to authenticated
     with check (bucket_id = 'gorseller' and (storage.foldername(name))[1] = 'vaka'

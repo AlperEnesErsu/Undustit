@@ -133,7 +133,10 @@ function sbClient(){
   const A = window.UD_AYAR || {};
   if (!sbClient.p) sbClient.p = (window.supabase && window.supabase.createClient ? Promise.resolve(window.supabase) : new Promise((ok, no) => {
     const sc = document.createElement('script');
+    // pinned to the exact file: if the CDN ever served something else, the browser refuses to run it.
+    // A new version needs a new hash (README, "Supabase istemcisi"); the same pair lives in assets/veri.js.
     sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+    sc.integrity = 'sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug'; sc.crossOrigin = 'anonymous';
     sc.onload = () => window.supabase && window.supabase.createClient ? ok(window.supabase) : no(new Error('Veri servisi yüklenemedi'));
     sc.onerror = () => no(new Error('Veri servisi yüklenemedi'));
     document.head.append(sc);

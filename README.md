@@ -3,7 +3,7 @@
 > **In English:** Undustit is a community product workshop in Turkish and English. People write a product idea in one
 > sentence; others say "I'd buy" and name their price; the five most wanted ideas are discussed live every
 > Thursday; enough pre-orders put a product into production and everyone who helped shares the sales. Companies
-> open their unsold stock as "cases" and the community finds it a new use. Static site (GitHub Pages) + Supabase
+> open their unsold stock as "cases" and the community finds it a new use. Static site (Netlify) + Supabase
 > (Postgres, auth, row-level security). No build step. Checks: Playwright, SQL tests, CI.
 
 Fikrini tek cümleyle yaz; topluluk "alırdım" der ve fiyat yazar. En çok istenen beş fikir her perşembe canlı yayında
@@ -116,8 +116,17 @@ Aynı üçü her PR'da GitHub Actions ile çalışır (`.github/workflows/kontro
 
 ## Yayın
 
-GitHub Pages, `main` dalının kökünden yayınlar; birleştirilen her PR birkaç dakikada canlıdadır. Alan adına geçince
-canonical, og ve `sitemap.xml` adresleri güncellenmeli (yol haritası).
+Netlify, `main` dalının kökünden olduğu gibi yayınlar (derleme yok, `netlify.toml`). Başlıklar `_headers`'ta
+(CSP, HSTS, çerçeveleme yasağı…), çalışma klasörlerini gizleyen kurallar `_redirects`'te.
+
+**Kredi:** her canlı yayın Netlify kredisi harcar. `tools/netlify-atla.sh` PR önizlemelerini ve yalnız çalışma
+dosyalarını (docs, tests, supabase, tools, notlar) değiştiren push'ları atlar. Yine de değişiklikleri yerelde
+toplayıp `main`'e seyrek, toplu birleştirmek en ucuzu.
+
+**Supabase istemcisi:** CDN'den sabit sürümle ve `integrity` özetiyle yüklenir (`assets/ud/temel.js`, `assets/veri.js`).
+Sürüm değişirse yeni özet: `curl -sL <adres> | openssl dgst -sha384 -binary | openssl base64 -A` (başına `sha384-`).
+
+Alan adına geçince canonical, og ve `sitemap.xml` adresleri güncellenmeli (yol haritası).
 
 ## Belgeler
 

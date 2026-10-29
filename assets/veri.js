@@ -8,6 +8,7 @@
   const SB_URL = AYAR.supabaseUrl || '';
   const SB_ANON = AYAR.supabaseAnon || '';
   const SB_SURUM = '2.45.4';
+  const SB_SRI = 'sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug';   // dosyanın özeti: sürüm değişirse bu da değişir (assets/ud/temel.js ile aynı)
   const ADMINLER = (AYAR.adminler || []).map(e => String(e).trim().toLowerCase());
   const LS = 'udv-v1';
   const SITE_LS = 'ud-store-v1';   // sitenin fikir deposu, yalnız okunur (bkz. assets/ud/depo.js Store)
@@ -251,6 +252,7 @@
       if (window.supabase && window.supabase.createClient) return ok(window.supabase);
       const s = document.createElement('script');
       s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@' + SB_SURUM + '/dist/umd/supabase.min.js';
+      s.integrity = SB_SRI; s.crossOrigin = 'anonymous';
       s.async = true;
       s.onload = () => (window.supabase && window.supabase.createClient) ? ok(window.supabase) : no(new Error('Veri servisi yüklenemedi'));
       s.onerror = () => no(new Error('Veri servisi yüklenemedi'));

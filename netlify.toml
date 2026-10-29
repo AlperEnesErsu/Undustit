@@ -1,5 +1,7 @@
 # Netlify: the site is plain files, published as they are from the repository root; no build step.
 # Response headers live in _headers, redirects in _redirects (the same files tests/sunucu.mjs applies).
+# ignore: tools/netlify-atla.sh skips previews and pushes that leave the site unchanged, so they spend no credits.
 [build]
   publish = "."
   command = ""
+  ignore = "bash tools/netlify-atla.sh"

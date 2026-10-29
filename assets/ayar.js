@@ -17,5 +17,5 @@ window.UD_AYAR = {
   yayin: '',
   // Spam koruması: Cloudflare Turnstile "site key" (herkese açık; gizli anahtar yalnız Supabase'e girilir).
   // Önce bunu doldurun, sonra Supabase > Authentication > Attack Protection'da CAPTCHA'yı açın (KURULUM.md §16).
-  turnstile: ''
+  turnstile: '0x4AAAAAAFq0JNxOMGzt8Zgz'
 };

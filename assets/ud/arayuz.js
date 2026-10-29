@@ -179,10 +179,10 @@ function feeLine(){
   const now = tl(n ? f.next : f.first);
   return T('ud.form.ucret', { ilk:tl(f.first), sonra:tl(f.next), bu:now }) + (f.charged ? '' : ' ' + T('ud.form.odemeyok'));
 }
-// Quick sign-up in front of every idea form, for someone without an account: Google (when it is on in Supabase),
-// an e-mail link, or "continue without". Never a wall: the choice is remembered and the form opens right after.
+// An offer under every idea form, for someone without an account: Google (when it is on in Supabase), an e-mail
+// link, or "not now". The form comes first and is never hidden behind it; "not now" is remembered.
 const KAYIT_GEC = 'ud-kayit-gec';
-function kayitAdimi(host, f, pitch){
+function kayitAdimi(host){
   try { if (localStorage.getItem(KAYIT_GEC) === '1') return; } catch(e){}
   Store.hesap().then(h => {
     if (!h || !h.anonim || h.bekleyen) return;   // preview mode, signed in, or the e-mail link is on its way
@@ -192,10 +192,9 @@ function kayitAdimi(host, f, pitch){
       <form novalidate><input type="email" name="e" autocomplete="email" maxlength="160" placeholder="${T('fikir.kayit.ipucu')}" aria-label="${T('fikir.kayit.ipucu')}"><button type="submit" class="btn sig sm">${T('fikir.kayit.gonder')}</button></form>
       <p class="durum" role="status" aria-live="polite"></p>
       <button type="button" class="link kayit-gec">${T('fikir.kayit.gec')}</button>`;
-    host.prepend(kart); f.hidden = true;
+    host.append(kart);
     const durum = $('.durum', kart), say = (t, k) => { durum.textContent = t; durum.className = 'durum' + (k ? ' ' + k : ''); };
-    const ac = odak => { kart.remove(); f.hidden = false; if (odak) pitch.focus(); };
-    $('.kayit-gec', kart).onclick = () => { try { localStorage.setItem(KAYIT_GEC, '1'); } catch(e){} ac(true); };
+    $('.kayit-gec', kart).onclick = () => { try { localStorage.setItem(KAYIT_GEC, '1'); } catch(e){} kart.remove(); };
     Store.googleAcik().then(acik => {
       if (!acik) return;
       const g = $('.btn.google', kart); g.parentNode.hidden = false;
@@ -210,7 +209,7 @@ function kayitAdimi(host, f, pitch){
       Store.epostaBagla(v, location.href).then(() => {
         olcu('Hesap bağla'); mailSet(v);
         // the link can wait; the idea is written now
-        ef.remove(); $('.kayit-gec', kart).remove(); say(T('fikir.kayit.gonderildi', { eposta:v }), 'ok'); f.hidden = false;
+        ef.remove(); $('.kayit-gec', kart).remove(); say(T('fikir.kayit.gonderildi', { eposta:v }), 'ok');
       }).catch(err => { $('button', ef).disabled = false; say(err && err.status === 429 ? T('benim.js.hata.sik') : T('benim.js.hata.genel'), 'bad'); });
     };
   }).catch(() => {});
@@ -313,7 +312,7 @@ function mountForm(host, opts={}){
     });
   });
   if (opts.focus) setTimeout(() => pitch.focus({ preventScroll:true }), 50);
-  kayitAdimi(host, f, pitch);
+  kayitAdimi(host);
   const useCase = id => {
     const c = openCases().find(x => x.id === id); if (!c) return;
     pickVaka(c.id);

@@ -123,7 +123,7 @@ function mountStory(host, name){
     <p class="sr">${t(S.sr)}</p>
     <div class="pc-stage"><div class="anl-cizim" aria-hidden="true"><svg viewBox="0 0 320 240">${S.svg()}</svg></div>
       <button type="button" class="pc-replay">${ICON.replay}${t('ud.akis.tekrar')}</button></div>
-    <ol class="pc-steps" style="grid-template-columns:repeat(${n},minmax(0,1fr))" aria-hidden="true">${S.steps.map(k => `<li>${t(k)}</li>`).join('')}</ol>`;
+    <ol class="pc-steps" style="--adim:${n}" aria-hidden="true">${S.steps.map(k => `<li>${t(k)}</li>`).join('')}</ol>`;
   host.replaceWith(box);
   const lis = Array.from(box.querySelectorAll('.pc-steps li'));
   const classes = S.at.map((_, i) => 'a' + (i + 1)).concat('end');

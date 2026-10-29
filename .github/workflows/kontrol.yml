@@ -1,5 +1,5 @@
 # Every pull request and every push to main: the site's texts, the database rules and the pages themselves.
-# The site has no build; GitHub Pages serves the branch as it is. These checks only guard it.
+# The site has no build; Netlify serves main as it is. These checks only guard it.
 name: Kontrol
 
 on:

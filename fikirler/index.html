@@ -22,23 +22,28 @@
 <meta name="twitter:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
 <meta property="og:title" content="Fikirler · Undustit" data-ta="content:fikirler.attr.3">
 <meta property="og:description" content="Talep toplayan fikirler: alırdım de, puanla, geliştir." data-ta="content:fikirler.attr.4">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%235B2EFF%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
 <link rel="stylesheet" href="../assets/anlatim.css">
 <script src="../assets/stil.js"></script>
 <style>
-.bar{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center;padding-block:18px;border-block:1px solid var(--line);margin-bottom:24px;position:sticky;top:68px;z-index:5;background:var(--bg)}
+/* one reading order: what to show (case, then category) on the left, how to order it on the right of the first row */
+.bar{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:flex-start;padding-block:16px;border-block:1px solid var(--line);margin-bottom:24px;position:sticky;top:68px;z-index:5;background:var(--bg)}
 .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
 .seg button{min-height:34px;padding:0 14px;border:0;border-radius:999px;background:transparent;font-size:14px;color:var(--ink-2);transition:all var(--dur-fast) var(--ease-out)}
 .seg button:hover{color:var(--ink);background:var(--bg-3)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .cat-f{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:100%}
 .cat-f .chip{flex:none}
-.filtre{display:grid;gap:8px;min-width:0;max-width:100%}
-.f-sat{display:flex;align-items:center;gap:12px;min-width:0}
-.f-ad{flex:none;width:68px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-@media (max-width:560px){.f-sat{display:grid;gap:6px}.f-ad{width:auto}}
+.filtre{display:grid;gap:10px;min-width:0;max-width:100%;flex:1}
+.bar .seg{order:2;flex:none}
+/* a label sits by the first line of its chips, also when they wrap to a second */
+.f-sat{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.f-ad{flex:none;width:72px;padding-top:9px;font-size:13.5px;font-weight:500;color:var(--ink-2)}
+/* phones: the order toggle on top, each filter row full width under it */
+@media (max-width:700px){.bar{flex-direction:column;align-items:stretch}.bar .seg{order:-1;align-self:flex-start}.filtre{width:100%}}
+@media (max-width:560px){.f-sat{display:grid;gap:6px}.f-ad{width:auto;padding-top:0}}
 .arena{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,3fr);gap:clamp(24px,4vw,56px);align-items:start}
 .arena aside{display:grid;gap:16px;position:sticky;top:150px;font-size:14px;color:var(--ink-2)}
 .arena aside div{padding:18px;border:1px solid var(--line);border-radius:var(--r-md);display:grid;gap:8px}
@@ -74,7 +79,7 @@
     <div id="board"></div>
     <aside aria-label="Kurallar" data-ta="aria-label:fikirler.attr.7">
       <div data-t="fikirler.div.1"><b>Beğeni değil, talep.</b>Her “alırdım” bir fiyatla gelir. Kişi sayısı ve ortalama fiyat sıralamayı belirler; 30 günden ne kaldığını kartın altındaki çizgi gösterir.</div>
-      <div data-t="fikirler.div.2"><b>Üç ölçüt.</b>Tasarım, pazar, uygulanabilirlik. Puanlar perşembe değerlendirmesine girer.</div>
+      <div data-t="fikirler.div.2"><b>Üç ölçüt.</b>Tasarım, pazar, uygulanabilirlik. Puanlar değerlendirmeye girer.</div>
       <div><b data-t="fikirler.b.1">Aklında bir şey mi var?</b><a class="btn sig sm" href="../fikir/" style="justify-self:start" data-t="fikirler.a.2">Fikrini yaz</a></div>
     </aside>
   </div>

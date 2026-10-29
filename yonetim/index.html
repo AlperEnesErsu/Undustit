@@ -23,6 +23,17 @@
 .tablo td a:hover{text-decoration-color:var(--ink)}
 .tablo td.bosluk{padding:0}
 .tablo .bos{margin:0;border:0}
+.y-etkinlik{display:grid;gap:18px}
+.et-form{display:grid;gap:12px}
+.alan-iki{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.et-liste{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2)}
+.et-liste li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px}
+.et-liste li + li{border-top:1px solid var(--line)}
+.et-liste li div{display:grid;gap:2px;min-width:0}
+.et-liste small{color:var(--muted);font-size:13px}
+.et-liste li.bitti b{color:var(--muted)}
+.et-liste .bos-satir{color:var(--muted)}
+@media (max-width:640px){.alan-iki{grid-template-columns:1fr}}
 .bos-panel thead{display:none}
 .bos-panel .tablo-kap{border:0;background:transparent;box-shadow:none}
 .bos-panel .tablo{min-width:0}
@@ -101,7 +112,9 @@ function ciz(o, a){
         '</table></div>' +
       '</div>' +
     '</section>' +
+    etkinlikHtml() +
     KAYITLAR.map(panelHtml).join('');
+  etkinlikBagla();
 
   KAYITLAR.forEach(function(k){
     ana.querySelector('#' + k.id + '-tbody').addEventListener('change', function(e){
@@ -170,6 +183,57 @@ function tarayiciAdi(ua){
   t = t.replace('Edg', 'Edge').replace('OPR', 'Opera').replace('CriOS', 'Chrome').replace('Version', 'Safari').replace('/', ' ');
   var s = /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : /Windows/.test(ua) ? 'Windows' : /Mac OS/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : '';
   return [t, s].filter(Boolean).join(' · ') || '—';
+}
+// ----------------------------------------------------------- etkinlikler
+// Yayın, atölye, buluşma: buraya eklenen sıradaki etkinlik sitede sayfaların üstünde geri sayımla görünür.
+function etkinlikHtml(){
+  return '<section class="panel" id="etkinlikler" aria-labelledby="et-b">' +
+    '<header class="panel-bas"><h2 id="et-b">Etkinlikler</h2><span class="sayac" id="et-sayac"></span></header>' +
+    '<div class="panel-ic y-etkinlik">' +
+      '<form id="et-form" class="et-form" novalidate>' +
+        '<label class="alan"><span>Başlık</span><input type="text" name="baslik" maxlength="120" required placeholder="Ör. Ekim değerlendirme yayını"></label>' +
+        '<div class="alan-iki"><label class="alan"><span>Başlangıç</span><input type="datetime-local" name="baslangic" required></label>' +
+          '<label class="alan"><span>Bitiş <small>boşsa 2 saat</small></span><input type="datetime-local" name="bitis"></label></div>' +
+        '<label class="alan"><span>Bağlantı <small>yayın, toplantı ya da kayıt sayfası; https://</small></span><input type="url" name="baglanti" maxlength="500" placeholder="https://"></label>' +
+        '<label class="alan"><span>Açıklama <small>isteğe bağlı, en çok 600 karakter</small></span><textarea name="aciklama" rows="2" maxlength="600"></textarea></label>' +
+        '<div class="y-eylem"><button class="btn sig" type="submit">Etkinlik ekle</button></div>' +
+      '</form>' +
+      '<ul class="et-liste" id="et-liste" aria-live="polite"></ul>' +
+    '</div></section>';
+}
+function etkinlikYenile(){
+  var ul = ana.querySelector('#et-liste'), simdi = Date.now();
+  return UDV.etkinlik.liste().then(function(l){
+    ana.querySelector('#et-sayac').textContent = l.length + ' etkinlik';
+    ul.innerHTML = l.length ? l.map(function(e){
+      var bitti = Date.parse(e.bitis || e.baslangic) + (e.bitis ? 0 : 72e5) < simdi;
+      return '<li' + (bitti ? ' class="bitti"' : '') + '><div><b>' + esc(e.baslik) + '</b><small>' + esc(YON.tarihSaat(e.baslangic)) + (bitti ? ' · geçti' : '') +
+        (e.baglanti ? ' · <a href="' + esc(e.baglanti) + '" target="_blank" rel="noopener">bağlantı</a>' : '') + '</small></div>' +
+        '<button type="button" class="btn alt sm" data-et-sil="' + esc(e.id) + '">Sil</button></li>';
+    }).join('') : '<li class="bos-satir">Henüz etkinlik yok. Eklediğinizde sitede sayfaların üstünde görünür.</li>';
+  }).catch(function(err){ ul.innerHTML = ''; YON.toast(err.message || 'Etkinlikler yüklenemedi.', 'hata'); });
+}
+function etkinlikBagla(){
+  var f = ana.querySelector('#et-form');
+  // datetime-local is the admin's local time; the database keeps an exact instant
+  var an = function(v){ return v ? new Date(v).toISOString() : null; };
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var b = f.querySelector('[type=submit]'); b.disabled = true;
+    UDV.etkinlik.ekle({ baslik:f.baslik.value, baslangic:an(f.baslangic.value), bitis:an(f.bitis.value), baglanti:f.baglanti.value.trim(), aciklama:f.aciklama.value })
+      .then(function(){ f.reset(); YON.toast('Etkinlik eklendi.', 'ok'); return etkinlikYenile(); })
+      .catch(function(err){ YON.toast(err.message || 'Eklenemedi.', 'hata'); })
+      .then(function(){ b.disabled = false; });
+  });
+  ana.querySelector('#et-liste').addEventListener('click', function(e){
+    var s = e.target.closest('[data-et-sil]');
+    if (!s) return;
+    YON.onay({ baslik:'Etkinlik silinsin mi?', metin:'Sitede artık görünmez.', eylem:'Sil', tehlike:true }).then(function(evet){
+      if (!evet) return;
+      return UDV.etkinlik.sil(s.dataset.etSil).then(function(){ YON.toast('Etkinlik silindi.', 'ok'); return etkinlikYenile(); });
+    }).catch(function(err){ YON.toast(err.message || 'Silinemedi.', 'hata'); });
+  });
+  etkinlikYenile();
 }
 // a company's photo: a small preview, opening the full image when it is a web address
 function gorselHucre(u){

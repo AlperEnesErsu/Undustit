@@ -37,5 +37,6 @@ export async function hazirla(page, veri){
 
 export async function yoneticiGiris(page){
   await page.goto('/yonetim/');
+  await page.waitForFunction(() => window.UDV);
   await page.evaluate(([e, s]) => UDV.giris(e, s), [ADMIN, ADMIN_SIFRE]);
 }

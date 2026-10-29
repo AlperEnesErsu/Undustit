@@ -62,8 +62,7 @@ const TERMS = {
   presale: [300, 750],
   // surplus-stock cases (Vaka 01 · Boltun): the profit above the stock's floor price is split, not the sale;
   // the four parts are the slot winners' 10%, the rest stays with Undustit. Changing a cost is repaid first.
-  caseShare: { inventor: 40, slots: { isim: 3, gorunum: 3, ambalaj: 2, kanal: 2 } },
-  liveDay: 4, liveHourUtc: 17, liveMinutes: 90 // Thursday 20:00 Istanbul (UTC+3, no DST), for about an hour and a half
+  caseShare: { inventor: 40, slots: { isim: 3, gorunum: 3, ambalaj: 2, kanal: 2 } }
 };
 const CATS = ['Mutfak','Ev & dekor','Fitness','Ofis & masa','Dış mekân','Teknoloji aksesuarı','Çocuk','Evcil hayvan'];
 // Cases are rows of the vakalar table (opened from yonetim/); Store.cases() fills this array in place.
@@ -73,11 +72,16 @@ const V01 = { id:'vaka-01', name:T('ud.vaka1.ad'), tag:T('ud.vaka1.etiket'), sho
 // a case photo: an https address (Supabase Storage) or, in the local preview, a data URL
 const gorselAdresi = u => /^(https:\/\/|data:image\/(jpeg|png|webp);base64,)/i.test(u || '') ? u : '';
 function caseOf(v){
-  if (v.id === V01.id) return { ...V01, durum:v.durum, gorsel:gorselAdresi(v.gorsel) };
+  // what the case offers (supabase/12-vaka-modeli.sql); older rows and the local seed are partnerships
+  const model = { ortaklik: v.ortaklik !== false, odul: Number(v.odul) || 0 };
+  if (v.id === V01.id) return { ...V01, ...model, durum:v.durum, gorsel:gorselAdresi(v.gorsel) };
   return { id:v.id, name:v.baslik, tag:v.olcu || v.stok || '', short:String(v.baslik).slice(0, 40), href:'vaka/?id=' + encodeURIComponent(v.id),
-    durum:v.durum, gorsel:gorselAdresi(v.gorsel), ozet:v.ozet || '', adet:Number(v.adet) || 0, olcu:v.olcu || '', sinif:v.sinif || '' };
+    durum:v.durum, ...model, gorsel:gorselAdresi(v.gorsel), ozet:v.ozet || '', adet:Number(v.adet) || 0, olcu:v.olcu || '', sinif:v.sinif || '' };
 }
 const openCases = () => CASES.filter(c => c.durum === 'acik');
+// what a case offers, in words: "Sales partnership · 40% of the profit to the idea's owner", "Idea prize · ₺25,000"
+const modelEtiketleri = c => [c.ortaklik !== false ? T('ud.model.ortaklik', { pay:pct(TERMS.caseShare.inventor) }) : null,
+  Number(c.odul) > 0 ? T('ud.model.odul', { tutar:tl(c.odul) }) : null].filter(Boolean);
 // an idea belongs to a case by its vaka_id; older ideas only carry the case's label as their category
 const inCase = (i, c) => i.caseId ? i.caseId === c.id : i.cat === c.short;
 // categories and case names are stored in Turkish (they are data); only what is shown is translated
@@ -93,15 +97,6 @@ const EXAMPLES = [
 const DAY = 864e5;
 const fmtDate = d => d.toLocaleDateString(LOCALE, { day:'numeric', month:'long' });
 const fmtDay = d => d.toLocaleDateString(LOCALE, { weekday:'long', day:'numeric', month:'long' });
-function nextLive(now = new Date()){
-  const t = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), TERMS.liveHourUtc));
-  let add = (TERMS.liveDay - t.getUTCDay() + 7) % 7;
-  if (add === 0 && t <= now) add = 7;
-  t.setUTCDate(t.getUTCDate() + add);
-  return t;
-}
-// the stream is on from the start time for TERMS.liveMinutes; nextLive() already points at next week by then
-const liveNow = (now = new Date()) => now - (nextLive(now) - 7*DAY) < TERMS.liveMinutes * 6e4;
 function daysLeft(at){
   if (!at) return null;
   const end = new Date(at).getTime() + TERMS.voteDays*DAY;
@@ -230,5 +225,5 @@ function sortIdeas(list, by){
 const pct = v => LANG === 'en' ? v + '%' : '%' + v;
 const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
 
-window.UD_IC = { captcha, gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, nextLive, liveNow, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
+window.UD_IC = { modelEtiketleri, captcha, gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
 })();

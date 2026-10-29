@@ -3,7 +3,7 @@
    Each file shares its top-level names on window.UD_IC and takes what it needs from there. */
 (function(){
 'use strict';
-const { $, CASES, CRIT, T, TERMS, V01, captcha, caseOf, daysLeft, sbClient, veriUyari } = window.UD_IC;
+const { $, CASES, DAY, CRIT, T, TERMS, V01, captcha, caseOf, daysLeft, sbClient, veriUyari } = window.UD_IC;
 const Store = (function(){
   const subs = new Set();
   const S = { mode:'local', uid:'local', canWrite:true, ideas:{}, votes:{}, notes:{} };
@@ -139,7 +139,7 @@ const Store = (function(){
     let rows = null;
     if (AYAR.supabaseUrl){
       const c = await sbClient();
-      const r = await c.from('vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,gorsel,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
+      const r = await c.from('vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,gorsel,ortaklik,odul,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
       if (!r.error) rows = r.data;
     } else if (!(window.claude && window.claude.use)){
       try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null'); if (d && d.vakalar) rows = Object.values(d.vakalar).filter(v => v.durum !== 'taslak').sort((a,b) => String(b.olusturma).localeCompare(String(a.olusturma))); } catch(e){}
@@ -149,6 +149,24 @@ const Store = (function(){
     return CASES;
   }
   const cases = () => casesP || (casesP = loadCases().catch(() => { if (!CASES.length) CASES.push(V01); emit(); return CASES; }));
+
+  // Events (supabase/11-etkinlik.sql), added in yonetim/: the ones not over yet, soonest first. An event with no
+  // end lasts two hours. Without the database: the admin panel's local copy. No table yet: no events.
+  let etkinlikP = null;
+  async function loadEtkinlik(){
+    let rows = [];
+    if (AYAR.supabaseUrl){
+      const c = await sbClient();
+      const r = await c.from('etkinlikler').select('id,baslik,aciklama,baslangic,bitis,baglanti').gte('baslangic', new Date(Date.now() - 30 * DAY).toISOString()).order('baslangic');
+      if (!r.error) rows = r.data;
+    } else {
+      try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null'); rows = Object.values((d && d.etkinlikler) || {}); } catch(e){}
+    }
+    const simdi = Date.now();
+    return rows.map(e => ({ ...e, bas:new Date(e.baslangic), son:new Date(e.bitis || +new Date(e.baslangic) + 2 * 36e5) }))
+      .filter(e => +e.son > simdi).sort((a, b) => a.bas - b.bas);
+  }
+  const etkinlikler = () => etkinlikP || (etkinlikP = loadEtkinlik().catch(() => []));
 
   // Everything below comes from other people's documents in live mode, so it is shaped before use:
   // strings are cut to the form's limits, a missing or future date never extends the 30 days.
@@ -202,7 +220,7 @@ const Store = (function(){
   const key = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   return {
     get mode(){ return S.mode; }, get canWrite(){ return S.canWrite; }, get uid(){ return S.uid; },
-    get ready(){ return start(); }, ideas, cases,
+    get ready(){ return start(); }, ideas, cases, etkinlikler,
     sub(fn){ start(); subs.add(fn); fn(); return () => subs.delete(fn); },
     myCount(){ return myItems('ideas').length; },
     addIdea(data){

@@ -22,7 +22,7 @@
 <meta name="twitter:image" content="https://alperenesersu.github.io/Undustit/assets/og.png">
 <meta property="og:title" content="Vakalar · Undustit" data-ta="content:vakalar.attr.3">
 <meta property="og:description" content="Fazla stoklar için açık fikir çağrıları." data-ta="content:vakalar.attr.4">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%23C2410C%22%3Eit%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23FAF9F6%22/%3E%3Ctext x=%2232%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-style=%22italic%22 font-size=%2240%22 fill=%22%235B2EFF%22%3Eit%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
 <link rel="stylesheet" href="../assets/anlatim.css">
@@ -125,6 +125,7 @@ function caseCard(c, ix){
     <span class="eyebrow">${v01 ? T('vakalar.span.3') : esc(c.tag)}</span>
     <h2>${v01 ? T('vakalar.h2.1') : esc(c.name)}</h2>
     ${v01 ? `<p>${T('vakalar.p.2')}</p>` : c.ozet ? `<p>${esc(c.ozet)}</p>` : ''}
+    <div class="model-etiket">${UD.modelEtiketleri(c).map(m => `<span>${esc(m)}</span>`).join('')}</div>
     <dl><div><dt>${T('vakalar.dt.1')}</dt><dd>${n(c.adet)}</dd></div><div><dt>${T('vakalar.dt.2')}</dt><dd>${v01 ? T('vakalar.dd.1') : esc([c.olcu, c.sinif].filter(Boolean).join(' · ') || '–')}</dd></div><div><dt>${T('vakalar.js.gelen')}</dt><dd class="n">0</dd></div></dl>
     <div class="acts">${open ? `<a class="btn sig" data-yaz>${T('vakalar.a.2')} ${ICON.arrow}</a>` : ''}<a class="btn alt" data-git>${T('vakalar.a.3')}</a></div>
     <div class="share"><code id="${link}"></code><button type="button" data-copy="${link}">${T('vakalar.button.1')}</button></div>` });

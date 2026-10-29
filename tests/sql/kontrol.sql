@@ -5,6 +5,7 @@
 grant select, insert, update, delete on all tables in schema public to anon, authenticated;
 \i supabase/8-gizli.sql
 \i supabase/10-hata.sql
+\i supabase/12-vaka-modeli.sql
 
 insert into auth.users (id) values
   ('00000000-0000-0000-0000-00000000000a'), ('00000000-0000-0000-0000-00000000000b'),
@@ -228,6 +229,44 @@ end $$;
 update public.hata_kayitlari set durum = 'cozuldu';
 do $$ begin
   if (select durum from public.hata_kayitlari limit 1) <> 'cozuldu' then raise exception 'yönetici hatayı çözüldü yapamıyor'; end if;
+end $$;
+reset role;
+-- events: everyone reads, only the admin writes, links are https or nothing
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+insert into public.etkinlikler (baslik, baslangic) values ('Ekim değerlendirmesi', now() + interval '3 days');
+do $$ begin
+  begin
+    insert into public.etkinlikler (baslik, baslangic, baglanti) values ('Kötü', now(), 'javascript:alert(1)');
+    raise exception 'etkinliğe https olmayan bağlantı girilebiliyor';
+  exception when check_violation then null; end;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+do $$ begin
+  if (select count(*) from public.etkinlikler) <> 1 then raise exception 'üye etkinliği göremiyor'; end if;
+  begin
+    insert into public.etkinlikler (baslik, baslangic) values ('Sahte', now());
+    raise exception 'üye etkinlik ekleyebiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+
+-- case model: a partnership, an idea prize or both, never neither; both are public, the floor price still is not
+do $$ begin
+  begin
+    update public.vakalar set ortaklik = false, odul = 0 where id = 'vaka-01';
+    raise exception 'ne ortaklık ne ödül sunan vaka kaydedilebiliyor';
+  exception when check_violation then null; end;
+end $$;
+update public.vakalar set ortaklik = false, odul = 25000 where id = 'vaka-01';
+set role anon;
+reset request.jwt.claim.sub;
+do $$ begin
+  if (select odul from public.vakalar where id = 'vaka-01') <> 25000 then raise exception 'ziyaretçi fikir ödülünü göremiyor'; end if;
+  begin
+    perform taban_fiyat from public.vakalar;
+    raise exception 'taban fiyat yeniden açığa çıktı';
+  exception when insufficient_privilege then null; end;
 end $$;
 reset role;
 select 'sql kontrolleri tamam' as sonuc;

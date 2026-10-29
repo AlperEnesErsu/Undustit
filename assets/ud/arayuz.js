@@ -3,7 +3,7 @@
    Each file shares its top-level names on window.UD_IC and takes what it needs from there. */
 (function(){
 'use strict';
-const { $, $$, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, katOf, vakaOf, fmtDay, homeHref, html, inCase, liveNow, nextLive, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
+const { $, $$, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, katOf, vakaOf, fmtDay, homeHref, html, inCase, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
 // =========================================================== nav + footer
 // The legal pages (kvkk/, kosullar/) stay unlinked drafts until ayar.js sets yasal: true.
 const YASAL = !!(window.UD_AYAR || {}).yasal;
@@ -38,17 +38,27 @@ function mountChrome(){
   }
 }
 
-// =========================================================== Thursday countdown
+// =========================================================== next event
+// The pill above a page's title: the next event from yonetim/ with a countdown, "now" while it runs, the date
+// when it is more than a week away. No event planned: the pill is not shown at all.
+const kalanMetin = ms => { const d = Math.floor(ms/DAY), h = Math.floor(ms%DAY/36e5), m = Math.floor(ms%36e5/6e4);
+  return (d ? d + T('ud.persembe.g') + ' ' : '') + h + T('ud.persembe.s') + ' ' + String(m).padStart(2, '0') + T('ud.persembe.dk'); };
+const saatMetin = d => d.toLocaleTimeString(LOCALE, { hour:'2-digit', minute:'2-digit' });
 function mountThu(node){
-  const tick = () => {
-    const t = nextLive(), ms = t - Date.now();
-    const d = Math.floor(ms/DAY), h = Math.floor(ms%DAY/36e5), m = Math.floor(ms%36e5/6e4);
-    node.classList.toggle('on', liveNow());
-    node.innerHTML = liveNow() ? `<i class="dot" aria-hidden="true"></i><b>${T('ud.persembe.simdi')}</b>`
-      : `<i class="dot" aria-hidden="true"></i><span>${T('ud.persembe.canli')}</span><b>${d ? d + T('ud.persembe.g') + ' ' : ''}${h}${T('ud.persembe.s')} ${String(m).padStart(2,'0')}${T('ud.persembe.dk')}</b>`;
-    node.setAttribute('title', fmtDay(t) + T('ud.persembe.saat'));
-  };
-  tick(); setInterval(tick, 30000);
+  node.hidden = true;
+  Store.etkinlikler().then(list => {
+    const e = list[0];
+    if (!e) return;
+    node.hidden = false;
+    const tick = () => {
+      const ms = e.bas - Date.now(), simdi = ms <= 0 && Date.now() < e.son;
+      node.classList.toggle('on', simdi);
+      node.innerHTML = `<i class="dot" aria-hidden="true"></i><span>${esc(simdi ? T('ud.etkinlik.simdi', { baslik:e.baslik }) : e.baslik)}</span>` +
+        (simdi ? '' : `<b>${ms > 7 * DAY ? fmtDate(e.bas) : kalanMetin(ms)}</b>`);
+      node.setAttribute('title', fmtDay(e.bas) + ' ' + saatMetin(e.bas));
+    };
+    tick(); setInterval(tick, 30000);
+  });
 }
 
 // =========================================================== share
@@ -288,7 +298,7 @@ function mountForm(host, opts={}){
       const end = new Date(Date.now() + TERMS.voteDays*DAY);
       const done = $('.if-done', f);
       done.innerHTML = `<span class="eyebrow k">${T('ud.gonderildi.etiket')}</span><h3>${esc(title)}</h3>
-        <dl><div><dt>${T('ud.gonderildi.bitis')}</dt><dd>${fmtDate(end)}</dd></div><div><dt>${T('ud.gonderildi.ilk')}</dt><dd>${fmtDay(nextLive())}${T('ud.persembe.saat')}</dd></div><div><dt>${T('ud.gonderildi.olcut')}</dt><dd>${CRIT.map(c => c[1]).join(' · ')}</dd></div></dl>
+        <dl><div><dt>${T('ud.gonderildi.bitis')}</dt><dd>${fmtDate(end)}</dd></div><div><dt>${T('ud.gonderildi.olcut')}</dt><dd>${CRIT.map(c => c[1]).join(' · ')}</dd></div></dl>
         <p class="lead" style="font-size:15px">${T('ud.gonderildi.not')}</p>
         <div class="acts"><button type="button" class="btn sig share">${T('ud.paylas.bul')} ${ICON.arrow}</button><a class="btn alt" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">${T('ud.gonderildi.gor')}</a><button type="button" class="btn alt again">${T('ud.gonderildi.yeni')}</button></div>`;
       f.classList.add('done'); done.focus();
@@ -588,7 +598,7 @@ function openShared(){
   let tries = 0; const t = setInterval(() => { if (openIdea(f, false) || ++tries > 40) clearInterval(t); }, 250);
 }
 
-Object.assign(window.UD_IC, { YASAL, kvkkLink, langSwitch, mountChrome, mountThu, ideaUrl, shareCard, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, KAYIT_GEC, kayitAdimi, mountForm, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
+Object.assign(window.UD_IC, { YASAL, kvkkLink, langSwitch, mountChrome, kalanMetin, saatMetin, mountThu, ideaUrl, shareCard, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, KAYIT_GEC, kayitAdimi, mountForm, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
 
 // =========================================================== boot
 applyText();

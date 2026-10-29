@@ -684,3 +684,14 @@ code{overflow-wrap:anywhere}
 /* Turnstile: invisible unless Cloudflare wants a click, then a small box at the bottom of the screen */
 .ts-kutu{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:1000}
 .ts-kutu:empty{display:none}
+
+/* top bar: the page links sit next to the logo, the actions (write, account, language) stay on the right */
+@media (min-width:901px){
+  .nav .wrap{justify-content:flex-start}
+  .nav-r{flex:1;min-width:0}
+  .nav-links{margin-inline:16px auto}
+}
+
+/* what a case offers: sales partnership, idea prize, or both (supabase/12-vaka-modeli.sql) */
+.model-etiket{display:flex;flex-wrap:wrap;gap:6px}
+.model-etiket span{font-family:var(--f-mono);font-size:12px;letter-spacing:.02em;padding:4px 10px;border:1px solid var(--line-2);border-radius:999px;background:var(--bg-2);color:var(--ink)}

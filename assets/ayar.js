@@ -6,7 +6,7 @@ window.UD_AYAR = {
   supabaseUrl: 'https://azjdweynukmwxywdfewb.supabase.co',
   supabaseAnon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amR3ZXludWttd3h5d2RmZXdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4NTc5ODcsImV4cCI6MjEwODQzMzk4N30.WmoNnRWTC5LPg-hFiUv3AdKl54CwTGaKEo4QS4RzwnE',
   adminler: ['alperenesersu.b@gmail.com'],
-  // Çerezsiz ölçüm (Plausible): plausible.io'da eklenen sitenin alan adı, ör. 'alperenesersu.github.io'. Boşken hiçbir şey yüklenmez.
+  // Çerezsiz ölçüm (Plausible): plausible.io'da eklenen sitenin alan adı, ör. 'undustit.com'. Boşken hiçbir şey yüklenmez.
   analitik: '',
   // Herkese açık iletişim adresi (iletisim/ sayfasında görünür). Boşken yalnız form.
   iletisim: '',

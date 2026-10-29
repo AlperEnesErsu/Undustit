@@ -66,11 +66,12 @@ aşağıdaki adımları izleyin.
 ## 6. Yönlendirme adreslerini ayarlayın
 
 1. **Authentication** > **URL Configuration** ekranına gidin.
-2. **Site URL** alanına GitHub Pages adresini yazın:
-   `https://alperenesersu.github.io/Undustit/`
+2. **Site URL** alanına sitenin adresini yazın:
+   `https://undustit.com/`
 3. **Redirect URLs** listesine şu iki adresi ekleyin:
-   - `https://alperenesersu.github.io/Undustit/`
-   - `http://localhost:4317/`
+   - `https://undustit.com/**`
+   - `https://www.undustit.com/**`
+   - `http://localhost:4317/**`
 
    Böylece sihirli bağlantılar hem canlı sitede hem yerel geliştirmede doğru sayfaya döner.
 
@@ -94,7 +95,7 @@ yapılmasa da site çalışır, adresler birikir ve sonra gönderilebilir.
    ```
 
 3. **Edge Functions** > **Secrets** altında şunları ekleyin: `RESEND_API_KEY`, `HABER_GONDEREN`
-   (ör. `Undustit <haber@alanadiniz.com>`), `SITE_URL` (`https://alperenesersu.github.io/Undustit/`) ve
+   (ör. `Undustit <haber@alanadiniz.com>`), `SITE_URL` (`https://undustit.com/`) ve
    `WEBHOOK_SECRET` (uzun, rastgele bir metin).
 4. **Database** > **Webhooks** > **Create a new hook**: tablo `public.talepler`, olay **Insert**, tür
    **Supabase Edge Functions**, fonksiyon `haber-gonder`. **HTTP Headers**'a `x-undustit-imza` adıyla
@@ -108,7 +109,7 @@ başlayınca yönetim tarafından bu listeye yazılır.
 ## 9. Ölçüm (Plausible)
 
 https://plausible.io'da siteyi ekleyin ve `assets/ayar.js` içindeki `analitik` alanına alan adını yazın
-(ör. `'alperenesersu.github.io'`). Çerez kullanmaz, KVKK için onay penceresi gerekmez. Özel olaylar
+(`'undustit.com'`). Çerez kullanmaz, KVKK için onay penceresi gerekmez. Özel olaylar
 (Fikir gönderildi, Alırdım, Paylaş, Haber ver, Vaka başvurusu) Plausible'da **Goals** altında aynı
 adlarla eklenmelidir.
 
@@ -122,7 +123,7 @@ döner (fikirleri, fiyatları, yorumları onda kalır). Başka cihazda aynı e-p
    altında kendi SMTP'nizi açın (Resend: host `smtp.resend.com`, port `465`, kullanıcı `resend`, şifre Resend
    API anahtarı, gönderen kendi alan adınızdan bir adres).
 2. **Yönlendirme adresleri:** **Authentication** > **URL Configuration** > **Redirect URLs** listesine
-   `https://alperenesersu.github.io/Undustit/**` ve `http://localhost:4317/**` ekleyin (e-postadaki bağlantı
+   `https://undustit.com/**` ve `http://localhost:4317/**` ekleyin (e-postadaki bağlantı
    "Benim" sayfasına döner).
 3. **E-posta şablonları:** **Authentication** > **Emails** > **Templates** altında "Magic Link" ve
    "Change Email Address" şablonlarını Türkçeleştirin (ör. konu: "Undustit hesabını onayla").
@@ -191,7 +192,7 @@ kendi tarafında doğrular. Gerçek ziyaretçi çoğu zaman hiçbir şey görmez
 **Sıra önemli:** önce site anahtarı sitede olmalı, sonra Supabase'de açılmalı. Tersi olursa siteye yazılamaz.
 
 1. **Cloudflare** (ücretsiz hesap) > **Turnstile** > **Add widget**: ad "Undustit"; **Hostname**: `localhost`,
-   `alperenesersu.github.io` ve alan adı gelince o; **Widget mode**: Managed. **Site Key** ve **Secret Key** çıkar.
+   `undustit.com`, `www.undustit.com`; **Widget mode**: Managed. **Site Key** ve **Secret Key** çıkar.
 2. `assets/ayar.js` > `turnstile:` alanına **Site Key**'i yazın ve yayına alın.
 3. Supabase > **Authentication** > **Attack Protection** > **Enable CAPTCHA protection** > sağlayıcı **Turnstile** >
    **Secret Key**'i yapıştırın > **Save**.

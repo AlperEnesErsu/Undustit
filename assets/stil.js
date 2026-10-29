@@ -4,6 +4,12 @@
    own site and two tabs never affect each other. */
 (function(){
   'use strict';
+  // the old address (GitHub Pages, until the domain in Oct 2026) sends each visitor to the same page on the domain;
+  // GitHub Pages cannot redirect on the server. Netlify's own netlify.app address is redirected in _redirects.
+  if (location.hostname === 'alperenesersu.github.io'){
+    location.replace('https://undustit.com/' + location.pathname.replace(/^\/Undustit\/?/, '') + location.search + location.hash);
+    return;
+  }
   // Oyuncu is the design language (owner's call, 24 Oct 2026); Kâğıt stays as ?stil=kagit
   var LIST = { oyuncu:'Oyuncu', kagit:'Kâğıt' };
   var DEFAULT = 'oyuncu';

@@ -1,6 +1,8 @@
 # Netlify redirects. The repository is published from its root, so the working files would be public too:
 # the handover guide (docs/), the database scripts (supabase/), tests, tools and the notes at the root.
 # They answer "not found" like any missing page. tests/sunucu.mjs applies the same rules locally.
+# The project's netlify.app address moves to the domain (www.undustit.com is redirected by Netlify itself).
+https://undustit.netlify.app/*  https://undustit.com/:splat  301!
 /docs/*        /404.html  404!
 /supabase/*    /404.html  404!
 /tests/*       /404.html  404!

@@ -10,7 +10,7 @@ Fikrini tek cümleyle yaz; topluluk "alırdım" der ve fiyat yazar. En çok iste
 konuşulur, ön satış eşiği dolunca üretilir, satıştan katkı veren herkes pay alır. Firmalar satamadıkları stoğu
 "vaka" olarak açar; topluluk o stoğa yeni bir iş bulur. İlk vaka: **Vaka 01 · Boltun**, bir milyon M10 cıvata.
 
-Canlı: https://alperenesersu.github.io/Undustit/
+Canlı: https://undustit.com/
 
 ## Neler var
 

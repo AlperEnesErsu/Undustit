@@ -1,0 +1,5 @@
+# Netlify: the site is plain files, published as they are from the repository root; no build step.
+# Response headers live in _headers, redirects in _redirects (the same files tests/sunucu.mjs applies).
+[build]
+  publish = "."
+  command = ""

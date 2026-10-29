@@ -15,6 +15,20 @@ for (const yol of SAYFALAR){
   });
 }
 
+// _headers and _redirects (Netlify; the test server applies the same files): security headers on every page,
+// the working files (handover guide, database scripts, tests) never served
+test('güvenlik başlıkları gelir, iç klasörler 404 döner', async ({ request }) => {
+  const r = await request.get('/');
+  const h = r.headers();
+  expect(h['content-security-policy']).toContain("frame-ancestors 'none'");
+  expect(h['content-security-policy']).toContain("object-src 'none'");
+  expect(h['x-content-type-options']).toBe('nosniff');
+  expect(h['referrer-policy']).toBe('strict-origin-when-cross-origin');
+  for (const yol of ['/docs/devir.md', '/supabase/sema.sql', '/tests/sunucu.mjs', '/tools/metin.py', '/README.md', '/_headers'])
+    expect((await request.get(yol)).status(), yol).toBe(404);
+  expect((await request.get('/assets/fonts/space-grotesk-latin.woff2')).headers()['cache-control']).toContain('immutable');
+});
+
 // English is complete where people sign in: no Turkish word left on the sign-in page or the company panel's door
 test('giriş sayfası ve firma paneli İngilizcede tamamen İngilizce', async ({ page }) => {
   for (const yol of ['/giris/?dil=en', '/giris/?dil=en&mod=kayit', '/firma/?dil=en']){

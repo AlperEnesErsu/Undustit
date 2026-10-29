@@ -109,7 +109,8 @@ test('tarayıcı hatası hata kaydına bir kez gider, adresin # kısmı gitmez',
 test('veri yüklenemezse görünür uyarı ve yeniden dene çıkar', async ({ page }) => {
   // a database address that refuses the connection (the client library still loads from its CDN)
   await page.route('**/assets/ayar.js', r => r.fulfill({ contentType:'text/javascript',
-    body:"window.UD_AYAR = { supabaseUrl:'http://127.0.0.1:9', supabaseAnon:'x', adminler:[], analitik:'', iletisim:'', yasal:false, yayin:'' };" }));
+    body:"window.UD_AYAR = { supabaseUrl:'http://sb.test', supabaseAnon:'x', adminler:[], analitik:'', iletisim:'', yasal:false, yayin:'' };" }));
+  await page.route('http://sb.test/**', r => r.abort('connectionrefused'));
   await page.goto('/fikirler/');
   const uyari = page.locator('.veri-uyari');
   await expect(uyari).toBeVisible({ timeout:15000 });

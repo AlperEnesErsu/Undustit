@@ -39,7 +39,7 @@ test('kötü niyetli metin her yerde metin olarak kalır', async ({ page }) => {
   await page.fill('.ilet-f [name=mesaj]', KOTU.firma);
   await page.check('.ilet-f [name=onay]');
   await page.locator('.ilet-f [type=submit]').click();
-  await page.goto('/vakalar/');
+  await page.goto('/nasil/');
   await page.locator('#basvuru button').click();
   await page.fill('form.basvuru [name=firma]', KOTU.firma);
   await page.fill('form.basvuru [name=stok]', KOTU.yorum);

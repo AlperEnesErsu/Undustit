@@ -119,6 +119,11 @@ a.link{display:inline-block;padding-block:3px;line-height:1.3;transition:color v
 .stil-bar a{color:var(--ink-2);text-decoration:none;min-height:36px;display:inline-flex;align-items:center;border-bottom:1px solid transparent}
 .stil-bar a:hover{color:var(--accent)}
 .stil-bar a[aria-current]{color:var(--ink);border-bottom-color:var(--ink)}
+/* a field that still needs something (temel.js alanUyar): marked in the accent, a quiet note under it */
+:is(input,textarea,select)[aria-invalid="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.chip[aria-invalid="true"]{box-shadow:0 0 0 3px var(--accent-soft)}
+.alan-not{display:block;margin-top:6px;font-size:13px;line-height:1.4;color:var(--ink-2)}
+.alan-not::before{content:"↑ ";color:var(--accent);font-weight:600}
 .mode-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted)}
 .mode-badge i{width:6px;height:6px;border-radius:50%;background:var(--warn)}
 .mode-badge.live i{background:var(--ok)}

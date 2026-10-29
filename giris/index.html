@@ -129,9 +129,9 @@ function formCiz(){
   f.onsubmit = async e => {
     e.preventDefault();
     const v = f.e.value.trim(), s = f.s.value;
-    if (!gecerli(v)){ durumYaz(T('ud.haber.hata.eposta'), 'bad'); return f.e.focus(); }
-    if (kayit && s.length < 8){ durumYaz(T('giris.hata.kisa'), 'bad'); return f.s.focus(); }
-    if (!s){ durumYaz(T('giris.hata.sifre'), 'bad'); return f.s.focus(); }
+    if (!gecerli(v)){ durumYaz(''); return UD.alanUyar(f.e, (v ? T('ud.haber.hata.eposta') : T('ud.eksik.eposta'))); }
+    if (kayit && s.length < 8){ durumYaz(''); return UD.alanUyar(f.s, T('giris.hata.kisa')); }
+    if (!s){ durumYaz(''); return UD.alanUyar(f.s, T('giris.hata.sifre')); }
     const b = f.querySelector('[type=submit]'); b.disabled = true; durumYaz(T('benim.js.gidiyor'));
     try { localStorage.setItem('ud-eposta', v); } catch(e){}
     try {
@@ -160,7 +160,7 @@ function formCiz(){
   const bl = kart.querySelector('#baglanti');
   if (bl) bl.onclick = () => {
     const v = f.e.value.trim();
-    if (!gecerli(v)){ durumYaz(T('giris.baglanti.not'), 'bad'); return f.e.focus(); }
+    if (!gecerli(v)){ durumYaz(''); return UD.alanUyar(f.e, (v ? T('ud.haber.hata.eposta') : T('giris.baglanti.not'))); }
     if (yerel) return durumYaz(T('giris.yerel'), 'bad');
     bl.disabled = true;
     try { localStorage.setItem('ud-eposta', v); } catch(e){}
@@ -170,7 +170,7 @@ function formCiz(){
   const u = kart.querySelector('#unuttum');
   if (u) u.onclick = () => {
     const v = f.e.value.trim();
-    if (!gecerli(v)){ durumYaz(T('giris.unuttum.not'), 'bad'); return f.e.focus(); }
+    if (!gecerli(v)){ durumYaz(''); return UD.alanUyar(f.e, (v ? T('ud.haber.hata.eposta') : T('giris.unuttum.not'))); }
     if (yerel) return durumYaz(T('giris.yerel'), 'bad');
     u.disabled = true;
     Store.sifreSifirla(v, DONUS).then(() => durumYaz(T('giris.unuttum.tamam', { eposta:v }), 'ok'), err => { u.disabled = false; durumYaz(hataMetni(err), 'bad'); });

@@ -3,7 +3,7 @@
    Each file shares its top-level names on window.UD_IC and takes what it needs from there. */
 (function(){
 'use strict';
-const { $, $$, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, katOf, vakaOf, fmtDay, homeHref, html, inCase, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
+const { $, $$, alanUyar, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, katOf, vakaOf, fmtDay, homeHref, html, inCase, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
 // =========================================================== nav + footer
 // The legal pages (kvkk/, kosullar/) stay unlinked drafts until ayar.js sets yasal: true.
 const YASAL = !!(window.UD_AYAR || {}).yasal;
@@ -32,7 +32,7 @@ function mountChrome(){
   const showStilBar = STIL.edit || cur === 'stiller' || /[?&]stil=/.test(location.search);
   if (foot){
     foot.className = 'foot';
-    foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>${T('ud.alt.prototip')} <span class="mode-badge" id="mode-badge"><i></i>${T('ud.alt.baglaniyor')}</span></span>
+    foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>${T('ud.alt.prototip', { yil:new Date().getFullYear() })} <span class="mode-badge" id="mode-badge" hidden><i></i>${T('ud.alt.baglaniyor')}</span></span>
       <nav aria-label="${T('ud.alt.menu')}"><a href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${links.map(([k,l,h]) => `<a href="${ROOT+h}">${l}</a>`).join('')}<a href="${ROOT}iletisim/">${T('ud.menu.iletisim')}</a>${YASAL ? `<a href="${ROOT}kvkk/">${T('ud.menu.kvkk')}</a><a href="${ROOT}kosullar/">${T('ud.menu.kosullar')}</a>` : ''}</nav></div>
       ${showStilBar ? `<div class="wrap stil-bar"><span>${T('ud.alt.stil')}</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${STIL.withStil(location.pathname, k)}"${k === STIL.current ? ' aria-current="true"' : ''}>${T('ud.stil.' + k)}</a>`).join('')}<a href="${ROOT}stiller/">${T('ud.alt.hepsi')}</a></div>` : ''}`;
   }
@@ -205,7 +205,7 @@ function kayitAdimi(host, f, pitch){
     ef.onsubmit = e => {
       e.preventDefault();
       const v = ef.e.value.trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ say(T('ud.haber.hata.eposta'), 'bad'); ef.e.focus(); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ say(''); alanUyar(ef.e, (v ? T('ud.haber.hata.eposta') : T('ud.eksik.eposta'))); return; }
       $('button', ef).disabled = true; say(T('benim.js.gidiyor'));
       Store.epostaBagla(v, location.href).then(() => {
         olcu('Hesap bağla'); mailSet(v);
@@ -284,7 +284,7 @@ function mountForm(host, opts={}){
   f.addEventListener('submit', e => {
     e.preventDefault();
     const title = pitch.value.trim(), feats = [f.f1, f.f2, f.f3].map(x => x.value.trim()).filter(Boolean);
-    const fail = (msg, node) => { say(msg, true); open(); node && node.focus(); };
+    const fail = (msg, node) => { open(); if (node){ say(''); alanUyar(node, msg); } else say(msg, true); };
     if (title.length < 10) return fail(T('ud.form.hata.kisa'), pitch);
     if (title.length > 140) return fail(T('ud.form.hata.uzun'), pitch);
     if (!cat && !vaka) return fail(T('ud.form.hata.kategori'), $('.chip', cats));
@@ -350,7 +350,7 @@ function mountCase(host, opts={}){
       <h2 class="cb-h">${v01 ? T('ud.vaka.baslik') : esc(c.name)}</h2>
       ${v01 ? `<p>${T('ud.vaka.metin')}</p>` : c.ozet ? `<p>${esc(c.ozet)}</p>` : ''}
       <dl><div><dt>${T('ud.vaka.adet')}</dt><dd>${c.adet ? c.adet.toLocaleString(LOCALE) : '–'}</dd></div><div><dt>${T('ud.vaka.olcu')}</dt><dd>${v01 ? 'M10 × 90 · 8.8' : esc([c.olcu, c.sinif].filter(Boolean).join(' · ') || '–')}</dd></div><div><dt>${T('ud.vaka.gelen')}</dt><dd class="cb-n">0</dd></div></dl>
-      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${encodeURIComponent(c.id)}" data-case>${T('ud.vaka.yaz')} ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">${T('ud.vaka.gor')}</a><a class="link" href="${ROOT}vakalar/">${T('ud.vaka.ac')}</a></div>
+      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${encodeURIComponent(c.id)}" data-case>${T('ud.vaka.yaz')} ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">${T('ud.vaka.gor')}</a><a class="link" href="${ROOT}nasil/#vakani-ac">${T('ud.vaka.ac')}</a></div>
     </div>
     <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">${v01 ? BOLT : PALLET}</svg>${c.adet ? `<figcaption>× ${c.adet.toLocaleString(LOCALE)}</figcaption>` : ''}</figure>`;
     const a = $('[data-case]', host);

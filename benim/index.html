@@ -154,7 +154,7 @@ function hesapCiz(){
     f.onsubmit = e => {
       e.preventDefault();
       const v = f.e.value.trim();
-      if (!gecerli(v)){ say(T('ud.haber.hata.eposta'), 'bad'); f.e.focus(); return; }
+      if (!gecerli(v)){ say(''); UD.alanUyar(f.e, (v ? T('ud.haber.hata.eposta') : T('ud.eksik.eposta'))); return; }
       f.querySelector('button').disabled = true; say(T('benim.js.gidiyor'));
       Store.epostaBagla(v, DONUS).then(() => { UD.olcu('Hesap bağla'); say(T('benim.js.gonderildi', { eposta:v }), 'ok'); })
         .catch(err => { f.querySelector('button').disabled = false; hata(err); });
@@ -168,7 +168,7 @@ function hesapCiz(){
       g.onsubmit = e => {
         e.preventDefault();
         const v = g.e.value.trim();
-        if (!gecerli(v)){ say(T('ud.haber.hata.eposta'), 'bad'); g.e.focus(); return; }
+        if (!gecerli(v)){ say(''); UD.alanUyar(g.e, (v ? T('ud.haber.hata.eposta') : T('ud.eksik.eposta'))); return; }
         g.querySelector('button').disabled = true; say(T('benim.js.gidiyor'));
         Store.girisBaglantisi(v, DONUS).then(() => say(T('benim.js.gonderildi', { eposta:v }), 'ok'))
           .catch(err => { g.querySelector('button').disabled = false; hata(err); });

@@ -27,8 +27,12 @@ test('iletişim formu doğrular, gönderir, yönetimde görünür', async ({ pag
   await hazirla(page);
   await page.goto('/iletisim/');
   await page.locator('.ilet-f [type=submit]').click();
-  await expect(page.locator('.ilet-f .durum')).toHaveClass(/bad/);
+  // an empty field is pointed at under the field itself (no red line), and typing clears the note
+  await expect(page.locator('.ilet-f [name=eposta]')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('.ilet-f .alan-not')).toBeVisible();
+  await expect(page.locator('.ilet-f .durum')).not.toHaveClass(/bad/);
   await page.fill('.ilet-f [name=eposta]', 'deneme@example.test');
+  await expect(page.locator('.ilet-f .alan-not')).toHaveCount(0);
   await page.selectOption('.ilet-f [name=konu]', 'yatirim');
   await page.fill('.ilet-f [name=mesaj]', 'Projeyi incelemek istiyoruz, görüşelim.');
   await page.check('.ilet-f [name=onay]');
@@ -40,7 +44,7 @@ test('iletişim formu doğrular, gönderir, yönetimde görünür', async ({ pag
 
 test('vaka başvurusu yönetimde durumuyla görünür', async ({ page }) => {
   await hazirla(page);
-  await page.goto('/vakalar/');
+  await page.goto('/nasil/');
   await page.locator('#basvuru button').click();
   const f = page.locator('form.basvuru');
   await f.locator('[name=firma]').fill('Örnek Metal A.Ş.');

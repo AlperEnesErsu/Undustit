@@ -27,6 +27,7 @@ const Store = (function(){
   const badge = () => {
     const b = $('#mode-badge'); if (!b) return;
     b.classList.toggle('live', S.mode !== 'local');
+    b.hidden = S.mode !== 'local';   // visitors on the live site need no status; the local preview says where data stays
     b.lastChild.textContent = S.mode !== 'local' ? T('ud.alt.canli') : T('ud.alt.onizleme');
   };
   // ---- Supabase (assets/ayar.js has a URL): ideas, demand, scores and comments are rows in Postgres,

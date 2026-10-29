@@ -3,7 +3,7 @@
    Each file shares its top-level names on window.UD_IC and takes what it needs from there. */
 (function(){
 'use strict';
-const { $, $$, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, katOf, vakaOf, fmtDay, homeHref, html, inCase, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
+const { $, $$, alanUyar, CATS, applyText, CRIT, DAY, EXAMPLES, ICON, LANG, LOCALE, ROOT, STIL, Store, T, TERMS, V01, catName, el, esc, etiket, fmtDate, katOf, vakaOf, fmtDay, homeHref, html, inCase, olcu, openCases, reduce, sortIdeas, tl, withStil, yazmaHatasi } = window.UD_IC;
 // =========================================================== nav + footer
 // The legal pages (kvkk/, kosullar/) stay unlinked drafts until ayar.js sets yasal: true.
 const YASAL = !!(window.UD_AYAR || {}).yasal;
@@ -32,7 +32,7 @@ function mountChrome(){
   const showStilBar = STIL.edit || cur === 'stiller' || /[?&]stil=/.test(location.search);
   if (foot){
     foot.className = 'foot';
-    foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>${T('ud.alt.prototip')} <span class="mode-badge" id="mode-badge"><i></i>${T('ud.alt.baglaniyor')}</span></span>
+    foot.innerHTML = `<div class="wrap foot-sig" aria-hidden="true">Undust<i>it</i></div><div class="wrap"><span>${T('ud.alt.prototip', { yil:new Date().getFullYear() })} <span class="mode-badge" id="mode-badge" hidden><i></i>${T('ud.alt.baglaniyor')}</span></span>
       <nav aria-label="${T('ud.alt.menu')}"><a href="${ROOT}fikir/">${T('ud.menu.yaz')}</a>${links.map(([k,l,h]) => `<a href="${ROOT+h}">${l}</a>`).join('')}<a href="${ROOT}iletisim/">${T('ud.menu.iletisim')}</a>${YASAL ? `<a href="${ROOT}kvkk/">${T('ud.menu.kvkk')}</a><a href="${ROOT}kosullar/">${T('ud.menu.kosullar')}</a>` : ''}</nav></div>
       ${showStilBar ? `<div class="wrap stil-bar"><span>${T('ud.alt.stil')}</span>${Object.entries(STIL.list).map(([k,l]) => `<a data-stil-link href="${STIL.withStil(location.pathname, k)}"${k === STIL.current ? ' aria-current="true"' : ''}>${T('ud.stil.' + k)}</a>`).join('')}<a href="${ROOT}stiller/">${T('ud.alt.hepsi')}</a></div>` : ''}`;
   }
@@ -179,10 +179,10 @@ function feeLine(){
   const now = tl(n ? f.next : f.first);
   return T('ud.form.ucret', { ilk:tl(f.first), sonra:tl(f.next), bu:now }) + (f.charged ? '' : ' ' + T('ud.form.odemeyok'));
 }
-// Quick sign-up in front of every idea form, for someone without an account: Google (when it is on in Supabase),
-// an e-mail link, or "continue without". Never a wall: the choice is remembered and the form opens right after.
+// An offer under every idea form, for someone without an account: Google (when it is on in Supabase), an e-mail
+// link, or "not now". The form comes first and is never hidden behind it; "not now" is remembered.
 const KAYIT_GEC = 'ud-kayit-gec';
-function kayitAdimi(host, f, pitch){
+function kayitAdimi(host){
   try { if (localStorage.getItem(KAYIT_GEC) === '1') return; } catch(e){}
   Store.hesap().then(h => {
     if (!h || !h.anonim || h.bekleyen) return;   // preview mode, signed in, or the e-mail link is on its way
@@ -192,10 +192,9 @@ function kayitAdimi(host, f, pitch){
       <form novalidate><input type="email" name="e" autocomplete="email" maxlength="160" placeholder="${T('fikir.kayit.ipucu')}" aria-label="${T('fikir.kayit.ipucu')}"><button type="submit" class="btn sig sm">${T('fikir.kayit.gonder')}</button></form>
       <p class="durum" role="status" aria-live="polite"></p>
       <button type="button" class="link kayit-gec">${T('fikir.kayit.gec')}</button>`;
-    host.prepend(kart); f.hidden = true;
+    host.append(kart);
     const durum = $('.durum', kart), say = (t, k) => { durum.textContent = t; durum.className = 'durum' + (k ? ' ' + k : ''); };
-    const ac = odak => { kart.remove(); f.hidden = false; if (odak) pitch.focus(); };
-    $('.kayit-gec', kart).onclick = () => { try { localStorage.setItem(KAYIT_GEC, '1'); } catch(e){} ac(true); };
+    $('.kayit-gec', kart).onclick = () => { try { localStorage.setItem(KAYIT_GEC, '1'); } catch(e){} kart.remove(); };
     Store.googleAcik().then(acik => {
       if (!acik) return;
       const g = $('.btn.google', kart); g.parentNode.hidden = false;
@@ -205,12 +204,12 @@ function kayitAdimi(host, f, pitch){
     ef.onsubmit = e => {
       e.preventDefault();
       const v = ef.e.value.trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ say(T('ud.haber.hata.eposta'), 'bad'); ef.e.focus(); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ say(''); alanUyar(ef.e, (v ? T('ud.haber.hata.eposta') : T('ud.eksik.eposta'))); return; }
       $('button', ef).disabled = true; say(T('benim.js.gidiyor'));
       Store.epostaBagla(v, location.href).then(() => {
         olcu('Hesap bağla'); mailSet(v);
         // the link can wait; the idea is written now
-        ef.remove(); $('.kayit-gec', kart).remove(); say(T('fikir.kayit.gonderildi', { eposta:v }), 'ok'); f.hidden = false;
+        ef.remove(); $('.kayit-gec', kart).remove(); say(T('fikir.kayit.gonderildi', { eposta:v }), 'ok');
       }).catch(err => { $('button', ef).disabled = false; say(err && err.status === 429 ? T('benim.js.hata.sik') : T('benim.js.hata.genel'), 'bad'); });
     };
   }).catch(() => {});
@@ -284,7 +283,7 @@ function mountForm(host, opts={}){
   f.addEventListener('submit', e => {
     e.preventDefault();
     const title = pitch.value.trim(), feats = [f.f1, f.f2, f.f3].map(x => x.value.trim()).filter(Boolean);
-    const fail = (msg, node) => { say(msg, true); open(); node && node.focus(); };
+    const fail = (msg, node) => { open(); if (node){ say(''); alanUyar(node, msg); } else say(msg, true); };
     if (title.length < 10) return fail(T('ud.form.hata.kisa'), pitch);
     if (title.length > 140) return fail(T('ud.form.hata.uzun'), pitch);
     if (!cat && !vaka) return fail(T('ud.form.hata.kategori'), $('.chip', cats));
@@ -313,7 +312,7 @@ function mountForm(host, opts={}){
     });
   });
   if (opts.focus) setTimeout(() => pitch.focus({ preventScroll:true }), 50);
-  kayitAdimi(host, f, pitch);
+  kayitAdimi(host);
   const useCase = id => {
     const c = openCases().find(x => x.id === id); if (!c) return;
     pickVaka(c.id);
@@ -350,7 +349,7 @@ function mountCase(host, opts={}){
       <h2 class="cb-h">${v01 ? T('ud.vaka.baslik') : esc(c.name)}</h2>
       ${v01 ? `<p>${T('ud.vaka.metin')}</p>` : c.ozet ? `<p>${esc(c.ozet)}</p>` : ''}
       <dl><div><dt>${T('ud.vaka.adet')}</dt><dd>${c.adet ? c.adet.toLocaleString(LOCALE) : '–'}</dd></div><div><dt>${T('ud.vaka.olcu')}</dt><dd>${v01 ? 'M10 × 90 · 8.8' : esc([c.olcu, c.sinif].filter(Boolean).join(' · ') || '–')}</dd></div><div><dt>${T('ud.vaka.gelen')}</dt><dd class="cb-n">0</dd></div></dl>
-      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${encodeURIComponent(c.id)}" data-case>${T('ud.vaka.yaz')} ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">${T('ud.vaka.gor')}</a><a class="link" href="${ROOT}vakalar/">${T('ud.vaka.ac')}</a></div>
+      <div class="cb-acts"><a class="btn sig" href="${ROOT}fikir/?vaka=${encodeURIComponent(c.id)}" data-case>${T('ud.vaka.yaz')} ${ICON.arrow}</a><a class="btn alt" href="${ROOT + c.href}">${T('ud.vaka.gor')}</a><a class="link" href="${ROOT}nasil/#vakani-ac">${T('ud.vaka.ac')}</a></div>
     </div>
     <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">${v01 ? BOLT : PALLET}</svg>${c.adet ? `<figcaption>× ${c.adet.toLocaleString(LOCALE)}</figcaption>` : ''}</figure>`;
     const a = $('[data-case]', host);

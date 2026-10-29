@@ -43,6 +43,23 @@ function el(tag, props={}, kids=[]){
   (Array.isArray(kids) ? kids : [kids]).forEach(c => c != null && n.append(c));
   return n;
 }
+// A field that still needs something: a quiet note under it, the field marked, the focus there; the next edit clears it.
+// Red stays for what went wrong (the server said no); an empty or mistyped field is a pointer, not an error.
+function alanUyar(node, metin){
+  if (!node) return;
+  const kap = node.closest('label, fieldset, .if-field');
+  const eski = (kap || node.parentElement.parentElement).querySelector('.alan-not');
+  const not = eski || el('small', { class:'alan-not', id:'an-' + Math.random().toString(36).slice(2, 8) });
+  not.textContent = metin;
+  if (!eski){ if (kap) kap.append(not); else node.parentElement.after(not); }
+  const once = node.getAttribute('aria-describedby');
+  node.setAttribute('aria-invalid', 'true');
+  node.setAttribute('aria-describedby', not.id);
+  const temizle = () => { not.remove(); node.removeAttribute('aria-invalid'); if (once) node.setAttribute('aria-describedby', once); else node.removeAttribute('aria-describedby'); };
+  const yazi = /^(INPUT|TEXTAREA)$/.test(node.tagName) && !/^(checkbox|radio|file)$/.test(node.type);
+  (yazi ? node : (kap || node.parentElement)).addEventListener(yazi ? 'input' : 'click', temizle, { once:true });
+  node.focus();
+}
 const ICON = {
   arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>',
@@ -228,5 +245,5 @@ function sortIdeas(list, by){
 const pct = v => LANG === 'en' ? v + '%' : '%' + v;
 const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
 
-window.UD_IC = { modelEtiketleri, captcha, gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
+window.UD_IC = { alanUyar, modelEtiketleri, captcha, gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
 })();

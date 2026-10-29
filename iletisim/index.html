@@ -62,7 +62,7 @@
     </section>
     <aside class="ilet-yan" aria-label="Diğer yollar" data-ta="aria-label:iletisim.attr.5">
       <div id="eposta-kutu" hidden><b data-t="iletisim.b.1">E-posta</b><p><a class="link" id="eposta-a"></a></p></div>
-      <div><b data-t="iletisim.b.2">Deponda bekleyen stok mu var?</b><p data-t="iletisim.p.2">Firmalar için ayrı, kısa bir vaka başvurusu var.</p><a class="link" href="../vakalar/#vakani-ac" data-t="iletisim.a.2">Vakanı aç</a></div>
+      <div><b data-t="iletisim.b.2">Deponda bekleyen stok mu var?</b><p data-t="iletisim.p.2">Firmalar için ayrı, kısa bir vaka başvurusu var.</p><a class="link" href="../nasil/#vakani-ac" data-t="iletisim.a.2">Vakanı aç</a></div>
       <div><b data-t="iletisim.b.3">Aklında bir ürün mü var?</b><p data-t="iletisim.p.3">Fikirler için mesaj gerekmez, doğrudan yaz.</p><a class="link" href="../fikir/" data-t="iletisim.a.3">Fikrini yaz</a></div>
     </aside>
   </div>
@@ -93,7 +93,7 @@ const say = (t, bad) => { const d = f.querySelector('.durum'); d.textContent = t
 f.onsubmit = e => {
   e.preventDefault();
   const v = n => f[n].value.trim();
-  const fail = (t, n) => { say(t, true); f[n].focus(); };
+  const fail = (t, n) => { say(''); UD.alanUyar(f[n], t); };
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('eposta'))) return fail(T('iletisim.js.hata.eposta'), 'eposta');
   if (v('mesaj').length < 10) return fail(T('iletisim.js.hata.mesaj'), 'mesaj');
   if (!f.onay.checked) return fail(T('iletisim.js.hata.onay'), 'onay');

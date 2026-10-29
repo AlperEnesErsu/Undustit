@@ -20,7 +20,7 @@ Canlı: https://alperenesersu.github.io/Undustit/
 | Fikir yaz | `/fikir/` | Cümle + kategori yeter; detay isteğe bağlı |
 | Fikirler | `/fikirler/` | Talep sıralaması, "alırdım" + hazır fiyatlar, üç ölçüt puanı, yorum, paylaş, bildir |
 | Vakalar | `/vakalar/`, `/vaka-01/`, `/vaka/?id=` | Fazla stok çağrıları, vakaya fikir, "Vakanı aç" başvurusu |
-| Perşembe | `/persembe/` | Sonraki yayın, takvime ekle, bu haftanın beş adayı |
+| Etkinlikler | `/persembe/` | Yönetimden eklenen yayın, atölye ve buluşmalar; geri sayım, takvime ekle; en çok istenen beş fikir |
 | Benim | `/benim/` | Kişinin fikirleri, talebi, "alırdım"ları, e-posta bağlama (isteğe bağlı hesap) |
 | Nasıl işler, Hikâye | `/nasil/`, `/hikaye/` | Model, paylar (genel %10–30, vakalarda kârın %40 + %10'u) |
 | İletişim, yasal | `/iletisim/`, `/kvkk/`, `/kosullar/` | Form; yasal metinler taslak, `ayar.js` ile açılır |
@@ -41,7 +41,7 @@ assets/anlatim.js   Vakalar, Fikirler, Hikâye sayfalarındaki anlatıcı animas
 assets/ayar.js      ayarlar (aşağıda)
 assets/metin/       tr.js ve en.js: sitedeki her yazı (anahtar → metin)
 assets/stil/        görünümler (Oyuncu varsayılan, Kâğıt ?stil=kagit); stil.js seçer
-supabase/           şema ve migration'lar (sırayla 1–8), Edge Function, KURULUM.md
+supabase/           şema ve migration'lar (sırayla 1–12), Edge Function, KURULUM.md
 tools/metin.py      metin aracı (etiketle, yaz, denetle)
 tests/              Playwright testleri (e2e/), SQL testleri (sql/), test sunucusu
 docs/               ürün sözleşmesi, açılış içerik kiti, yol haritası, devir el kitabı
@@ -90,7 +90,7 @@ Ticari oranlar (ücret, gün, paylar, eşik, yayın saati) `assets/ud/temel.js` 
 ## Veritabanı
 
 `supabase/KURULUM.md` adım adım anlatır. Sıra: `sema.sql`, `2-fikirler.sql`, `3-hiz.sql`, `4-acilis.sql`,
-`5-guven.sql`, `6-gorsel.sql`, `7-firma.sql`, `8-gizli.sql` (hepsi yeniden çalıştırılabilir). Ürün görselleri Supabase Storage'da, `gorseller` kovasında. Ziyaretçi anonim oturumla yazar; satır düzeyinde güvenlik (RLS)
+`5-guven.sql`, `6-gorsel.sql`, `7-firma.sql`, `8-gizli.sql`, `9-saglam.sql`, `10-hata.sql`, `11-etkinlik.sql`, `12-vaka-modeli.sql` (hepsi yeniden çalıştırılabilir). Ürün görselleri Supabase Storage'da, `gorseller` kovasında. Ziyaretçi anonim oturumla yazar; satır düzeyinde güvenlik (RLS)
 herkesin yalnız kendi satırlarını değiştirmesine izin verir, günlük sınırlar trigger'larla. E-posta bildirimi:
 `supabase/functions/haber-gonder` (Resend).
 

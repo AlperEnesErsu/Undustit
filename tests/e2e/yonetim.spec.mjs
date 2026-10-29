@@ -135,6 +135,7 @@ test('kişi simgesi giriş sayfasını açar; yönetici yönetime, firma firma p
   await page.fill('#kart [name=s]', ADMIN_SIFRE);
   await page.locator('#kart [type=submit]').click();
   await expect(page).toHaveURL(/\/yonetim\/$/);
+  await page.waitForFunction(() => window.UDV);   // the redirect has landed, the page's scripts may still be loading
   // a company: the admin adds its e-mail, then it signs in from the same door
   await page.evaluate(() => UDV.firma.ekle('vaka-01', 'satis@firma.test'));
   await page.evaluate(() => UDV.cikis());

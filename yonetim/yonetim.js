@@ -120,16 +120,25 @@ const ALANLAR = {
   taban_fiyat:  { etiket:'Taban fiyat (₺)', tur:'sayi', min:0, adim:'any', ipucu:'Boş bırakılabilir' },
   deneme_adedi: { etiket:'Deneme partisi', tur:'sayi', min:0, adim:1, ipucu:'Kaç adet üretilecek' },
   sure_gun:     { etiket:'Fikir süresi', tur:'sayi', min:1, max:365, adim:1, ipucu:'Gün' },
+  ortaklik:     { etiket:'Satış ortaklığı', tur:'onay', ipucu:'En çok istenen fikirle deneme partisi; kârdan pay (fikir sahibine %40, katkılara %10)' },
+  odul:         { etiket:'Fikir ödülü (₺)', tur:'sayi', min:0, adim:'any', ipucu:'Firma seçilen fikre bu tutarı öder; 0 = ödül yok' },
   gorsel:       { etiket:'Ürün görseli', tur:'gorsel', ipucu:'Teknik föyde görünür. JPEG, PNG ya da WebP; site küçültüp yükler' }
 };
 // satırda yan yana duran alanlar
-const GRUPLAR = [['baslik'], ['ozet'], ['aciklama'], ['firma', 'stok'], ['adet', 'olcu'], ['sinif', 'taban_fiyat'], ['deneme_adedi', 'sure_gun'], ['gorsel']];
+const GRUPLAR = [['baslik'], ['ozet'], ['aciklama'], ['firma', 'stok'], ['adet', 'olcu'], ['sinif', 'taban_fiyat'], ['deneme_adedi', 'sure_gun'], ['ortaklik', 'odul'], ['gorsel']];
 
 function alanHtml(ad, deger){
   const a = ALANLAR[ad];
   const id = 'f-' + ad, hid = id + '-h';
   const deg = deger == null ? '' : String(deger);
   let kontrol;
+  if (a.tur === 'onay'){
+    // a yes/no choice; a new case starts as a partnership
+    const acik = deger == null ? true : deger === true || deger === 'true';
+    return '<label class="alan alan-onay"><span>' + esc(a.etiket) + (a.ipucu ? ' <small>' + esc(a.ipucu) + '</small>' : '') + '</span>' +
+      '<span class="onay-satir"><input type="checkbox" id="' + id + '" name="' + ad + '"' + (acik ? ' checked' : '') + ' aria-describedby="' + hid + '"> Bu vakada sunulsun</span>' +
+      '<em class="alan-hata" id="' + hid + '" hidden></em></label>';
+  }
   if (a.tur === 'gorsel'){
     // the address lives in a hidden field; the buttons upload a new photo or clear it (gorselBagla)
     return '<div class="alan" role="group" aria-labelledby="' + id + '-e"><span id="' + id + '-e">' + esc(a.etiket) + ' <small>' + esc(a.ipucu) + '</small></span>' +
@@ -190,6 +199,7 @@ function formOku(form){
   Object.keys(ALANLAR).forEach(ad => {
     const k = form.querySelector('[name="' + ad + '"]');
     if (!k) return;
+    if (ALANLAR[ad].tur === 'onay'){ v[ad] = k.checked; return; }
     const x = k.value.trim();
     v[ad] = ALANLAR[ad].tur === 'sayi' ? (x === '' ? null : Number(x)) : x;
   });
@@ -206,6 +216,8 @@ function formDogrula(v){
   if (v.taban_fiyat != null && (!isFinite(v.taban_fiyat) || v.taban_fiyat < 0)) h.taban_fiyat = 'Taban fiyat 0 veya daha büyük olmalı.';
   if (v.deneme_adedi != null && (!Number.isInteger(v.deneme_adedi) || v.deneme_adedi < 0)) h.deneme_adedi = 'Deneme adedi 0 veya daha büyük bir tam sayı olmalı.';
   if (v.sure_gun == null || !Number.isInteger(v.sure_gun) || v.sure_gun < 1 || v.sure_gun > 365) h.sure_gun = '1 ile 365 gün arasında bir tam sayı olmalı.';
+  if (v.odul != null && (!isFinite(v.odul) || v.odul < 0)) h.odul = 'Ödül 0 ya da daha büyük olmalı.';
+  if (v.ortaklik === false && !(v.odul > 0)) h.odul = 'Satış ortaklığı ya da fikir ödülünden en az birini seçin.';
   if (v.gorsel && !UD.gorselAdresi(v.gorsel)) h.gorsel = 'Görsel yüklenemedi; yeniden seçin.';
   return h;
 }

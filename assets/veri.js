@@ -17,9 +17,9 @@
   const DURUMLAR = ['taslak','acik','degerlendirme','kazanan','uretim','kapali'];
   const DURUM_ADI = { taslak:'Taslak', acik:'Açık', degerlendirme:'Değerlendirmede', kazanan:'Kazanan seçildi', uretim:'Üretimde', kapali:'Kapandı' };
   const GECIS = { taslak:['acik'], acik:['degerlendirme','kapali'], degerlendirme:['kazanan','acik','kapali'], kazanan:['uretim','kapali'], uretim:['kapali'], kapali:[] };
-  const ALANLAR = ['baslik','ozet','aciklama','firma','stok','adet','olcu','sinif','taban_fiyat','deneme_adedi','sure_gun','gorsel'];
-  const SAYI = ['adet','taban_fiyat','deneme_adedi','sure_gun'];
-  const VARSAYILAN = { ozet:'', aciklama:'', firma:'', stok:'', adet:0, olcu:'', sinif:'', taban_fiyat:0, deneme_adedi:0, sure_gun:30, gorsel:'' };
+  const ALANLAR = ['baslik','ozet','aciklama','firma','stok','adet','olcu','sinif','taban_fiyat','deneme_adedi','sure_gun','gorsel','ortaklik','odul'];
+  const SAYI = ['adet','taban_fiyat','deneme_adedi','sure_gun','odul'];
+  const VARSAYILAN = { ozet:'', aciklama:'', firma:'', stok:'', adet:0, olcu:'', sinif:'', taban_fiyat:0, deneme_adedi:0, sure_gun:30, gorsel:'', ortaklik:true, odul:0 };
   const YANLIS = 'E-posta ya da şifre yanlış';   // giriş hatasını ayırt etmeden söyler
   const YETKI = 'Bu işlem için yönetici girişi gerekli';
 
@@ -41,7 +41,7 @@
   let bellek = null;   // localStorage yoksa ya da engelliyse sayfa boyunca bu kopya kullanılır
   function tohum(){
     const an = simdi();
-    return { vakalar: { 'vaka-01': { id:'vaka-01', baslik:'Bir milyon cıvata', ozet:'Bir milyon cıvata için fikir yarışı.', aciklama:'', firma:'Örnek Fabrika', stok:'M10 × 90 flanşlı cıvata + flanşlı somun', adet:1000000, olcu:'M10 × 90', sinif:'8.8', taban_fiyat:2, deneme_adedi:1000, sure_gun:30, gorsel:'', durum:'acik', acilis:an, kapanis:null, kazanan:null, olusturan:'admin@undustit.local', olusturma:an, guncelleme:an } },
+    return { vakalar: { 'vaka-01': { id:'vaka-01', baslik:'Bir milyon cıvata', ozet:'Bir milyon cıvata için fikir yarışı.', aciklama:'', firma:'Örnek Fabrika', stok:'M10 × 90 flanşlı cıvata + flanşlı somun', adet:1000000, olcu:'M10 × 90', sinif:'8.8', taban_fiyat:2, deneme_adedi:1000, sure_gun:30, gorsel:'', ortaklik:true, odul:0, durum:'acik', acilis:an, kapanis:null, kazanan:null, olusturan:'admin@undustit.local', olusturma:an, guncelleme:an } },
       gecmis: { 'vaka-01': [{ durum:'acik', not:'Vaka 01 açıldı', kim:'admin@undustit.local', zaman:an }] },
       gizli: {}, oturum: null };
   }
@@ -108,6 +108,10 @@
       Object.values(s.notes || {}).forEach(doc => { yorum += doc && Array.isArray(doc.items) ? doc.items.length : 0; });
       return { fikirler, talepler, yorum };
     },
+    // etkinlikler: udv-v1.etkinlikler = { id: satır }
+    etkinlikler: async () => Object.values(oku().etkinlikler || {}),
+    etkinlikEkle: async e => { const d = oku(); d.etkinlikler = d.etkinlikler || {}; const id = 'e' + Date.now().toString(36); d.etkinlikler[id] = { id, ...e, olusturma:simdi() }; yaz(d); },
+    etkinlikSil: async id => { const d = oku(); if (d.etkinlikler) delete d.etkinlikler[id]; yaz(d); },
     // firma erişimi: udv-v1.firmalar = { vakaId: [e-posta, ...] }
     firmalar: async vakaId => ((oku().firmalar || {})[vakaId] || []).slice(),
     firmaEkle: async (vakaId, eposta) => { const d = oku(); d.firmalar = d.firmalar || {}; const l = d.firmalar[vakaId] = d.firmalar[vakaId] || []; if (!l.includes(eposta)) l.push(eposta); yaz(d); },
@@ -140,7 +144,7 @@
   async function sorgu(q){ const { data, error } = await q; if (error) throw hata(error); return data; }
   // Ziyaretçinin okuyabildiği sütunlar (8-gizli.sql). firma, taban_fiyat ve olusturan yalnız vaka_tam() ile gelir:
   // yöneticiye hepsi, firmaya kendi vakası. 8-gizli.sql çalışmadan önce (fonksiyon yok) eski yoldan okunur.
-  const ACIK = 'id,baslik,ozet,aciklama,stok,adet,olcu,sinif,deneme_adedi,sure_gun,gorsel,durum,acilis,kapanis,kazanan,olusturma,guncelleme';
+  const ACIK = 'id,baslik,ozet,aciklama,stok,adet,olcu,sinif,deneme_adedi,sure_gun,gorsel,ortaklik,odul,durum,acilis,kapanis,kazanan,olusturma,guncelleme';
   async function tam(v){
     const r = await istemci().rpc('vaka_tam', v ? { v } : {});
     if (r.error && r.error.code === 'PGRST202') return sorgu(v ? istemci().from('vakalar').select('*').eq('id', v) : istemci().from('vakalar').select('*'));
@@ -191,6 +195,14 @@
         yorum: y.count || 0
       };
     },
+    etkinlikler: async () => {
+      const { data, error } = await istemci().from('etkinlikler').select('*').order('baslangic', { ascending:false }).limit(200);
+      if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // 11-etkinlik.sql henüz çalışmadı
+      if (error) throw hata(error);
+      return data;
+    },
+    etkinlikEkle: async e => { await sorgu(istemci().from('etkinlikler').insert(e)); },
+    etkinlikSil: async id => { await sorgu(istemci().from('etkinlikler').delete().eq('id', id)); },
     firmalar: async vakaId => (await sorgu(istemci().from('vaka_firmalari').select('eposta').eq('vaka_id', vakaId).order('eklenme'))).map(r => r.eposta),
     firmaEkle: async (vakaId, eposta) => { await sorgu(istemci().from('vaka_firmalari').upsert({ vaka_id:vakaId, eposta }, { onConflict:'vaka_id,eposta', ignoreDuplicates:true })); },
     firmaSil: async (vakaId, eposta) => { await sorgu(istemci().from('vaka_firmalari').delete().eq('vaka_id', vakaId).eq('eposta', eposta)); },
@@ -256,7 +268,7 @@
     if (!a || typeof a !== 'object') return o;
     ALANLAR.forEach(k => {
       if (!(k in a)) return;
-      o[k] = SAYI.includes(k) ? (a[k] === '' || a[k] == null ? 0 : Number(a[k])) : str(a[k]);
+      o[k] = k === 'ortaklik' ? (a[k] === true || a[k] === 'true' || a[k] === 'on') : SAYI.includes(k) ? (a[k] === '' || a[k] == null ? 0 : Number(a[k])) : str(a[k]);
     });
     return o;
   }
@@ -270,6 +282,9 @@
     if (!sayi(v.taban_fiyat, 0)) throw new Error('Taban fiyat 0 ya da daha büyük olmalı');
     if (!(sayi(v.deneme_adedi, 0) && tam(v.deneme_adedi))) throw new Error('Deneme adedi 0 ya da daha büyük bir tam sayı olmalı');
     if (!(sayi(v.sure_gun, 1) && tam(v.sure_gun))) throw new Error('Fikir süresi en az 1 gün olmalı');
+    // a case offers a sales partnership, an idea prize, or both (supabase/12-vaka-modeli.sql)
+    if (v.odul != null && !sayi(v.odul, 0)) throw new Error('Fikir ödülü 0 ya da daha büyük olmalı');
+    if (v.ortaklik === false && !(v.odul > 0)) throw new Error('Satış ortaklığı ya da fikir ödülünden en az birini seçin');
     // https in the database; the local preview stores the uploaded photo itself as a data URL
     if (v.gorsel && !(/^https:\/\//.test(v.gorsel) || (!SB_URL && /^data:image\/(jpeg|png|webp);base64,/.test(v.gorsel)))) throw new Error('Görsel adresi https ile başlamalı');
   }
@@ -486,6 +501,22 @@
       const satirlar = [['baslik','vaka','alirdim','ort_fiyat','talep_tutari','zaman']]
         .concat(r.fikirler.map(f => [f.baslik, f.vaka, f.talep, f.ortFiyat, f.tutar, f.zaman || '']));
       return '\ufeff' + satirlar.map(x => x.map(hucre).join(';')).join('\r\n');
+    },
+
+    // Etkinlikler (yayın, atölye, buluşma): yönetici ekler ve siler; site sıradakini sayfaların üstünde gösterir.
+    etkinlik: {
+      async liste(){ yetkiTest(); return (await depo.etkinlikler()).sort((a, b) => String(b.baslangic).localeCompare(String(a.baslangic))); },
+      async ekle(e){
+        yetkiTest();
+        const x = { baslik:str(e.baslik), aciklama:str(e.aciklama), baslangic:e.baslangic, bitis:e.bitis || null, baglanti:str(e.baglanti) };
+        if (!x.baslik || x.baslik.length > 120) throw new Error('Başlık 1–120 karakter olmalı');
+        if (!x.baslangic || isNaN(Date.parse(x.baslangic))) throw new Error('Başlangıç zamanını seçin');
+        if (x.bitis && !(Date.parse(x.bitis) > Date.parse(x.baslangic))) throw new Error('Bitiş, başlangıçtan sonra olmalı');
+        if (x.baglanti && !/^https:\/\/\S+$/.test(x.baglanti)) throw new Error('Bağlantı https:// ile başlamalı');
+        if (x.aciklama.length > 600) throw new Error('Açıklama en çok 600 karakter');
+        await depo.etkinlikEkle(x);
+      },
+      async sil(id){ yetkiTest(); await depo.etkinlikSil(str(id)); }
     },
 
     // Firma paneli (firma/): yöneticinin vakaya eklediği e-postayla giren firma kendi vakasını görür.

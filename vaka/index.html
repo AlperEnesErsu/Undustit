@@ -84,6 +84,7 @@ function ciz(v){
         '<span class="rozet" data-durum="' + esc(v.durum) + '">' + T('ud.durum.' + v.durum) + '</span></div>' +
       '<h1 id="vb">' + esc(v.baslik) + '</h1>' +
       (v.ozet ? '<p class="lead">' + esc(v.ozet) + '</p>' : '') +
+      '<div class="model-etiket">' + UD.modelEtiketleri(v).map(function(m){ return '<span>' + esc(m) + '</span>'; }).join('') + '</div>' +
       '<dl class="vaka-bilgi">' +
         '<div><dt>' + T('vakasayfa.js.adet') + '</dt><dd>' + sayi(v.adet) + '</dd></div>' +
         '<div><dt>' + T('vakasayfa.js.olcu') + '</dt><dd>' + esc([v.olcu, v.sinif].filter(Boolean).join(' · ') || '—') + '</dd></div>' +

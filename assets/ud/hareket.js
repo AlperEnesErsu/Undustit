@@ -3,7 +3,7 @@
    Each file shares its top-level names on window.UD_IC and takes what it needs from there. */
 (function(){
 'use strict';
-const { captcha, toast, $, $$, CASES, gorselAdresi, katOf, vakaOf, CATS, CRIT, ICON, LANG, LOCALE, ROOT, Store, T, TERMS, applyText, catName, el, esc, fmtDate, fmtDay, hedef, hedefMetni, html, inCase, kvkkLink, liveNow, mountBoard, mountCase, mountForm, mountStats, mountThu, nextLive, olcu, openCases, openIdea, openShared, pct, reduce, tl } = window.UD_IC;
+const { modelEtiketleri, captcha, kalanMetin, saatMetin, toast, $, $$, CASES, gorselAdresi, katOf, vakaOf, CATS, CRIT, ICON, LANG, LOCALE, ROOT, Store, T, TERMS, applyText, catName, el, esc, fmtDate, fmtDay, hedef, hedefMetni, html, inCase, kvkkLink, mountBoard, mountCase, mountForm, mountStats, mountThu, olcu, openCases, openIdea, openShared, pct, reduce, tl } = window.UD_IC;
 // =========================================================== the process run
 // Sketch to shelf in one pass (about 7.5 s). The same drawing lives through the whole story: a rough
 // pencil sketch next to the idea, price bubbles from people who would buy it, the community's notes
@@ -162,5 +162,5 @@ Object.assign(window.UD_IC, { mountProc, GRIDS, mountMotion });
 
 // =========================================================== boot
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { captcha, toast, gorselAdresi, vakaOf, katOf, T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, hedef, hedefMetni, nextLive, liveNow, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
+window.UD = { modelEtiketleri, captcha, kalanMetin, saatMetin, toast, gorselAdresi, vakaOf, katOf, T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, hedef, hedefMetni, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
 })();

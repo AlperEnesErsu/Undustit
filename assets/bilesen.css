@@ -155,3 +155,5 @@
 .gorsel-dugme label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:560px){.gorsel-alan{grid-template-columns:minmax(0,1fr)}}
 .b-gorsel{display:block;width:72px;height:54px;object-fit:cover;border:1px solid var(--line);border-radius:6px;background:var(--bg-2)}
+.alan-onay .onay-satir{display:flex;align-items:center;gap:8px;min-height:44px;font-size:15px;color:var(--ink)}
+.alan-onay input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}

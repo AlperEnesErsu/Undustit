@@ -273,3 +273,30 @@ p em,li em,dd em,.lead em{font-family:inherit;font-style:normal;font-size:1em;fo
 .pc-stage{border:1px solid var(--line-2);box-shadow:none}
 /* a board of nine cards reads as one list: light lines, the "alırdım" box carries the colour */
 .icard{border-color:var(--line)}
+
+/* ===================================================================== yeni görünüm (27 Ekim 2026)
+   Üç renk: mürekkep, mor (eylem ve marka) ve sarı (yalnız vurgu). Logodaki kırmızı da mor. Başlıklar Space Grotesk:
+   teknik ve net. Vurgu kelimenin altını çizmez, ikas'taki gibi üstünü işaretleyici kalemle boyar. Köşeler daha az
+   yuvarlak: kartlar araç gibi dursun, şişkin değil. Zemin sıcak kâğıttan neredeyse beyaza. */
+:root{
+  --f-serif:"Space Grotesk","Geist",system-ui,sans-serif;
+  --brand:var(--accent);
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+  --bg:#FAFAF8; --bg-3:#F1F0EC; --line:#E4E2DC;
+}
+.nav{background:rgba(250,250,248,.92)}
+h1,h2,h3,.brand b,.istat b,.icard .rank{letter-spacing:-.03em}
+h1 em,html .mission q em,.cb-h em{font-style:normal;background-image:linear-gradient(var(--sun),var(--sun));background-repeat:no-repeat;background-position:0 55%;background-size:100% 82%;
+  padding-inline:.08em;margin-inline:-.04em;border-radius:.06em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+h1 em{background-size:0% 82%}
+@keyframes hl-swipe{to{background-size:100% 82%}}
+@media (prefers-reduced-motion:reduce){h1 em{background-size:100% 82%;animation:none}}
+/* the marker stays inside its own line: a little more line height, a band that leaves the line above alone */
+.hero h1,.phead h1,.case-head h1{line-height:1.02}
+h1 em,html .mission q em,.cb-h em{background-position:0 88%;background-size:100% 66%}
+h1 em{background-size:0% 66%}
+@keyframes hl-swipe{to{background-size:100% 66%}}
+@media (prefers-reduced-motion:reduce){h1 em{background-size:100% 66%}}
+/* a case chip is a chip: the case-card rules above must not reach it */
+.chip.case{border:1px solid var(--line-2);box-shadow:none}
+.chip.case[aria-pressed="true"]{border-color:var(--accent)}

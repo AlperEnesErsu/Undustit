@@ -1,0 +1,25 @@
+# Netlify response headers. tests/sunucu.mjs applies the same file, so the end-to-end tests run under these rules.
+#
+# Content-Security-Policy, by source:
+#   self                         the site itself
+#   cdn.jsdelivr.net             the Supabase client library (assets/ud/temel.js, assets/veri.js)
+#   *.supabase.co                the database, sign-in and stored photos (https and the realtime socket)
+#   challenges.cloudflare.com    Turnstile spam protection (script and its frame)
+#   plausible.io                 cookieless analytics, when ayar.js analitik is set
+# Inline scripts stay allowed: every page sets itself up in a small inline <script>, and stil.js picks the look
+# before the first paint. What the policy still closes: other sites' scripts, plugins, being framed elsewhere,
+# forms posting to other sites, data leaving for unknown hosts.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com https://plausible.io; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Fonts never change under the same name: keep them a year. Images a day. Pages, scripts and styles are
+# always checked with the server first (Netlify's default), so a new version is seen at once.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/og.png
+  Cache-Control: public, max-age=86400

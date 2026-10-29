@@ -11,6 +11,8 @@ export const test = base.extend({
     const hatalar = [];
     // an error a test throws on purpose carries "[beklenen]" and does not count
     page.on('pageerror', e => { if (!String(e).includes('[beklenen]')) hatalar.push(String(e)); });
+    // the Content-Security-Policy (_headers) blocking something the site needs is an error too
+    page.on('console', m => { if (m.type() === 'error' && /Content Security Policy/i.test(m.text())) hatalar.push('CSP: ' + m.text()); });
     await page.route('**/assets/ayar.js', r => r.fulfill({ contentType:'text/javascript', body:AYAR }));
     await use(page);
     expect(hatalar, 'JS hatası').toEqual([]);

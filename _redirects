@@ -1,0 +1,18 @@
+# Netlify redirects. The repository is published from its root, so the working files would be public too:
+# the handover guide (docs/), the database scripts (supabase/), tests, tools and the notes at the root.
+# They answer "not found" like any missing page. tests/sunucu.mjs applies the same rules locally.
+/docs/*        /404.html  404!
+/supabase/*    /404.html  404!
+/tests/*       /404.html  404!
+/tools/*       /404.html  404!
+/node_modules/*  /404.html  404!
+/.github/*     /404.html  404!
+/.claude/*     /404.html  404!
+/README.md     /404.html  404!
+/DESIGN.md     /404.html  404!
+/package.json  /404.html  404!
+/package-lock.json  /404.html  404!
+/playwright.config.mjs  /404.html  404!
+/netlify.toml  /404.html  404!
+/_headers      /404.html  404!
+/_redirects    /404.html  404!

@@ -23,7 +23,9 @@ left join lateral (select count(distinct uye) as puanci,
                           round(avg(puan) filter (where olcut = 'm')::numeric, 2) as m,
                           round(avg(puan) filter (where olcut = 'u')::numeric, 2) as u
                    from public.puanlar where fikir_id = f.id) p on true
-left join lateral (select count(*) as sayi from public.yorumlar where fikir_id = f.id) y on true;
+left join lateral (select count(*) as sayi from public.yorumlar where fikir_id = f.id) y on true
+-- a hidden idea is in nobody's list, the admin's and its writer's included (the admin reads them in yonetim/icerik/)
+where not f.gizli;
 
 grant select on public.fikir_kart to anon, authenticated;
 

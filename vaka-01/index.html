@@ -92,6 +92,7 @@
         <div class="starters" id="starters"></div>
         <div id="form"></div>
       </div>
+      <div id="numune"></div>
     </div>
     <figure class="cb-art" aria-hidden="true"><svg viewBox="0 0 260 150">
       <g class="cb-l"><path d="M24 52h26v46H24z"/><path d="M50 60h10v30H50z"/><path d="M60 66h150v18H60z"/>
@@ -168,6 +169,7 @@ const host = document.getElementById('starters');
 starters.forEach(([l, t]) => host.append(UD.el('button', { type:'button', class:'chip', text:l, onclick(){
   const p = document.querySelector('#form .if-pitch'); p.value = t; p.dispatchEvent(new Event('input')); form.useCase(CASE.id); p.setSelectionRange(t.length, t.length);
 } })));
+UD.mountNumune(document.getElementById('numune'), CASE.id);
 UD.mountBoard(document.getElementById('board'), { filter:i => UD.inCase(i, CASE), examples:false, emptyTitle:UD.T('vaka.js.bos'), emptyNote:UD.T('vaka.js.bos.not') });
 // the product photo comes from the case row (yonetim/ adds it); until then the frame stays empty
 UD.Store.cases().then(cs => {

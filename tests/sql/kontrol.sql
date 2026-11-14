@@ -269,4 +269,161 @@ do $$ begin
   exception when insufficient_privilege then null; end;
 end $$;
 reset role;
+-- moderation (13-moderasyon.sql): a listed word saves the idea or comment hidden; the writer and the admin still
+-- see it, nobody else does; only the admin changes "hidden"; everyday words that merely look close pass
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+insert into public.fikirler (id, sahip, baslik, kategori) values
+  ('33333333-3333-3333-3333-333333333333', '00000000-0000-0000-0000-00000000000b', 'Bu ürün tam bir SİİKTİR git ürünü', 'Mutfak'),
+  ('44444444-4444-4444-4444-444444444444', '00000000-0000-0000-0000-00000000000b', 'Sıkıştırmalı klasik fizik seti, sıkı ambalaj', 'Çocuk');
+
+insert into public.yorumlar (id, fikir_id, uye, metin) values
+  ('66666666-6666-6666-6666-666666666666', '11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000b', 'siz 0r0spular ne anlarsınız'),
+  ('77777777-7777-7777-7777-777777777777', '11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000b', 'Bence fiyatı biraz yüksek');
+do $$ begin
+  if not (select gizli from public.fikirler where id = '33333333-3333-3333-3333-333333333333') then raise exception 'küfürlü fikir gizlenmedi (ya da yazarı göremiyor)'; end if;
+  if (select count(*) from public.fikir_kart where id = '33333333-3333-3333-3333-333333333333') <> 0 then raise exception 'gizli fikir yazarının listesinde görünüyor'; end if;
+  if (select gizli from public.fikirler where id = '44444444-4444-4444-4444-444444444444') then raise exception 'temiz fikir gizlendi'; end if;
+  if not (select gizli from public.yorumlar where id = '66666666-6666-6666-6666-666666666666') then raise exception 'küfürlü yorum gizlenmedi'; end if;
+  if (select gizli from public.yorumlar where id = '77777777-7777-7777-7777-777777777777') then raise exception 'temiz yorum gizlendi'; end if;
+  -- the writer cannot unhide their own comment, and editing a clean one into a bad one hides it
+  update public.yorumlar set gizli = false where id = '66666666-6666-6666-6666-666666666666';
+  if not (select gizli from public.yorumlar where id = '66666666-6666-6666-6666-666666666666') then raise exception 'yazar kendi yorumunu açabildi'; end if;
+  update public.yorumlar set metin = 'amk böyle fiyat mı olur' where id = '77777777-7777-7777-7777-777777777777';
+  if not (select gizli from public.yorumlar where id = '77777777-7777-7777-7777-777777777777') then raise exception 'düzenlenen yorum yeniden denetlenmedi'; end if;
+  if (select count(*) from public.yasak_sozler) <> 0 then raise exception 'üye yasak söz listesini okuyabiliyor'; end if;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000c';
+do $$ begin
+  if (select count(*) from public.fikirler where id = '33333333-3333-3333-3333-333333333333') <> 0 then raise exception 'gizli fikir başkasına görünüyor'; end if;
+  if (select count(*) from public.fikir_kart where id = '33333333-3333-3333-3333-333333333333') <> 0 then raise exception 'gizli fikir listede görünüyor'; end if;
+  if (select count(*) from public.yorumlar where id in ('66666666-6666-6666-6666-666666666666', '77777777-7777-7777-7777-777777777777')) <> 0 then raise exception 'gizli yorum başkasına görünüyor'; end if;
+  if (select yorum from public.fikir_kart where id = '11111111-1111-1111-1111-111111111111') <> 1 then raise exception 'gizli yorumlar sayılıyor'; end if;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+do $$ begin
+  if (select count(*) from public.yorumlar where gizli) <> 2 then raise exception 'yönetici gizli yorumları göremiyor'; end if;
+  if (select count(*) from public.fikir_kart where id in ('22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333')) <> 0 then raise exception 'gizli fikir yöneticinin site listesinde görünüyor'; end if;
+  if (select count(*) from public.fikirler where gizli and id in ('22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333')) <> 2 then raise exception 'yönetici gizli fikirleri yönetimde göremiyor'; end if;
+  update public.yorumlar set gizli = false where id = '66666666-6666-6666-6666-666666666666';
+  if (select gizli from public.yorumlar where id = '66666666-6666-6666-6666-666666666666') then raise exception 'yönetici yorumu açamadı'; end if;
+  insert into public.yasak_sozler (soz) values ('  ÇÖPLÜK ');
+  if (select count(*) from public.yasak_sozler where soz = 'copluk') <> 1 then raise exception 'yeni söz sade biçime çevrilmedi'; end if;
+end $$;
+reset role;
+reset request.jwt.claim.sub;
+-- product requests (14-numune.sql): a visitor leaves one and reads none back; only the admin sees and updates them
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+insert into public.numune_talepleri (vaka_id, amac, ad, eposta) values ('vaka-01', 'satin', 'Deneme Kişi', 'b@example.com');
+do $$ begin
+  if (select count(*) from public.numune_talepleri) <> 0 then raise exception 'ziyaretçi ürün taleplerini okuyabiliyor'; end if;
+  begin
+    insert into public.numune_talepleri (vaka_id, ad, eposta, durum) values ('vaka-01', 'Deneme Kişi', 'b@example.com', 'gonderildi');
+    raise exception 'ziyaretçi talebin durumunu kendi belirleyebiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+do $$ begin
+  if (select count(*) from public.numune_talepleri where amac = 'satin') <> 1 then raise exception 'yönetici ürün talebini göremiyor'; end if;
+  update public.numune_talepleri set durum = 'arandi';
+end $$;
+reset role;
+reset request.jwt.claim.sub;
+-- applications (15-basvuru.sql): the new answers are stored; whoever signs in with the application's e-mail
+-- reads its status, nobody else does; a visitor cannot mark their own application accepted
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-00000000000e', 'Satis@Firma.test') on conflict (id) do nothing;
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+insert into public.vaka_basvurulari (firma, eposta, stok, olcu, taban_fiyat, model, baslik, ozet, sinif, deneme_adedi, odul)
+  values ('Firma A.Ş.', 'satis@firma.test', 'paslanmaz menteşe', '40 × 40 mm', 'adedi 2 ₺', 'ikisi', 'Kırk bin menteşe', 'Depoda bekliyor.', 'A kalite', '1.000', '25.000');
+do $$ begin
+  begin
+    insert into public.vaka_basvurulari (firma, eposta, stok, durum) values ('Firma A.Ş.', 'satis@firma.test', 'paslanmaz menteşe', 'kabul');
+    raise exception 'ziyaretçi başvurusunu kabul edilmiş olarak yazabiliyor';
+  exception when insufficient_privilege then null; end;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000e';
+do $$ begin
+  if (select count(*) from public.vaka_basvurulari where model = 'ikisi' and durum = 'yeni') <> 1 then raise exception 'firma kendi başvurusunu göremiyor'; end if;
+  if (select count(*) from public.vaka_basvurulari) <> 1 then raise exception 'firma başkasının başvurusunu görüyor'; end if;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000c';
+do $$ begin
+  if (select count(*) from public.vaka_basvurulari) <> 0 then raise exception 'başka ziyaretçi başvuruları okuyabiliyor'; end if;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+update public.vaka_basvurulari set durum = 'kabul', vaka_id = 'vaka-01' where model = 'ikisi';
+reset role;
+reset request.jwt.claim.sub;
+-- usernames (16-kullanici-adi.sql): an admin sets one and it resolves to the admin's address for sign-in;
+-- a member can neither set one nor be looked up
+update auth.users set email = 'yonetici@example.com' where id = '00000000-0000-0000-0000-00000000000d';
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000d';
+do $$ begin
+  if public.kullanici_adi_koy('  Yonetici.1 ') <> 'yonetici.1' then raise exception 'kullanıcı adı sade biçime çevrilmedi'; end if;
+  begin
+    perform public.kullanici_adi_koy('a b');
+    raise exception 'geçersiz kullanıcı adı kabul edildi';
+  exception when invalid_parameter_value then null; end;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+do $$ begin
+  begin
+    perform public.kullanici_adi_koy('uye');
+    raise exception 'üye kullanıcı adı alabildi';
+  exception when insufficient_privilege then null; end;
+end $$;
+set role anon;
+reset request.jwt.claim.sub;
+do $$ begin
+  if public.giris_eposta('YONETICI.1') is distinct from 'yonetici@example.com' then raise exception 'kullanıcı adı yöneticinin adresine çözülmedi'; end if;
+  if public.giris_eposta('yok') is not null then raise exception 'olmayan kullanıcı adı bir adres döndürdü'; end if;
+end $$;
+reset role;
+update public.profiller set kullanici_adi = 'uye.b' where id = '00000000-0000-0000-0000-00000000000b';
+set role anon;
+do $$ begin
+  if public.giris_eposta('uye.b') is not null then raise exception 'üyenin adresi kullanıcı adından öğrenilebiliyor'; end if;
+end $$;
+reset role;
+-- fair demand (17-oy.sql): nobody votes for or scores their own idea; one browser counts once per idea; the browser
+-- an idea was written on cannot vote for it under another identity; nobody reads the device table
+insert into auth.users (id) values ('00000000-0000-0000-0000-00000000000f') on conflict (id) do nothing;
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000a';
+do $$ begin
+  begin
+    insert into public.talepler (fikir_id, uye, fiyat) values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000a', 500);
+    raise exception 'kişi kendi fikrine alırdım diyebildi';
+  exception when raise_exception then if sqlerrm not like 'Kendi fikrine%' then raise; end if; end;
+  begin
+    insert into public.puanlar (fikir_id, uye, olcut, puan) values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000a', 'd', 5);
+    raise exception 'kişi kendi fikrine puan verebildi';
+  exception when raise_exception then if sqlerrm not like 'Kendi fikrine%' then raise; end if; end;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
+select public.alirdim('11111111-1111-1111-1111-111111111111', 220, 'bbbbbbbbbbbbbbbb01');   -- B already said so: a new price, and the browser is noted
+select public.fikir_cihazi('44444444-4444-4444-4444-444444444444', 'bbbbbbbbbbbbbbbb01');   -- B wrote idea 44 on that browser
+do $$ begin
+  if (select fiyat from public.talepler where fikir_id = '11111111-1111-1111-1111-111111111111' and uye = '00000000-0000-0000-0000-00000000000b') <> 220 then raise exception 'alirdim fiyatı yazmadı'; end if;
+  -- (this file grants every table to the roles at its top, so what is checked here is row level security itself)
+  if (select count(*) from public.cihaz_izleri) <> 0 then raise exception 'cihaz izleri okunabiliyor'; end if;
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000f';
+do $$ begin
+  begin
+    perform public.alirdim('11111111-1111-1111-1111-111111111111', 300, 'bbbbbbbbbbbbbbbb01');
+    raise exception 'aynı tarayıcıdan ikinci kimlikle alırdım denebildi';
+  exception when raise_exception then if sqlerrm not like 'Bu cihazdan%' then raise; end if; end;
+  begin
+    perform public.alirdim('44444444-4444-4444-4444-444444444444', 300, 'bbbbbbbbbbbbbbbb01');
+    raise exception 'fikrin yazıldığı tarayıcıdan başka kimlikle alırdım denebildi';
+  exception when raise_exception then if sqlerrm not like 'Bu fikir bu cihazdan%' then raise; end if; end;
+  perform public.alirdim('11111111-1111-1111-1111-111111111111', 300, 'ffffffffffffffff01');
+  if (select count(*) from public.talepler where fikir_id = '11111111-1111-1111-1111-111111111111') <> 3 then raise exception 'başka tarayıcıdan gelen alırdım sayılmadı'; end if;
+end $$;
+reset role;
+reset request.jwt.claim.sub;
 select 'sql kontrolleri tamam' as sonuc;

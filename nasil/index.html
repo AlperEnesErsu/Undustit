@@ -61,12 +61,15 @@ table.split{width:100%;border-collapse:collapse;font-size:15px}
 @media (max-width:560px){.big2{grid-template-columns:minmax(0,1fr)}.big2 div + div{border-inline-start:0;border-top:1px solid var(--line-2)}.steps > li{grid-template-columns:minmax(0,1fr)}.steps .why{grid-column:auto}}
 .open ol{margin:0;padding-inline-start:20px;color:var(--ink-2);display:grid;gap:8px;font-weight:300}
 .basvuru{display:grid;gap:14px}
-.basvuru .iki{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.basvuru .iki{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
 .basvuru .onay{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
 .basvuru .onay input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent)}
 .basvuru .durum{font-size:14px;min-height:1.4em}
 .basvuru input[type=file]{font-size:14px;padding:8px 0}
 .basvuru .b-not{color:var(--muted);font-size:12.5px}
+.basvuru .b-grup{font-family:var(--f-mono);font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 0}
+.basvuru fieldset{border:0;margin:0;padding:0;min-width:0;display:grid;gap:8px}
+.basvuru legend{font-size:13.5px;font-weight:500;color:var(--ink-2);padding:0;margin-bottom:8px}
 .basvuru .durum.bad{color:var(--err)}
 .basvuru-tamam{display:grid;gap:6px;padding:16px;border:1px solid var(--ok);border-radius:var(--r-md);background:var(--ok-soft)}
 @media (max-width:560px){.basvuru .iki{grid-template-columns:minmax(0,1fr)}}
@@ -206,39 +209,72 @@ const kutu = document.getElementById('basvuru');
 const ac = el('button', { type:'button', class:'btn sig', html:T('vakalar.js.b.ac') + ' ' + ICON.arrow });
 kutu.append(ac);
 ac.onclick = () => {
-  const alan = (ad, etiket, tur, zorunlu, ipucu, uzun) => `<label class="if-field"><span>${etiket}${zorunlu ? '' : ` <small>${T('ud.form.istege')}</small>`}</span>${uzun
-    ? `<textarea name="${ad}" maxlength="1000" placeholder="${ipucu}"></textarea>`
-    : `<input name="${ad}" type="${tur}" maxlength="${ad === 'stok' ? 300 : 160}"${zorunlu ? ' required' : ''}${ipucu ? ` placeholder="${ipucu}"` : ''}${tur === 'email' ? ' autocomplete="email"' : tur === 'tel' ? ' autocomplete="tel"' : ad === 'kisi' ? ' autocomplete="name"' : ad === 'firma' ? ' autocomplete="organization"' : ''}>`}</label>`;
+  // two short groups: what is waiting in the depot, then who we write back to
+  const grup = t => `<h3 class="b-grup">${t}</h3>`;
+  const alan = (ad, etiket, tur, zorunlu, max, ipucu, oto, not) => `<label class="if-field"><span>${etiket}${zorunlu ? '' : ` <small>${T('ud.form.istege')}</small>`}</span>` +
+    `<input name="${ad}" type="${tur}" maxlength="${max}"${zorunlu ? ' required' : ''}${ipucu ? ` placeholder="${ipucu}"` : ''}${oto ? ` autocomplete="${oto}"` : ''}>${not ? `<small class="b-not">${not}</small>` : ''}</label>`;
+  const uzun = (ad, etiket, max, ipucu) => `<label class="if-field"><span>${etiket} <small>${T('ud.form.istege')}</small></span><textarea name="${ad}" maxlength="${max}" placeholder="${ipucu}"></textarea></label>`;
+  // The company fills in what its case page will say and what it offers; the admin only checks it and publishes
+  // (yonetim/ > Vaka oluştur opens the case form with these answers in place).
   const f = el('form', { class:'basvuru', novalidate:true, 'aria-label':T('vakalar.h2.2').replace(/<[^>]+>/g, ''), html:
-    alan('firma', T('vakalar.js.b.firma'), 'text', true, T('vakalar.js.b.firma.ipucu')) +
-    alan('stok', T('vakalar.js.b.stok'), 'text', true, T('vakalar.js.b.stok.ipucu')) +
-    `<div class="iki">${alan('adet', T('vakalar.js.b.adet'), 'text', false, T('vakalar.js.b.adet.ipucu'))}${alan('kisi', T('vakalar.js.b.kisi'), 'text', false)}</div>` +
-    `<div class="iki">${alan('eposta', T('vakalar.js.b.eposta'), 'email', true)}${alan('telefon', T('vakalar.js.b.telefon'), 'tel', false)}</div>` +
-    alan('notlar', T('vakalar.js.b.not'), 'text', false, T('vakalar.js.b.not.ipucu'), true) +
+    grup(T('vakalar.js.b.grup.stok')) +
+    alan('stok', T('vakalar.js.b.stok'), 'text', true, 300, T('vakalar.js.b.stok.ipucu')) +
+    `<div class="iki">${alan('adet', T('vakalar.js.b.adet'), 'text', false, 60, T('vakalar.js.b.adet.ipucu'))}${alan('olcu', T('vakalar.js.b.olcu'), 'text', false, 160, T('vakalar.js.b.olcu.ipucu'))}</div>` +
+    `<div class="iki">${alan('sinif', T('vakalar.js.b.sinif'), 'text', false, 60, T('vakalar.js.b.sinif.ipucu'))}${alan('taban_fiyat', T('vakalar.js.b.taban'), 'text', false, 60, T('vakalar.js.b.taban.ipucu'), '', T('vakalar.js.b.taban.not'))}</div>` +
+    grup(T('vakalar.js.b.grup.sayfa')) + `<p class="b-not">${T('vakalar.js.b.grup.sayfa.not')}</p>` +
+    alan('baslik', T('vakalar.js.b.baslik'), 'text', false, 140, T('vakalar.js.b.baslik.ipucu')) +
+    uzun('ozet', T('vakalar.js.b.ozet'), 300, T('vakalar.js.b.ozet.ipucu')) +
+    uzun('notlar', T('vakalar.js.b.not'), 1000, T('vakalar.js.b.not.ipucu')) +
     `<label class="if-field"><span>${T('vakalar.js.b.gorsel')} <small>${T('ud.form.istege')}</small></span><input name="gorsel" type="file" accept="image/jpeg,image/png,image/webp"><small class="b-not">${T('vakalar.js.b.gorsel.not')}</small></label>` +
+    grup(T('vakalar.js.b.grup.teklif')) +
+    `<fieldset><legend>${T('vakalar.js.b.model')}</legend><div class="chips">${[['ortaklik', 'ortaklik'], ['odul', 'odul'], ['ikisi', 'ikisi'], ['', 'bilmiyorum']].map(([deger, k]) =>
+      `<label class="chip bildir-n"><input type="radio" name="model" value="${deger}"${deger ? '' : ' checked'}> ${T('vakalar.js.b.model.' + k)}</label>`).join('')}</div><small class="b-not">${T('vakalar.js.b.model.not')}</small></fieldset>` +
+    `<div class="iki">${alan('deneme_adedi', T('vakalar.js.b.deneme'), 'text', false, 60, T('vakalar.js.b.deneme.ipucu'))}${alan('odul', T('vakalar.js.b.odul'), 'text', false, 60, T('vakalar.js.b.odul.ipucu'))}</div>` +
+    grup(T('vakalar.js.b.grup.iletisim')) +
+    `<div class="iki">${alan('firma', T('vakalar.js.b.firma'), 'text', true, 120, T('vakalar.js.b.firma.ipucu'), 'organization')}${alan('kisi', T('vakalar.js.b.kisi'), 'text', false, 80, '', 'name')}</div>` +
+    `<div class="iki">${alan('eposta', T('vakalar.js.b.eposta'), 'email', true, 160, '', 'email', T('vakalar.js.b.eposta.not'))}${alan('telefon', T('vakalar.js.b.telefon'), 'tel', false, 40, '', 'tel')}</div>` +
     `<label class="onay"><input type="checkbox" name="onay" required><span>${T('vakalar.js.b.onay')}${UD.kvkkLink()}</span></label>` +
     `<div><button type="submit" class="btn sig">${T('vakalar.js.b.gonder')} ${ICON.arrow}</button></div>` +
     `<p class="durum" role="status" aria-live="polite"></p>` });
+  // the prize amount is asked only when a prize is on offer
+  const odulAlan = f.odul.closest('label');
+  const modelDegisti = () => { const var_ = /odul|ikisi/.test(f.model.value); odulAlan.style.display = var_ ? '' : 'none'; if (!var_) f.odul.value = ''; };
+  f.addEventListener('change', e => { if (e.target.name === 'model') modelDegisti(); });
+  modelDegisti();
   kutu.replaceChildren(f);
-  f.firma.focus();
+  f.stok.focus();
   const say = (t, bad) => { const d = f.querySelector('.durum'); d.textContent = t; d.classList.toggle('bad', !!bad); };
+  // A database that has not run supabase/15-basvuru.sql (or only its first version) has no columns for the newer
+  // answers: those go into the description instead, so an application is never lost over a missing column.
+  const ETIKET = { baslik:'Başlık', ozet:'Kısa açıklama', sinif:'Sınıf', deneme_adedi:'Deneme partisi', odul:'Fikir ödülü', olcu:'Ölçü', taban_fiyat:'Taban fiyat', model:'Model' };
+  const sadelestir = (k, alanlar) => {
+    const eski = { ...k }, ek = [];
+    alanlar.forEach(a => { if (eski[a]) ek.push(ETIKET[a] + ': ' + eski[a]); delete eski[a]; });
+    eski.notlar = [k.notlar].concat(ek).filter(Boolean).join('\n').slice(0, 1000);
+    return eski;
+  };
+  const eksik = err => err && err.code === 'PGRST204';
+  const yolla = k => UD.Store.basvur(k)
+    .catch(err => { if (!eksik(err)) throw err; return UD.Store.basvur(sadelestir(k, ['baslik', 'ozet', 'sinif', 'deneme_adedi', 'odul'])); })
+    .catch(err => { if (!eksik(err)) throw err; return UD.Store.basvur(sadelestir(k, Object.keys(ETIKET))); });
   f.onsubmit = e => {
     e.preventDefault();
     const v = n => f[n].value.trim();
     const fail = (t, n) => { say(''); UD.alanUyar(f[n], t); };
-    if (v('firma').length < 2) return fail(T('vakalar.js.b.hata.firma'), 'firma');
     if (v('stok').length < 3) return fail(T('vakalar.js.b.hata.stok'), 'stok');
+    if (v('firma').length < 2) return fail(T('vakalar.js.b.hata.firma'), 'firma');
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('eposta'))) return fail(T('vakalar.js.b.hata.eposta'), 'eposta');
     if (!f.onay.checked) return fail(T('vakalar.js.b.hata.onay'), 'onay');
     const gonder = f.querySelector('[type=submit]'); gonder.disabled = true; say(T('vakalar.js.b.gidiyor'));
     // the photo goes up first; if it cannot, the application waits so nothing is lost silently
     const dosya = f.gorsel.files && f.gorsel.files[0];
-    const kayit = { firma:v('firma'), stok:v('stok'), adet:v('adet'), kisi:v('kisi'), eposta:v('eposta'), telefon:v('telefon'), notlar:v('notlar') };
+    const kayit = { firma:v('firma'), stok:v('stok'), adet:v('adet'), olcu:v('olcu'), sinif:v('sinif'), taban_fiyat:v('taban_fiyat'), baslik:v('baslik'), ozet:v('ozet'), notlar:v('notlar'),
+      model:f.model.value, deneme_adedi:v('deneme_adedi'), odul:v('odul'), kisi:v('kisi'), eposta:v('eposta'), telefon:v('telefon') };
     (dosya ? UD.Store.gorselYukle(dosya, 'basvuru').then(url => { kayit.gorsel = url; }, e => { e.gorsel = true; throw e; }) : Promise.resolve())
-      .then(() => UD.Store.basvur(kayit))
+      .then(() => yolla(kayit))
       .then(() => {
         UD.olcu('Vaka başvurusu');
-        kutu.innerHTML = `<div class="basvuru-tamam" tabindex="-1"><b>${T('vakalar.js.b.tamam')}</b><p>${T('vakalar.js.b.tamam.not', { eposta:esc(v('eposta')) })}</p></div>`;
+        kutu.innerHTML = `<div class="basvuru-tamam" tabindex="-1"><b>${T('vakalar.js.b.tamam')}</b><p>${T('vakalar.js.b.tamam.not', { eposta:esc(v('eposta')) })}</p><p>${T('vakalar.js.b.tamam.takip')}</p></div>`;
         kutu.firstChild.focus();
       })
       .catch(err => { gonder.disabled = false; say(err && err.gorsel ? T('vakalar.js.b.hata.gorsel') : err && err.code === 'P0001' ? T('vakalar.js.b.hata.sinir') : T('vakalar.js.b.hata.genel'), true); });

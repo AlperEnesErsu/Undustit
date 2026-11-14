@@ -14,7 +14,16 @@
 /* Yönetim özeti: yalnız bu sayfanın düzeni. Bileşenler bilesen.css'ten gelir. */
 .y-ust{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
 .y-ust h1{font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:8px 0 0}
-.panel + .panel{margin-top:20px}
+.panel + .panel,.bekleyen + .panel{margin-top:20px}
+.bekleyen{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:16px;padding:14px 18px;border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--bg-2)}
+.bekleyen b{font-weight:500;margin-right:6px}
+.bekleyen span{color:var(--muted)}
+.bekleyen a{text-decoration:none}
+.durum-h{display:flex;align-items:center;gap:8px}
+.durum-h select{min-width:0}
+.ka-form{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.ka-form .alan{flex:1 1 260px;max-width:420px;margin:0}
+.ka-durum{margin:12px 0 0;color:var(--ink-2);font-size:14.5px}
 .y-ara{width:100%}
 .y-ara.arama{flex:1 1 220px}
 .chipler{display:flex;flex-wrap:wrap;gap:6px}
@@ -59,6 +68,7 @@
   <nav class="y-yan" aria-label="Yönetim menüsü">
     <a href="./" aria-current="page">Özet</a>
     <a href="./#vakalar">Vakalar</a>
+    <a href="icerik/">İçerik</a>
     <a href="rapor/">Rapor</a>
     <a href="vaka/">Yeni vaka</a>
     <a href="../">Siteye dön</a>
@@ -93,6 +103,7 @@ function ciz(o, a){
   ana.innerHTML =
     '<div class="y-ust"><div><span class="eyebrow">Yönetim</span><h1>Özet</h1></div></div>' +
     '<div class="istatlar" id="istatlar" aria-live="polite"></div>' +
+    '<div class="bekleyen" id="bekleyen" aria-live="polite"></div>' +
     '<section class="panel" id="vakalar" aria-labelledby="vk-b">' +
       '<header class="panel-bas"><h2 id="vk-b">Vakalar</h2><span class="sayac" id="sayac"></span></header>' +
       '<div class="panel-ic">' +
@@ -112,20 +123,36 @@ function ciz(o, a){
         '</table></div>' +
       '</div>' +
     '</section>' +
+    KAYITLAR.map(panelHtml).join('') +
     etkinlikHtml() +
-    KAYITLAR.map(panelHtml).join('');
+    '<section class="panel" id="hesap" aria-labelledby="hs-b"><header class="panel-bas"><h2 id="hs-b">Giriş bilgileri</h2></header>' +
+      '<div class="panel-ic"><form id="ka-form" class="ka-form" novalidate>' +
+        '<label class="alan"><span>Kullanıcı adı <small>3–24 karakter: küçük harf, rakam, nokta, alt çizgi</small></span>' +
+        '<input type="text" name="ad" maxlength="24" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ör. alper"></label>' +
+        '<button class="btn sig" type="submit">Kaydet</button></form>' +
+      '<p class="ka-durum" id="ka-durum" aria-live="polite"></p></div></section>';
+  hesapBagla(o);
   etkinlikBagla();
 
+  // A status is chosen first and written only with "Kaydet". The table is then read back from the database,
+  // so what the row shows afterwards is what was really saved.
   KAYITLAR.forEach(function(k){
-    ana.querySelector('#' + k.id + '-tbody').addEventListener('change', function(e){
+    var tb = ana.querySelector('#' + k.id + '-tbody');
+    tb.addEventListener('change', function(e){
       var sec = e.target.closest('select[data-kayit]');
       if (!sec) return;
-      sec.disabled = true;
+      sec.parentNode.querySelector('[data-kaydet]').disabled = sec.value === sec.dataset.ilk;
+    });
+    tb.addEventListener('click', function(e){
+      var b = e.target.closest('[data-kaydet]');
+      if (!b) return;
+      var sec = b.parentNode.querySelector('select[data-kayit]');
+      b.disabled = true; sec.disabled = true; b.textContent = 'Kaydediliyor…';
       Promise.resolve(k.degisince ? k.degisince(sec.dataset.kayit, sec.value, sec) : null)
         .then(function(){ return UDV[k.tur].durum(sec.dataset.kayit, sec.value); })
-        .then(function(){ YON.toast(k.tamam, 'ok'); })
-        .catch(function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); kayitYenile(k); })
-        .then(function(){ sec.disabled = false; });
+        .then(function(){ YON.toast(k.tamam, 'ok'); }, function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); })
+        .then(function(){ return kayitYenile(k); })
+        .then(function(){ if (k.id === 'bildirimler') istatYenile(); });
     });
   });
 
@@ -151,20 +178,38 @@ function ciz(o, a){
 
 // Sitenin yalnız yöneticiye gelen kayıtları: başvurular, mesajlar, bildirimler. Yeni olanlar üstte, durum satırdan değişir.
 var KONU = { genel:'Genel', ortaklik:'İş birliği', basin:'Basın', yatirim:'Yatırım' };
+var AMAC = { gormek:'Görmek', denemek:'Denemek', satin:'Satın almak' }, KIMIN = { bireysel:'Bireysel', firma:'Firma' };
+var MODEL = { ortaklik:'Satış ortaklığı', odul:'Fikir ödülü', ikisi:'Ortaklık + ödül' };
 var NEDEN = { spam:'Spam', uygunsuz:'Uygunsuz', kopya:'Kopya', yaniltici:'Yanıltıcı', diger:'Diğer' };
 function posta(e){ return '<a class="link" href="mailto:' + encodeURIComponent(e).replace(/%40/g, '@') + '">' + esc(e) + '</a>'; }
 var KAYITLAR = [
   { id:'bildirimler', tur:'bildirimler', baslik:'Bildirilen fikirler', ad:'bildirim', bos:'Bildirilen fikir yok.', tamam:'Bildirim kaydedildi.',
-    kolon:['Fikir','Neden','Açıklama','Tarih'],
+    kolon:['Fikir','Sitede','Neden','Açıklama','Tarih'],
     etiket:function(b){ return (b.fikirler && b.fikirler.baslik) || 'Fikir'; },
-    satir:function(b){ return ['<b>' + esc((b.fikirler && b.fikirler.baslik) || b.fikir_id) + '</b>', esc(NEDEN[b.neden] || b.neden), esc(b.aciklama || '—'), tarih(b.zaman)]; },
-    // "Fikir gizlendi" fikri sitede gizler; başka bir duruma dönmek gizliliği kaldırır
+    // "Sitede" is the idea's real state, read from the idea itself: the proof that hiding worked
+    satir:function(b){
+      var f = b.fikirler || {}, ad = esc(f.baslik || b.fikir_id);
+      var anahtar = f.sahip ? f.sahip + ':' + b.fikir_id : (String(b.fikir_id).indexOf(':') > -1 ? b.fikir_id : '');
+      return ['<b>' + (anahtar && f.gizli === false ? '<a href="../fikirler/?f=' + encodeURIComponent(anahtar) + '">' + ad + '</a>' : ad) + '</b>',
+        f.gizli == null ? '—' : f.gizli ? '<span class="rozet kirmizi">Gizli</span>' : '<span class="rozet yesil">Yayında</span>',
+        esc(NEDEN[b.neden] || b.neden), esc(b.aciklama || '—'), tarih(b.zaman)]; },
+    // "Fikri gizle" fikri sitede gizler; başka bir karara dönmek onu yeniden yayına alır
     degisince:function(id, durum, sec){ var fid = sec.dataset.fikir; return fid ? UDV.fikirler.gizle(fid, durum === 'gizlendi') : null; } },
-  { id:'basvurular', tur:'basvurular', baslik:'Vaka başvuruları', ad:'başvuru', bos:'Henüz başvuru yok.', tamam:'Başvuru durumu kaydedildi.',
-    kolon:['Firma','Stok','Adet','Görsel','İletişim','Not','Tarih'],
-    etiket:function(b){ return b.firma; },
-    satir:function(b){ return ['<b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : ''), esc(b.stok), esc(b.adet || '—'), gorselHucre(b.gorsel),
+  // "Ürünü görmek istiyorum": a visitor wants to see, try or buy a case's stock itself
+  { id:'numuneler', tur:'numuneler', baslik:'Ürün talepleri', ad:'talep', bos:'Henüz ürün talebi yok.', tamam:'Talep durumu kaydedildi.',
+    kolon:['Kim','İstek','Vaka','Adet','İletişim','Not','Tarih'],
+    etiket:function(b){ return b.ad; },
+    satir:function(b){ return ['<b>' + esc(b.ad) + '</b><br><small>' + esc(KIMIN[b.tur] || b.tur) + (b.sehir ? ' · ' + esc(b.sehir) : '') + '</small>', esc(AMAC[b.amac] || b.amac),
+      '<a href="vaka/?id=' + encodeURIComponent(b.vaka_id) + '">' + esc(b.vaka_id) + '</a>', esc(b.adet || '—'),
       posta(b.eposta) + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : ''), esc(b.notlar || '—'), tarih(b.zaman)]; } },
+  { id:'basvurular', tur:'basvurular', baslik:'Vaka başvuruları', ad:'başvuru', bos:'Henüz başvuru yok.', tamam:'Başvuru durumu kaydedildi.',
+    kolon:['Firma','Stok','Adet','Görsel','İletişim','Not','Vaka','Tarih'],
+    etiket:function(b){ return b.firma; },
+    satir:function(b){ return ['<b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : ''), (b.baslik ? '<b>' + esc(b.baslik) + '</b><br>' : '') + esc(b.stok) + [[b.olcu, b.sinif].filter(Boolean).join(' · '), b.taban_fiyat && 'taban: ' + b.taban_fiyat, MODEL[b.model], b.deneme_adedi && 'deneme: ' + b.deneme_adedi, b.odul && 'ödül: ' + b.odul].filter(Boolean).map(function(x){ return '<br><small>' + esc(x) + '</small>'; }).join(''),
+      esc(b.adet || '—'), gorselHucre(b.gorsel),
+      posta(b.eposta) + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : ''), esc(b.notlar || '—'),
+      // one step from an application to its case: the form opens filled in, the company gets its panel access
+      b.vaka_id ? '<a href="vaka/?id=' + encodeURIComponent(b.vaka_id) + '">Vakayı aç</a>' : '<a class="btn alt sm" href="vaka/?basvuru=' + encodeURIComponent(b.id) + '">Vaka oluştur</a>', tarih(b.zaman)]; } },
   { id:'mesajlar', tur:'mesajlar', baslik:'İletişim mesajları', ad:'mesaj', bos:'Henüz mesaj yok.', tamam:'Mesaj durumu kaydedildi.',
     kolon:['Kimden','Konu','Mesaj','Tarih'],
     etiket:function(b){ return b.eposta; },
@@ -254,23 +299,57 @@ function kayitYenile(k){
   var tb = ana.querySelector('#' + k.id + '-tbody'), n = tb.dataset.n, T = UDV[k.tur];
   tb.innerHTML = '<tr><td colspan="' + n + '">Yükleniyor…</td></tr>';
   return Promise.resolve().then(function(){ return T.liste(); }).then(function(liste){
-    ana.querySelector('#' + k.id + '-sayac').textContent = liste.length + ' ' + k.ad;
+    // waiting = still in the first status (yeni / karar bekliyor)
+    k.bekleyen = liste.filter(function(b){ return b.durum === T.DURUMLAR[0]; }).length;
+    ana.querySelector('#' + k.id + '-sayac').textContent = liste.length + ' ' + k.ad + (k.bekleyen ? ' · ' + k.bekleyen + ' bekliyor' : '');
+    bekleyenYaz();
     // nothing waiting: the panel shrinks to one quiet line instead of an empty table
     tb.closest('.panel').classList.toggle('bos-panel', !liste.length);
     if (!liste.length){ tb.innerHTML = '<tr><td colspan="' + n + '">' + k.bos + '</td></tr>'; return; }
     tb.innerHTML = liste.map(function(b){
       return '<tr>' + k.satir(b).map(function(h){ return '<td>' + h + '</td>'; }).join('') +
-        '<td><select data-kayit="' + esc(b.id) + '"' + (b.fikir_id ? ' data-fikir="' + esc(b.fikir_id) + '"' : '') + ' aria-label="' + esc(k.etiket(b)) + ': durum">' +
+        '<td><div class="durum-h"><select data-kayit="' + esc(b.id) + '" data-ilk="' + esc(b.durum) + '"' + (b.fikir_id ? ' data-fikir="' + esc(b.fikir_id) + '"' : '') + ' aria-label="' + esc(k.etiket(b)) + ': durum">' +
           T.DURUMLAR.map(function(d){ return '<option value="' + d + '"' + (d === b.durum ? ' selected' : '') + '>' + T.DURUM_ADI[d] + '</option>'; }).join('') +
-        '</select></td></tr>';
+        '</select><button type="button" class="btn sig sm" data-kaydet disabled>Kaydet</button></div></td></tr>';
     }).join('');
   }).catch(function(err){
     tb.innerHTML = '<tr><td colspan="' + n + '">' + esc(err.message || 'Yüklenemedi.') + '</td></tr>';
   });
 }
 
+// The admin's username: an easier thing to type than the address when signing in. The line under the field
+// always says what signs in right now, read back from the database after every save.
+function hesapBagla(o){
+  var f = ana.querySelector('#ka-form'), d = ana.querySelector('#ka-durum');
+  var yaz = function(ad){
+    f.ad.value = ad || '';
+    d.innerHTML = ad
+      ? 'Şu an <b>' + esc(ad) + '</b> kullanıcı adıyla ya da <b>' + esc(o.email) + '</b> adresiyle giriş yapabilirsin. Şifre aynı.'
+      : 'Henüz kullanıcı adın yok: yalnız <b>' + esc(o.email) + '</b> adresiyle giriş yapıyorsun.';
+  };
+  UDV.hesap.kullaniciAdi().then(yaz).catch(function(err){ d.textContent = err.message || 'Kullanıcı adı okunamadı.'; });
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var b = f.querySelector('[type=submit]'); b.disabled = true;
+    UDV.hesap.kullaniciAdiKoy(f.ad.value).then(function(){ return UDV.hesap.kullaniciAdi(); })
+      .then(function(ad){ yaz(ad); YON.toast(ad ? 'Kullanıcı adı kaydedildi.' : 'Kullanıcı adı kaldırıldı.', 'ok'); })
+      .catch(function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); })
+      .then(function(){ b.disabled = false; });
+  });
+}
+
+// what still needs a decision, as links to its table
+function bekleyenYaz(){
+  var kap = ana.querySelector('#bekleyen');
+  if (!kap) return;
+  var l = KAYITLAR.filter(function(k){ return k.bekleyen > 0; });
+  kap.innerHTML = '<b>Bekleyen işler</b>' + (l.length
+    ? l.map(function(k){ return '<a class="chip" href="#' + k.id + '">' + k.bekleyen + ' ' + k.ad + '</a>'; }).join('')
+    : '<span>Şu an bekleyen iş yok.</span>');
+}
+
 function $$chip(){
-  ana.querySelectorAll('.chip').forEach(function(c){
+  ana.querySelectorAll('.chipler .chip').forEach(function(c){
     c.setAttribute('aria-pressed', String(c.dataset.durum === filtre.durum));
   });
 }
@@ -280,7 +359,7 @@ function istatYenile(){
   return Promise.resolve().then(function(){ return UDV.ozet(); }).then(function(z){
     kap.innerHTML =
       '<div class="istat"><span>Vaka</span><b>' + sayi(z.vaka.toplam) + '</b><small>' + sayi(z.vaka.acik) + ' açık</small></div>' +
-      '<div class="istat"><span>Fikir</span><b>' + sayi(z.fikir) + '</b></div>' +
+      '<div class="istat"><span>Fikir</span><b>' + sayi(z.fikir) + '</b>' + (z.gizli ? '<small><a class="link" href="icerik/">' + sayi(z.gizli) + ' gizli</a></small>' : '') + '</div>' +
       '<div class="istat"><span>Alıcı</span><b>' + sayi(z.alici) + '</b></div>';
   }).catch(function(err){
     kap.innerHTML = '';

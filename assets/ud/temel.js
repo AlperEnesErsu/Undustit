@@ -173,6 +173,8 @@ window.UD_SB = sbClient;
   const gorulen = new Set(); let kalan = 5;
   const gonder = (mesaj, kaynak, satir) => {
     mesaj = String(mesaj || '').trim().slice(0, 500); kaynak = String(kaynak || '');
+    // a page transition the browser skipped (a fast second click, a hidden tab) rejects a promise; nothing is broken
+    if (/view transition|transition was skipped/i.test(mesaj)) return;
     if (!mesaj || mesaj === 'Script error.' || /^(chrome|moz|safari)-extension:/.test(kaynak) || gorulen.has(mesaj) || kalan <= 0) return;
     gorulen.add(mesaj); kalan--;
     fetch(A.supabaseUrl + '/rest/v1/hata_kayitlari', { method:'POST',

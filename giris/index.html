@@ -112,7 +112,7 @@ function formCiz(){
     <div class="g-sekme" role="tablist"><button type="button" role="tab" data-mod="giris" aria-selected="${!kayit}">${T('giris.sekme.giris')}</button><button type="button" role="tab" data-mod="kayit" aria-selected="${kayit}">${T('giris.sekme.kayit')}</button></div>
     <div class="g-google" hidden><button type="button" class="btn google" style="width:100%">${ICON.google}<span>${T('benim.js.google')}</span></button><div class="g-ya" style="margin-top:14px">${T('giris.ya')}</div></div>
     <form novalidate>
-      <label>${T('giris.eposta')}<input type="email" name="e" autocomplete="email" maxlength="160" required></label>
+      <label>${kayit ? T('giris.eposta') : T('giris.kimlik')}<input type="${kayit ? 'email' : 'text'}" name="e" autocomplete="${kayit ? 'email' : 'username'}" autocapitalize="none" spellcheck="false" maxlength="160" required></label>
       <label>${T('giris.sifre')}<input type="password" name="s" autocomplete="${kayit ? 'new-password' : 'current-password'}" minlength="${kayit ? 8 : 1}" required>${kayit ? `<small>${T('giris.sifre.not')}</small>` : ''}</label>
       <button type="submit" class="btn sig">${kayit ? T('giris.kayit.dugme') : T('giris.giris.dugme')}</button>
       <p class="durum" role="status" aria-live="polite">${yerel ? T('giris.yerel') : ''}</p>
@@ -129,11 +129,13 @@ function formCiz(){
   f.onsubmit = async e => {
     e.preventDefault();
     const v = f.e.value.trim(), s = f.s.value;
-    if (!gecerli(v)){ durumYaz(''); return UD.alanUyar(f.e, (v ? T('ud.haber.hata.eposta') : T('ud.eksik.eposta'))); }
+    // signing in also takes a username (admins may have one, yonetim/ > Giriş bilgileri)
+    const adMi = !kayit && /^[a-z0-9_.]{3,24}$/i.test(v);
+    if (!gecerli(v) && !adMi){ durumYaz(''); return UD.alanUyar(f.e, kayit ? (v ? T('ud.haber.hata.eposta') : T('ud.eksik.eposta')) : (v.includes('@') ? T('ud.haber.hata.eposta') : T('giris.hata.kimlik'))); }
     if (kayit && s.length < 8){ durumYaz(''); return UD.alanUyar(f.s, T('giris.hata.kisa')); }
     if (!s){ durumYaz(''); return UD.alanUyar(f.s, T('giris.hata.sifre')); }
     const b = f.querySelector('[type=submit]'); b.disabled = true; durumYaz(T('benim.js.gidiyor'));
-    try { localStorage.setItem('ud-eposta', v); } catch(e){}
+    if (!adMi) try { localStorage.setItem('ud-eposta', v); } catch(e){}
     try {
       if (kayit){
         if (yerel) throw new Error('yerel');
@@ -142,7 +144,7 @@ function formCiz(){
         return gonderildiCiz(v, tur);
       }
       // the local preview has no member accounts: the admin signs in with the preview password, a company by e-mail
-      if (yerel){ try { await UDV.giris(v, s); } catch(err){ await UDV.firma.giris(v); } }
+      if (yerel && !adMi){ try { await UDV.giris(v, s); } catch(err){ await UDV.firma.giris(v); } }
       else await UDV.giris(v, s);
       location.href = await yer();
     } catch(err){

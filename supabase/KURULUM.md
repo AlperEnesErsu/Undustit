@@ -199,6 +199,52 @@ kendi tarafında doğrular. Gerçek ziyaretçi çoğu zaman hiçbir şey görmez
 4. Deneme: gizli pencerede bir fikre "alırdım" deyin; kaydolmalı. Konsolda `captcha` hatası varsa 1'deki hostname
    listesine sitenin adresi eklenmemiştir.
 
+## 17. Moderasyon: ön filtre ve yorum gizleme
+
+SQL Editor'da `13-moderasyon.sql` dosyasını çalıştırın (yeniden çalıştırılabilir). Getirdikleri:
+
+- **Ön filtre:** `yasak_sozler` listesindeki bir sözü içeren fikir ya da yorum reddedilmez, gizli kaydedilir.
+  Yazarı "incelemede" notuyla görmeye devam eder, başka kimse görmez.
+- **Yorum gizleme:** `yorumlar.gizli` sütunu; yalnız yönetici değiştirir.
+- **Yönetim:** `/yonetim/icerik/` bütün fikirleri ve yorumları listeler, tek anahtarla gizler ya da yayına alır;
+  söz listesi aynı sayfadan düzenlenir. Dosya çalışmadan önce sayfa fikirleri listeler ve gizler, yorum gizleme
+  ve söz listesi çalışmaz.
+
+Dosya yeniden çalıştırılırsa başlangıç sözleri geri eklenir; sayfadan sildiğiniz bir başlangıç sözü geri gelir.
+
+## 18. Ürün talepleri ("Ürünü görmek istiyorum")
+
+SQL Editor'da `14-numune.sql` dosyasını çalıştırın (yeniden çalıştırılabilir). Vaka sayfasındaki form buraya yazar:
+görmek, denemek ya da satın almak isteyen kişi adını ve iletişim bilgisini bırakır. Sipariş değildir, ödeme alınmaz.
+Talepleri yalnız yönetici okur (`/yonetim/` > **Ürün talepleri**); kişi başına günde 5 talep sınırı vardır.
+
+## 19. Vaka başvurusu: yeni alanlar ve durum takibi
+
+SQL Editor'da `15-basvuru.sql` dosyasını çalıştırın (yeniden çalıştırılabilir). Başvuru formundaki ölçü, taban fiyat
+ve model (satış ortaklığı / fikir ödülü) yanıtları kendi sütunlarına yazılır; başvuru, açılan vakaya bağlanır.
+Başvurudaki e-postayla giriş yapan firma, vakası açılmadan önce `/firma/` sayfasında başvurusunun durumunu görür.
+Yönetimde başvuru satırındaki **Vaka oluştur**, vaka formunu başvurudan doldurur; vaka oluşunca firma e-postası
+panele eklenir ve başvuru "Kabul" olur. Dosya çalışmadan önce yeni yanıtlar başvurunun not alanına yazılır.
+
+## 20. Yönetici kullanıcı adı
+
+SQL Editor'da `16-kullanici-adi.sql` dosyasını çalıştırın (yeniden çalıştırılabilir). Yönetici, `/yonetim/` >
+**Giriş bilgileri**'nden bir kullanıcı adı seçer; sonra `/giris/` ve `/yonetim/` giriş kutularına e-posta yerine onu
+yazabilir, şifre aynıdır. Kullanıcı adı yalnız yönetici hesapları içindir: girişte adın hangi adrese ait olduğu sorulur
+ve bu soru yalnız yönetici hesapları için yanıtlanır, üyelerin adresi bu yolla öğrenilemez.
+
+## 21. Adil talep: kendine oy ve aynı tarayıcı
+
+SQL Editor'da `17-oy.sql` dosyasını çalıştırın (yeniden çalıştırılabilir).
+
+- Kimse kendi fikrine "alırdım" diyemez, puan veremez.
+- Bir tarayıcı bir fikre bir kez sayılır: site rastgele bir kimliği `ud_cihaz` çerezinde (ve yerel depoda) tutar,
+  "alırdım" ile birlikte gönderir. Çıkış yapıp yeni ziyaretçi olarak dönmek ikinci bir "alırdım" eklemez; fikrin
+  yazıldığı tarayıcı başka bir kimlikle o fikre "alırdım" diyemez.
+- Gizli pencere ya da ikinci bir tarayıcı yeni bir cihaz sayılır; bunu yalnız doğrulanmış hesap zorunluluğu kapatır.
+- Çerez kişiyi tanıtmaz (rastgele bir dizgi), iki yıl durur; KVKK ve çerez metninde "kötüye kullanımı önleme" amacıyla
+  anılmalıdır.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

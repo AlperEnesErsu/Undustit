@@ -77,7 +77,7 @@ test('paylaş: görsel kart hazırlanır, ağ bağlantıları fikrin adresini ta
   const panel = page.locator('dialog.paylas-dlg');
   await expect(panel).toBeVisible();
   const gorsel = panel.locator('.pl-kart img');
-  await expect(gorsel).toHaveAttribute('src', /^blob:/);
+  await expect(gorsel).toHaveAttribute('src', /^blob:/, { timeout:15000 });   // drawing waits for three fonts; slow when every worker is busy
   // the card is a real 4:5 picture, not an empty canvas
   expect(await gorsel.evaluate(i => i.decode().then(() => [i.naturalWidth, i.naturalHeight]))).toEqual([1080, 1350]);
   await expect(panel.locator('.pl-indir')).toBeVisible();
@@ -113,4 +113,20 @@ test('ana sayfada fikir aynı sayfada pencerede açılır, ?f= bağlantısı ça
   const adres = page.url();
   await page.goto(adres);
   await expect(page.locator('dialog.idlg')).toBeVisible();
+});
+
+test('kendi fikrine alırdım denmez; tarayıcı kimliği çerezde durur', async ({ page }) => {
+  await hazirla(page, tohum({ benimkiler:['Cıvatalı bisiklet askısı', 'Mutfak için mıknatıslı raf'] }));
+  await page.goto('/fikirler/');
+  const benim = page.locator('.icard', { hasText:'Mutfak için mıknatıslı raf' });
+  await expect(benim.locator('.vote')).toBeDisabled();
+  await expect(benim.locator('.buy-mine')).toHaveText('senin fikrin');
+  // the store refuses too, whatever the page shows
+  const sonuc = await page.evaluate(() => UD.Store.setBuy('local:m1', 300).then(() => 'oldu', e => e.message));
+  expect(sonuc).toContain('Kendi fikrine');
+  // somebody else's idea still takes an "alırdım"
+  const baska = page.locator('.icard', { hasText:'numara 0' });
+  await baska.locator('.vote').click();
+  await baska.locator('.buy-q .chip').first().click();
+  await expect(baska.locator('.buy-mine')).toBeVisible();
 });

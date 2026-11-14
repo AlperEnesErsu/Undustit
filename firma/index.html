@@ -23,6 +23,11 @@
 .f-giris form{display:grid;gap:12px}
 .f-giris .durum{min-height:1.4em;font-size:14px}
 .f-giris .durum.bad{color:var(--err)}
+.f-basvuru{list-style:none;margin:0;padding:0;border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--bg-2)}
+.f-basvuru li{display:grid;gap:2px;padding:12px 16px}
+.f-basvuru li + li{border-top:1px solid var(--line)}
+.f-basvuru span{color:var(--ink-2);font-size:14.5px}
+.f-basvuru small{color:var(--muted);font-size:12.5px}
 .f-iki{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px;align-items:start}
 .f-iki > .panel{margin:0}
 @media (min-width:900px){#istatlar{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -81,8 +86,18 @@ function girisCiz(){
   kapi(T('firma.giris.baslik'), T('firma.giris.metin'), '<a class="btn sig" href="../giris/?mod=giris">' + T('giris.giris.dugme') + ' ' + UD.ICON.arrow + '</a>');
 }
 function vakaYokCiz(eposta){
-  kapi(T('firma.yok.baslik'), T('firma.yok.metin', { eposta:'<b>' + esc(eposta) + '</b>' }),
-    '<button class="btn alt" type="button" data-cikis>' + T('benim.js.cikis') + '</button><a class="btn alt" href="../iletisim/">' + T('firma.iletisim') + '</a>');
+  var eylem = '<button class="btn alt" type="button" data-cikis>' + T('benim.js.cikis') + '</button><a class="btn alt" href="../iletisim/">' + T('firma.iletisim') + '</a>';
+  kapi(T('firma.yok.baslik'), T('firma.yok.metin', { eposta:'<b>' + esc(eposta) + '</b>' }), eylem);
+  // applied but no case yet: say where the application stands instead of "nothing here"
+  UDV.firma.basvurularim().then(function(l){
+    if (!l.length || son !== eposta) return;
+    kapi(T('firma.basvuru.baslik'), T('firma.basvuru.metin', { eposta:'<b>' + esc(eposta) + '</b>' }), eylem);
+    var ul = document.createElement('ul'); ul.className = 'f-basvuru';
+    ul.innerHTML = l.map(function(b){
+      return '<li><b>' + esc(b.stok) + '</b><span>' + T('firma.basvuru.d.' + b.durum) + '</span><small>' + esc(new Date(b.zaman).toLocaleDateString(UD.LOCALE, { day:'numeric', month:'long', year:'numeric' })) + '</small></li>';
+    }).join('');
+    ana.querySelector('.f-giris .f-eylem').before(ul);
+  }).catch(function(){});
 }
 
 // ----------------------------------------------------------- panel

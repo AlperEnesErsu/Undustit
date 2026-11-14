@@ -278,7 +278,7 @@ function girisYaz(ana, yonlendir){
     '<section class="panel" aria-labelledby="gi-b"><header class="panel-bas"><h2 id="gi-b">Yönetici girişi</h2></header>' +
     '<div class="panel-ic">' +
       '<form class="y-giris" novalidate>' +
-        '<label class="alan"><span>E-posta</span><input type="email" name="email" autocomplete="username"></label>' +
+        '<label class="alan"><span>E-posta ya da kullanıcı adı</span><input type="text" name="email" autocomplete="username" autocapitalize="none" spellcheck="false"></label>' +
         '<label class="alan"><span>Şifre</span><input type="password" name="sifre" autocomplete="current-password"></label>' +
         '<div class="y-eylem"><button class="btn sig" type="submit">Giriş yap</button></div>' +
       '</form>' +
@@ -289,7 +289,7 @@ function girisYaz(ana, yonlendir){
     e.preventDefault();
     const email = f.querySelector('[name="email"]').value.trim();
     const sifre = f.querySelector('[name="sifre"]').value;
-    if (!email || !sifre){ toast('E-posta ve şifre girin.', 'hata'); return; }
+    if (!email || !sifre){ toast('E-posta ya da kullanıcı adınızı ve şifrenizi girin.', 'hata'); return; }
     const btn = f.querySelector('button[type="submit"]');
     btn.disabled = true;
     Promise.resolve()

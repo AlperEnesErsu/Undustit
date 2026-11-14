@@ -210,7 +210,7 @@ function kayitAdimi(host){
         olcu('Hesap bağla'); mailSet(v);
         // the link can wait; the idea is written now
         ef.remove(); $('.kayit-gec', kart).remove(); say(T('fikir.kayit.gonderildi', { eposta:v }), 'ok');
-      }).catch(err => { $('button', ef).disabled = false; say(err && err.status === 429 ? T('benim.js.hata.sik') : T('benim.js.hata.genel'), 'bad'); });
+      }).catch(err => { $('button', ef).disabled = false; say(err && err.status === 429 ? T('benim.js.hata.sik') : err && (err.code === 'email_exists' || err.code === 'user_already_exists') ? T('giris.hata.var') : T('benim.js.hata.genel'), 'bad'); });
     };
   }).catch(() => {});
 }
@@ -219,7 +219,7 @@ function mountForm(host, opts={}){
   host.innerHTML = `
   <form class="iform" novalidate aria-label="${T('ud.form.aria')}">
     <div class="if-top">
-      <label for="${id}-p"><span class="eyebrow k">${opts.label || T('ud.form.etiket')}</span><span class="if-count" aria-live="polite">0 / 140</span></label>
+      <label for="${id}-p"><span class="eyebrow k">${opts.label || T('ud.form.etiket')}</span><span class="if-count" aria-live="polite">${T('ud.form.sayac', { n:0 })}</span></label>
       <textarea id="${id}-p" class="if-pitch" rows="1" maxlength="160" placeholder="${opts.placeholder || T('ud.form.ipucu')}" required></textarea>
       <button type="button" class="btn sig if-next" aria-controls="${id}-more" aria-expanded="false">${T('ud.form.devam')} ${ICON.arrow}</button>
     </div>
@@ -268,10 +268,13 @@ function mountForm(host, opts={}){
   const paintFee = () => { $('.if-fee', f).innerHTML = feeLine(); };
   Store.sub(paintFee);
   const open = () => { f.classList.add('open'); next.setAttribute('aria-expanded','true'); };
+  let detayAcildi = false;
   const len = () => {
     const n = pitch.value.trim().length;
-    count.textContent = n + ' / 140';
+    count.textContent = T('ud.form.sayac', { n });
     count.classList.toggle('near', n > 120 && n <= 140); count.classList.toggle('over', n > 140);
+    // the sentence is running out of room: the longer fields (400 characters each) open by themselves, once
+    if (n > 120 && !detayAcildi){ detayAcildi = true; $('.if-detay', f).open = true; }
   };
   pitch.addEventListener('input', () => { len(); if (pitch.value.trim().length >= 3 && opts.autoOpen !== false) open(); });
   // only the sentence plus a case or a category is needed: on a case page Enter sends right away
@@ -300,6 +303,10 @@ function mountForm(host, opts={}){
         <dl><div><dt>${T('ud.gonderildi.bitis')}</dt><dd>${fmtDate(end)}</dd></div><div><dt>${T('ud.gonderildi.olcut')}</dt><dd>${CRIT.map(c => c[1]).join(' · ')}</dd></div></dl>
         <p class="lead" style="font-size:15px">${T('ud.gonderildi.not')}</p>
         <div class="acts"><button type="button" class="btn sig share">${T('ud.paylas.bul')} ${ICON.arrow}</button><a class="btn alt" href="${ROOT}fikirler/?f=${encodeURIComponent(k)}">${T('ud.gonderildi.gor')}</a><button type="button" class="btn alt again">${T('ud.gonderildi.yeni')}</button></div>`;
+      // held for review (the database's word filter): say so plainly instead of letting it look published
+      // (the database keeps a held idea out of the list, so right after writing it is simply not there)
+      const yazilan = Store.ideas().find(x => x.key === k);
+      if (!yazilan || yazilan.hidden){ $('.lead', done).textContent = T('ud.gonderildi.inceleme'); $$('.acts .share, .acts a', done).forEach(x => x.remove()); }
       f.classList.add('done'); done.focus();
       const sh = $('.share', done); sh.onclick = () => { olcu('Paylaş', { yer:'gönderim' }); shareIdea({ title, key:k, label:catName(isCase ? isCase.short : cat), buyers:0, avg:0, benim:true }, 'gönderim'); };
       done.append(haberForm(k, 'fikrim'));
@@ -356,6 +363,50 @@ function mountCase(host, opts={}){
     if (opts.form) a.addEventListener('click', e => { e.preventDefault(); opts.form.useCase(c.id); });
     Store.sub(() => { $('.cb-n', host).textContent = String(Store.ideas().filter(i => inCase(i, c)).length); });
   });
+}
+
+// =========================================================== "Ürünü görmek istiyorum"
+// On a case page: someone who wants to see, try or buy the stock itself leaves a request (not an order, no
+// payment). It reaches only the admin panel (supabase/14-numune.sql); the team answers by e-mail or phone.
+function mountNumune(host, vakaId){
+  if (!host || !vakaId) return;
+  const kart = el('section', { class:'numune', 'aria-label':T('numune.baslik') });
+  host.replaceChildren(kart);
+  const secim = (ad, ks) => `<fieldset><legend>${T('numune.' + ad)}</legend><div class="chips">${ks.map((k, ix) =>
+    `<label class="chip bildir-n"><input type="radio" name="${ad}" value="${k}"${ix ? '' : ' checked'}> ${T('numune.' + ad + '.' + k)}</label>`).join('')}</div></fieldset>`;
+  const alan = (ad, etiket, tur, zorunlu, max, ipucu, oto) => `<label class="if-field"><span>${etiket}${zorunlu ? '' : ` <small>${T('ud.form.istege')}</small>`}</span>` +
+    `<input name="${ad}" type="${tur}" maxlength="${max}"${zorunlu ? ' required' : ''}${ipucu ? ` placeholder="${ipucu}"` : ''}${oto ? ` autocomplete="${oto}"` : ''}></label>`;
+  const ac = () => {
+    olcu('Numune formu', { vaka:vakaId });
+    const f = el('form', { class:'numune-f', novalidate:true, 'aria-label':T('numune.baslik'), html:
+      secim('amac', ['gormek', 'denemek', 'satin']) + secim('tur', ['bireysel', 'firma']) +
+      `<div class="iki">${alan('ad', T('numune.ad'), 'text', true, 80, '', 'name')}${alan('eposta', T('numune.eposta'), 'email', true, 160, '', 'email')}</div>` +
+      `<div class="iki">${alan('telefon', T('numune.telefon'), 'tel', false, 40, '', 'tel')}${alan('sehir', T('numune.sehir'), 'text', false, 60, '', 'address-level1')}</div>` +
+      `<div class="iki">${alan('adet', T('numune.adet'), 'text', false, 60, T('numune.adet.ipucu'))}${alan('notlar', T('numune.not'), 'text', false, 500, T('numune.not.ipucu'))}</div>` +
+      `<label class="onay"><input type="checkbox" name="onay" required><span>${T('numune.onay')}${kvkkLink()}</span></label>` +
+      `<div><button type="submit" class="btn sig">${T('numune.gonder')} ${ICON.arrow}</button></div><p class="durum" role="status" aria-live="polite"></p>` });
+    kart.replaceChildren(f);
+    f.eposta.value = mailGet();
+    f.ad.focus();
+    const say = (t, bad) => { const d = $('.durum', f); d.textContent = t; d.classList.toggle('bad', !!bad); };
+    f.onsubmit = e => {
+      e.preventDefault();
+      const v = n => f[n].value.trim();
+      say('');
+      if (v('ad').length < 2) return alanUyar(f.ad, T('numune.hata.ad'));
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('eposta'))) return alanUyar(f.eposta, T('vakalar.js.b.hata.eposta'));
+      if (!f.onay.checked) return alanUyar(f.onay, T('vakalar.js.b.hata.onay'));
+      const gonder = $('[type=submit]', f); gonder.disabled = true; say(T('numune.gidiyor'));
+      const amac = f.amac.value, eposta = v('eposta');
+      Store.kaydet('numune_talepleri', { vaka_id:vakaId, amac, tur:f.tur.value, ad:v('ad'), eposta, telefon:v('telefon'), sehir:v('sehir'), adet:v('adet'), notlar:v('notlar') }).then(() => {
+        olcu('Numune talebi', { vaka:vakaId, amac }); mailSet(eposta);
+        kart.innerHTML = `<div class="numune-tamam" tabindex="-1"><b>${T('numune.tamam')}</b><p>${T('numune.tamam.not', { eposta:esc(eposta) })}</p></div>`;
+        kart.firstChild.focus();
+      }).catch(err => { gonder.disabled = false; say(err && err.code === 'P0001' ? T('numune.hata.sinir') : T('vakalar.js.b.hata.genel'), true); });
+    };
+  };
+  kart.innerHTML = `<div><b>${T('numune.baslik')}</b><p>${T('numune.metin')}</p></div>`;
+  kart.append(el('button', { type:'button', class:'btn alt', html:T('numune.ac') + ' ' + ICON.arrow, onclick:ac }));
 }
 
 // =========================================================== live numbers
@@ -417,11 +468,14 @@ function buyCtl(i){
     // the accessible name starts with the visible text ("3 alırdım") and adds the context after it
     const more = i.ex ? ' ' + T('ud.al.ornek') : i.mine ? ': ' + T('ud.al.benim', { baslik:esc(i.title), fiyat:tl(i.myPrice) }) : `: ${esc(i.title)}`;
     // an example looks like the real control; a tap says what it is instead of doing nothing
-    const btn = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: !i.ex && (!voting || !Store.canWrite),
+    // your own idea: the count is shown, the button is not yours to press (unless an old "alırdım" is there to take back)
+    const kendi = !i.ex && i.owner === Store.uid && !i.mine;
+    const btn = el('button', { type:'button', class:'vote', 'aria-pressed': String(!!i.mine), disabled: !i.ex && (!voting || !Store.canWrite || kendi),
       html:`<b>${i.ex ? '–' : i.buyers}</b> <span>${T('ud.al.alirdim')}</span><span class="sr">${more}</span>` });
     btn.onclick = i.ex ? () => { if (!$('.buy-ex', box)) box.append(el('small', { class:'buy-ex', role:'status', text:T('ud.al.ornek.not') })); } : edit;
     box.append(btn);
     if (i.mine) box.append(el('small', { class:'buy-mine', text:T('ud.al.sen', { fiyat:tl(i.myPrice) }) }));
+    if (kendi) box.append(el('small', { class:'buy-mine', text:T('ud.al.kendi') }));
     if (justBought === i.key){ box.classList.add('just'); justBought = null; }
   };
   function edit(){
@@ -456,6 +510,7 @@ function card(i, ix, opts={}){
   const meta = el('div', { class:'m' }, [
     vakaOf(i) ? el('span', { class:'vk', text:catName(vakaOf(i).short) }) : null,
     katOf(i) ? el('span', { class:'c', text:catName(katOf(i)) }) : null,
+    i.hidden ? el('span', { class:'ex', text:T('ud.kart.inceleme') }) : null,
     i.ex ? el('span', { class:'ex', text:T('ud.kart.ornek') }) : el('span', { text: voting ? T('ud.kart.kaldi', { n:i.left }) : T('ud.kart.bitti') }),
     !i.ex && i.buyers ? el('span', { class:'p', text:T('ud.kart.ort', { fiyat:tl(i.avg) }) }) : null,
     !i.ex && i.noteCount ? el('span', { text: T('ud.kart.yorum', { n:i.noteCount }) }) : null,
@@ -557,10 +612,10 @@ function openIdea(key, push=true){
       ${it.mine && it.owner !== Store.uid ? '<div class="haber-yer"></div>' : ''}
       ${it.owner === Store.uid && Store.canWrite ? `<div class="own" aria-live="polite"><span>${T('ud.pencere.senin')}</span><button type="button" class="link own-x">${T('ud.pencere.gerial')}</button></div>` : ''}
       <section class="crit" aria-label="${T('ud.pencere.olcut')}"><span class="eyebrow">${T('ud.pencere.puan', { n:it.raters })}</span>
-        ${CRIT.map(([c,l]) => `<div class="crit-row"><span>${l}</span><div class="stars" role="group" aria-label="${T('ud.pencere.puani', { olcut:l })}">${[1,2,3,4,5].map(n => `<button type="button" data-c="${c}" data-n="${n}" aria-pressed="${mine[c] === n}" ${Store.canWrite ? '' : 'disabled'}>${n}</button>`).join('')}</div><output>${it.crit[c] ? it.crit[c].toFixed(1) : '–'}</output></div>`).join('')}
+        ${CRIT.map(([c,l]) => `<div class="crit-row"><span>${l}</span><div class="stars" role="group" aria-label="${T('ud.pencere.puani', { olcut:l })}">${[1,2,3,4,5].map(n => `<button type="button" data-c="${c}" data-n="${n}" aria-pressed="${mine[c] === n}" ${Store.canWrite && it.owner !== Store.uid ? '' : 'disabled'}>${n}</button>`).join('')}</div><output>${it.crit[c] ? it.crit[c].toFixed(1) : '–'}</output></div>`).join('')}
       </section>
       <section style="display:grid;gap:14px" aria-labelledby="nt-h"><h3 id="nt-h" style="font-size:17px">${T('ud.pencere.yorumlar')}</h3>
-        <div class="notes">${!it.notesLoaded ? `<p class="ex-note">${T('ud.not.yukleniyor')}</p>` : it.notes.length ? it.notes.map(n => `<div class="note ${n.kind}"><small>${T('ud.not.' + n.kind)} · ${esc(n.handle || T('ud.not.isimsiz'))}</small><p>${esc(n.text)}</p></div>`).join('') : `<p class="ex-note">${T('ud.not.ilk')}</p>`}</div>
+        <div class="notes">${!it.notesLoaded ? `<p class="ex-note">${T('ud.not.yukleniyor')}</p>` : it.notes.length ? it.notes.map(n => `<div class="note ${n.kind}"><small>${T('ud.not.' + n.kind)} · ${esc(n.handle || T('ud.not.isimsiz'))}${n.hidden ? ' · ' + T('ud.kart.inceleme') : ''}</small><p>${esc(n.text)}</p></div>`).join('') : `<p class="ex-note">${T('ud.not.ilk')}</p>`}</div>
         <form class="note-form"><textarea name="t" maxlength="500" placeholder="${T('ud.not.ipucu')}" aria-label="${T('ud.not.yorum')}"></textarea>
           <div class="row"><div class="chips" role="group" aria-label="${T('ud.not.tur')}">${[['yorum',T('ud.not.yorum')],['oneri',T('ud.not.oneri')],['endise',T('ud.not.endise')]].map(([k,l],x) => `<button type="button" class="chip" data-k="${k}" aria-pressed="${x===0}">${l}</button>`).join('')}</div>
           <button type="submit" class="btn sm" ${Store.canWrite ? '' : 'disabled'}>${T('ud.not.ekle')}</button></div></form>
@@ -597,7 +652,7 @@ function openShared(){
   let tries = 0; const t = setInterval(() => { if (openIdea(f, false) || ++tries > 40) clearInterval(t); }, 250);
 }
 
-Object.assign(window.UD_IC, { YASAL, kvkkLink, langSwitch, mountChrome, kalanMetin, saatMetin, mountThu, ideaUrl, shareCard, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, KAYIT_GEC, kayitAdimi, mountForm, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
+Object.assign(window.UD_IC, { YASAL, kvkkLink, langSwitch, mountChrome, kalanMetin, saatMetin, mountThu, ideaUrl, shareCard, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, KAYIT_GEC, kayitAdimi, mountForm, mountNumune, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
 
 // =========================================================== boot
 applyText();

@@ -23,6 +23,9 @@
   const VARSAYILAN = { ozet:'', aciklama:'', firma:'', stok:'', adet:0, olcu:'', sinif:'', taban_fiyat:0, deneme_adedi:0, sure_gun:30, gorsel:'', ortaklik:true, odul:0 };
   const YANLIS = 'E-posta ya da şifre yanlış';   // giriş hatasını ayırt etmeden söyler
   const YETKI = 'Bu işlem için yönetici girişi gerekli';
+  const GEREK13 = 'Önce supabase/13-moderasyon.sql çalıştırılmalı.';
+  const GEREK16 = 'Önce supabase/16-kullanici-adi.sql çalıştırılmalı.';
+  const AD_KURALI = /^[a-z0-9_.]{3,24}$/;
 
   const str = v => v == null ? '' : String(v).trim();
   const simdi = () => new Date().toISOString();
@@ -92,6 +95,34 @@
     gecmis: async id => (oku().gecmis[id] || []).slice().sort((a,b) => Date.parse(a.zaman) - Date.parse(b.zaman)),
     fikirler: async vakaId => yerelFikirler(vakaId),
     gizle: async (id, gizli) => { const d = oku(); if (gizli) d.gizli[id] = true; else delete d.gizli[id]; yaz(d); },
+    // moderasyon (yonetim/icerik/): vakalı vakasız bütün fikirler ve bütün yorumlar, gizliler dahil
+    tumFikirler: async () => {
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
+      const gizli = oku().gizli, out = [];
+      Object.entries(s.ideas || {}).forEach(([sahip, doc]) => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(it => {
+        if (!it || !it.k) return;
+        const id = sahip + ':' + it.k;
+        out.push({ id, anahtar:id, baslik:str(it.title), problem:str(it.problem), cozum:str(it.solution), ad:str(it.handle),
+          vakaId: it.caseId || null, kategori:str(it.cat), gizli:!!gizli[id], zaman:it.at || null });
+      }));
+      return out;
+    },
+    tumYorumlar: async () => {
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
+      const gizli = oku().gizliYorum || {}, baslik = {}, out = [];
+      Object.entries(s.ideas || {}).forEach(([sahip, doc]) => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(it => { if (it && it.k) baslik[sahip + ':' + it.k] = str(it.title); }));
+      Object.entries(s.notes || {}).forEach(([uye, doc]) => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(n => {
+        if (!n || !n.k || typeof n.idea !== 'string') return;
+        const id = uye + ':' + n.k;
+        out.push({ id, anahtar:n.idea, fikirBaslik:baslik[n.idea] || '', metin:str(n.text), ad:str(n.handle), tur:n.kind || 'yorum', gizli:!!gizli[id], zaman:n.at || null });
+      }));
+      return out;
+    },
+    yorumGizle: async (id, gizli) => { const d = oku(); d.gizliYorum = d.gizliYorum || {}; if (gizli) d.gizliYorum[id] = true; else delete d.gizliYorum[id]; yaz(d); },
+    // yasak söz listesi veritabanında yaşar (supabase/13-moderasyon.sql); yerel önizlemede ön filtre yok
+    sozler: async () => null, sozEkle: async () => { throw new Error('Yerel önizlemede söz listesi yok'); }, sozSil: async () => {},
     // rapor için ham satırlar: bütün fikirler (gizliler dahil) ve bütün "alırdım"lar. Yerelde talebin tarihi yok.
     raporHam: async () => {
       let s = {};
@@ -108,6 +139,16 @@
       }));
       Object.values(s.notes || {}).forEach(doc => { yorum += doc && Array.isArray(doc.items) ? doc.items.length : 0; });
       return { fikirler, talepler, yorum };
+    },
+    // yöneticinin kullanıcı adı: udv-v1.kullaniciAdi = { ad: e-posta }
+    girisEposta: async ad => (oku().kullaniciAdi || {})[ad] || null,
+    kullaniciAdi: async () => { const m = oku().kullaniciAdi || {}, e = mevcut().email; return Object.keys(m).find(a => m[a] === e) || null; },
+    kullaniciAdiKoy: async ad => {
+      const d = oku(), e = mevcut().email; d.kullaniciAdi = d.kullaniciAdi || {};
+      if (ad && d.kullaniciAdi[ad] && d.kullaniciAdi[ad] !== e) throw new Error('Bu kullanıcı adı alınmış');
+      Object.keys(d.kullaniciAdi).forEach(a => { if (d.kullaniciAdi[a] === e) delete d.kullaniciAdi[a]; });
+      if (ad) d.kullaniciAdi[ad] = e;
+      yaz(d); return ad || null;
     },
     // etkinlikler: udv-v1.etkinlikler = { id: satır }
     etkinlikler: async () => Object.values(oku().etkinlikler || {}),
@@ -128,7 +169,15 @@
       return out;
     },
     // "Vakanı aç" başvuruları: sitenin formu yerelde buraya yazar (assets/ud/depo.js Store.basvur)
-    kayitlar: async tablo => Object.values(kayitOku(tablo)).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman))),
+    // bildirimler fikrin başlığı ve sitede görünüp görünmediğiyle gelir (supabase modundaki fikirler(…) ile aynı biçim)
+    kayitlar: async tablo => {
+      const l = Object.values(kayitOku(tablo)).sort((a,b) => String(b.zaman).localeCompare(String(a.zaman)));
+      if (tablo !== 'fikir_bildirimleri') return l;
+      const f = {}; (await yerel.tumFikirler()).forEach(x => { f[x.id] = x; });
+      return l.map(b => Object.assign({}, b, { fikirler: f[b.fikir_id] ? { baslik:f[b.fikir_id].baslik, gizli:f[b.fikir_id].gizli } : null }));
+    },
+    basvuruBagla: async (id, vakaId) => { const d = kayitOku('vaka_basvurulari'); if (!d[id]) throw new Error('Kayıt bulunamadı'); d[id].durum = 'kabul'; d[id].vaka_id = vakaId; try { localStorage.setItem('udv-vaka_basvurulari', JSON.stringify(d)); } catch(e){} },
+    basvurularim: async eposta => Object.values(kayitOku('vaka_basvurulari')).filter(b => kucuk(str(b.eposta)) === eposta).sort((a, b) => String(b.zaman).localeCompare(String(a.zaman))),
     kayitDurum: async (tablo, id, durum) => { const d = kayitOku(tablo); if (!d[id]) throw new Error('Kayıt bulunamadı'); d[id].durum = durum; try { localStorage.setItem('udv-' + tablo, JSON.stringify(d)); } catch(e){} }
   };
 
@@ -184,6 +233,25 @@
       const r = await sorgu(istemci().from('fikirler').update({ gizli }).eq('id', id).select('id'));
       if (!r || !r.length) throw new Error('Fikir bulunamadı ya da yetkiniz yok');
     },
+    tumFikirler: async () => (await sorgu(istemci().from('fikirler').select('id,sahip,vaka_id,kategori,baslik,problem,cozum,ad,gizli,zaman').order('zaman', { ascending:false }).limit(500)))
+      .map(r => ({ id:r.id, anahtar:r.sahip + ':' + r.id, baslik:r.baslik, problem:r.problem || '', cozum:r.cozum || '', ad:r.ad || '', vakaId:r.vaka_id, kategori:r.kategori || '', gizli:!!r.gizli, zaman:r.zaman })),
+    tumYorumlar: async () => (await sorgu(istemci().from('yorumlar').select('*, fikirler(baslik,sahip)').order('zaman', { ascending:false }).limit(500)))
+      .map(r => ({ id:r.id, anahtar: r.fikirler ? r.fikirler.sahip + ':' + r.fikir_id : '', fikirBaslik:(r.fikirler && r.fikirler.baslik) || '', metin:r.metin, ad:r.ad || '', tur:r.tur, gizli:!!r.gizli, zaman:r.zaman })),
+    // gizli sütunu ve söz listesi 13-moderasyon.sql ile gelir; çalışmadıysa bunu açıkça söyler
+    yorumGizle: async (id, gizli) => {
+      const { data, error } = await istemci().from('yorumlar').update({ gizli }).eq('id', id).select('id');
+      if (error && (error.code === 'PGRST204' || error.code === '42703')) throw new Error(GEREK13);
+      if (error) throw hata(error);
+      if (!data || !data.length) throw new Error('Yorum değiştirilemedi. ' + GEREK13);
+    },
+    sozler: async () => {
+      const { data, error } = await istemci().from('yasak_sozler').select('soz,tam').order('soz');
+      if (error && (error.code === 'PGRST205' || error.code === '42P01')) return null;
+      if (error) throw hata(error);
+      return data;
+    },
+    sozEkle: async (soz, tam) => { await sorgu(istemci().from('yasak_sozler').upsert({ soz, tam }, { onConflict:'soz' })); },
+    sozSil: async soz => { await sorgu(istemci().from('yasak_sozler').delete().eq('soz', soz)); },
     raporHam: async () => {
       const [f, t, y] = await Promise.all([
         sorgu(istemci().from('fikirler').select('id,vaka_id,kategori,baslik,sahip,gizli,zaman').limit(20000)),
@@ -195,6 +263,20 @@
         talepler: t.map(r => ({ fikirId:r.fikir_id, uye:r.uye, fiyat:Number(r.fiyat), zaman:r.zaman })),
         yorum: y.count || 0
       };
+    },
+    // kullanıcı adı (16-kullanici-adi.sql): girişte adın e-postası sorulur (yalnız yönetici hesapları yanıt verir)
+    girisEposta: async ad => { const r = await istemci().rpc('giris_eposta', { ad }); return r.error ? null : (r.data || null); },
+    kullaniciAdi: async () => {
+      const r = await istemci().from('profiller').select('kullanici_adi').eq('id', mevcut().id).maybeSingle();
+      if (r.error) throw new Error(GEREK16);
+      return (r.data && r.data.kullanici_adi) || null;
+    },
+    kullaniciAdiKoy: async ad => {
+      const r = await istemci().rpc('kullanici_adi_koy', { ad: ad || '' });
+      if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK16);
+      if (r.error && r.error.code === '23505') throw new Error('Bu kullanıcı adı alınmış');
+      if (r.error) throw hata(r.error);
+      return r.data || null;
     },
     etkinlikler: async () => {
       const { data, error } = await istemci().from('etkinlikler').select('*').order('baslangic', { ascending:false }).limit(200);
@@ -222,11 +304,22 @@
     },
     kayitlar: async tablo => {
       // bildirimler fikrin başlığıyla gelir (fikir_id yabancı anahtarı üzerinden)
-      const secim = tablo === 'fikir_bildirimleri' ? '*, fikirler(baslik)' : '*';
+      const secim = tablo === 'fikir_bildirimleri' ? '*, fikirler(baslik,gizli,sahip)' : '*';
       const { data, error } = await istemci().from(tablo).select(secim).order('zaman', { ascending:false }).limit(200);
       if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // tablonun migration'ı henüz çalışmadı
       if (error) throw hata(error);
       return data;
+    },
+    // vaka_id sütunu 15-basvuru.sql ile gelir; yoksa yalnız durum yazılır
+    basvuruBagla: async (id, vakaId) => {
+      const r = await istemci().from('vaka_basvurulari').update({ durum:'kabul', vaka_id:vakaId }).eq('id', id);
+      if (r.error && r.error.code === 'PGRST204') return void await sorgu(istemci().from('vaka_basvurulari').update({ durum:'kabul' }).eq('id', id));
+      if (r.error) throw hata(r.error);
+    },
+    // firmanın kendi başvuruları: e-postası eşleşen satırları okuyabilir (15-basvuru.sql); öncesinde boş döner
+    basvurularim: async eposta => {
+      const { data, error } = await istemci().from('vaka_basvurulari').select('id,stok,durum,zaman,eposta').ilike('eposta', eposta.replace(/[%_\\]/g, '\\$&')).order('zaman', { ascending:false }).limit(20);
+      return error ? [] : data.filter(b => kucuk(b.eposta) === eposta);
     },
     kayitDurum: async (tablo, id, durum) => { await sorgu(istemci().from(tablo).update({ durum }).eq('id', id)); }
   };
@@ -335,7 +428,13 @@
       hazirSoz.then(() => { if (aboneler.has(fn)) fn(UDV.oturum()); });
       return () => { aboneler.delete(fn); };
     },
+    // email: an address, or an admin's username (no "@" in it), which is first turned into its address
     async giris(email, sifre){
+      if (!str(email).includes('@')){
+        const ad = kucuk(str(email));
+        email = AD_KURALI.test(ad) ? await depo.girisEposta(ad) : null;
+        if (!email) throw new Error(YANLIS);
+      }
       if (SB_URL){
         const { data, error } = await istemci().auth.signInWithPassword({ email: str(email), password: String(sifre || ''), options: { captchaToken: await tsJeton() } });
         // an unconfirmed address is the one failure worth naming: the person can ask for the link again
@@ -446,8 +545,30 @@
       }
     },
 
+    // Moderasyon: sitedeki bütün fikirler ve yorumlar (en yeni önce, gizliler dahil) ve ön filtrenin söz listesi.
+    // Fikir gizlemek için UDV.fikirler.gizle; sozler() söz listesi yoksa (yerel mod, migration çalışmadı) null döner.
+    icerik: {
+      async fikirler(){ yetkiTest(); return (await depo.tumFikirler()).sort((a, b) => String(b.zaman).localeCompare(String(a.zaman))); },
+      async yorumlar(){ yetkiTest(); return (await depo.tumYorumlar()).sort((a, b) => String(b.zaman).localeCompare(String(a.zaman))); },
+      async yorumGizle(id, gizli){ yetkiTest(); await depo.yorumGizle(str(id), !!gizli); },
+      async sozler(){ yetkiTest(); return depo.sozler(); },
+      async sozEkle(soz, tam){
+        yetkiTest();
+        const s = kucuk(str(soz));
+        if (s.length < 2 || s.length > 40 || /\s/.test(s)) throw new Error('Tek bir kelime yazın (2–40 harf)');
+        await depo.sozEkle(s, !!tam);
+      },
+      async sozSil(soz){ yetkiTest(); await depo.sozSil(str(soz)); }
+    },
+
     async ozet(){
       const liste = await UDV.vakalar.liste();
+      // yönetici sitenin tamamını görür: vakasız fikirler de sayılır, gizlenenler ayrıca verilir
+      if (benAdmin()){
+        const ham = await depo.raporHam(), gorunur = new Set(ham.fikirler.filter(f => !f.gizli).map(f => f.id));
+        return { vaka:{ toplam:liste.length, acik:liste.filter(v => v.durum === 'acik').length }, fikir:gorunur.size,
+          alici: ham.talepler.filter(t => gorunur.has(t.fikirId)).length, gizli: ham.fikirler.length - gorunur.size };
+      }
       let fikir = 0, alici = 0;
       for (const v of liste){
         const fs = await UDV.fikirler.vaka(v.id);
@@ -505,6 +626,17 @@
       return '\ufeff' + satirlar.map(x => x.map(hucre).join(';')).join('\r\n');
     },
 
+    // Yöneticinin giriş bilgileri: e-postanın yanında bir kullanıcı adı (yoksa null). Boş metin adı kaldırır.
+    hesap: {
+      async kullaniciAdi(){ yetkiTest(); return depo.kullaniciAdi(); },
+      async kullaniciAdiKoy(ad){
+        yetkiTest();
+        const v = kucuk(str(ad));
+        if (v && !AD_KURALI.test(v)) throw new Error('Kullanıcı adı 3–24 karakter olmalı: küçük harf (a–z), rakam, nokta, alt çizgi');
+        return depo.kullaniciAdiKoy(v);
+      }
+    },
+
     // Etkinlikler (yayın, atölye, buluşma): yönetici ekler ve siler; site sıradakini sayfaların üstünde gösterir.
     etkinlik: {
       async liste(){ yetkiTest(); return (await depo.etkinlikler()).sort((a, b) => String(b.baslangic).localeCompare(String(a.baslangic))); },
@@ -533,6 +665,8 @@
       },
       async sil(vakaId, eposta){ yetkiTest(); await depo.firmaSil(str(vakaId), kucuk(str(eposta))); },
       async vakalarim(){ const e = UDV.firma.eposta(); return e ? depo.firmaVakalari(e) : []; },
+      // vakası henüz açılmamış firmanın başvuruları: [{ id, stok, durum, zaman }]
+      async basvurularim(){ const e = UDV.firma.eposta(); return e ? depo.basvurularim(e) : []; },
       // yerel önizlemede e-posta gönderilmez: kayıtlı bir firma e-postasıyla doğrudan girilir
       async giris(eposta){
         const e = kucuk(str(eposta));
@@ -577,9 +711,11 @@
     },
 
     // Sitenin yalnız yöneticiye giden kayıtları: aynı liste ve durum arayüzü, farklı tablo ve durumlar
+    // vaka sayfasındaki "Ürünü görmek istiyorum" talepleri (supabase/14-numune.sql)
+    numuneler: kayitTuru('numune_talepleri', { yeni:'Yeni', arandi:'İletişime geçildi', gonderildi:'Gönderildi', kapandi:'Kapandı' }),
     basvurular: kayitTuru('vaka_basvurulari', { yeni:'Yeni', incelendi:'İncelendi', kabul:'Kabul', red:'Ret' }),
     mesajlar: kayitTuru('iletisim_mesajlari', { yeni:'Yeni', yanitlandi:'Yanıtlandı', kapandi:'Kapandı' }),
-    bildirimler: kayitTuru('fikir_bildirimleri', { acik:'Açık', gizlendi:'Fikir gizlendi', yok_sayildi:'Yok sayıldı' }),
+    bildirimler: kayitTuru('fikir_bildirimleri', { acik:'Karar bekliyor', gizlendi:'Fikri gizle', yok_sayildi:'Yok say, fikir yayında kalsın' }),
     hatalar: kayitTuru('hata_kayitlari', { yeni:'Yeni', cozuldu:'Çözüldü' }),
 
     async csv(vakaId){
@@ -608,6 +744,9 @@
     oku();
     hazirCoz();
   }
+
+  // Başvurudan açılan vaka: başvuru "Kabul" olur ve vakasına bağlanır (yonetim/vaka/?basvuru=…)
+  UDV.basvurular.bagla = async (id, vakaId) => { yetkiTest(); await depo.basvuruBagla(str(id), str(vakaId)); };
 
   window.UDV = UDV;
 })();

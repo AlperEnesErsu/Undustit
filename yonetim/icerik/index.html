@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="tr" data-root="../../" data-page="yonetim">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FCF9F3">
+<title>İçerik · Yönetim · Undustit</title>
+<link rel="stylesheet" href="../../assets/fonts/base.css">
+<link rel="stylesheet" href="../../assets/ud.css">
+<link rel="stylesheet" href="../../assets/bilesen.css">
+<script src="../../assets/stil.js"></script>
+<style>
+/* İçerik: sitedeki bütün fikirler ve yorumlar, gizleme ve ön filtrenin söz listesi. Bileşenler bilesen.css'ten gelir. */
+.y-ust{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.y-ust h1{font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:8px 0 0}
+.y-ust p{margin:6px 0 0;color:var(--ink-2);font-size:14px;max-width:64ch}
+.panel + .panel{margin-top:20px}
+.y-ara{width:100%}
+.chipler{display:flex;flex-wrap:wrap;gap:6px}
+.sayac{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tablo td{vertical-align:top}
+.tablo td small{display:block;color:var(--muted);font-size:12.5px;max-width:60ch;overflow-wrap:anywhere}
+.tablo td.metin{max-width:56ch;overflow-wrap:anywhere}
+.tablo td a{color:var(--ink);font-weight:500;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2)}
+.tablo tr.gizli td:first-child{box-shadow:inset 3px 0 0 var(--err)}
+.tablo tr.gizli td.metin,.tablo tr.gizli td.metin a{color:var(--muted)}
+.bos-satir{color:var(--muted)}
+.gorunur{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.soz-form{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:14px}
+.soz-form .alan{flex:1 1 220px;margin:0}
+.sozler{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.sozler li{display:inline-flex;align-items:center;gap:6px;padding:4px 4px 4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--bg-2);font-size:13.5px}
+.sozler li small{color:var(--muted)}
+.sozler button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;border-radius:999px}
+.sozler button:hover,.sozler button:focus-visible{color:var(--err);outline:2px solid var(--accent);outline-offset:1px}
+.not{color:var(--muted);font-size:13px;margin:10px 0 0;max-width:70ch}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+</head>
+<body class="yonetim">
+<a class="skip" href="#main">İçeriğe geç</a>
+<header class="y-bas">
+  <div class="y-kimlik" style="display:flex;align-items:center;gap:12px;min-width:0">
+    <a class="link" href="../../" style="font-weight:500;color:var(--ink);text-decoration:none">Undustit</a>
+    <span style="color:var(--muted);font-size:14px">Yönetim</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;min-width:0">
+    <span data-y-kim style="font-size:14px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44vw"></span>
+    <button type="button" class="btn alt sm" data-y-cikis hidden>Çıkış</button>
+  </div>
+</header>
+<div class="y-govde">
+  <nav class="y-yan" aria-label="Yönetim menüsü">
+    <a href="../">Özet</a>
+    <a href="../#vakalar">Vakalar</a>
+    <a href="./" aria-current="page">İçerik</a>
+    <a href="../rapor/">Rapor</a>
+    <a href="../vaka/">Yeni vaka</a>
+    <a href="../../">Siteye dön</a>
+  </nav>
+  <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
+</div>
+
+<script src="../../assets/ayar.js"></script>
+<script src="../../assets/ud/temel.js"></script>
+<script src="../../assets/ud/depo.js"></script>
+<script src="../../assets/ud/arayuz.js"></script>
+<script src="../../assets/ud/hareket.js"></script>
+<script src="../../assets/veri.js"></script>
+<script src="../yonetim.js"></script>
+<script>
+(function(){
+'use strict';
+// Moderation: every idea and comment on the site, newest first, hidden ones included. One switch hides a row
+// from everyone but its writer; the word list decides what is held back before anyone sees it.
+var YON = window.YONETIM;
+var esc = YON.esc, tarih = YON.tarih;
+var ana = null;
+var veri = { fikir:[], yorum:[] };
+var filtre = { fikir:{ ara:'', gizli:false }, yorum:{ ara:'', gizli:false } };
+var TUR = { yorum:'Yorum', oneri:'Öneri', endise:'Endişe' };
+var kucuk = function(s){ return String(s || '').toLocaleLowerCase('tr'); };
+
+function panel(tur, baslik, ipucu){
+  return '<section class="panel" id="' + tur + '" aria-labelledby="' + tur + '-b">' +
+    '<header class="panel-bas"><h2 id="' + tur + '-b">' + baslik + '</h2><span class="sayac" id="' + tur + '-sayac"></span></header>' +
+    '<div class="panel-ic"><div class="arac-cubugu"><div class="sol">' +
+      '<input class="y-ara" type="search" data-ara="' + tur + '" placeholder="' + ipucu + '" aria-label="' + baslik + ' içinde ara">' +
+      '<div class="chipler" role="group" aria-label="Görünürlüğe göre filtrele">' +
+        '<button type="button" class="chip" data-filtre="' + tur + '" data-gizli="0" aria-pressed="true">Tümü</button>' +
+        '<button type="button" class="chip" data-filtre="' + tur + '" data-gizli="1" aria-pressed="false">Yalnız gizli</button>' +
+      '</div></div></div>' +
+      '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">' + baslik + '</caption><thead id="' + tur + '-bas"></thead><tbody id="' + tur + '-tbody"></tbody></table></div>' +
+    '</div></section>';
+}
+
+function ciz(o, a){
+  ana = a;
+  ana.innerHTML =
+    '<div class="y-ust"><div><span class="eyebrow">Yönetim</span><h1>İçerik</h1>' +
+      '<p>Sitedeki bütün fikirler ve yorumlar, en yeni üstte. Gizlenen satırı yazarı dışında kimse görmez; ' +
+      'ön filtrenin tuttukları burada gizli olarak bekler, yanlış yakalananı “Yayına al” ile açarsın.</p></div></div>' +
+    panel('fikir', 'Fikirler', 'Başlık, açıklama, takma ad') +
+    panel('yorum', 'Yorumlar', 'Yorum, fikir, takma ad') +
+    '<section class="panel" id="sozler-panel" aria-labelledby="soz-b" hidden>' +
+      '<header class="panel-bas"><h2 id="soz-b">Ön filtre: yasak sözler</h2><span class="sayac" id="soz-sayac"></span></header>' +
+      '<div class="panel-ic">' +
+        '<form class="soz-form" id="soz-form" novalidate><label class="alan"><span>Yeni söz <small>tek kelime</small></span>' +
+          '<input type="text" name="soz" maxlength="40" autocomplete="off" required></label>' +
+          '<label class="anahtar"><input type="checkbox" name="tam"><span>Yalnız tam kelime</span></label>' +
+          '<button class="btn sig sm" type="submit">Ekle</button></form>' +
+        '<ul class="sozler" id="sozler" aria-live="polite"></ul>' +
+        '<p class="not">Bu sözlerden birini içeren fikir ya da yorum reddedilmez; gizli olarak kaydedilir ve yukarıda bekler. ' +
+          'Söz, kelimenin başında aranır (ekleri de yakalar: “örnek” → “örnekler”); “Yalnız tam kelime” işaretliyse kelime birebir aynı olmalıdır. ' +
+          'Büyük-küçük harf, ç/ğ/ö/ş/ü, rakamla yazım (0→o, 1→i, 3→e) ve uzatılan harfler aynı sayılır.</p>' +
+      '</div></section>';
+
+  ana.addEventListener('input', function(e){
+    var t = e.target.dataset && e.target.dataset.ara;
+    if (!t) return;
+    filtre[t].ara = e.target.value.trim(); yaz(t);
+  });
+  ana.addEventListener('click', function(e){
+    var c = e.target.closest('[data-filtre]');
+    if (c){
+      var t = c.dataset.filtre;
+      filtre[t].gizli = c.dataset.gizli === '1';
+      ana.querySelectorAll('[data-filtre="' + t + '"]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === c)); });
+      return yaz(t);
+    }
+    var s = e.target.closest('[data-soz-sil]');
+    if (s) UDV.icerik.sozSil(s.dataset.sozSil).then(function(){ YON.toast('Söz kaldırıldı.', 'ok'); return sozleriYaz(); })
+      .catch(function(err){ YON.toast(err.message || 'Kaldırılamadı.', 'hata'); });
+  });
+  ana.addEventListener('click', gizleTikla);
+  ana.querySelector('#soz-form').addEventListener('submit', sozEkle);
+
+  yukle('fikir'); yukle('yorum'); sozleriYaz();
+}
+
+function yukle(t){
+  var tb = ana.querySelector('#' + t + '-tbody');
+  tb.innerHTML = '<tr><td>Yükleniyor…</td></tr>';
+  return Promise.resolve().then(function(){ return t === 'fikir' ? UDV.icerik.fikirler() : UDV.icerik.yorumlar(); })
+    .then(function(l){ veri[t] = l; yaz(t); })
+    .catch(function(err){ tb.innerHTML = '<tr><td>' + esc(err.message || 'Yüklenemedi.') + '</td></tr>'; });
+}
+
+function anahtar(t, x, ad){
+  return '<div class="gorunur">' + (x.gizli ? '<span class="rozet kirmizi">Gizli</span>' : '<span class="rozet yesil">Yayında</span>') +
+    '<button type="button" class="btn alt sm" data-gizle="' + t + '" data-id="' + esc(x.id) + '" data-yeni="' + (x.gizli ? '0' : '1') + '" aria-label="' + esc(ad) + ': ' + (x.gizli ? 'yayına al' : 'gizle') + '">' +
+    (x.gizli ? 'Yayına al' : 'Gizle') + '</button></div>';
+}
+function bag(anahtarK, metin){
+  return anahtarK ? '<a href="../../fikirler/?f=' + encodeURIComponent(anahtarK) + '">' + esc(metin) + '</a>' : esc(metin);
+}
+
+function yaz(t){
+  var f = filtre[t], q = kucuk(f.ara);
+  var liste = veri[t].filter(function(x){
+    if (f.gizli && !x.gizli) return false;
+    if (!q) return true;
+    return (t === 'fikir' ? [x.baslik, x.problem, x.cozum, x.ad] : [x.metin, x.fikirBaslik, x.ad]).some(function(s){ return kucuk(s).indexOf(q) > -1; });
+  });
+  var gizli = veri[t].filter(function(x){ return x.gizli; }).length;
+  ana.querySelector('#' + t + '-sayac').textContent = veri[t].length + (t === 'fikir' ? ' fikir' : ' yorum') + (gizli ? ' · ' + gizli + ' gizli' : '');
+  var bas = ana.querySelector('#' + t + '-bas'), tb = ana.querySelector('#' + t + '-tbody');
+  bas.innerHTML = t === 'fikir'
+    ? '<tr><th scope="col">Fikir</th><th scope="col">Kimden</th><th scope="col">Nerede</th><th scope="col">Tarih</th><th scope="col">Sitede</th></tr>'
+    : '<tr><th scope="col">Yorum</th><th scope="col">Fikir</th><th scope="col">Kimden</th><th scope="col">Tarih</th><th scope="col">Sitede</th></tr>';
+  if (!liste.length){
+    tb.innerHTML = '<tr><td colspan="5" class="bos-satir">' + (veri[t].length ? 'Bu filtrede sonuç yok.' : (t === 'fikir' ? 'Henüz fikir yok.' : 'Henüz yorum yok.')) + '</td></tr>';
+    return;
+  }
+  tb.innerHTML = liste.map(function(x){
+    var sinif = x.gizli ? ' class="gizli"' : '';
+    if (t === 'fikir'){
+      var detay = [x.problem, x.cozum].filter(Boolean).join(' · ');
+      return '<tr' + sinif + '><td class="metin">' + bag(x.anahtar, x.baslik) + (detay ? '<small>' + esc(detay) + '</small>' : '') + '</td>' +
+        '<td>' + esc(x.ad || '—') + '</td><td>' + esc(x.vakaId || x.kategori || '—') + '</td><td>' + tarih(x.zaman) + '</td><td>' + anahtar(t, x, x.baslik) + '</td></tr>';
+    }
+    return '<tr' + sinif + '><td class="metin">' + esc(x.metin) + '<small>' + esc(TUR[x.tur] || x.tur) + '</small></td>' +
+      '<td>' + bag(x.anahtar, x.fikirBaslik || '—') + '</td><td>' + esc(x.ad || '—') + '</td><td>' + tarih(x.zaman) + '</td><td>' + anahtar(t, x, x.metin.slice(0, 60)) + '</td></tr>';
+  }).join('');
+}
+
+// the badge beside the button is repainted only after the database took the change
+function gizleTikla(e){
+  var c = e.target.closest('button[data-gizle]');
+  if (!c) return;
+  var t = c.dataset.gizle, id = c.dataset.id, gizli = c.dataset.yeni === '1';
+  c.disabled = true; c.textContent = 'Kaydediliyor…';
+  Promise.resolve().then(function(){ return t === 'fikir' ? UDV.fikirler.gizle(id, gizli) : UDV.icerik.yorumGizle(id, gizli); }).then(function(){
+    var x = veri[t].find(function(v){ return v.id === id; });
+    if (x) x.gizli = gizli;
+    YON.toast((t === 'fikir' ? 'Fikir ' : 'Yorum ') + (gizli ? 'gizlendi: sitede artık görünmüyor.' : 'yeniden yayında.'), 'ok');
+  }, function(err){ YON.toast(err.message || 'Güncellenemedi.', 'hata'); }).then(function(){ yaz(t); });
+}
+
+// the word list lives in the database (supabase/13-moderasyon.sql); without it the panel stays hidden
+function sozleriYaz(){
+  var kap = ana.querySelector('#sozler-panel');
+  return Promise.resolve().then(function(){ return UDV.icerik.sozler(); }).then(function(l){
+    kap.hidden = !l;
+    if (!l) return;
+    ana.querySelector('#soz-sayac').textContent = l.length + ' söz';
+    ana.querySelector('#sozler').innerHTML = l.length ? l.map(function(s){
+      return '<li><span>' + esc(s.soz) + (s.tam ? ' <small>tam</small>' : '') + '</span><button type="button" data-soz-sil="' + esc(s.soz) + '" aria-label="' + esc(s.soz) + ' sözünü kaldır">×</button></li>';
+    }).join('') : '<li class="bos-satir" style="border:0;background:transparent;padding-left:0">Liste boş: ön filtre hiçbir şeyi tutmuyor.</li>';
+  }).catch(function(){ kap.hidden = true; });
+}
+function sozEkle(e){
+  e.preventDefault();
+  var f = e.target, b = f.querySelector('[type=submit]');
+  b.disabled = true;
+  UDV.icerik.sozEkle(f.soz.value, f.tam.checked).then(function(){ f.reset(); YON.toast('Söz eklendi.', 'ok'); return sozleriYaz(); })
+    .catch(function(err){ YON.toast(err.message || 'Eklenemedi.', 'hata'); f.soz.focus(); })
+    .then(function(){ b.disabled = false; });
+}
+
+YON.guard(ciz);
+})();
+</script>
+</body>
+</html>

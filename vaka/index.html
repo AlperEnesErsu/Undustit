@@ -30,6 +30,8 @@
 .vaka-detay-in{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(20px,4vw,56px);align-items:start;padding-bottom:24px}
 @media (max-width:820px){.vaka-detay-in{grid-template-columns:minmax(0,1fr)}}
 .vaka-sayfa .phead{padding-top:0}
+.vaka-foto{max-width:560px}
+.vaka-detay .vaka-metin{padding-bottom:24px;max-width:70ch}
 .vaka-yaz{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,72px);align-items:start}
 .vaka-yaz > div{display:grid;gap:16px;align-content:start}
 @media (max-width:980px){.vaka-yaz{grid-template-columns:minmax(0,1fr)}}
@@ -85,6 +87,8 @@ function ciz(v){
       '<h1 id="vb">' + esc(v.baslik) + '</h1>' +
       (v.ozet ? '<p class="lead">' + esc(v.ozet) + '</p>' : '') +
       '<div class="model-etiket">' + UD.modelEtiketleri(v).map(function(m){ return '<span>' + esc(m) + '</span>'; }).join('') + '</div>' +
+      // the company's photo is the first thing a visitor should see; without one nothing is shown (no empty frame)
+      (gorsel ? '<figure class="foy-gorsel vaka-foto"><img src="' + esc(gorsel) + '" alt="' + esc(v.baslik) + '" decoding="async"></figure>' : '') +
       '<dl class="vaka-bilgi">' +
         '<div><dt>' + T('vakasayfa.js.adet') + '</dt><dd>' + sayi(v.adet) + '</dd></div>' +
         '<div><dt>' + T('vakasayfa.js.olcu') + '</dt><dd>' + esc([v.olcu, v.sinif].filter(Boolean).join(' · ') || '—') + '</dd></div>' +
@@ -92,20 +96,18 @@ function ciz(v){
         '<div><dt>' + T('vakasayfa.js.gelen') + '</dt><dd id="n-fikir">0</dd></div>' +
       '</dl>' +
       (acik ? '' : '<p class="lead" style="font-size:15px">' + T('vakasayfa.js.kapali') + '</p>') +
+      (v.durum !== 'kapali' ? '<div id="numune"></div>' : '') +
     '</section>' +
     '<section class="vaka-yaz" id="yaz" aria-label="' + T('vakasayfa.js.fikirler') + '">' +
       (acik ? '<div><span class="eyebrow">' + T('vakasayfa.js.sira') + '</span><div id="form"></div></div>' : '') +
       '<div><span class="eyebrow">' + T('vakasayfa.js.fikirler') + '</span><div id="board"></div></div>' +
     '</section>' +
-    // the technical sheet comes after the form, folded: the product photo (an empty frame until the admin adds one)
-    // and the long description
-    '<details class="vaka-detay"><summary>' + T('vakasayfa.js.detay') + '</summary><div class="vaka-detay-in">' +
-      (gorsel ? '<figure class="foy-gorsel"><img src="' + esc(gorsel) + '" alt="' + esc(v.baslik) + '" loading="lazy" decoding="async"></figure>'
-        : '<figure class="foy-gorsel yok"><figcaption>' + T('vaka.foy.yok') + '</figcaption></figure>') +
-      (paragraflar.length ? '<div class="vaka-metin">' + paragraflar.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' : '') +
-    '</div></details>';
+    // the long description comes after the form, folded; a case without one has nothing to unfold
+    (paragraflar.length ? '<details class="vaka-detay"><summary>' + T('vakasayfa.js.detay') + '</summary><div class="vaka-metin">' +
+      paragraflar.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div></details>' : '');
 
   if (acik) UD.mountForm(document.getElementById('form'), { caseId: v.id });
+  UD.mountNumune(document.getElementById('numune'), v.id);
   UD.mountBoard(document.getElementById('board'), { filter: function(i){ return UD.inCase(i, vaka); }, examples: false,
     emptyTitle: T('vakasayfa.js.bos'), emptyNote: acik ? T('vakasayfa.js.bos.not') : '' });
   UD.Store.sub(function(){

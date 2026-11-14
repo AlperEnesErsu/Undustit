@@ -59,7 +59,7 @@ const Store = (function(){
       S.ideas = ideas; S.votes = me ? { [me]: mine } : {}; veriUyari(false); emit();
       return;
     }
-    const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => sb.from(t).select('*').limit(5000)));
+    const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => (t === 'fikirler' ? sb.from(t).select('*').eq('gizli', false) : sb.from(t).select('*')).limit(5000)));
     const bad = res.find(r => r.error); if (bad) throw bad.error;
     const [f, t, p, y] = res.map(r => r.data || []);
     const keyOf = {}, ideas = {}, votes = {}, notes = {};
@@ -68,16 +68,17 @@ const Store = (function(){
       (ideas[r.sahip] = ideas[r.sahip] || { items:[] }).items.push({ k:r.id, caseId:r.vaka_id, title:r.baslik, cat:r.kategori, problem:r.problem, solution:r.cozum, feats:r.ozellikler, handle:r.ad, at:r.zaman }); });
     t.forEach(r => { if (keyOf[r.fikir_id]) vote(r.uye).buy[keyOf[r.fikir_id]] = r.fiyat; });
     p.forEach(r => { const k = keyOf[r.fikir_id]; if (k) { const v = vote(r.uye); v.rate[k] = { ...(v.rate[k] || {}), [r.olcut]: r.puan }; } });
-    y.forEach(r => { if (keyOf[r.fikir_id]) (notes[r.uye] = notes[r.uye] || { items:[] }).items.push({ k:r.id, idea:keyOf[r.fikir_id], kind:r.tur, text:r.metin, handle:r.ad, at:r.zaman }); });
+    y.forEach(r => { if (keyOf[r.fikir_id]) (notes[r.uye] = notes[r.uye] || { items:[] }).items.push({ k:r.id, idea:keyOf[r.fikir_id], kind:r.tur, text:r.metin, handle:r.ad, at:r.zaman, gizli:!!r.gizli }); });
     S.ideas = ideas; S.votes = votes; S.notes = notes; emit();
   }
   const sbReload = () => sbLoad().then(() => veriUyari(false)).catch(() => veriUyari(true, sbReload));
   // an idea's comments, read when its window opens (summary mode keeps only their count in the list)
   const noteCache = {};
   async function sbNotes(key){
-    const r = await sb.from('yorumlar').select('id,tur,metin,ad,zaman,uye').eq('fikir_id', idOf(key)).order('zaman', { ascending:true }).limit(500);
+    // every column: "gizli" exists only after supabase/13-moderasyon.sql, and naming it before that would fail
+    const r = await sb.from('yorumlar').select('*').eq('fikir_id', idOf(key)).order('zaman', { ascending:true }).limit(500);
     if (r.error){ veriUyari(true, () => sbNotes(key).then(() => veriUyari(false))); return; }
-    noteCache[key] = r.data.map(n => ({ k:n.id, idea:key, kind:n.tur, text:n.metin, handle:n.ad, at:n.zaman, owner:n.uye }));
+    noteCache[key] = r.data.map(n => ({ k:n.id, idea:key, kind:n.tur, text:n.metin, handle:n.ad, at:n.zaman, owner:n.uye, hidden:!!n.gizli }));
     emit();
   }
   // long side at most `uzun` px, JPEG on white (a transparent PNG would turn black)
@@ -88,12 +89,42 @@ const Store = (function(){
     const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
     return new Promise((ok, no) => c.toBlob(b => b ? ok(b) : no(new Error(T('ud.gorsel.tur'))), 'image/jpeg', .85));
   }
+  // One random id per browser, kept in a cookie and in local storage (either one restores the other). It goes
+  // along with "alırdım" and a new idea, so the database counts one browser once per idea and knows the browser an
+  // idea was written on (supabase/17-oy.sql). It says nothing about the person and is never shown to anyone.
+  function cihazId(){
+    let v = '';
+    try { v = (document.cookie.match(/(?:^|; )ud_cihaz=([a-z0-9]{16,40})/) || [])[1] || localStorage.getItem('ud-cihaz') || ''; } catch(e){}
+    if (!/^[a-z0-9]{16,40}$/.test(v)){
+      const a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a);
+      v = Array.from(a, x => (x % 36).toString(36)).join('') + Date.now().toString(36);
+    }
+    try { localStorage.setItem('ud-cihaz', v); } catch(e){}
+    try { document.cookie = 'ud_cihaz=' + v + '; Max-Age=63072000; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); } catch(e){}
+    return v;
+  }
+  // "alırdım" goes through the database's own function; a database without it yet takes the plain row as before
+  const alirdim = async (id, fiyat) => {
+    const r = await sb.rpc('alirdim', { f:id, fiyat, cihaz:cihazId() });
+    if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) return sb.from('talepler').upsert({ fikir_id:id, uye:S.uid, fiyat }, { onConflict:'fikir_id,uye' });
+    return r;
+  };
+  // nobody votes for, or scores, their own idea: said here at once, enforced by the database as well
+  const kendiMi = k => k.slice(0, k.lastIndexOf(':')) === S.uid;
+  const kendiHatasi = () => Promise.reject(Object.assign(new Error(T('ud.al.kendi.hata')), { code:'P0001' }));
+  // One anonymous sign-in at a time. A first-time visitor tapping two stars in a row used to start two of them:
+  // the first write then carried the first identity in its row and the second one's token, and the database
+  // refused it (seen live as "new row violates row-level security policy for table puanlar").
+  let girisP = null;
   async function sbUser(){
     const { data } = await sb.auth.getSession();
     if (data && data.session) return (S.uid = data.session.user.id);
-    const r = await sb.auth.signInAnonymously({ options:{ captchaToken: await captcha() } });
-    if (r.error) throw r.error;
-    return (S.uid = r.data.user.id);
+    girisP = girisP || (async () => {
+      const r = await sb.auth.signInAnonymously({ options:{ captchaToken: await captcha() } });
+      if (r.error) throw r.error;
+      return r.data.user.id;
+    })().finally(() => { girisP = null; });
+    return (S.uid = await girisP);
   }
   // every write: make sure we are someone, do it, then read back what the database now says
   const sbDo = async fn => { await start(); await sbUser(); const r = await fn(); if (r && r.error) { sbReload(); throw r.error; } await sbLoad(); return r; };
@@ -177,13 +208,22 @@ const Store = (function(){
   function clean(it, owner){
     return { k: str(String(it.k), 40), key: owner + ':' + str(String(it.k), 40), owner, caseId: str(it.caseId, 80), title: str(it.title, 140), cat: str(it.cat, 40),
       problem: str(it.problem, 400), solution: str(it.solution, 400), handle: str(it.handle, 30),
-      feats: (Array.isArray(it.feats) ? it.feats : []).slice(0, 3).map(x => str(x, 80)).filter(Boolean), at: when(it.at), agg: it.agg || null };
+      feats: (Array.isArray(it.feats) ? it.feats : []).slice(0, 3).map(x => str(x, 80)).filter(Boolean), at: when(it.at), agg: it.agg || null, hidden: it.gizli === true };
+  }
+  // What the admin hid. The database keeps hidden rows from everyone but their writer by itself; the local
+  // preview reads the admin panel's own list (udv-v1, assets/veri.js) and does the same here.
+  function yerelGizli(){
+    if (S.mode !== 'local') return null;
+    try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null') || {}; return { fikir: d.gizli || {}, yorum: d.gizliYorum || {} }; } catch(e){ return null; }
   }
   function ideas(){
-    const out = [];
+    const out = [], gz = yerelGizli();
     for (const [owner, doc] of Object.entries(S.ideas)){
       (Array.isArray(doc.items) ? doc.items : []).forEach(it => {
-        if (it && typeof it.title === 'string' && it.k) out.push(clean(it, owner));
+        if (!(it && typeof it.title === 'string' && it.k)) return;
+        const i = clean(it, owner);
+        if (gz && gz.fikir[i.key]) return;
+        out.push(i);
       });
     }
     const buy = {}, rates = {};
@@ -193,7 +233,12 @@ const Store = (function(){
     }
     const notes = {};
     for (const [owner, doc] of Object.entries(S.notes)){
-      (Array.isArray(doc.items) ? doc.items : []).forEach(n => { if (n && typeof n.idea === 'string' && typeof n.text === 'string') (notes[n.idea] = notes[n.idea] || []).push({ k: n.k, idea: n.idea, kind: KINDS.includes(n.kind) ? n.kind : 'yorum', text: str(n.text, 500), handle: str(n.handle, 30), at: when(n.at), owner }); });
+      (Array.isArray(doc.items) ? doc.items : []).forEach(n => {
+        if (!(n && typeof n.idea === 'string' && typeof n.text === 'string')) return;
+        const hidden = n.gizli === true || !!(gz && gz.yorum[owner + ':' + n.k]);
+        if (hidden && owner !== S.uid) return;
+        (notes[n.idea] = notes[n.idea] || []).push({ k: n.k, idea: n.idea, kind: KINDS.includes(n.kind) ? n.kind : 'yorum', text: str(n.text, 500), handle: str(n.handle, 30), at: when(n.at), owner, hidden });
+      });
     }
     out.forEach(i => {
       const bs = Object.values(buy[i.key] || {});
@@ -227,7 +272,10 @@ const Store = (function(){
     addIdea(data){
       if (S.mode === 'supabase'){
         return sbDo(() => sb.from('fikirler').insert({ sahip:S.uid, vaka_id: data.caseId || null, baslik:data.title, kategori:data.cat, problem:data.problem,
-          cozum:data.solution, ozellikler:data.feats, ad:data.handle || '' }).select('id').single()).then(r => S.uid + ':' + r.data.id);
+          cozum:data.solution, ozellikler:data.feats, ad:data.handle || '' }).select('id').single()).then(r => {
+          sb.rpc('fikir_cihazi', { f:r.data.id, cihaz:cihazId() }).then(() => {}, () => {});   // which browser wrote it; never blocks the idea
+          return S.uid + ':' + r.data.id;
+        });
       }
       const it = { k:key(), ...data, at:new Date().toISOString() };
       return write('ideas', { items: myItems('ideas').concat([it]).slice(-40) }).then(() => S.uid + ':' + it.k);
@@ -238,13 +286,15 @@ const Store = (function(){
       return write('ideas', { items: myItems('ideas').filter(it => it.k !== k) });
     },
     setBuy(k, price){
+      if (price && kendiMi(k)) return kendiHatasi();
       if (S.mode === 'supabase'){
         if (S.uid !== 'anon'){ const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; S.votes[S.uid] = v; emit(); }
-        return sbDo(() => price ? sb.from('talepler').upsert({ fikir_id:idOf(k), uye:S.uid, fiyat:price }, { onConflict:'fikir_id,uye' })
+        return sbDo(() => price ? alirdim(idOf(k), price)
           : sb.from('talepler').delete().eq('fikir_id', idOf(k)).eq('uye', S.uid));
       }
       const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; return write('votes', v); },
     rate(k, c, n){
+      if (kendiMi(k)) return kendiHatasi();
       if (S.mode === 'supabase') return sbDo(() => sb.from('puanlar').upsert({ fikir_id:idOf(k), uye:S.uid, olcut:c, puan:n }, { onConflict:'fikir_id,uye,olcut' }));
       const v = myVotes(); v.rate[k] = { ...(v.rate[k] || {}), [c]: n }; return write('votes', v); },
     myRate(k){ return ((S.votes[S.uid] || {}).rate || {})[k] || {}; },

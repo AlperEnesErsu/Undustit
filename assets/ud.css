@@ -700,3 +700,19 @@ code{overflow-wrap:anywhere}
 /* what a case offers: sales partnership, idea prize, or both (supabase/12-vaka-modeli.sql) */
 .model-etiket{display:flex;flex-wrap:wrap;gap:6px}
 .model-etiket span{font-family:var(--f-mono);font-size:12px;letter-spacing:.02em;padding:4px 10px;border:1px solid var(--line-2);border-radius:999px;background:var(--bg-2);color:var(--ink)}
+
+/* "Ürünü görmek istiyorum": a sample or purchase request on a case page (supabase/14-numune.sql) */
+.numune{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;padding:18px 22px;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg-2)}
+.numune > div{display:grid;gap:4px;min-width:0;flex:1 1 280px}
+.numune b{font-weight:500}
+.numune p{color:var(--ink-2);font-size:14.5px;margin:0}
+.numune-f{display:grid;gap:14px;flex:1 1 100%}
+.numune-f fieldset{border:0;margin:0;padding:0;min-width:0}
+.numune-f legend{font-size:13.5px;font-weight:500;color:var(--ink-2);padding:0;margin-bottom:8px}
+.numune-f .iki{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.numune-f .onay{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
+.numune-f .onay input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent)}
+.numune-f .durum{font-size:14px;min-height:1.4em;margin:0}
+.numune-f .durum.bad{color:var(--err)}
+.numune-tamam{display:grid;gap:6px}
+@media (max-width:560px){.numune-f .iki{grid-template-columns:minmax(0,1fr)}}

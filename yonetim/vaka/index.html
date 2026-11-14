@@ -53,6 +53,7 @@
   <nav class="y-yan" aria-label="Yönetim menüsü">
     <a href="../">Özet</a>
     <a href="../#vakalar" data-nav="vakalar">Vakalar</a>
+    <a href="../icerik/">İçerik</a>
     <a href="../rapor/">Rapor</a>
     <a href="./" data-nav="yeni">Yeni vaka</a>
     <a href="../../">Siteye dön</a>
@@ -74,6 +75,7 @@ var YON = window.YONETIM;
 var esc = YON.esc, sayi = YON.sayi, tutar = YON.tutar;
 var params = new URLSearchParams(location.search);
 var id = (params.get('id') || '').trim();
+var basvuruId = (params.get('basvuru') || '').trim();   // yeni vaka bir başvurudan açılıyorsa
 var enc = encodeURIComponent;
 var GECIS_ETIKET = { acik:'Açık yap', degerlendirme:'Değerlendirmeye al', kazanan:'Kazananı onayla', uretim:'Üretime al', kapali:'Kapat' };
 var ana = null;
@@ -107,13 +109,30 @@ function yeniFormCiz(){
       '<h1>Yeni vaka</h1></div></div>' +
     '<section class="panel" aria-labelledby="yn-b"><header class="panel-bas"><h2 id="yn-b">Vaka bilgileri</h2>' +
       '<span class="sayac">Taslak olarak açılır</span></header>' +
-    '<div class="panel-ic"><form id="vaka-form" novalidate>' +
+    '<div class="panel-ic"><p class="lead" id="bv-not" hidden></p><form id="vaka-form" novalidate>' +
       '<div class="y-alanlar" id="alanlar"></div>' +
       '<div class="y-eylem"><button class="btn sig" type="submit">Vakayı oluştur</button>' +
       '<a class="btn alt" href="../">Vazgeç</a></div>' +
     '</form></div></section>';
   var form = $('#vaka-form');
   YON.formCiz($('#alanlar'), null);
+  // from an application: its answers fill the form, and creating the case gives the company its panel access
+  var basvuru = null;
+  var sayiCek = function(s){ var m = String(s || '').replace(/\./g, '').replace(',', '.').match(/\d+(\.\d+)?/); return m ? Number(m[0]) : null; };
+  if (basvuruId) Promise.resolve().then(function(){ return UDV.basvurular.liste(); }).then(function(l){
+    basvuru = l.find(function(b){ return b.id === basvuruId; }) || null;
+    if (!basvuru) return;
+    var adet = sayiCek(basvuru.adet);
+    var deneme = sayiCek(basvuru.deneme_adedi);
+    YON.formCiz($('#alanlar'), { sure_gun:30, baslik:basvuru.baslik || '', ozet:basvuru.ozet || '', aciklama:basvuru.notlar || '',
+      firma:basvuru.firma, stok:basvuru.stok, adet: adet ? Math.round(adet) : null, olcu:basvuru.olcu || '', sinif:basvuru.sinif || '',
+      taban_fiyat:sayiCek(basvuru.taban_fiyat), deneme_adedi: deneme ? Math.round(deneme) : null, odul:sayiCek(basvuru.odul),
+      gorsel:basvuru.gorsel || '', ortaklik: basvuru.model !== 'odul' });
+    var n = $('#bv-not'); n.hidden = false;
+    n.textContent = basvuru.firma + ' başvurusundan dolduruldu. Firmanın yazdıklarını ve sayıları kontrol edin; boş kalanı siz yazın. Oluşturunca ' + basvuru.eposta +
+      ' firma paneline eklenir ve başvuru “Kabul” olur.';
+    form.querySelector('[name="baslik"]').focus();
+  }).catch(function(err){ hata(err, 'Başvuru okunamadı.'); });
   form.addEventListener('submit', function(e){
     e.preventDefault();
     var v = YON.formOku(form), h = YON.formDogrula(v);
@@ -121,7 +140,13 @@ function yeniFormCiz(){
     var btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
     Promise.resolve().then(function(){ return UDV.vakalar.olustur(v); }).then(function(yeni){
-      YON.sonrakiBildirim('“' + yeni.baslik + '” taslak olarak açıldı.', 'ok');
+      if (!basvuru) return { yeni:yeni };
+      return UDV.firma.ekle(yeni.id, basvuru.eposta).then(function(){ return UDV.basvurular.bagla(basvuru.id, yeni.id); })
+        .then(function(){ return { yeni:yeni, firma:basvuru.eposta }; }, function(err){ return { yeni:yeni, sorun:(err && err.message) || 'bilinmeyen hata' }; });
+    }).then(function(s){
+      var yeni = s.yeni;
+      YON.sonrakiBildirim('“' + yeni.baslik + '” taslak olarak açıldı.' + (s.firma ? ' ' + s.firma + ' firma paneline eklendi.' : '') +
+        (s.sorun ? ' Firma erişimi eklenemedi: ' + s.sorun : ''), s.sorun ? 'hata' : 'ok');
       location.href = '?id=' + enc(yeni.id);
     }).catch(function(err){
       btn.disabled = false;

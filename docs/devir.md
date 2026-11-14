@@ -8,7 +8,7 @@ devir adım adım nasıl yapılır. Rakamlar ve fiyatlar yaklaşıktır; devir g
 | Varlık | Nerede | Devir yolu | Durum |
 |---|---|---|---|
 | Kaynak kod | GitHub `AlperEnesErsu/Undustit` | Depo aktarımı (Settings › Transfer) | Hazır |
-| Yayın | GitHub Pages (`main`, kök) | Depoyla birlikte gelir | Hazır |
+| Yayın | Netlify (`main`, kök; `netlify.toml`, `_headers`, `_redirects`, `netlify/edge-functions/`) | Netlify sitesini alıcının ekibine aktarma | Hazır |
 | Veritabanı, kimlik, fonksiyonlar | Supabase projesi `azjdweynukmwxywdfewb` | Projeyi alıcının organizasyonuna aktarma | Hazır |
 | Alan adı | Kayıt firması | Aktarma kodu (EPP) ya da firma içi devir | Alındı, bağlanmadı |
 | E-posta gönderimi | Resend | Hesap ya da alan adı doğrulaması alıcıya | Kurulacak |
@@ -43,7 +43,7 @@ bağlı değilken (yerel önizleme) geçerlidir.
 
 1. **Hazırlık:** kontroller yeşil (GitHub Actions "Kontrol"), `supabase/KURULUM.md` güncel, yönetim panelinden vaka
    CSV'leri ve Supabase'den tam yedek alınır (Database › Backups ya da `pg_dump`).
-2. **Kod:** depo alıcıya aktarılır. GitHub Pages ayarı (Settings › Pages › `main` / kök) kontrol edilir.
+2. **Kod:** depo alıcıya aktarılır. Netlify sitesi alıcının ekibine aktarılır, alan adı oraya bağlanır.
 3. **Supabase:** proje alıcının organizasyonuna aktarılır. Ardından service_role ve veritabanı şifresi yenilenir;
    yeni anon anahtar `assets/ayar.js`'e yazılırsa site yeniden yayınlanır.
 4. **Yöneticiler:** alıcının hesabı yönetici yapılır, eskiler kaldırılır:
@@ -64,5 +64,5 @@ bağlı değilken (yerel önizleme) geçerlidir.
 - **Kontroller:** Playwright (15 sayfa + ana akışlar, masaüstü ve telefon), SQL testleri (migration'lar ve erişim
   kuralları), sözlük denetimi; hepsi her PR'da.
 - **Erişilebilirlik ve hız:** axe ciddi ihlal 0, mobil LCP ~2 sn (jüri 4. tur), hareketi azalt desteği.
-- **Bilinen sınırlar:** `docs/yol-haritasi.md` (ödeme yok, fikir başına paylaşım önizlemesi alan adını bekliyor,
-  `ud.js` tek dosya).
+- **Bilinen sınırlar:** `docs/yol-haritasi.md` (ödeme yok, "alırdım" ücretsiz ve anonim olduğu için bir niyet
+  göstergesi, ön sipariş değil; fikir görseli paylaşımda hâlâ genel görsel).

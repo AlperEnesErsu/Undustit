@@ -5,6 +5,7 @@
   "scripts": {
     "test": "playwright test",
     "test:metin": "python tools/metin.py denetle --kati",
+    "test:edge": "node --test tests/edge/",
     "sunucu": "node tests/sunucu.mjs"
   },
   "devDependencies": {

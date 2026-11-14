@@ -3,10 +3,10 @@
 Bu belge üç parçanın birbirine nasıl bağlandığını sabitler; her parça ayrı yazılabilir. Sınıf adları,
 fonksiyon adları ve alanlar burada yazdığı gibi kullanılır. Değişmesi gerekirse önce bu belge değişir.
 
-Proje statik bir site: GitHub Pages, derleme adımı yok, düz HTML + CSS + tarayıcı JS (ES2020, modül yok,
+Proje statik bir site: Netlify, derleme adımı yok, düz HTML + CSS + tarayıcı JS (ES2020, modül yok,
 `(function(){ ... })()` içinde). Her sayfa `<html lang="tr" data-root="../" data-page="...">` ile başlar,
 `<head>`'de `assets/fonts/base.css`, `assets/ud.css`, `assets/stil.js` yükler (stil.js Oyuncu görünümünü
-ve sözlükleri getirir), gövde sonunda `assets/ud.js`. Yeni dosyalar:
+ve sözlükleri getirir), gövde sonunda `assets/ud/` altındaki dört dosya (temel, depo, arayuz, hareket). Yeni dosyalar:
 
 | Dosya | Sahibi |
 |---|---|
@@ -14,7 +14,7 @@ ve sözlükleri getirir), gövde sonunda `assets/ud.js`. Yeni dosyalar:
 | `assets/ayar.js`, `assets/veri.js`, `supabase/sema.sql`, `supabase/KURULUM.md` | Veri katmanı |
 | `yonetim/index.html`, `yonetim/vaka/index.html`, `yonetim/yonetim.js`, `vaka/index.html` | Yönetim paneli |
 
-Kimse başkasının dosyasını değiştirmez. `assets/ud.css`, `assets/ud.js`, `assets/stil.js` ve `assets/metin/*`
+Kimse başkasının dosyasını değiştirmez. `assets/ud.css`, `assets/ud/*.js`, `assets/stil.js` ve `assets/metin/*`
 yalnız koordinatörün.
 
 ## 1. Tasarım dili: Oyun (Oyuncu)

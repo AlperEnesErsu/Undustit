@@ -41,9 +41,10 @@ assets/anlatim.js   Vakalar, Fikirler, Hikâye sayfalarındaki anlatıcı animas
 assets/ayar.js      ayarlar (aşağıda)
 assets/metin/       tr.js ve en.js: sitedeki her yazı (anahtar → metin)
 assets/stil/        görünümler (Oyuncu varsayılan, Kâğıt ?stil=kagit); stil.js seçer
-supabase/           şema ve migration'lar (sırayla 1–17), Edge Function, KURULUM.md
+supabase/           şema ve migration'lar (sırayla 1–18), Edge Function, KURULUM.md
 tools/metin.py      metin aracı (etiketle, yaz, denetle)
-tests/              Playwright testleri (e2e/), SQL testleri (sql/), test sunucusu
+netlify/            Edge Function: paylaşılan fikrin kendi başlığı ve önizlemesi (fikirler/?f=…)
+tests/              Playwright testleri (e2e/), SQL testleri (sql/), Edge testi (edge/), test sunucusu
 docs/               ürün sözleşmesi, açılış içerik kiti, yol haritası, devir el kitabı
 DESIGN.md           tasarım ve ürün kararları, tarihleriyle
 ```
@@ -90,7 +91,7 @@ Ticari oranlar (ücret, gün, paylar, eşik, yayın saati) `assets/ud/temel.js` 
 ## Veritabanı
 
 `supabase/KURULUM.md` adım adım anlatır. Sıra: `sema.sql`, `2-fikirler.sql`, `3-hiz.sql`, `4-acilis.sql`,
-`5-guven.sql`, `6-gorsel.sql`, `7-firma.sql`, `8-gizli.sql`, `9-saglam.sql`, `10-hata.sql`, `11-etkinlik.sql`, `12-vaka-modeli.sql`, `13-moderasyon.sql`, `14-numune.sql`, `15-basvuru.sql`, `16-kullanici-adi.sql`, `17-oy.sql` (hepsi yeniden çalıştırılabilir). Ürün görselleri Supabase Storage'da, `gorseller` kovasında. Ziyaretçi anonim oturumla yazar; satır düzeyinde güvenlik (RLS)
+`5-guven.sql`, `6-gorsel.sql`, `7-firma.sql`, `8-gizli.sql`, `9-saglam.sql`, `10-hata.sql`, `11-etkinlik.sql`, `12-vaka-modeli.sql`, `13-moderasyon.sql`, `14-numune.sql`, `15-basvuru.sql`, `16-kullanici-adi.sql`, `17-oy.sql`, `18-talep-kilidi.sql` (hepsi yeniden çalıştırılabilir). Ürün görselleri Supabase Storage'da, `gorseller` kovasında. Ziyaretçi anonim oturumla yazar; satır düzeyinde güvenlik (RLS)
 herkesin yalnız kendi satırlarını değiştirmesine izin verir, günlük sınırlar trigger'larla. E-posta bildirimi:
 `supabase/functions/haber-gonder` (Resend).
 
@@ -110,6 +111,7 @@ npm ci && npx playwright install chromium
 npm test                               # sayfalar ve akışlar, masaüstü + telefon, yerel modda
 npm run test:metin                     # sözlük denetimi (hata varsa başarısız)
 bash tests/sql/calistir.sh             # migration'lar + erişim kuralları (psql ve PG* değişkenleri gerekir)
+npm run test:edge                      # paylaşılan fikrin önizlemesi (Edge Function)
 ```
 
 Aynı üçü her PR'da GitHub Actions ile çalışır (`.github/workflows/kontrol.yml`). Testler canlı veritabanına dokunmaz.

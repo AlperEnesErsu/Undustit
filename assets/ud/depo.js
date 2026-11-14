@@ -103,12 +103,8 @@ const Store = (function(){
     try { document.cookie = 'ud_cihaz=' + v + '; Max-Age=63072000; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); } catch(e){}
     return v;
   }
-  // "alırdım" goes through the database's own function; a database without it yet takes the plain row as before
-  const alirdim = async (id, fiyat) => {
-    const r = await sb.rpc('alirdim', { f:id, fiyat, cihaz:cihazId() });
-    if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) return sb.from('talepler').upsert({ fikir_id:id, uye:S.uid, fiyat }, { onConflict:'fikir_id,uye' });
-    return r;
-  };
+  // "alırdım" goes through the database's own function only: the table takes no plain insert (supabase/18-talep-kilidi.sql)
+  const alirdim = (id, fiyat) => sb.rpc('alirdim', { f:id, fiyat, cihaz:cihazId() });
   // nobody votes for, or scores, their own idea: said here at once, enforced by the database as well
   const kendiMi = k => k.slice(0, k.lastIndexOf(':')) === S.uid;
   const kendiHatasi = () => Promise.reject(Object.assign(new Error(T('ud.al.kendi.hata')), { code:'P0001' }));

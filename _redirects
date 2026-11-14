@@ -7,6 +7,7 @@ https://undustit.netlify.app/*  https://undustit.com/:splat  301!
 /supabase/*    /404.html  404!
 /tests/*       /404.html  404!
 /tools/*       /404.html  404!
+/netlify/*     /404.html  404!
 /node_modules/*  /404.html  404!
 /.github/*     /404.html  404!
 /.claude/*     /404.html  404!

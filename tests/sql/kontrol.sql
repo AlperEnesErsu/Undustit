@@ -80,8 +80,7 @@ exception when raise_exception then
 end $$;
 
 -- changing a price you already gave is not a new demand; the daily cap counts only new rows
-insert into public.talepler (fikir_id, uye, fiyat) values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000c', 350)
-  on conflict (fikir_id, uye) do update set fiyat = excluded.fiyat;
+select public.alirdim('11111111-1111-1111-1111-111111111111', 350, null);   -- a price already given: no browser id needed
 
 -- photos: a visitor stores only in basvuru/<own id>/, five a day; only the admin stores case photos
 set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000c';
@@ -395,7 +394,7 @@ set role authenticated;
 set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000a';
 do $$ begin
   begin
-    insert into public.talepler (fikir_id, uye, fiyat) values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-00000000000a', 500);
+    perform public.alirdim('11111111-1111-1111-1111-111111111111', 500, 'aaaaaaaaaaaaaaaa01');
     raise exception 'kişi kendi fikrine alırdım diyebildi';
   exception when raise_exception then if sqlerrm not like 'Kendi fikrine%' then raise; end if; end;
   begin
@@ -423,6 +422,27 @@ do $$ begin
   exception when raise_exception then if sqlerrm not like 'Bu fikir bu cihazdan%' then raise; end if; end;
   perform public.alirdim('11111111-1111-1111-1111-111111111111', 300, 'ffffffffffffffff01');
   if (select count(*) from public.talepler where fikir_id = '11111111-1111-1111-1111-111111111111') <> 3 then raise exception 'başka tarayıcıdan gelen alırdım sayılmadı'; end if;
+end $$;
+-- 18-talep-kilidi.sql: no plain insert around alirdim(), a new one needs the browser id, the price has a ceiling
+reset role;
+insert into auth.users (id) values ('00000000-0000-0000-0000-000000000010') on conflict (id) do nothing;
+set role authenticated;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-000000000010';
+do $$ begin
+  begin
+    insert into public.talepler (fikir_id, uye, fiyat) values ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-000000000010', 400);
+    raise exception 'alırdım tabloya doğrudan yazılabildi';
+  exception when insufficient_privilege then null; end;
+  begin
+    perform public.alirdim('11111111-1111-1111-1111-111111111111', 400, null);
+    raise exception 'tarayıcı kimliği olmadan yeni alırdım denebildi';
+  exception when raise_exception then if sqlerrm not like 'Tarayıcı kimliği%' then raise; end if; end;
+  begin
+    perform public.alirdim('11111111-1111-1111-1111-111111111111', 20001, '10101010101010101010');
+    raise exception '20.000 ₺ üstü fiyat kabul edildi';
+  exception when check_violation then null; end;
+  perform public.alirdim('11111111-1111-1111-1111-111111111111', 20000, '10101010101010101010');
+  if (select count(*) from public.talepler where uye = '00000000-0000-0000-0000-000000000010') <> 1 then raise exception 'geçerli alırdım yazılmadı'; end if;
 end $$;
 reset role;
 reset request.jwt.claim.sub;

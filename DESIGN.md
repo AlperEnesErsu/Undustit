@@ -514,4 +514,14 @@ dosya çalışmadan önce de sonra da çalışır (fonksiyon yoksa eski yoldan o
   kaybolmaz. O Google hesabı zaten bir Undustit hesabına bağlıysa dönüşte "O hesapla gir" çıkar.
 - **Firma paneli:** "Google ile gir" (Workspace kullanan firmalar için); panel yine e-postaya göre açılır.
 - Düğme yalnız Supabase'de Google açıkken görünür (`/auth/v1/settings`), kurulum bitmeden bozuk düğme olmaz.
-  E-postayla bağlantı yolu ikinci seçenek olarak duruyor.
+  E-postayla bağlantı yolu ikinci seçenek olarak duruyor.## Talep kilidi ve paylaşım önizlemesi (14 Kasım 2026)
+
+- **"Alırdım" yalnız `alirdim()` üzerinden** (`supabase/18-talep-kilidi.sql`): `talepler` tablosunun ekleme kuralı
+  kalktı, yeni bir talep tarayıcı kimliği olmadan kabul edilmez, fiyat tavanı 20.000 ₺. Sıralama, perşembe ve rapor
+  bu sayıya dayandığı için API'den doğrudan yazma yolu kapatıldı. İstemcideki eski "tabloya yaz" yedeği de kalktı.
+- **Paylaşılan fikrin kendi önizlemesi** (`netlify/edge-functions/fikir-onizleme.js`): `fikirler/?f=…` bağlantısı
+  WhatsApp, X ve arama motorlarında artık fikrin başlığını, problemini ve talebini gösterir; canonical da o fikre
+  döner. Veri herkese açık `fikir_kart` görünümünden okunur, gizli fikir hiç görünmez; 1,5 saniyede yanıt yoksa sayfa
+  olduğu gibi gider. Görsel şimdilik genel `og.png`.
+- **Hata kaydı botları saymaz:** Googlebot ve başsız tarayıcılar betikleri yarıda bıraktığı için ("UD is not
+  defined") hata kayıtlarına yazılmaz.

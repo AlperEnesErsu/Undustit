@@ -53,6 +53,9 @@ testler) ve bunları kimin nasıl yönettiği. "Basit görünüyor" hissinin as�
 
 ## Faz 4: Devredilebilirlik (yaklaşık 1 hafta)
 
+> Durum (14 Kasım 2026): `ud.js` `assets/ud/` altında dört dosyaya bölündü, yayın Netlify'a taşındı, fikir başına
+> paylaşım önizlemesi Edge Function ile geldi. Kalan: derleme adımı, hata izleme (Sentry), staging ortamı.
+>
 > Durum (26 Ekim 2026): testler, CI, README ve devir el kitabı yapıldı. Kalan: `ud.js`'in modüllere bölünmesi
 > ve derleme adımı, hata izleme (Sentry hesabı gerekir), staging ortamı.
 - Kodun düzenlenmesi: `ud.js` modüllere bölünür, küçük bir derleme adımı (Vite) eklenir, kodda tek bir

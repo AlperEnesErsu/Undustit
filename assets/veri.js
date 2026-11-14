@@ -13,7 +13,7 @@
   const LS = 'udv-v1';
   const SITE_LS = 'ud-store-v1';   // sitenin fikir deposu, yalnız okunur (bkz. assets/ud/depo.js Store)
   const CAT = 'Vaka 01 · Cıvata';
-  const MAKS_FIYAT = 100000;       // assets/ud/temel.js TERMS.maxPrice ile aynı
+  const MAKS_FIYAT = 20000;        // assets/ud/temel.js TERMS.maxPrice ile aynı
 
   const DURUMLAR = ['taslak','acik','degerlendirme','kazanan','uretim','kapali'];
   const DURUM_ADI = { taslak:'Taslak', acik:'Açık', degerlendirme:'Değerlendirmede', kazanan:'Kazanan seçildi', uretim:'Üretimde', kapali:'Kapandı' };

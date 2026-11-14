@@ -74,7 +74,7 @@ const ICON = {
 // Draft business terms from the first meeting. Change them here only.
 const TERMS = {
   fee: { first: 99, next: 10, cur: '₺', charged: false },
-  voteDays: 30, maxPrice: 100000,
+  voteDays: 30, maxPrice: 20000,   // supabase/18-talep-kilidi.sql: the database's ceiling too
   shareRetail: 10, shareDirect: 30,
   presale: [300, 750],
   // surplus-stock cases (Vaka 01 · Boltun): the profit above the stock's floor price is split, not the sale;
@@ -169,7 +169,8 @@ window.UD_SB = sbClient;
 // insert, so it works without a session. Browser extensions' errors and the content-free "Script error." are skipped.
 (function(){
   const A = window.UD_AYAR || {};
-  if (!A.supabaseUrl || !window.fetch) return;
+  // search engines' renderers (Googlebot, headless checkers) stop scripts half way; their errors say nothing about visitors
+  if (!A.supabaseUrl || !window.fetch || /bot|crawl|spider|slurp|headless|lighthouse/i.test(navigator.userAgent)) return;
   const gorulen = new Set(); let kalan = 5;
   const gonder = (mesaj, kaynak, satir) => {
     mesaj = String(mesaj || '').trim().slice(0, 500); kaynak = String(kaynak || '');

@@ -233,6 +233,17 @@ SQL Editor'da `16-kullanici-adi.sql` dosyasını çalıştırın (yeniden çalı
 yazabilir, şifre aynıdır. Kullanıcı adı yalnız yönetici hesapları içindir: girişte adın hangi adrese ait olduğu sorulur
 ve bu soru yalnız yönetici hesapları için yanıtlanır, üyelerin adresi bu yolla öğrenilemez.
 
+## 22. Talep kilidi: "alırdım" yalnız sitenin yolundan
+
+SQL Editor'da `18-talep-kilidi.sql` dosyasını `17-oy.sql`'den sonra çalıştırın (yeniden çalıştırılabilir).
+
+- `talepler` tablosuna doğrudan satır yazılamaz; yeni bir "alırdım" yalnız `alirdim()` fonksiyonundan geçer ve
+  tarayıcı kimliği olmadan kabul edilmez. Önceden API'den doğrudan yazan biri tarayıcı kontrolünü atlayabiliyordu.
+- Fiyat tavanı 100.000 ₺'den 20.000 ₺'ye iner: tek bir uydurma fiyat toplam talebi ve ortalamayı tek başına
+  oynatamaz. Daha yüksek bir ürün gelirse önce bu sayı, sonra `assets/ud/temel.js` `TERMS.maxPrice` ve
+  `assets/veri.js` `MAKS_FIYAT` birlikte değişir.
+- Fiyat değiştirmek ve "alırdım"ı geri almak eskisi gibi.
+
 ## 21. Adil talep: kendine oy ve aynı tarayıcı
 
 SQL Editor'da `17-oy.sql` dosyasını çalıştırın (yeniden çalıştırılabilir).

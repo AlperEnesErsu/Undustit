@@ -13,10 +13,13 @@ const LANG = METIN.lang;
 const LOCALE = LANG === 'en' ? 'en-GB' : 'tr-TR';
 function T(k, v){
   let s = METIN.al(k);
-  if (s == null) return k;
+  // a missing text never shows its key ("ud.al.alirdim" once reached a search result, when the crawler's render
+  // ran without the dictionary); metin.py denetle catches missing keys before they ship
+  if (s == null){ if (!T.eksik[k]){ T.eksik[k] = 1; console.warn('metin yok: ' + k); } return ''; }
   if (v) s = s.replace(/\{(\w+)\}/g, (m, n) => n in v ? v[n] : m);
   return s;
 }
+T.eksik = {};
 // pages carry their text in place (data-t for the inside, data-ta="attr:key;attr:key" for attributes)
 function applyText(root=document){
   if (root === document && LANG !== 'tr'){

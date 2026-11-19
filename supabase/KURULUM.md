@@ -256,6 +256,29 @@ SQL Editor'da `17-oy.sql` dosyasını çalıştırın (yeniden çalıştırılab
 - Çerez kişiyi tanıtmaz (rastgele bir dizgi), iki yıl durur; KVKK ve çerez metninde "kötüye kullanımı önleme" amacıyla
   anılmalıdır.
 
+## 23. Firma giriş bilgileri (kabul e-postası)
+
+Yönetici bir başvurudan "Vaka oluştur" deyince firma e-postası vakaya eklenir ve `firma-davet` fonksiyonu o adrese
+**kullanıcı adını** (e-posta adresi) ve tek kullanımlık **şifre belirleme bağlantısını** gönderir. Hesabı olmayan
+firmaya davet bağlantısı, hesabı olana şifre yenileme bağlantısı gider. Şifre hiçbir zaman e-postaya yazılmaz.
+Bağlantı `giris/` sayfasında "Yeni şifreni belirle" formunu açar; firma şifresini koyunca doğrudan firma paneline geçer.
+Yönetim > vaka > **Firma erişimi** sekmesinde her adresin yanında son gönderim zamanı ve "Giriş bilgisi gönder /
+Tekrar gönder" düğmesi vardır.
+
+1. `supabase/19-davet.sql` dosyasını SQL Editor'de çalıştırın (gönderim zamanı sütunu).
+2. Fonksiyonu yükleyin. JWT doğrulaması **açık** kalır, çünkü yalnız giriş yapmış yönetici çağırabilir:
+
+   ```bash
+   supabase functions deploy firma-davet --project-ref azjdweynukmwxywdfewb
+   ```
+
+3. Secrets: `haber-gonder` ile aynı `RESEND_API_KEY`, `HABER_GONDEREN` ve `SITE_URL` (§8). Ek bir şey gerekmez.
+4. **Authentication** > **URL Configuration** > **Redirect URLs** listesinde `https://undustit.com/giris/` olmalı (§10).
+5. Bağlantının geçerlilik süresi **Authentication** > **Emails** altındaki e-posta OTP süresidir (varsayılan 1 saat;
+   firmalar için 24 saat önerilir). Süresi geçerse "Tekrar gönder" ya da giriş sayfasındaki "Şifremi unuttum" yeterli.
+6. Deneme: kendi adresinizle bir başvuru gönderin, yönetimde "Vaka oluştur" deyin. E-posta gelmeli, bağlantı şifre
+   formunu açmalı, şifreden sonra firma paneli açılmalı.
+
 ## Sorun giderme
 
 - **"Veri servisi yüklenemedi"**: İnternet bağlantısını ve `supabaseUrl` değerinin `https://` ile başladığını kontrol edin.

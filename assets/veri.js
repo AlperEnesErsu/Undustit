@@ -159,6 +159,9 @@
     firmaEkle: async (vakaId, eposta) => { const d = oku(); d.firmalar = d.firmalar || {}; const l = d.firmalar[vakaId] = d.firmalar[vakaId] || []; if (!l.includes(eposta)) l.push(eposta); yaz(d); },
     firmaSil: async (vakaId, eposta) => { const d = oku(); if (d.firmalar && d.firmalar[vakaId]) d.firmalar[vakaId] = d.firmalar[vakaId].filter(e => e !== eposta); yaz(d); },
     firmaVakalari: async eposta => { const d = oku(); return Object.keys(d.firmalar || {}).filter(id => d.firmalar[id].includes(eposta) && d.vakalar[id]).map(id => d.vakalar[id]); },
+    // giriş bilgisi e-postası: yerel önizleme e-posta göndermez, yalnız zamanı yazar (udv-v1.davetler = { vakaId: { e-posta: zaman } })
+    davetler: async vakaId => Object.assign({}, (oku().davetler || {})[vakaId]),
+    davet: async (vakaId, eposta) => { const d = oku(); d.davetler = d.davetler || {}; const z = simdi(); (d.davetler[vakaId] = d.davetler[vakaId] || {})[eposta] = z; yaz(d); return { yerel:true, zaman:z }; },
     firmaGorsel: async (vakaId, adres) => { const d = oku(); if (!d.vakalar[vakaId]) throw new Error('Vaka bulunamadı'); d.vakalar[vakaId].gorsel = adres; d.vakalar[vakaId].guncelleme = simdi(); yaz(d); },
     // bir vakanın fikirlerine yazılan fiyatlar (fiyat dağılımı için)
     talepFiyatlari: async vakaId => {
@@ -297,6 +300,22 @@
       return ids.length ? (await tam()).filter(v => ids.includes(v.id)) : [];
     },
     firmaGorsel: async (vakaId, adres) => { await sorgu(istemci().rpc('firma_gorsel', { v:vakaId, adres })); },
+    davetler: async vakaId => {
+      const { data, error } = await istemci().from('vaka_firmalari').select('eposta,davet').eq('vaka_id', vakaId);
+      if (error && error.code === '42703') return {};   // 19-davet.sql henüz çalışmadı
+      if (error) throw hata(error);
+      const o = {}; data.forEach(r => { if (r.davet) o[r.eposta] = r.davet; }); return o;
+    },
+    // firma-davet Edge Function: kullanıcı adı (e-posta) ve tek kullanımlık şifre belirleme bağlantısı gönderir
+    davet: async (vakaId, eposta) => {
+      const { data, error } = await istemci().functions.invoke('firma-davet', { body:{ vaka_id:vakaId, eposta } });
+      if (error){
+        let ayrinti = null; try { ayrinti = await error.context.json(); } catch(e){}
+        const neden = { yetki:'Yalnız yönetici gönderebilir', 'erisim-yok':'Bu e-posta vakaya ekli değil', ayar:'E-posta ayarları eksik (KURULUM.md §23)', gonderim:'E-posta servisi göndermedi' }[ayrinti && ayrinti.hata];
+        throw new Error(neden || 'E-posta gönderilemedi. firma-davet fonksiyonu yüklü mü? (KURULUM.md §23)');
+      }
+      return data;
+    },
     talepFiyatlari: async vakaId => {
       const ids = (await sorgu(istemci().from('fikirler').select('id').eq('vaka_id', vakaId))).map(r => r.id);
       if (!ids.length) return [];
@@ -664,6 +683,9 @@
         await depo.firmaEkle(str(vakaId), e);
       },
       async sil(vakaId, eposta){ yetkiTest(); await depo.firmaSil(str(vakaId), kucuk(str(eposta))); },
+      // kabul edilen firmaya giriş bilgisi: kullanıcı adı ve şifre belirleme bağlantısı (şifre e-postaya yazılmaz)
+      async davet(vakaId, eposta){ yetkiTest(); return depo.davet(str(vakaId), kucuk(str(eposta))); },
+      async davetler(vakaId){ yetkiTest(); return depo.davetler(str(vakaId)); },
       async vakalarim(){ const e = UDV.firma.eposta(); return e ? depo.firmaVakalari(e) : []; },
       // vakası henüz açılmamış firmanın başvuruları: [{ id, stok, durum, zaman }]
       async basvurularim(){ const e = UDV.firma.eposta(); return e ? depo.basvurularim(e) : []; },

@@ -33,6 +33,8 @@
 .y-firmalar li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;overflow-wrap:anywhere}
 .y-firmalar li + li{border-top:1px solid var(--line)}
 .y-firmalar .bos-satir{color:var(--muted)}
+.y-firmalar .y-davet{color:var(--muted)}
+.y-firma-eylem{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media (max-width:640px){.y-ust{align-items:stretch}.y-eylemler .btn{flex:1 1 auto}}
 </style>
@@ -130,7 +132,7 @@ function yeniFormCiz(){
       gorsel:basvuru.gorsel || '', ortaklik: basvuru.model !== 'odul' });
     var n = $('#bv-not'); n.hidden = false;
     n.textContent = basvuru.firma + ' başvurusundan dolduruldu. Firmanın yazdıklarını ve sayıları kontrol edin; boş kalanı siz yazın. Oluşturunca ' + basvuru.eposta +
-      ' firma paneline eklenir ve başvuru “Kabul” olur.';
+      ' firma paneline eklenir, başvuru “Kabul” olur ve bu adrese kullanıcı adı ile şifre belirleme bağlantısı e-postayla gider.';
     form.querySelector('[name="baslik"]').focus();
   }).catch(function(err){ hata(err, 'Başvuru okunamadı.'); });
   form.addEventListener('submit', function(e){
@@ -142,11 +144,17 @@ function yeniFormCiz(){
     Promise.resolve().then(function(){ return UDV.vakalar.olustur(v); }).then(function(yeni){
       if (!basvuru) return { yeni:yeni };
       return UDV.firma.ekle(yeni.id, basvuru.eposta).then(function(){ return UDV.basvurular.bagla(basvuru.id, yeni.id); })
-        .then(function(){ return { yeni:yeni, firma:basvuru.eposta }; }, function(err){ return { yeni:yeni, sorun:(err && err.message) || 'bilinmeyen hata' }; });
+        .then(function(){
+          // accepted: the company gets its username and a set-your-password link (never a password)
+          return UDV.firma.davet(yeni.id, basvuru.eposta).then(function(d){ return { yeni:yeni, firma:basvuru.eposta, davet:d }; },
+            function(err){ return { yeni:yeni, firma:basvuru.eposta, davetSorun:(err && err.message) || 'bilinmeyen hata' }; });
+        }, function(err){ return { yeni:yeni, sorun:(err && err.message) || 'bilinmeyen hata' }; });
     }).then(function(s){
       var yeni = s.yeni;
       YON.sonrakiBildirim('“' + yeni.baslik + '” taslak olarak açıldı.' + (s.firma ? ' ' + s.firma + ' firma paneline eklendi.' : '') +
-        (s.sorun ? ' Firma erişimi eklenemedi: ' + s.sorun : ''), s.sorun ? 'hata' : 'ok');
+        (s.davet ? (s.davet.yerel ? ' Yerel önizlemede e-posta gönderilmez.' : ' Giriş bilgileri e-postayla gönderildi.') : '') +
+        (s.davetSorun ? ' Giriş bilgileri gönderilemedi: ' + s.davetSorun + '. Firma erişimi sekmesinden tekrar deneyin.' : '') +
+        (s.sorun ? ' Firma erişimi eklenemedi: ' + s.sorun : ''), (s.sorun || s.davetSorun) ? 'hata' : 'ok');
       location.href = '?id=' + enc(yeni.id);
     }).catch(function(err){
       btn.disabled = false;
@@ -241,9 +249,15 @@ function sekmeYukle(ad){
 // ----------------------------------------------------------- firma erişimi
 function firmalariYaz(){
   var kap = $('#firmalar');
-  return Promise.resolve().then(function(){ return UDV.firma.liste(vaka.id); }).then(function(l){
+  return Promise.resolve().then(function(){
+    return Promise.all([UDV.firma.liste(vaka.id), UDV.firma.davetler(vaka.id).catch(function(){ return {}; })]);
+  }).then(function(r){
+    var l = r[0], dv = r[1];
     kap.innerHTML = l.length ? l.map(function(e){
-      return '<li><span>' + esc(e) + '</span><button type="button" class="btn alt sm" data-firma-sil="' + esc(e) + '">Kaldır</button></li>';
+      // the visible state: when the sign-in e-mail last went out, and the verb that sends it (again)
+      return '<li><span>' + esc(e) + '<br><small class="y-davet">' + (dv[e] ? 'Giriş bilgisi gönderildi: ' + esc(YON.tarihSaat(dv[e])) : 'Giriş bilgisi gönderilmedi') + '</small></span>' +
+        '<span class="y-firma-eylem"><button type="button" class="btn alt sm" data-firma-davet="' + esc(e) + '">' + (dv[e] ? 'Tekrar gönder' : 'Giriş bilgisi gönder') + '</button>' +
+        '<button type="button" class="btn alt sm" data-firma-sil="' + esc(e) + '">Kaldır</button></span></li>';
     }).join('') : '<li class="bos-satir">Henüz firma eklenmedi.</li>';
   }).catch(function(err){ kap.innerHTML = ''; hata(err, 'Firma listesi yüklenemedi.'); });
 }
@@ -257,7 +271,20 @@ function firmaEkle(e){
   }).catch(function(err){ hata(err, 'Firma eklenemedi.'); f.eposta.focus(); })
     .then(function(){ btn.disabled = false; });
 }
+function firmaDavet(b){
+  var eposta = b.dataset.firmaDavet;
+  YON.onay({ baslik:'Giriş bilgisi gönderilsin mi?', metin:eposta + ' adresine kullanıcı adı ve tek kullanımlık şifre belirleme bağlantısı gider. Şifre e-postaya yazılmaz.', eylem:'Gönder' }).then(function(evet){
+    if (!evet) return;
+    b.disabled = true;
+    return UDV.firma.davet(vaka.id, eposta).then(function(d){
+      YON.toast(d && d.yerel ? 'Yerel önizlemede e-posta gönderilmez; zaman kaydedildi.' : 'Giriş bilgileri ' + eposta + ' adresine gönderildi.', 'ok');
+      return firmalariYaz();
+    });
+  }).catch(function(err){ b.disabled = false; hata(err, 'Gönderilemedi.'); });
+}
 function firmaSil(e){
+  var d = e.target.closest('[data-firma-davet]');
+  if (d) return firmaDavet(d);
   var b = e.target.closest('[data-firma-sil]');
   if (!b) return;
   var eposta = b.dataset.firmaSil;

@@ -106,6 +106,15 @@ test('vaka başvurusu yönetimde durumuyla görünür', async ({ page }) => {
   expect(son.b.durum).toBe('kabul');
   expect(son.b.vaka_id).toBe('yirmi-bin-mentese');
   expect(son.f['yirmi-bin-mentese']).toEqual(['satis@example.test']);
+  // accepted: the sign-in e-mail (username + set-your-password link) went out, and the access tab says when
+  await expect(page.locator('body')).toContainText('Yerel önizlemede e-posta gönderilmez');
+  await page.locator('#t-firma').click();
+  const erisim = page.locator('#firmalar li', { hasText:'satis@example.test' });
+  await expect(erisim).toContainText('Giriş bilgisi gönderildi:');
+  await erisim.getByRole('button', { name:'Tekrar gönder' }).click();
+  await page.locator('dialog.diyalog [data-tamam]').click();
+  await expect(page.locator('body')).toContainText('zaman kaydedildi');
+  await expect(erisim).toContainText('Giriş bilgisi gönderildi:');
 });
 
 test('yönetici vaka görseli yükler, teknik föyde görünür', async ({ page }) => {

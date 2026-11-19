@@ -112,6 +112,8 @@ küçük bir espri; rakamlar, oranlar ve kurallar hiç değişmedi.
 
 ## Canlıya çıkış: eksikler (24 Ekim 2026)
 
+> Güncel durum (19 Kasım 2026): `docs/denetim-raporu.md`. 1, 2, 5, 6 ve 9 kapandı; 4, 7 ve 8 yarım; 3 (ödeme) açık.
+
 **Bu turda kapatılanlar**
 - Başkalarının verisi güvenilmez kabul ediliyor: başlık, metin ve listeler formun sınırlarına kırpılıyor,
   geçersiz ya da ileri tarihli `at` 30 günü uzatamıyor, yorum türü beyaz listeden (`class` içine giden

@@ -50,10 +50,11 @@ export function yerlestir(html, e){
   return html.replace(/(<(?:title|meta name="description"|meta property="og:(?:title|description)")[^>]*?)\s+data-ta?="[^"]*"/g, '$1');
 }
 
+// the database's names are English (assets/ud/db.js); the row comes back under the Turkish aliases used below
 async function fikirOku(id, url, anon){
   const ctrl = new AbortController(); const zaman = setTimeout(() => ctrl.abort(), 1500);
   try {
-    const r = await fetch(`${url}/rest/v1/fikir_kart?id=eq.${id}&select=sahip,baslik,problem,alici,ort_fiyat&limit=1`,
+    const r = await fetch(`${url}/rest/v1/idea_cards?id=eq.${id}&select=sahip:owner_id,baslik:title,problem,alici:buyers,ort_fiyat:avg_price&limit=1`,
       { headers:{ apikey:anon, Authorization:'Bearer ' + anon }, signal:ctrl.signal });
     if (!r.ok) return null;
     const satir = (await r.json())[0];

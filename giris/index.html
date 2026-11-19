@@ -40,6 +40,7 @@
 </main>
 <footer data-ud-foot></footer>
 <script src="../assets/ayar.js"></script>
+<script src="../assets/ud/db.js"></script>
 <script src="../assets/ud/temel.js"></script>
 <script src="../assets/ud/depo.js"></script>
 <script src="../assets/ud/arayuz.js"></script>
@@ -181,7 +182,8 @@ function formCiz(){
 
 // coming back from an e-mail: a password reset, or a confirmed sign-up that may still need its password
 Promise.resolve(UDV.hazir).then(() => {
-  if (isaret.get('type') === 'recovery') return yeniSifreCiz();
+  // a reset link, or the invite an accepted company gets (supabase/functions/firma-davet): set the password here
+  if (isaret.get('type') === 'recovery' || isaret.get('type') === 'invite') return yeniSifreCiz();
   const o = UDV.oturum();
   let sonra = false; try { sonra = localStorage.getItem('ud-sifre-sonra') === '1'; } catch(e){}
   if (o && o.email && sonra) return yeniSifreCiz();

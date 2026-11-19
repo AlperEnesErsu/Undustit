@@ -13,10 +13,13 @@ const LANG = METIN.lang;
 const LOCALE = LANG === 'en' ? 'en-GB' : 'tr-TR';
 function T(k, v){
   let s = METIN.al(k);
-  if (s == null) return k;
+  // a missing text never shows its key ("ud.al.alirdim" once reached a search result, when the crawler's render
+  // ran without the dictionary); metin.py denetle catches missing keys before they ship
+  if (s == null){ if (!T.eksik[k]){ T.eksik[k] = 1; console.warn('metin yok: ' + k); } return ''; }
   if (v) s = s.replace(/\{(\w+)\}/g, (m, n) => n in v ? v[n] : m);
   return s;
 }
+T.eksik = {};
 // pages carry their text in place (data-t for the inside, data-ta="attr:key;attr:key" for attributes)
 function applyText(root=document){
   if (root === document && LANG !== 'tr'){
@@ -163,7 +166,7 @@ function sbClient(){
 window.UD_SB = sbClient;
 
 // =========================================================== error log
-// An uncaught error goes to hata_kayitlari (supabase/10-hata.sql) so a broken page gets noticed; the admin reads
+// An uncaught error goes to error_logs (supabase/10-hata.sql, renamed in 20-english-names.sql) so a broken page gets noticed; the admin reads
 // them in yonetim/. Each message once, five per page view at most, never what the visitor typed: the address
 // without its #fragment (sign-in tokens live there), the message, where it came from, the browser. A plain REST
 // insert, so it works without a session. Browser extensions' errors and the content-free "Script error." are skipped.
@@ -178,10 +181,11 @@ window.UD_SB = sbClient;
     if (/view transition|transition was skipped/i.test(mesaj)) return;
     if (!mesaj || mesaj === 'Script error.' || /^(chrome|moz|safari)-extension:/.test(kaynak) || gorulen.has(mesaj) || kalan <= 0) return;
     gorulen.add(mesaj); kalan--;
-    fetch(A.supabaseUrl + '/rest/v1/hata_kayitlari', { method:'POST',
+    // error_logs (assets/ud/db.js: the database's own names)
+    fetch(A.supabaseUrl + '/rest/v1/error_logs', { method:'POST',
       headers:{ apikey:A.supabaseAnon, Authorization:'Bearer ' + A.supabaseAnon, 'Content-Type':'application/json', Prefer:'return=minimal' },
-      body:JSON.stringify({ sayfa:(location.pathname + location.search).slice(0, 300), mesaj, kaynak:kaynak.slice(0, 300),
-        satir:Number(satir) || null, tarayici:navigator.userAgent.slice(0, 300) }) }).catch(() => {});
+      body:JSON.stringify({ page:(location.pathname + location.search).slice(0, 300), message:mesaj, source:kaynak.slice(0, 300),
+        line:Number(satir) || null, user_agent:navigator.userAgent.slice(0, 300) }) }).catch(() => {});
   };
   // the error's own message: the event's adds a browser-specific "Uncaught Error: " in front
   addEventListener('error', e => { const m = (e.error && e.error.message) || e.message; if (m) gonder(m, e.filename, e.lineno); });

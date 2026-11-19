@@ -80,7 +80,7 @@ test('Turnstile anahtarı boşken hiçbir şey yüklenmez', async ({ page }) => 
   expect(await page.evaluate(() => [...document.scripts].some(s => s.src.includes('turnstile')))).toBe(false);
 });
 
-// The error log (supabase/10-hata.sql): an uncaught error is sent once, without the #fragment where sign-in
+// The error log (supabase/10-hata.sql, error_logs since 20-english-names.sql): an uncaught error is sent once, without the #fragment where sign-in
 // tokens sit, and nothing the visitor typed
 test('tarayıcı hatası hata kaydına bir kez gider, adresin # kısmı gitmez', async ({ page }) => {
   const giden = [];
@@ -90,19 +90,20 @@ test('tarayıcı hatası hata kaydına bir kez gider, adresin # kısmı gitmez',
   const cors = { 'access-control-allow-origin':'*', 'access-control-allow-headers':'*', 'access-control-allow-methods':'*' };
   await page.route('http://sb.test/**', r => {
     const q = r.request();
-    if (q.method() === 'POST' && q.url().endsWith('/rest/v1/hata_kayitlari')) giden.push({ govde:q.postDataJSON(), anahtar:q.headers().apikey });
+    if (q.method() === 'POST' && q.url().endsWith('/rest/v1/error_logs')) giden.push({ govde:q.postDataJSON(), anahtar:q.headers().apikey });
     r.fulfill({ status: q.method() === 'OPTIONS' ? 204 : 201, headers:cors, body:'' });
   });
   await page.goto('/hikaye/?x=1#access_token=gizli');
   const MESAJ = '[beklenen] deneme hatası';
   await page.evaluate(m => { for (let i = 0; i < 3; i++) setTimeout(() => { throw new Error(m); }); }, MESAJ);
-  await expect.poll(() => giden.filter(g => g.govde.mesaj === MESAJ).length).toBe(1);
+  await expect.poll(() => giden.filter(g => g.govde.message === MESAJ).length).toBe(1);
   await page.waitForTimeout(300);
-  expect(giden.filter(g => g.govde.mesaj === MESAJ)).toHaveLength(1);
-  const g = giden.find(x => x.govde.mesaj === MESAJ);
-  expect(g.govde.sayfa).toBe('/hikaye/?x=1');
+  expect(giden.filter(g => g.govde.message === MESAJ)).toHaveLength(1);
+  const g = giden.find(x => x.govde.message === MESAJ);
+  expect(g.govde.page).toBe('/hikaye/?x=1');
   expect(JSON.stringify(g.govde)).not.toContain('gizli');
-  expect(Object.keys(g.govde).sort()).toEqual(['kaynak', 'mesaj', 'satir', 'sayfa', 'tarayici']);
+  // the database's own (English) column names: error_logs, supabase/20-english-names.sql
+  expect(Object.keys(g.govde).sort()).toEqual(['line', 'message', 'page', 'source', 'user_agent']);
   expect(g.anahtar).toBe('anahtar');
 });
 

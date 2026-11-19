@@ -45,6 +45,30 @@ test('İngilizce sayfa metni İngilizce', async ({ page }) => {
   await expect(page.locator('h1')).not.toContainText('Fazla stok');
 });
 
+// no ?dil in the address: the browser's language decides, and a choice made on the switch is remembered
+test.describe('İngilizce tarayıcı', () => {
+  test.use({ locale: 'en-US' });
+  test('site İngilizce açılır, TR seçimi hatırlanır', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => localStorage.clear());
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await page.goto('/?dil=tr');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
+    await page.goto('/nasil/');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
+    // a link written by the page keeps the language even without the address naming it
+    const href = await page.locator('a[href*="vakalar"]').first().getAttribute('href');
+    await page.goto(href);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
+  });
+});
+
+test('Türkçe tarayıcıda site Türkçe açılır', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
+});
+
 test('yasal sayfalar arama motorlarına kapalı ve alt bilgide yok', async ({ page }) => {
   await page.goto('/kvkk/');
   await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', 'noindex');

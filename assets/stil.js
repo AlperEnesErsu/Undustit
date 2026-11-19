@@ -17,7 +17,19 @@
   var base = document.currentScript.src.replace(/assets\/stil\.js.*$/, '');
   var qs = new URLSearchParams(location.search);
   var stil = LIST[qs.get('stil')] ? qs.get('stil') : DEFAULT;
-  var dil = LANGS[qs.get('dil')] ? qs.get('dil') : 'tr';
+  // language without ?dil: the visitor's last choice, else the browser's language (Turkish browser → tr, any
+  // other → en). Crawlers keep Turkish, so the plain address stays the Turkish page hreflang points at.
+  var LANG_KEY = 'ud-dil';
+  var BOT = /bot|crawl|spider|slurp|lighthouse|facebookexternalhit|embedly|preview/i.test(navigator.userAgent || '');
+  function stored(){ try { var v = localStorage.getItem(LANG_KEY); return LANGS[v] ? v : null; } catch(e){ return null; } }
+  function browserLang(){
+    var l = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+    return /^tr\b/i.test(l) ? 'tr' : 'en';
+  }
+  var AUTO = BOT ? 'tr' : (stored() || browserLang());
+  var asked = LANGS[qs.get('dil')] ? qs.get('dil') : null;
+  var dil = asked || AUTO;
+  if (asked && !BOT) try { localStorage.setItem(LANG_KEY, asked); } catch(e){}
   var edit = qs.get('duzenle') === '1';
   var html = document.documentElement;
   html.setAttribute('data-stil', stil);
@@ -49,7 +61,8 @@
 
   function carry(u, s, l){
     if (s === DEFAULT) u.searchParams.delete('stil'); else u.searchParams.set('stil', s);
-    if (l === 'tr') u.searchParams.delete('dil'); else u.searchParams.set('dil', l);
+    // the address names the language only when it differs from what this visitor gets without it
+    if (l === dil && !asked) u.searchParams.delete('dil'); else u.searchParams.set('dil', l);
     if (edit) u.searchParams.set('duzenle', '1');
     return u.pathname + u.search + u.hash;
   }
@@ -61,7 +74,7 @@
     var u = new URL(href, location.href);
     return u.origin !== location.origin ? href : carry(u, u.searchParams.get('stil') || stil, l);
   }
-  var plain = stil === DEFAULT && dil === 'tr' && !edit;
+  var plain = stil === DEFAULT && !asked && !edit;
   function fix(root){
     if (plain || !root.querySelectorAll) return;
     var links = root.matches && root.matches('a[href]') ? [root] : root.querySelectorAll('a[href]');

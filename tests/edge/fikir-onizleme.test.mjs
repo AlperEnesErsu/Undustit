@@ -7,7 +7,8 @@ import fn, { anahtar } from '../../netlify/edge-functions/fikir-onizleme.js';
 const SAHIP = '11111111-2222-3333-4444-555555555555', ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 const sayfa = fs.readFileSync(new URL('../../fikirler/index.html', import.meta.url), 'utf8');
 const baglam = { next: async () => new Response(sayfa, { headers:{ 'content-type':'text/html; charset=utf-8' } }) };
-const veri = satirlar => { globalThis.fetch = async () => new Response(JSON.stringify(satirlar), { headers:{ 'content-type':'application/json' } }); };
+let sonAdres = '';
+const veri = satirlar => { globalThis.fetch = async u => (sonAdres = String(u), new Response(JSON.stringify(satirlar), { headers:{ 'content-type':'application/json' } })); };
 const iste = f => fn(new Request('https://undustit.com/fikirler/?f=' + encodeURIComponent(f)), baglam);
 
 test('anahtar yalnız sahip:id kabul eder', () => {
@@ -22,6 +23,8 @@ test('paylaşılan fikrin başlığı, talebi ve adresi sayfaya yazılır, metin
   assert.match(html, /property="og:description" content="Bahçe çiti çabuk yıkılıyor\. 3 kişi alırdım dedi, ortalama ₺420\."/);
   assert.ok(html.includes(`rel="canonical" href="https://undustit.com/fikirler/?f=${SAHIP}%3A${ID}"`));
   assert.match(html, /property="og:type" content="article"/);
+  // the database's English view, read under the Turkish names the page uses
+  assert.match(sonAdres, /\/rest\/v1\/idea_cards\?id=eq\.[^&]+&select=sahip:owner_id,baslik:title,problem,alici:buyers,ort_fiyat:avg_price&/);
   assert.doesNotMatch(html, /og:title" content="[^"]*" data-ta/);
 });
 

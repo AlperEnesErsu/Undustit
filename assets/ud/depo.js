@@ -4,6 +4,8 @@
 (function(){
 'use strict';
 const { $, CASES, DAY, CRIT, T, TERMS, V01, captcha, caseOf, daysLeft, sbClient, veriUyari } = window.UD_IC;
+// the database speaks English; assets/ud/db.js turns the Turkish names below into its names
+const DB = window.UD_DB;
 const Store = (function(){
   const subs = new Set();
   const S = { mode:'local', uid:'local', canWrite:true, ideas:{}, votes:{}, notes:{} };
@@ -46,10 +48,10 @@ const Store = (function(){
   const num = v => Number(v) || 0;
   async function sbLoad(){
     if (summary){
-      const k = await sb.from('fikir_kart').select('*').order('zaman', { ascending:false }).limit(NEWEST);
+      const k = await DB.from(sb, 'fikir_kart').select('*').order('zaman', { ascending:false }).limit(NEWEST);
       if (k.error){ summary = false; return sbLoad(); }
       const me = S.uid !== 'anon' ? S.uid : null;
-      const [t, p] = me ? await Promise.all([sb.from('talepler').select('fikir_id,fiyat').eq('uye', me), sb.from('puanlar').select('fikir_id,olcut,puan').eq('uye', me)]) : [{}, {}];
+      const [t, p] = me ? await Promise.all([DB.from(sb, 'talepler').select('fikir_id,fiyat').eq('uye', me), DB.from(sb, 'puanlar').select('fikir_id,olcut,puan').eq('uye', me)]) : [{}, {}];
       const keyOf = {}, ideas = {}, mine = { buy:{}, rate:{} };
       k.data.forEach(r => { keyOf[r.id] = r.sahip + ':' + r.id;
         (ideas[r.sahip] = ideas[r.sahip] || { items:[] }).items.push({ k:r.id, caseId:r.vaka_id, title:r.baslik, cat:r.kategori, problem:r.problem, solution:r.cozum, feats:r.ozellikler, handle:r.ad, at:r.zaman,
@@ -59,7 +61,7 @@ const Store = (function(){
       S.ideas = ideas; S.votes = me ? { [me]: mine } : {}; veriUyari(false); emit();
       return;
     }
-    const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => (t === 'fikirler' ? sb.from(t).select('*').eq('gizli', false) : sb.from(t).select('*')).limit(5000)));
+    const res = await Promise.all(['fikirler', 'talepler', 'puanlar', 'yorumlar'].map(t => (t === 'fikirler' ? DB.from(sb, t).select('*').eq('gizli', false) : DB.from(sb, t).select('*')).limit(5000)));
     const bad = res.find(r => r.error); if (bad) throw bad.error;
     const [f, t, p, y] = res.map(r => r.data || []);
     const keyOf = {}, ideas = {}, votes = {}, notes = {};
@@ -76,7 +78,7 @@ const Store = (function(){
   const noteCache = {};
   async function sbNotes(key){
     // every column: "gizli" exists only after supabase/13-moderasyon.sql, and naming it before that would fail
-    const r = await sb.from('yorumlar').select('*').eq('fikir_id', idOf(key)).order('zaman', { ascending:true }).limit(500);
+    const r = await DB.from(sb, 'yorumlar').select('*').eq('fikir_id', idOf(key)).order('zaman', { ascending:true }).limit(500);
     if (r.error){ veriUyari(true, () => sbNotes(key).then(() => veriUyari(false))); return; }
     noteCache[key] = r.data.map(n => ({ k:n.id, idea:key, kind:n.tur, text:n.metin, handle:n.ad, at:n.zaman, owner:n.uye, hidden:!!n.gizli }));
     emit();
@@ -104,7 +106,7 @@ const Store = (function(){
     return v;
   }
   // "alırdım" goes through the database's own function only: the table takes no plain insert (supabase/18-talep-kilidi.sql)
-  const alirdim = (id, fiyat) => sb.rpc('alirdim', { f:id, fiyat, cihaz:cihazId() });
+  const alirdim = (id, fiyat) => DB.rpc(sb, 'alirdim', { f:id, fiyat, cihaz:cihazId() });
   // nobody votes for, or scores, their own idea: said here at once, enforced by the database as well
   const kendiMi = k => k.slice(0, k.lastIndexOf(':')) === S.uid;
   const kendiHatasi = () => Promise.reject(Object.assign(new Error(T('ud.al.kendi.hata')), { code:'P0001' }));
@@ -167,7 +169,7 @@ const Store = (function(){
     let rows = null;
     if (AYAR.supabaseUrl){
       const c = await sbClient();
-      const r = await c.from('vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,gorsel,ortaklik,odul,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
+      const r = await DB.from(c, 'vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,gorsel,ortaklik,odul,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
       if (!r.error) rows = r.data;
     } else if (!(window.claude && window.claude.use)){
       try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null'); if (d && d.vakalar) rows = Object.values(d.vakalar).filter(v => v.durum !== 'taslak').sort((a,b) => String(b.olusturma).localeCompare(String(a.olusturma))); } catch(e){}
@@ -185,7 +187,7 @@ const Store = (function(){
     let rows = [];
     if (AYAR.supabaseUrl){
       const c = await sbClient();
-      const r = await c.from('etkinlikler').select('id,baslik,aciklama,baslangic,bitis,baglanti').gte('baslangic', new Date(Date.now() - 30 * DAY).toISOString()).order('baslangic');
+      const r = await DB.from(c, 'etkinlikler').select('id,baslik,aciklama,baslangic,bitis,baglanti').gte('baslangic', new Date(Date.now() - 30 * DAY).toISOString()).order('baslangic');
       if (!r.error) rows = r.data;
     } else {
       try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null'); rows = Object.values((d && d.etkinlikler) || {}); } catch(e){}
@@ -267,9 +269,9 @@ const Store = (function(){
     myCount(){ return myItems('ideas').length; },
     addIdea(data){
       if (S.mode === 'supabase'){
-        return sbDo(() => sb.from('fikirler').insert({ sahip:S.uid, vaka_id: data.caseId || null, baslik:data.title, kategori:data.cat, problem:data.problem,
+        return sbDo(() => DB.from(sb, 'fikirler').insert({ sahip:S.uid, vaka_id: data.caseId || null, baslik:data.title, kategori:data.cat, problem:data.problem,
           cozum:data.solution, ozellikler:data.feats, ad:data.handle || '' }).select('id').single()).then(r => {
-          sb.rpc('fikir_cihazi', { f:r.data.id, cihaz:cihazId() }).then(() => {}, () => {});   // which browser wrote it; never blocks the idea
+          DB.rpc(sb, 'fikir_cihazi', { f:r.data.id, cihaz:cihazId() }).then(() => {}, () => {});   // which browser wrote it; never blocks the idea
           return S.uid + ':' + r.data.id;
         });
       }
@@ -277,7 +279,7 @@ const Store = (function(){
       return write('ideas', { items: myItems('ideas').concat([it]).slice(-40) }).then(() => S.uid + ':' + it.k);
     },
     removeIdea(key){
-      if (S.mode === 'supabase') return sbDo(() => sb.from('fikirler').delete().eq('id', idOf(key)));
+      if (S.mode === 'supabase') return sbDo(() => DB.from(sb, 'fikirler').delete().eq('id', idOf(key)));
       const k = key.slice(key.lastIndexOf(':') + 1);
       return write('ideas', { items: myItems('ideas').filter(it => it.k !== k) });
     },
@@ -286,12 +288,12 @@ const Store = (function(){
       if (S.mode === 'supabase'){
         if (S.uid !== 'anon'){ const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; S.votes[S.uid] = v; emit(); }
         return sbDo(() => price ? alirdim(idOf(k), price)
-          : sb.from('talepler').delete().eq('fikir_id', idOf(k)).eq('uye', S.uid));
+          : DB.from(sb, 'talepler').delete().eq('fikir_id', idOf(k)).eq('uye', S.uid));
       }
       const v = myVotes(); if (price) v.buy[k] = price; else delete v.buy[k]; return write('votes', v); },
     rate(k, c, n){
       if (kendiMi(k)) return kendiHatasi();
-      if (S.mode === 'supabase') return sbDo(() => sb.from('puanlar').upsert({ fikir_id:idOf(k), uye:S.uid, olcut:c, puan:n }, { onConflict:'fikir_id,uye,olcut' }));
+      if (S.mode === 'supabase') return sbDo(() => DB.from(sb, 'puanlar').upsert({ fikir_id:idOf(k), uye:S.uid, olcut:c, puan:n }, { onConflict:'fikir_id,uye,olcut' }));
       const v = myVotes(); v.rate[k] = { ...(v.rate[k] || {}), [c]: n }; return write('votes', v); },
     myRate(k){ return ((S.votes[S.uid] || {}).rate || {})[k] || {}; },
     // "Haber ver": an e-mail to reach this person later about one idea (tur 'fikrim' or 'alirdim').
@@ -299,7 +301,7 @@ const Store = (function(){
     async haberVer(eposta, key, tur){
       if (S.mode === 'supabase'){
         await start(); await sbUser();
-        const r = await sb.from('haber_istekleri').upsert({ uye:S.uid, eposta, fikir_id:idOf(key), tur }, { onConflict:'uye,fikir_id,tur' });
+        const r = await DB.from(sb, 'haber_istekleri').upsert({ uye:S.uid, eposta, fikir_id:idOf(key), tur }, { onConflict:'uye,fikir_id,tur' });
         if (r.error) throw r.error;
         return;
       }
@@ -384,7 +386,7 @@ const Store = (function(){
       if (S.mode === 'supabase'){
         await start();
         if (S.uid === 'anon') return [];
-        const r = await sb.from('haber_istekleri').select('id,eposta,fikir_id,tur,gonderildi').eq('uye', S.uid);
+        const r = await DB.from(sb, 'haber_istekleri').select('id,eposta,fikir_id,tur,gonderildi').eq('uye', S.uid);
         if (r.error) return [];
         return r.data.map(h => ({ id:h.id, eposta:h.eposta, tur:h.tur, gonderildi:h.gonderildi, idea:(ideas().find(i => idOf(i.key) === h.fikir_id) || {}).key }));
       }
@@ -392,7 +394,7 @@ const Store = (function(){
       return d.map((h, ix) => ({ id:String(ix), eposta:h.eposta, tur:h.tur, idea:h.key }));
     },
     async haberIptal(h){
-      if (S.mode === 'supabase'){ await start(); const r = await sb.from('haber_istekleri').delete().eq('id', h.id); if (r.error) throw r.error; return; }
+      if (S.mode === 'supabase'){ await start(); const r = await DB.from(sb, 'haber_istekleri').delete().eq('id', h.id); if (r.error) throw r.error; return; }
       let d = []; try { d = JSON.parse(localStorage.getItem('ud-haber') || '[]') || []; } catch(e){}
       d = d.filter(x => !(x.key === h.idea && x.tur === h.tur));
       try { localStorage.setItem('ud-haber', JSON.stringify(d)); } catch(e){}
@@ -403,7 +405,7 @@ const Store = (function(){
     async kaydet(tablo, data){
       if (S.mode === 'supabase'){
         await start(); await sbUser();
-        const r = await sb.from(tablo).insert(data);
+        const r = await DB.from(sb, tablo).insert(data);
         if (r.error) throw r.error;
         return;
       }
@@ -429,7 +431,7 @@ const Store = (function(){
     bildir(key, neden, aciklama){ return this.kaydet('fikir_bildirimleri', { fikir_id: S.mode === 'supabase' ? idOf(key) : key, neden, aciklama }); },
     loadNotes(key){ if (S.mode === 'supabase' && summary) start().then(() => sbNotes(key)).catch(() => veriUyari(true, () => sbNotes(key))); },
     addNote(idea, kind, text, handle){
-      if (S.mode === 'supabase') return sbDo(() => sb.from('yorumlar').insert({ fikir_id:idOf(idea), uye:S.uid, tur:kind, metin:text, ad:handle || '' })).then(r => { if (summary) sbNotes(idea); return r; });
+      if (S.mode === 'supabase') return sbDo(() => DB.from(sb, 'yorumlar').insert({ fikir_id:idOf(idea), uye:S.uid, tur:kind, metin:text, ad:handle || '' })).then(r => { if (summary) sbNotes(idea); return r; });
       return write('notes', { items: myItems('notes').concat([{ k:key(), idea, kind, text, handle, at:new Date().toISOString() }]).slice(-200) });
     }
   };

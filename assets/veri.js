@@ -5,6 +5,8 @@
   'use strict';
 
   const AYAR = window.UD_AYAR || {};
+  // the database speaks English; assets/ud/db.js turns the Turkish names below into its names
+  const DB = window.UD_DB;
   const SB_URL = AYAR.supabaseUrl || '';
   const SB_ANON = AYAR.supabaseAnon || '';
   const SB_SURUM = '2.45.4';
@@ -199,8 +201,8 @@
   // yöneticiye hepsi, firmaya kendi vakası. 8-gizli.sql çalışmadan önce (fonksiyon yok) eski yoldan okunur.
   const ACIK = 'id,baslik,ozet,aciklama,stok,adet,olcu,sinif,deneme_adedi,sure_gun,gorsel,ortaklik,odul,durum,acilis,kapanis,kazanan,olusturma,guncelleme';
   async function tam(v){
-    const r = await istemci().rpc('vaka_tam', v ? { v } : {});
-    if (r.error && r.error.code === 'PGRST202') return sorgu(v ? istemci().from('vakalar').select('*').eq('id', v) : istemci().from('vakalar').select('*'));
+    const r = await DB.rpc(istemci(), 'vaka_tam', v ? { v } : {});
+    if (r.error && r.error.code === 'PGRST202') return sorgu(v ? DB.from(istemci(), 'vakalar').select('*').eq('id', v) : DB.from(istemci(), 'vakalar').select('*'));
     if (r.error) throw hata(r.error);
     return r.data;
   }
@@ -210,22 +212,22 @@
     al: async id => {
       const o = mevcut();
       if (o && o.email){ const r = await tam(id).catch(() => []); if (r.length) return r[0]; }
-      return sorgu(istemci().from('vakalar').select(ACIK).eq('id', id).maybeSingle());
+      return sorgu(DB.from(istemci(), 'vakalar').select(ACIK).eq('id', id).maybeSingle());
     },
-    ekle: async v => { await sorgu(istemci().from('vakalar').insert(v)); return (await tam(v.id))[0]; },
+    ekle: async v => { await sorgu(DB.from(istemci(), 'vakalar').insert(v)); return (await tam(v.id))[0]; },
     guncelle: async (id, yama) => {
-      const r = await sorgu(istemci().from('vakalar').update(yama).eq('id', id).select('id'));
+      const r = await sorgu(DB.from(istemci(), 'vakalar').update(yama).eq('id', id).select('id'));
       if (!r || !r.length) throw new Error('Vaka bulunamadı ya da yetkiniz yok');
       return (await tam(id))[0];
     },
-    sil: async id => { await sorgu(istemci().from('vakalar').delete().eq('id', id)); },
-    gecmisEkle: async (id, s) => { await sorgu(istemci().from('vaka_gecmis').insert({ vaka_id:id, durum:s.durum, not:s.not, kim:s.kim, zaman:s.zaman })); },
-    gecmis: async id => (await sorgu(istemci().from('vaka_gecmis').select('*').eq('vaka_id', id).order('zaman', { ascending:true })))
+    sil: async id => { await sorgu(DB.from(istemci(), 'vakalar').delete().eq('id', id)); },
+    gecmisEkle: async (id, s) => { await sorgu(DB.from(istemci(), 'vaka_gecmis').insert({ vaka_id:id, durum:s.durum, not:s.not, kim:s.kim, zaman:s.zaman })); },
+    gecmis: async id => (await sorgu(DB.from(istemci(), 'vaka_gecmis').select('*').eq('vaka_id', id).order('zaman', { ascending:true })))
       .map(r => ({ durum:r.durum, not:r.not, kim:r.kim, zaman:r.zaman })),
     fikirler: async vakaId => {
       const [satirlar, ozet] = await Promise.all([
-        sorgu(istemci().from('fikirler').select('*').eq('vaka_id', vakaId).order('zaman', { ascending:false })),
-        sorgu(istemci().from('fikir_ozet').select('*').eq('vaka_id', vakaId))
+        sorgu(DB.from(istemci(), 'fikirler').select('*').eq('vaka_id', vakaId).order('zaman', { ascending:false })),
+        sorgu(DB.from(istemci(), 'fikir_ozet').select('*').eq('vaka_id', vakaId))
       ]);
       const o = {}; ozet.forEach(r => { o[r.fikir_id] = r; });
       return satirlar.map(r => { const k = o[r.id] || {}; return { id:r.id, anahtar:r.sahip + ':' + r.id, baslik:r.baslik, problem:r.problem || '', cozum:r.cozum || '',
@@ -233,33 +235,33 @@
         alici:Number(k.alici) || 0, ortFiyat:Math.round((Number(k.ort_fiyat) || 0) * 100) / 100, yorum:Number(k.yorum) || 0 }; });
     },
     gizle: async (id, gizli) => {
-      const r = await sorgu(istemci().from('fikirler').update({ gizli }).eq('id', id).select('id'));
+      const r = await sorgu(DB.from(istemci(), 'fikirler').update({ gizli }).eq('id', id).select('id'));
       if (!r || !r.length) throw new Error('Fikir bulunamadı ya da yetkiniz yok');
     },
-    tumFikirler: async () => (await sorgu(istemci().from('fikirler').select('id,sahip,vaka_id,kategori,baslik,problem,cozum,ad,gizli,zaman').order('zaman', { ascending:false }).limit(500)))
+    tumFikirler: async () => (await sorgu(DB.from(istemci(), 'fikirler').select('id,sahip,vaka_id,kategori,baslik,problem,cozum,ad,gizli,zaman').order('zaman', { ascending:false }).limit(500)))
       .map(r => ({ id:r.id, anahtar:r.sahip + ':' + r.id, baslik:r.baslik, problem:r.problem || '', cozum:r.cozum || '', ad:r.ad || '', vakaId:r.vaka_id, kategori:r.kategori || '', gizli:!!r.gizli, zaman:r.zaman })),
-    tumYorumlar: async () => (await sorgu(istemci().from('yorumlar').select('*, fikirler(baslik,sahip)').order('zaman', { ascending:false }).limit(500)))
+    tumYorumlar: async () => (await sorgu(DB.from(istemci(), 'yorumlar').select('*, fikirler(baslik,sahip)').order('zaman', { ascending:false }).limit(500)))
       .map(r => ({ id:r.id, anahtar: r.fikirler ? r.fikirler.sahip + ':' + r.fikir_id : '', fikirBaslik:(r.fikirler && r.fikirler.baslik) || '', metin:r.metin, ad:r.ad || '', tur:r.tur, gizli:!!r.gizli, zaman:r.zaman })),
     // gizli sütunu ve söz listesi 13-moderasyon.sql ile gelir; çalışmadıysa bunu açıkça söyler
     yorumGizle: async (id, gizli) => {
-      const { data, error } = await istemci().from('yorumlar').update({ gizli }).eq('id', id).select('id');
+      const { data, error } = await DB.from(istemci(), 'yorumlar').update({ gizli }).eq('id', id).select('id');
       if (error && (error.code === 'PGRST204' || error.code === '42703')) throw new Error(GEREK13);
       if (error) throw hata(error);
       if (!data || !data.length) throw new Error('Yorum değiştirilemedi. ' + GEREK13);
     },
     sozler: async () => {
-      const { data, error } = await istemci().from('yasak_sozler').select('soz,tam').order('soz');
+      const { data, error } = await DB.from(istemci(), 'yasak_sozler').select('soz,tam').order('soz');
       if (error && (error.code === 'PGRST205' || error.code === '42P01')) return null;
       if (error) throw hata(error);
       return data;
     },
-    sozEkle: async (soz, tam) => { await sorgu(istemci().from('yasak_sozler').upsert({ soz, tam }, { onConflict:'soz' })); },
-    sozSil: async soz => { await sorgu(istemci().from('yasak_sozler').delete().eq('soz', soz)); },
+    sozEkle: async (soz, tam) => { await sorgu(DB.from(istemci(), 'yasak_sozler').upsert({ soz, tam }, { onConflict:'soz' })); },
+    sozSil: async soz => { await sorgu(DB.from(istemci(), 'yasak_sozler').delete().eq('soz', soz)); },
     raporHam: async () => {
       const [f, t, y] = await Promise.all([
-        sorgu(istemci().from('fikirler').select('id,vaka_id,kategori,baslik,sahip,gizli,zaman').limit(20000)),
-        sorgu(istemci().from('talepler').select('fikir_id,uye,fiyat,zaman').limit(100000)),
-        istemci().from('yorumlar').select('id', { count:'exact', head:true })
+        sorgu(DB.from(istemci(), 'fikirler').select('id,vaka_id,kategori,baslik,sahip,gizli,zaman').limit(20000)),
+        sorgu(DB.from(istemci(), 'talepler').select('fikir_id,uye,fiyat,zaman').limit(100000)),
+        DB.from(istemci(), 'yorumlar').select('id', { count:'exact', head:true })
       ]);
       return {
         fikirler: f.map(r => ({ id:r.id, vakaId: r.vaka_id || (r.kategori === CAT ? 'vaka-01' : null), baslik:r.baslik, sahip:r.sahip, gizli:!!r.gizli, zaman:r.zaman })),
@@ -268,40 +270,40 @@
       };
     },
     // kullanıcı adı (16-kullanici-adi.sql): girişte adın e-postası sorulur (yalnız yönetici hesapları yanıt verir)
-    girisEposta: async ad => { const r = await istemci().rpc('giris_eposta', { ad }); return r.error ? null : (r.data || null); },
+    girisEposta: async ad => { const r = await DB.rpc(istemci(), 'giris_eposta', { ad }); return r.error ? null : (r.data || null); },
     kullaniciAdi: async () => {
-      const r = await istemci().from('profiller').select('kullanici_adi').eq('id', mevcut().id).maybeSingle();
+      const r = await DB.from(istemci(), 'profiller').select('kullanici_adi').eq('id', mevcut().id).maybeSingle();
       if (r.error) throw new Error(GEREK16);
       return (r.data && r.data.kullanici_adi) || null;
     },
     kullaniciAdiKoy: async ad => {
-      const r = await istemci().rpc('kullanici_adi_koy', { ad: ad || '' });
+      const r = await DB.rpc(istemci(), 'kullanici_adi_koy', { ad: ad || '' });
       if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK16);
       if (r.error && r.error.code === '23505') throw new Error('Bu kullanıcı adı alınmış');
       if (r.error) throw hata(r.error);
       return r.data || null;
     },
     etkinlikler: async () => {
-      const { data, error } = await istemci().from('etkinlikler').select('*').order('baslangic', { ascending:false }).limit(200);
+      const { data, error } = await DB.from(istemci(), 'etkinlikler').select('*').order('baslangic', { ascending:false }).limit(200);
       if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // 11-etkinlik.sql henüz çalışmadı
       if (error) throw hata(error);
       return data;
     },
-    etkinlikEkle: async e => { await sorgu(istemci().from('etkinlikler').insert(e)); },
-    etkinlikSil: async id => { await sorgu(istemci().from('etkinlikler').delete().eq('id', id)); },
-    firmalar: async vakaId => (await sorgu(istemci().from('vaka_firmalari').select('eposta').eq('vaka_id', vakaId).order('eklenme'))).map(r => r.eposta),
-    firmaEkle: async (vakaId, eposta) => { await sorgu(istemci().from('vaka_firmalari').upsert({ vaka_id:vakaId, eposta }, { onConflict:'vaka_id,eposta', ignoreDuplicates:true })); },
-    firmaSil: async (vakaId, eposta) => { await sorgu(istemci().from('vaka_firmalari').delete().eq('vaka_id', vakaId).eq('eposta', eposta)); },
+    etkinlikEkle: async e => { await sorgu(DB.from(istemci(), 'etkinlikler').insert(e)); },
+    etkinlikSil: async id => { await sorgu(DB.from(istemci(), 'etkinlikler').delete().eq('id', id)); },
+    firmalar: async vakaId => (await sorgu(DB.from(istemci(), 'vaka_firmalari').select('eposta').eq('vaka_id', vakaId).order('eklenme'))).map(r => r.eposta),
+    firmaEkle: async (vakaId, eposta) => { await sorgu(DB.from(istemci(), 'vaka_firmalari').upsert({ vaka_id:vakaId, eposta }, { onConflict:'vaka_id,eposta', ignoreDuplicates:true })); },
+    firmaSil: async (vakaId, eposta) => { await sorgu(DB.from(istemci(), 'vaka_firmalari').delete().eq('vaka_id', vakaId).eq('eposta', eposta)); },
     firmaVakalari: async eposta => {
-      const { data, error } = await istemci().from('vaka_firmalari').select('vaka_id').eq('eposta', eposta);
+      const { data, error } = await DB.from(istemci(), 'vaka_firmalari').select('vaka_id').eq('eposta', eposta);
       if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // 7-firma.sql henüz çalışmadı
       if (error) throw hata(error);
       const ids = data.map(r => r.vaka_id);
       return ids.length ? (await tam()).filter(v => ids.includes(v.id)) : [];
     },
-    firmaGorsel: async (vakaId, adres) => { await sorgu(istemci().rpc('firma_gorsel', { v:vakaId, adres })); },
+    firmaGorsel: async (vakaId, adres) => { await sorgu(DB.rpc(istemci(), 'firma_gorsel', { v:vakaId, adres })); },
     davetler: async vakaId => {
-      const { data, error } = await istemci().from('vaka_firmalari').select('eposta,davet').eq('vaka_id', vakaId);
+      const { data, error } = await DB.from(istemci(), 'vaka_firmalari').select('eposta,davet').eq('vaka_id', vakaId);
       if (error && error.code === '42703') return {};   // 19-davet.sql henüz çalışmadı
       if (error) throw hata(error);
       const o = {}; data.forEach(r => { if (r.davet) o[r.eposta] = r.davet; }); return o;
@@ -317,36 +319,36 @@
       return data;
     },
     talepFiyatlari: async vakaId => {
-      const ids = (await sorgu(istemci().from('fikirler').select('id').eq('vaka_id', vakaId))).map(r => r.id);
+      const ids = (await sorgu(DB.from(istemci(), 'fikirler').select('id').eq('vaka_id', vakaId))).map(r => r.id);
       if (!ids.length) return [];
-      return (await sorgu(istemci().from('talepler').select('fikir_id,fiyat').in('fikir_id', ids).limit(50000))).map(r => ({ fikirId:r.fikir_id, fiyat:Number(r.fiyat) }));
+      return (await sorgu(DB.from(istemci(), 'talepler').select('fikir_id,fiyat').in('fikir_id', ids).limit(50000))).map(r => ({ fikirId:r.fikir_id, fiyat:Number(r.fiyat) }));
     },
     kayitlar: async tablo => {
       // bildirimler fikrin başlığıyla gelir (fikir_id yabancı anahtarı üzerinden)
       const secim = tablo === 'fikir_bildirimleri' ? '*, fikirler(baslik,gizli,sahip)' : '*';
-      const { data, error } = await istemci().from(tablo).select(secim).order('zaman', { ascending:false }).limit(200);
+      const { data, error } = await DB.from(istemci(), tablo).select(secim).order('zaman', { ascending:false }).limit(200);
       if (error && (error.code === 'PGRST205' || error.code === '42P01')) return [];   // tablonun migration'ı henüz çalışmadı
       if (error) throw hata(error);
       return data;
     },
     // vaka_id sütunu 15-basvuru.sql ile gelir; yoksa yalnız durum yazılır
     basvuruBagla: async (id, vakaId) => {
-      const r = await istemci().from('vaka_basvurulari').update({ durum:'kabul', vaka_id:vakaId }).eq('id', id);
-      if (r.error && r.error.code === 'PGRST204') return void await sorgu(istemci().from('vaka_basvurulari').update({ durum:'kabul' }).eq('id', id));
+      const r = await DB.from(istemci(), 'vaka_basvurulari').update({ durum:'kabul', vaka_id:vakaId }).eq('id', id);
+      if (r.error && r.error.code === 'PGRST204') return void await sorgu(DB.from(istemci(), 'vaka_basvurulari').update({ durum:'kabul' }).eq('id', id));
       if (r.error) throw hata(r.error);
     },
     // firmanın kendi başvuruları: e-postası eşleşen satırları okuyabilir (15-basvuru.sql); öncesinde boş döner
     basvurularim: async eposta => {
-      const { data, error } = await istemci().from('vaka_basvurulari').select('id,stok,durum,zaman,eposta').ilike('eposta', eposta.replace(/[%_\\]/g, '\\$&')).order('zaman', { ascending:false }).limit(20);
+      const { data, error } = await DB.from(istemci(), 'vaka_basvurulari').select('id,stok,durum,zaman,eposta').ilike('eposta', eposta.replace(/[%_\\]/g, '\\$&')).order('zaman', { ascending:false }).limit(20);
       return error ? [] : data.filter(b => kucuk(b.eposta) === eposta);
     },
-    kayitDurum: async (tablo, id, durum) => { await sorgu(istemci().from(tablo).update({ durum }).eq('id', id)); }
+    kayitDurum: async (tablo, id, durum) => { await sorgu(DB.from(istemci(), tablo).update({ durum }).eq('id', id)); }
   };
   const depo = SB_URL ? uzak : yerel;
 
   // Oturum: sıra numarası, en son başlayan yüklemenin sonucu geçerli (giriş + olay yarışmasında eski sonuç yazılmaz).
   async function rolOku(user){
-    try { const p = await sorgu(istemci().from('profiller').select('rol').eq('id', user.id).maybeSingle()); return p && p.rol === 'admin' ? 'admin' : 'uye'; }
+    try { const p = await sorgu(DB.from(istemci(), 'profiller').select('rol').eq('id', user.id).maybeSingle()); return p && p.rol === 'admin' ? 'admin' : 'uye'; }
     catch(e){ return 'uye'; }
   }
   async function oturumYukle(session){

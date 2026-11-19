@@ -97,7 +97,7 @@ yapılmasa da site çalışır, adresler birikir ve sonra gönderilebilir.
 3. **Edge Functions** > **Secrets** altında şunları ekleyin: `RESEND_API_KEY`, `HABER_GONDEREN`
    (ör. `Undustit <haber@alanadiniz.com>`), `SITE_URL` (`https://undustit.com/`) ve
    `WEBHOOK_SECRET` (uzun, rastgele bir metin).
-4. **Database** > **Webhooks** > **Create a new hook**: tablo `public.talepler`, olay **Insert**, tür
+4. **Database** > **Webhooks** > **Create a new hook**: tablo `public.demands` (20'den önce `public.talepler`), olay **Insert**, tür
    **Supabase Edge Functions**, fonksiyon `haber-gonder`. **HTTP Headers**'a `x-undustit-imza` adıyla
    3. adımdaki `WEBHOOK_SECRET` değerini ekleyin.
 5. Deneme: bir fikre "haber ver" ile kendi adresinizi bırakın, başka bir tarayıcıdan "alırdım" deyin.
@@ -265,7 +265,7 @@ Bağlantı `giris/` sayfasında "Yeni şifreni belirle" formunu açar; firma şi
 Yönetim > vaka > **Firma erişimi** sekmesinde her adresin yanında son gönderim zamanı ve "Giriş bilgisi gönder /
 Tekrar gönder" düğmesi vardır.
 
-1. `supabase/19-davet.sql` dosyasını SQL Editor'de çalıştırın (gönderim zamanı sütunu).
+1. `supabase/19-davet.sql` dosyasını SQL Editor'de çalıştırın (gönderim zamanı sütunu, 20'den sonra `case_companies.invited_at`).
 2. Fonksiyonu yükleyin. JWT doğrulaması **açık** kalır, çünkü yalnız giriş yapmış yönetici çağırabilir:
 
    ```bash
@@ -278,6 +278,33 @@ Tekrar gönder" düğmesi vardır.
    firmalar için 24 saat önerilir). Süresi geçerse "Tekrar gönder" ya da giriş sayfasındaki "Şifremi unuttum" yeterli.
 6. Deneme: kendi adresinizle bir başvuru gönderin, yönetimde "Vaka oluştur" deyin. E-posta gelmeli, bağlantı şifre
    formunu açmalı, şifreden sonra firma paneli açılmalı.
+
+## 24. Veritabanı adları İngilizce (`20-english-names.sql`)
+
+Veritabanına bakan herkes Türkçe bilmeden okuyabilsin diye bütün tablo, sütun, görünüm, fonksiyon, kısıt, indeks,
+kural ve tetikleyici adları İngilizcedir (`fikirler` → `ideas`, `vakalar.baslik` → `cases.title`, `alirdim()` →
+`place_demand()`). Durum değerleri (`'yeni'`, `'acik'`, `'kabul'`) ve ziyaretçinin okuduğu hata mesajları Türkçe kaldı.
+
+- **Tek eşleme:** Türkçe ad → İngilizce ad listesi `assets/ud/db.js` içindedir. Sitenin kodu Türkçe alan adlarıyla
+  yazmaya devam eder, her sorgu bu dosyadan geçer. Sonuç satırları da Türkçe takma adla gelir (`baslik:title`).
+  Göçün yeniden adlandırma kısmı aynı listeden `node tools/db-adlar.mjs` ile üretilir.
+- **Yeni sütun ya da tablo eklerken:** SQL'de İngilizce adla yazın, `assets/ud/db.js` içine Türkçe karşılığını ekleyin.
+  `node --test tests/edge/db.test.mjs` adların İngilizce ve tekil olduğunu denetler.
+- **Sırası:** 1–19 numaralı dosyalar eski (Türkçe) adlarla yazılmıştır. Yeni kurulumda hepsini sırayla, sonra 20'yi
+  çalıştırın. 20 çalıştıktan sonra 1–19'u **tekrar çalıştırmayın**, eski adlarla yeni tablolar açarlar.
+- **Canlıya alma:** göç ve sitenin yeni kodu birlikte gider. Önce PR birleşir (Netlify yayınlar), hemen ardından
+  `20-english-names.sql` çalışır, sonra iki Edge Function yeniden yüklenir:
+
+  ```bash
+  supabase functions deploy firma-davet --project-ref azjdweynukmwxywdfewb
+  ```
+
+  Arada geçen bir iki dakika boyunca site veri okuyamaz, yazamaz.
+- **Adı değişmeyenler:** `auth.users` üzerindeki `auth_kullanici_profil` tetikleyicisi ve `storage.objects` üzerindeki
+  `gorsel_*` kuralları Supabase'in kendi rollerine aittir, proje rolü adlarını değiştiremez. Çalışmaları etkilenmez:
+  tetikleyici `public.create_profile()`'ı, kurallar `public.can_upload_image()` ve `public.is_any_company()`'yi çağırır.
+  Görsel kovası `gorseller` adını korur (adı değişirse yüklenmiş fotoğrafların adresleri bozulur).
+- **Webhook:** `haber-gonder` için bir Database Webhook kurduysanız tablosunu `public.demands` olarak seçin.
 
 ## Sorun giderme
 

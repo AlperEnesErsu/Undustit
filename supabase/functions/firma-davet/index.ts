@@ -2,7 +2,7 @@
 // The admin panel calls this right after a case opens from an application, and again from "Firma erişimi" >
 // "Giriş bilgisi gönder". It e-mails the company's username (its e-mail address) and a one-time link that sets
 // its password: an invite link for a new account, a reset link for one that exists. No password ever goes into
-// an e-mail. The time it went out is kept on vaka_firmalari.davet (supabase/19-davet.sql).
+// an e-mail. The time it went out is kept on case_companies.invited_at (supabase/19-davet.sql, 20-english-names.sql).
 // Setup: supabase/KURULUM.md, section 23 "Firma giriş bilgileri".
 //
 // Secrets (Edge Functions > Secrets): RESEND_API_KEY, HABER_GONDEREN, SITE_URL (with the trailing slash), the same
@@ -59,9 +59,9 @@ if (import.meta.main) Deno.serve(async (req) => {
 
   const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
   // the address must already have access to this case: the function never widens access by itself
-  const { data: erisim } = await db.from('vaka_firmalari').select('eposta').eq('vaka_id', vakaId).eq('eposta', eposta).maybeSingle();
+  const { data: erisim } = await db.from('case_companies').select('email').eq('case_id', vakaId).eq('email', eposta).maybeSingle();
   if (!erisim) return cevap({ hata: 'erisim-yok' }, 404);
-  const { data: vaka } = await db.from('vakalar').select('baslik, firma').eq('id', vakaId).maybeSingle();
+  const { data: vaka } = await db.from('cases').select('title, company').eq('id', vakaId).maybeSingle();
   if (!vaka) return cevap({ hata: 'vaka-yok' }, 404);
 
   const giris = env('SITE_URL') + 'giris/';
@@ -75,7 +75,7 @@ if (import.meta.main) Deno.serve(async (req) => {
   const link = r.data?.properties?.action_link;
   if (r.error || !link) return cevap({ hata: 'baglanti', mesaj: r.error?.message }, 500);
 
-  const m = epostaMetni({ firma: vaka.firma ?? '', vaka: vaka.baslik ?? vakaId, eposta, link, giris, yeni });
+  const m = epostaMetni({ firma: vaka.company ?? '', vaka: vaka.title ?? vakaId, eposta, link, giris, yeni });
   const g = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + env('RESEND_API_KEY'), 'Content-Type': 'application/json' },
@@ -84,6 +84,6 @@ if (import.meta.main) Deno.serve(async (req) => {
   if (!g.ok) return cevap({ hata: 'gonderim', durum: g.status }, 502);
 
   const zaman = new Date().toISOString();
-  await db.from('vaka_firmalari').update({ davet: zaman }).eq('vaka_id', vakaId).eq('eposta', eposta);
+  await db.from('case_companies').update({ invited_at: zaman }).eq('case_id', vakaId).eq('email', eposta);
   return cevap({ gitti: true, yeni, zaman });
 });

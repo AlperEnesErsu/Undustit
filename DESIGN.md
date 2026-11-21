@@ -527,3 +527,15 @@ dosya çalışmadan önce de sonra da çalışır (fonksiyon yoksa eski yoldan o
   olduğu gibi gider. Görsel şimdilik genel `og.png`.
 - **Hata kaydı botları saymaz:** Googlebot ve başsız tarayıcılar betikleri yarıda bıraktığı için ("UD is not
   defined") hata kayıtlarına yazılmaz.
+
+## Broşür QR'ı ve "Ne kadar çalıştı?" (21 Kasım 2026)
+
+- **QR:** basılı broşürün kodu `undustit.com/brosur`'a gider; `_redirects` onu vaka 01'in fikir sayfasına
+  (`?k=brosur`) yönlendirir. Gelen kişi önce broşürün kendisini görür (kapatılabilir pencere; Esc ya da dışına
+  dokunmak da kapatır). `k` adresten hemen silinir; yenileme ya da paylaşılan bağlantı afişi yeniden açmaz, broşür sayılmaz.
+- **Sayım:** `ud_cihaz` çerezindeki rastgele kimlik kaynak başına bir kez yazılır (`22-kaynak.sql`). Fikir ve
+  "alırdım" ziyaretçiye yeni bir şey sormadan `device_marks`'tan okunur: o tarayıcının ilk gelişinden sonra yazdığı
+  fikirler ve hâlâ duran "alırdım"ları. Gizli pencere ya da ikinci cihaz ayrı sayılır; rakamlar kesin değil, yön gösterir.
+- **Yönetim:** `/yonetim/kaynak/`: bağlantı başına gelen, fikir yazan (oranıyla), fikir, alırdım diyen, son geliş.
+  Yeni bağlantı "Kaydet" ile eklenir ve QR'a konacak tam adres gösterilir.
+- KVKK metni artık çerezi anlatıyor ("Undustit çerez kullanmaz" cümlesi `ud_cihaz` geldiğinden beri yanlıştı).

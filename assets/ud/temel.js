@@ -192,6 +192,87 @@ window.UD_SB = sbClient;
   addEventListener('unhandledrejection', e => { const r = e.reason; gonder(r && (r.message || String(r)), r && r.stack ? String(r.stack).split('\n')[1] : '', null); });
 })();
 
+// =========================================================== browser id
+// One random id per browser, kept in a cookie and in local storage (either one restores the other). It goes
+// along with "alırdım", a new idea and a visit from a tracked link, so the database counts one browser once per idea
+// and knows the browser an idea was written on (supabase/17-oy.sql, 22-kaynak.sql). It says nothing about the
+// person and is never shown to anyone.
+function cihazId(){
+  let v = '';
+  try { v = (document.cookie.match(/(?:^|; )ud_cihaz=([a-z0-9]{16,40})/) || [])[1] || localStorage.getItem('ud-cihaz') || ''; } catch(e){}
+  if (!/^[a-z0-9]{16,40}$/.test(v)){
+    const a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a);
+    v = Array.from(a, x => (x % 36).toString(36)).join('') + Date.now().toString(36);
+  }
+  try { localStorage.setItem('ud-cihaz', v); } catch(e){}
+  try { document.cookie = 'ud_cihaz=' + v + '; Max-Age=63072000; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); } catch(e){}
+  return v;
+}
+window.UD_CIHAZ = cihazId;
+
+// =========================================================== the printed poster, once, for who came from it
+// Someone who scans the brochure's QR first sees the brochure itself, closable (Kapat, Esc, a tap outside). Only
+// on that arrival: the k leaves the address (below), so a reload or a shared link opens the page alone.
+const AFISLER = {
+  brosur: { src:'assets/afis/challenge-001.webp', w:1200, h:1703,
+    alt:'Challenge #001: Bu cıvatalarla ne yapardın? Cıvatanın 999.999 kardeşi yeni bir hayat arıyor. Undustit atıl ürünleri ' +
+      'topluluğun fikirleriyle yeni ürünlere dönüştürür; en çok talep gören fikir deneme üretimine geçer, fikir sahipleri kârdan pay alır. ' +
+      'Fikirler 21.12.2026 tarihine kadar toplanır, sonra oylamaya sunulur ve sonuç undustit.com üzerinden açıklanır.' }
+};
+function afisGoster(k){
+  const a = AFISLER[k];
+  if (!a || typeof HTMLDialogElement !== 'function') return;
+  // the poster starts loading at once; the window opens when it is in (no empty frame with a lone button), at most three seconds later
+  const resim = new Image(a.w, a.h);
+  resim.alt = a.alt;
+  const yuklendi = new Promise(ok => { resim.onload = resim.onerror = ok; });
+  resim.src = ROOT + a.src;
+  const ac = () => {
+    const d = document.createElement('dialog');
+    d.className = 'afis-dlg';
+    d.setAttribute('aria-label', LANG === 'en' ? 'Brochure' : 'Broşür');
+    const kapat = LANG === 'en' ? 'Close' : 'Kapat';
+    d.innerHTML = '<form method="dialog" class="afis-kapat"><button class="btn sig sm" value="kapat" autofocus>' + kapat + '</button></form>';
+    d.append(resim);
+    d.addEventListener('click', e => { if (e.target === d) d.close(); });   // a tap on the dimmed area outside
+    d.addEventListener('close', () => d.remove());
+    document.body.append(d);
+    d.showModal();
+  };
+  const hazir = Promise.race([yuklendi, new Promise(ok => setTimeout(ok, 3000))]);
+  const dom = new Promise(ok => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', ok, { once:true }) : ok());
+  Promise.all([hazir, dom]).then(ac);
+}
+
+// =========================================================== tracked links ("Ne kadar çalıştı?")
+// A link with ?k=<source> (the brochure QR: undustit.com/brosur → /fikir/?vaka=vaka-01&k=brosur) counts this browser
+// once for that source; the admin sees in /yonetim/kaynak/ how many came and how many then wrote an idea or said
+// "alırdım" (supabase/22-kaynak.sql). The k leaves the address at once, so a link shared on from here is not counted
+// as the brochure. Search engines' renderers are not counted. Locally (no database) the visit stays in this browser.
+(function(){
+  let k = '';
+  try { k = new URLSearchParams(location.search).get('k') || ''; } catch(e){ return; }
+  if (!k) return;
+  try { const u = new URL(location.href); u.searchParams.delete('k'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch(e){}
+  k = k.toLowerCase();
+  if (!/^[a-z0-9-]{1,30}$/.test(k)) return;
+  afisGoster(k);
+  if (/bot|crawl|spider|slurp|headless|lighthouse/i.test(navigator.userAgent)) return;
+  const A = window.UD_AYAR || {};
+  if (!A.supabaseUrl){
+    try {
+      const z = JSON.parse(localStorage.getItem('ud-kaynak-ziyaret') || '{}') || {};
+      if (!z[k]){ z[k] = new Date().toISOString(); localStorage.setItem('ud-kaynak-ziyaret', JSON.stringify(z)); }
+    } catch(e){}
+    return;
+  }
+  if (!window.fetch) return;
+  // log_source_visit (assets/ud/db.js: kaynak_ziyaret); unknown sources are ignored by the database
+  fetch(A.supabaseUrl + '/rest/v1/rpc/log_source_visit', { method:'POST', keepalive:true,
+    headers:{ apikey:A.supabaseAnon, Authorization:'Bearer ' + A.supabaseAnon, 'Content-Type':'application/json' },
+    body:JSON.stringify({ p_source:k, p_device:cihazId() }) }).catch(() => {});
+})();
+
 // =========================================================== spam protection
 // Cloudflare Turnstile in front of every Supabase sign-in, the anonymous one too: every write (idea, "alırdım",
 // comment, application, message) needs a session, so this one gate guards them all, and Supabase checks the

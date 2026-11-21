@@ -503,6 +503,14 @@ dialog.idlg{width:min(720px,100% - 24px);max-height:min(88vh,920px);padding:0;bo
 dialog.idlg::backdrop{background:rgba(22,24,29,.32);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 dialog.idlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
 @keyframes dlg{from{opacity:0;transform:translateY(12px) scale(.98)}}
+/* the printed brochure, shown once to who scanned its QR (assets/ud/temel.js afisGoster): the whole page fits the screen */
+dialog.afis-dlg{position:fixed;padding:0;border:0;border-radius:var(--r-md);background:transparent;overflow:visible;
+  width:fit-content;margin:auto;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);box-shadow:0 40px 120px -30px rgba(22,24,29,.45)}
+dialog.afis-dlg::backdrop{background:rgba(22,24,29,.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+dialog.afis-dlg[open]{animation:dlg var(--dur-mod) var(--ease-out)}
+dialog.afis-dlg img{display:block;width:auto;height:auto;max-width:calc(100vw - 24px);max-height:calc(100dvh - 80px);border-radius:var(--r-md)}
+/* its own row above the poster, so it never covers the printed text */
+.afis-kapat{display:flex;justify-content:flex-end;margin:0 0 10px}
 .idlg header{position:sticky;top:0;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px 14px 24px;background:var(--bg-2);border-bottom:1px solid var(--line)}
 .idlg .x{width:40px;height:40px;border-radius:999px;border:1px solid var(--line-2);background:transparent;display:inline-flex;align-items:center;justify-content:center}
 .idlg .x:hover{border-color:var(--ink-2)}

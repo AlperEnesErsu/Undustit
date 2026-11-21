@@ -27,6 +27,10 @@
   const YETKI = 'Bu işlem için yönetici girişi gerekli';
   const GEREK13 = 'Önce supabase/13-moderasyon.sql çalıştırılmalı.';
   const GEREK16 = 'Önce supabase/16-kullanici-adi.sql çalıştırılmalı.';
+  const GEREK22 = 'Önce supabase/22-kaynak.sql çalıştırılmalı.';
+  // izlenen bağlantılar: ilki broşürdeki QR (undustit.com/brosur, _redirects)
+  const KAYNAK_ILK = [{ id:'brosur', baslik:'Broşür QR', hedef:'/fikir/?vaka=vaka-01', olusturma:'2026-11-21T00:00:00.000Z' }];
+  const SITE = 'https://undustit.com';
   const AD_KURALI = /^[a-z0-9_.]{3,24}$/;
 
   const str = v => v == null ? '' : String(v).trim();
@@ -125,6 +129,21 @@
     yorumGizle: async (id, gizli) => { const d = oku(); d.gizliYorum = d.gizliYorum || {}; if (gizli) d.gizliYorum[id] = true; else delete d.gizliYorum[id]; yaz(d); },
     // yasak söz listesi veritabanında yaşar (supabase/13-moderasyon.sql); yerel önizlemede ön filtre yok
     sozler: async () => null, sozEkle: async () => { throw new Error('Yerel önizlemede söz listesi yok'); }, sozSil: async () => {},
+    // izlenen bağlantılar (22-kaynak.sql): yerelde yalnız bu tarayıcının ziyareti ve ondan sonra yazdığı fikirler sayılır
+    kaynakRaporu: async () => {
+      const d = oku(), liste = d.kaynaklar || KAYNAK_ILK.map(k => ({ ...k }));
+      let z = {}, s = {};
+      try { z = JSON.parse(localStorage.getItem('ud-kaynak-ziyaret') || '{}') || {}; } catch(e){}
+      try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
+      const benim = [];
+      Object.values(s.ideas || {}).forEach(doc => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(it => { if (it && it.at) benim.push(it.at); }));
+      return liste.map(k => {
+        const ilk = z[k.id] || null, fikir = ilk ? benim.filter(at => at >= ilk).length : 0;
+        return { ...k, ziyaretci: ilk ? 1 : 0, yazan: fikir ? 1 : 0, fikir, alici: 0, talep: 0, sonZiyaret: ilk };
+      });
+    },
+    kaynakEkle: async k => { const d = oku(); d.kaynaklar = (d.kaynaklar || KAYNAK_ILK.map(x => ({ ...x }))).concat([k]); yaz(d); },
+    kaynakSil: async id => { const d = oku(); d.kaynaklar = (d.kaynaklar || KAYNAK_ILK.map(x => ({ ...x }))).filter(k => k.id !== id); yaz(d); },
     // rapor için ham satırlar: bütün fikirler (gizliler dahil) ve bütün "alırdım"lar. Yerelde talebin tarihi yok.
     raporHam: async () => {
       let s = {};
@@ -257,6 +276,20 @@
     },
     sozEkle: async (soz, tam) => { await sorgu(DB.from(istemci(), 'yasak_sozler').upsert({ soz, tam }, { onConflict:'soz' })); },
     sozSil: async soz => { await sorgu(DB.from(istemci(), 'yasak_sozler').delete().eq('soz', soz)); },
+    kaynakRaporu: async () => {
+      const r = await DB.rpc(istemci(), 'kaynak_raporu');
+      if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK22);
+      if (r.error) throw hata(r.error);
+      return (r.data || []).map(x => ({ id:x.source_id, baslik:x.title, hedef:x.target, olusturma:x.created_at, ziyaretci:Number(x.visitors) || 0,
+        yazan:Number(x.idea_writers) || 0, fikir:Number(x.ideas) || 0, alici:Number(x.demanders) || 0, talep:Number(x.demands) || 0, sonZiyaret:x.last_visit }));
+    },
+    kaynakEkle: async k => {
+      const r = await DB.from(istemci(), 'kaynaklar').insert(k);
+      if (r.error && r.error.code === '23505') throw new Error('Bu ad zaten var');
+      if (r.error && (r.error.code === 'PGRST205' || r.error.code === '42P01')) throw new Error(GEREK22);
+      if (r.error) throw hata(r.error);
+    },
+    kaynakSil: async id => { await sorgu(DB.from(istemci(), 'kaynaklar').delete().eq('id', id)); },
     raporHam: async () => {
       const [f, t, y] = await Promise.all([
         sorgu(DB.from(istemci(), 'fikirler').select('id,vaka_id,kategori,baslik,sahip,gizli,zaman').limit(20000)),
@@ -568,6 +601,25 @@
 
     // Moderasyon: sitedeki bütün fikirler ve yorumlar (en yeni önce, gizliler dahil) ve ön filtrenin söz listesi.
     // Fikir gizlemek için UDV.fikirler.gizle; sozler() söz listesi yoksa (yerel mod, migration çalışmadı) null döner.
+    // "Ne kadar çalıştı?" (yonetim/kaynak/): izlenen her bağlantıdan gelen tarayıcı ve sonra yazdıkları.
+    // baglanti: QR'a ya da paylaşıma konacak tam adres (?k=ad).
+    kaynak: {
+      async rapor(){ yetkiTest(); return depo.kaynakRaporu(); },
+      baglanti(k){
+        const h = str(k.hedef) || '/';
+        return SITE + h + (h.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(k.id);
+      },
+      async ekle(k){
+        yetkiTest();
+        const id = kucuk(str(k.id)), baslik = str(k.baslik), hedef = str(k.hedef) || '/';
+        if (!/^[a-z0-9-]{1,30}$/.test(id)) throw new Error('Ad yalnız küçük harf, rakam ve tire olabilir (en çok 30)');
+        if (!baslik || baslik.length > 80) throw new Error('Bir açıklama yazın (en çok 80 harf)');
+        if (!/^\/[^\s]*$/.test(hedef) || hedef.length > 300 || /[?&]k=/.test(hedef)) throw new Error('Hedef sitedeki bir yol olmalı, ör. /fikir/?vaka=vaka-01');
+        await depo.kaynakEkle({ id, baslik, hedef });
+      },
+      async sil(id){ yetkiTest(); await depo.kaynakSil(str(id)); }
+    },
+
     icerik: {
       async fikirler(){ yetkiTest(); return (await depo.tumFikirler()).sort((a, b) => String(b.zaman).localeCompare(String(a.zaman))); },
       async yorumlar(){ yetkiTest(); return (await depo.tumYorumlar()).sort((a, b) => String(b.zaman).localeCompare(String(a.zaman))); },

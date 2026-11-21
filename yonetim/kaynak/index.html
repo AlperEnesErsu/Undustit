@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="tr" data-root="../../" data-page="yonetim">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FCF9F3">
+<title>Ne kadar çalıştı · Yönetim · Undustit</title>
+<link rel="stylesheet" href="../../assets/fonts/base.css">
+<link rel="stylesheet" href="../../assets/ud.css">
+<link rel="stylesheet" href="../../assets/bilesen.css">
+<script src="../../assets/stil.js"></script>
+<style>
+/* Ne kadar çalıştı: izlenen bağlantılar (broşür QR'ı gibi) ve getirdikleri. Bileşenler bilesen.css'ten gelir. */
+.y-ust{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.y-ust h1{font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:8px 0 0}
+.y-ust p{margin:6px 0 0;color:var(--ink-2);font-size:14px;max-width:64ch}
+.panel{margin-top:20px}
+.not{color:var(--muted);font-size:13px;margin:10px 0 0;max-width:72ch}
+.tablo td .alt{display:block;color:var(--muted);font-size:12.5px}
+.tablo td code{font-size:12.5px;word-break:break-all}
+.oran{display:block;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.k-baglanti{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.k-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end}
+.k-form .alan{margin:0}
+.k-form .eylem{display:flex;gap:10px;align-items:center}
+.k-sonuc{margin-top:12px;font-size:14px}
+.k-sonuc code{word-break:break-all}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:640px){.y-ust{align-items:stretch}.y-ust .btn{width:100%}}
+</style>
+
+</head>
+<body class="yonetim">
+<a class="skip" href="#main">İçeriğe geç</a>
+<header class="y-bas">
+  <div class="y-kimlik" style="display:flex;align-items:center;gap:12px;min-width:0">
+    <a class="link" href="../../" style="font-weight:500;color:var(--ink);text-decoration:none">Undustit</a>
+    <span style="color:var(--muted);font-size:14px">Yönetim</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;min-width:0">
+    <span data-y-kim style="font-size:14px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44vw"></span>
+    <button type="button" class="btn alt sm" data-y-cikis hidden>Çıkış</button>
+  </div>
+</header>
+<div class="y-govde">
+  <nav class="y-yan" aria-label="Yönetim menüsü">
+    <a href="../">Özet</a>
+    <a href="../#vakalar">Vakalar</a>
+    <a href="../icerik/">İçerik</a>
+    <a href="../rapor/">Rapor</a>
+    <a href="./" aria-current="page">Ne kadar çalıştı</a>
+    <a href="../vaka/">Yeni vaka</a>
+    <a href="../../">Siteye dön</a>
+  </nav>
+  <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
+</div>
+
+<script src="../../assets/ayar.js"></script>
+<script src="../../assets/ud/db.js"></script>
+<script src="../../assets/ud/temel.js"></script>
+<script src="../../assets/ud/depo.js"></script>
+<script src="../../assets/ud/arayuz.js"></script>
+<script src="../../assets/ud/hareket.js"></script>
+<script src="../../assets/veri.js"></script>
+<script src="../yonetim.js"></script>
+<script>
+(function(){
+'use strict';
+var YON = window.YONETIM;
+var esc = YON.esc, sayi = YON.sayi;
+var ana = null, son = [];
+
+function yuzde(a, b){ return b ? Math.round(a / b * 100) + '%' : '—'; }
+function zaman(iso){ return iso ? YON.tarihSaat(iso) : '—'; }
+
+function ciz(o, a){
+  ana = a;
+  ana.innerHTML =
+    '<div class="y-ust"><div><span class="eyebrow">Yönetim</span><h1>Ne kadar çalıştı?</h1>' +
+      '<p>Broşürdeki QR gibi izlenen bağlantılardan kaç kişi geldi, kaçı sonra fikir yazdı ya da “alırdım” dedi. ' +
+      'Her tarayıcı bir kez sayılır; aynı kişi telefonla ve bilgisayarla gelirse iki sayılır.</p></div>' +
+      '<button class="btn alt sm" type="button" data-yenile>Yenile</button></div>' +
+    '<section class="panel" aria-labelledby="k-b"><header class="panel-bas"><h2 id="k-b">Bağlantılar</h2><span class="sayac" id="k-sayac"></span></header>' +
+      '<div class="panel-ic" id="kaynaklar" aria-live="polite"><p class="lead">Yükleniyor…</p></div></section>' +
+    '<section class="panel" aria-labelledby="y-b"><header class="panel-bas"><h2 id="y-b">Yeni bağlantı</h2></header>' +
+      '<div class="panel-ic">' +
+        '<form class="k-form" id="k-form" novalidate>' +
+          '<label class="alan"><span>Ad <small>adreste görünür: küçük harf, rakam, tire</small></span>' +
+            '<input type="text" name="ad" maxlength="30" autocomplete="off" placeholder="afis-kampus" required></label>' +
+          '<label class="alan"><span>Açıklama</span>' +
+            '<input type="text" name="baslik" maxlength="80" autocomplete="off" placeholder="Kampüs afişi, Kasım" required></label>' +
+          '<label class="alan"><span>Nereye gitsin <small>sitedeki yol</small></span>' +
+            '<input type="text" name="hedef" maxlength="300" autocomplete="off" value="/fikir/?vaka=vaka-01" required></label>' +
+          '<div class="eylem"><button class="btn sig sm" type="submit">Kaydet</button></div>' +
+        '</form>' +
+        '<div class="k-sonuc" id="k-sonuc" aria-live="polite"></div>' +
+        '<p class="not">Kaydedince QR koduna konacak tam adres çıkar. Ziyaret yalnız burada kayıtlı bir ada sayılır. ' +
+          'Broşürdeki kod <code>undustit.com/brosur</code> adresine gider; o adres buradaki “brosur” bağlantısına yönlenir.</p>' +
+      '</div></section>' +
+    '<p class="not">Nasıl sayılır: bağlantıyla gelen tarayıcının rastgele kimliği (ud_cihaz çerezi, kişiye dair bir şey taşımaz) bir kez kaydedilir. ' +
+      'O tarayıcıdan ilk gelişten sonra yazılan fikirler ve hâlâ duran “alırdım”lar sayılır; gizlenen fikirler sayılmaz. ' +
+      'Çerezi silen ya da gizli pencere açan yeniden sayılabilir; aynı kişi başka cihazdan fikir yazarsa o fikir sayılmaz.</p>';
+  ana.querySelector('[data-yenile]').addEventListener('click', function(){ yukle(); });
+  ana.querySelector('#k-form').addEventListener('submit', kaydet);
+  ana.querySelector('#kaynaklar').addEventListener('click', tikla);
+  yukle();
+}
+
+function yukle(){
+  return Promise.resolve().then(function(){ return UDV.kaynak.rapor(); }).then(function(liste){
+    son = liste;
+    ana.querySelector('#k-sayac').textContent = sayi(liste.length) + ' bağlantı';
+    ana.querySelector('#kaynaklar').innerHTML = liste.length
+      ? '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">İzlenen bağlantılar ve getirdikleri</caption>' +
+        '<thead><tr><th scope="col">Bağlantı</th><th scope="col" class="sayi">Gelen</th><th scope="col" class="sayi">Fikir yazan</th>' +
+        '<th scope="col" class="sayi">Fikir</th><th scope="col" class="sayi">Alırdım diyen</th><th scope="col" class="sayi">Alırdım</th>' +
+        '<th scope="col">Son geliş</th><th scope="col"><span class="sr-only">İşlem</span></th></tr></thead><tbody>' +
+        liste.map(function(k){
+          var adres = UDV.kaynak.baglanti(k);
+          return '<tr data-id="' + esc(k.id) + '"><td><b>' + esc(k.baslik || k.id) + '</b>' +
+              '<span class="alt">' + esc(k.id) + ' → ' + esc(k.hedef || '/') + '</span>' +
+              '<span class="k-baglanti"><code>' + esc(adres) + '</code><button class="btn alt sm" type="button" data-kopyala>Kopyala</button></span></td>' +
+            '<td class="sayi" data-sutun="gelen">' + sayi(k.ziyaretci) + '</td>' +
+            '<td class="sayi" data-sutun="yazan">' + sayi(k.yazan) + '<span class="oran">' + yuzde(k.yazan, k.ziyaretci) + '</span></td>' +
+            '<td class="sayi" data-sutun="fikir">' + sayi(k.fikir) + '</td>' +
+            '<td class="sayi">' + sayi(k.alici) + '<span class="oran">' + yuzde(k.alici, k.ziyaretci) + '</span></td>' +
+            '<td class="sayi">' + sayi(k.talep) + '</td>' +
+            '<td>' + esc(zaman(k.sonZiyaret)) + '</td>' +
+            '<td><button class="btn alt sm" type="button" data-sil>Sil</button></td></tr>';
+        }).join('') + '</tbody></table></div>'
+      : '<p class="lead">Henüz izlenen bağlantı yok. Aşağıdan ekleyebilirsin.</p>';
+  }).catch(function(err){
+    ana.querySelector('#kaynaklar').innerHTML = '<p class="lead">' + esc(err.message || 'Yüklenemedi.') + '</p>';
+    YON.toast(err.message || 'Yüklenemedi.', 'hata');
+  });
+}
+
+function tikla(e){
+  var satir = e.target.closest('tr[data-id]'); if (!satir) return;
+  var k = son.find(function(x){ return x.id === satir.dataset.id; }); if (!k) return;
+  if (e.target.closest('[data-kopyala]')){
+    var adres = UDV.kaynak.baglanti(k);
+    Promise.resolve().then(function(){ return navigator.clipboard.writeText(adres); })
+      .then(function(){ YON.toast('Adres kopyalandı.', 'ok'); }, function(){ YON.toast(adres, 'ok'); });
+  }
+  if (e.target.closest('[data-sil]')){
+    YON.onay({ baslik: '“' + (k.baslik || k.id) + '” silinsin mi?', tehlike: true, eylem: 'Sil',
+      metin: 'Bağlantının sayımı da silinir (' + sayi(k.ziyaretci) + ' geliş). Bu ada giden basılı bir QR artık sayılmaz; sayfa yine açılır.' })
+      .then(function(r){
+        if (!r) return;
+        return UDV.kaynak.sil(k.id).then(function(){ YON.toast('Bağlantı silindi.', 'ok'); return yukle(); });
+      }).catch(function(err){ YON.toast(err.message || 'Silinemedi.', 'hata'); });
+  }
+}
+
+function kaydet(e){
+  e.preventDefault();
+  var f = e.target, dugme = f.querySelector('[type=submit]');
+  var k = { id: f.elements.ad.value, baslik: f.elements.baslik.value, hedef: f.elements.hedef.value };
+  dugme.disabled = true;
+  Promise.resolve().then(function(){ return UDV.kaynak.ekle(k); }).then(function(){
+    var adres = UDV.kaynak.baglanti({ id: String(k.id).trim().toLocaleLowerCase('tr'), hedef: String(k.hedef).trim() || '/' });
+    ana.querySelector('#k-sonuc').innerHTML = 'Kaydedildi. QR koduna bu adresi koy: <code>' + esc(adres) + '</code>';
+    f.elements.ad.value = ''; f.elements.baslik.value = '';
+    YON.toast('Bağlantı kaydedildi.', 'ok');
+    return yukle();
+  }).catch(function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); })
+    .then(function(){ dugme.disabled = false; });
+}
+
+YON.guard(ciz);
+})();
+</script>
+</body>
+</html>

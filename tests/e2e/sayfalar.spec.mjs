@@ -2,7 +2,7 @@
 import { test, expect } from './yardim.mjs';
 
 const SAYFALAR = ['/', '/fikir/', '/fikirler/', '/vakalar/', '/vaka-01/', '/vaka/?id=vaka-01', '/nasil/', '/hikaye/',
-  '/persembe/', '/iletisim/', '/benim/', '/kvkk/', '/kosullar/', '/yonetim/', '/yonetim/rapor/', '/yonetim/icerik/', '/firma/', '/giris/', '/olmayan-sayfa/'];
+  '/persembe/', '/iletisim/', '/benim/', '/kvkk/', '/kosullar/', '/yonetim/', '/yonetim/rapor/', '/yonetim/icerik/', '/yonetim/kaynak/', '/yonetim/ayarlar/', '/firma/', '/giris/', '/olmayan-sayfa/'];
 
 for (const yol of SAYFALAR){
   test(`açılıyor: ${yol}`, async ({ page }) => {

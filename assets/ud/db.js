@@ -22,7 +22,7 @@ const TABLES = {
   hata_kayitlari: ['error_logs', { id:'id', zaman:'created_at', sayfa:'page', mesaj:'message', kaynak:'source', satir:'line', tarayici:'user_agent', uye:'member_id', durum:'status' }],
   profiller: ['profiles', { id:'id', email:'email', rol:'role', kullanici_adi:'username' }],
   vakalar: ['cases', { id:'id', baslik:'title', ozet:'summary', aciklama:'description', firma:'company', stok:'stock', adet:'quantity', olcu:'size_spec',
-    sinif:'grade', taban_fiyat:'floor_price', deneme_adedi:'trial_quantity', sure_gun:'duration_days', gorsel:'image_url', durum:'status',
+    sinif:'grade', taban_fiyat:'floor_price', deneme_adedi:'trial_quantity', sure_gun:'duration_days', gorsel:'image_url', model3d:'model_url', durum:'status',
     acilis:'opened_at', kapanis:'closed_at', kazanan:'winner_idea_id', olusturan:'created_by', olusturma:'created_at', guncelleme:'updated_at',
     ortaklik:'partnership', odul:'prize' }],
   vaka_basvurulari: ['case_applications', { id:'id', gonderen:'sender_id', firma:'company', kisi:'contact_name', eposta:'email', telefon:'phone', stok:'stock',
@@ -33,6 +33,7 @@ const TABLES = {
   etkinlikler: ['events', { id:'id', baslik:'title', aciklama:'description', baslangic:'starts_at', bitis:'ends_at', baglanti:'link', olusturma:'created_at' }],
   yasak_sozler: ['banned_words', { soz:'word', tam:'exact_match', eklenme:'added_at' }],
   kaynaklar: ['sources', { id:'id', baslik:'title', hedef:'target', olusturma:'created_at' }],
+  kagit_fikirler: ['paper_ideas', { fikir_id:'idea_id', iletisim:'contact', kaynak:'source_id', not:'note', giren:'entered_by', zaman:'created_at' }],
   // views
   fikir_kart: ['idea_cards', { id:'id', sahip:'owner_id', vaka_id:'case_id', baslik:'title', kategori:'category', problem:'problem', cozum:'solution',
     ozellikler:'features', ad:'display_name', zaman:'created_at', alici:'buyers', ort_fiyat:'avg_price', puanci:'raters',
@@ -45,11 +46,14 @@ const RPC = {
   alirdim: ['place_demand', { f:'p_idea_id', fiyat:'p_price', cihaz:'p_device' }],
   fikir_cihazi: ['mark_idea_device', { f:'p_idea_id', cihaz:'p_device' }],
   firma_gorsel: ['set_case_image', { v:'p_case_id', adres:'p_url' }],
+  firma_model: ['set_case_model', { v:'p_case_id', adres:'p_url' }],
   giris_eposta: ['sign_in_email', { ad:'p_username' }],
   kullanici_adi_koy: ['set_username', { ad:'p_username' }],
   vaka_tam: ['cases_full', { v:'p_case_id' }, 'vakalar'],
   kaynak_ziyaret: ['log_source_visit', { kaynak:'p_source', cihaz:'p_device' }],
   kaynak_raporu: ['source_report', {}],
+  kagit_fikir_ekle: ['add_paper_idea', { vaka:'p_case_id', kategori:'p_category', baslik:'p_title', problem:'p_problem', cozum:'p_solution',
+    ad:'p_display_name', iletisim:'p_contact', kaynak:'p_source', not:'p_note' }],
   is_admin: ['is_admin', {}]
 };
 

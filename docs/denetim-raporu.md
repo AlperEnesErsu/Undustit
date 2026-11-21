@@ -56,7 +56,9 @@ firma şifresini koyunca doğrudan firma paneline geçer. Yönetim > vaka > "Fir
 yanında son gönderim zamanı ve "Giriş bilgisi gönder / Tekrar gönder" düğmesi var.
 Canlıya alma: `supabase/KURULUM.md` §23 (`19-davet.sql` ve `firma-davet` fonksiyonu).
 
-## 4. Öneri: ürün görselinde 3D (plan, kod yok)
+## 4. Ürün görselinde 3D (aşama 1 yapıldı, aşama 2 plan)
+
+> 21 Kasım 2026: aşama 1 sitede (`23-model.sql`, `supabase/KURULUM.md` §26). Aşama 2 karar bekliyor.
 
 **Aşama 1: Elinde 3D dosyası olan yüklesin (yaklaşık 1–2 gün)**
 - Firma panelinde ve yönetimde fotoğrafın yanına "3D model (.glb)" alanı gelir. Supabase Storage'a yüklenir

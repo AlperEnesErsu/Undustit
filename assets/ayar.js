@@ -16,6 +16,7 @@ window.UD_AYAR = {
   // Perşembe yayınının adresi (YouTube, Twitch…). Doluyken persembe/ sayfasında "Yayına git" çıkar.
   yayin: '',
   // Spam koruması: Cloudflare Turnstile "site key" (herkese açık; gizli anahtar yalnız Supabase'e girilir).
-  // Önce bunu doldurun, sonra Supabase > Authentication > Attack Protection'da CAPTCHA'yı açın (KURULUM.md §16).
-  turnstile: '0x4AAAAAAFq0JNxOMGzt8Zgz'
+  // 21 Kasım 2026'da kapatıldı (yönetici girişte doğrulamayı geçemiyordu). Boşken hiçbir kutu çıkmaz; Supabase'de de
+  // CAPTCHA kapalı olmalı. Yeniden açmak: KURULUM.md §16 (anahtar: 0x4AAAAAAFq0JNxOMGzt8Zgz).
+  turnstile: ''
 };

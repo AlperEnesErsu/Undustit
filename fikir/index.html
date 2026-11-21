@@ -76,7 +76,7 @@ const q = new URLSearchParams(location.search).get('vaka');
 UD.mountForm(document.getElementById('form'), { open:true, caseId:q });
 
 // the case list comes from the database; the form picks the case itself once it arrives
-UD.Store.cases().then(() => { const c = UD.openCases().find(x => x.id === q); if (c) document.getElementById('case-line').textContent = UD.T('fikir.js.vaka', { vaka:c.name }); });
+UD.Store.cases().then(cs => { const k = q && cs.find(x => x.id === q), s = k && k.durum === 'acik' && UD.vakaSuresi(k); if (s && s.doldu) return void (document.getElementById('case-line').textContent = UD.T('fikir.js.doldu', { vaka:k.name })); const c = UD.openCases().find(x => x.id === q); if (c) document.getElementById('case-line').textContent = UD.T('fikir.js.vaka', { vaka:c.name }); });
 </script>
 </body>
 </html>

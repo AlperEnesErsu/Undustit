@@ -39,6 +39,8 @@
 .f-foto .foy-gorsel{max-width:340px}
 .f-foto label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
 .f-foto .alan-hata{color:var(--err);font-size:13px;font-style:normal}
+.f-model .foy-gorsel{max-width:460px}
+.f-model-dugme{display:flex;flex-wrap:wrap;gap:10px}
 .tablo td small{display:block;color:var(--muted);font-size:12.5px;max-width:52ch}
 .tablo td a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2)}
 .chipler{display:flex;flex-wrap:wrap;gap:6px}
@@ -118,8 +120,10 @@ function panelCiz(vakalar){
       '<section class="panel" aria-labelledby="d-b"><header class="panel-bas"><h2 id="d-b">' + T('firma.dagilim') + '</h2></header><div class="panel-ic" id="dagilim"></div></section>' +
       '<section class="panel" aria-labelledby="g-b"><header class="panel-bas"><h2 id="g-b">' + T('firma.foto') + '</h2></header><div class="panel-ic f-foto" id="foto"></div></section>' +
     '</div>' +
+    '<section class="panel" aria-labelledby="m-b"><header class="panel-bas"><h2 id="m-b">' + T('firma.model') + '</h2></header><div class="panel-ic f-foto f-model" id="model"></div></section>' +
     '<section class="panel" aria-labelledby="f-b"><header class="panel-bas"><h2 id="f-b">' + T('firma.fikirler') + '</h2><span class="sayac" id="f-sayac"></span></header><div class="panel-ic" id="fikirler"><p class="lead">' + T('giris.p.1') + '</p></div></section>';
   fotoCiz(v);
+  modelCiz(v);
   return UDV.firma.panel(v.id).then(function(p){
     var t = p.toplam;
     ana.querySelector('#istatlar').innerHTML =
@@ -169,6 +173,32 @@ function fotoCiz(v){
     UD.Store.gorselYukle(file, 'vaka').then(function(adres){
       return UDV.firma.gorsel(v.id, adres).then(function(){ v.gorsel = adres; fotoCiz(v); UD.toast(T('firma.foto.tamam')); });
     }).catch(function(err){ em.textContent = (err && err.message) || T('firma.foto.hata'); yazi.textContent = url ? T('firma.foto.degistir') : T('firma.foto.yukle'); inp.disabled = false; inp.value = ''; });
+  });
+}
+
+// the product's 3D model (.glb): uploaded as it is, shown turnable with the photo as its poster (UDV.firma.model)
+function modelCiz(v){
+  var kap = ana.querySelector('#model');
+  var url = UD.modelAdresi(v.model3d);
+  kap.innerHTML = '<figure class="foy-gorsel' + (url ? '' : ' yok') + '" data-model>' + (url ? '' : '<figcaption>' + T('firma.model.yok') + '</figcaption>') + '</figure>' +
+    '<p style="color:var(--ink-2);font-size:14px;margin:0;max-width:70ch">' + T('firma.model.not') + '</p>' +
+    '<div class="f-model-dugme"><label class="btn alt sm"><span data-yazi>' + (url ? T('firma.model.degistir') : T('firma.model.yukle')) + '</span><input type="file" class="sr-only" accept=".glb,model/gltf-binary" id="f-model"></label>' +
+    (url ? '<button type="button" class="btn alt sm" data-model-sil>' + T('firma.model.kaldir') + '</button>' : '') + '</div>' +
+    '<em class="alan-hata" role="status" aria-live="polite"></em>';
+  if (url) UD.model3d(kap.querySelector('[data-model]'), { model:url, poster:UD.gorselAdresi(v.gorsel), alt:T('firma.model') });
+  var inp = kap.querySelector('#f-model'), yazi = kap.querySelector('[data-yazi]'), em = kap.querySelector('.alan-hata'), sil = kap.querySelector('[data-model-sil]');
+  var kaydet = function(adres, mesaj){
+    return UDV.firma.model(v.id, adres).then(function(){ v.model3d = adres; modelCiz(v); UD.toast(mesaj); });
+  };
+  inp.addEventListener('change', function(){
+    var file = inp.files && inp.files[0];
+    if (!file) return;
+    em.textContent = ''; yazi.textContent = T('firma.foto.yukleniyor'); inp.disabled = true;
+    UD.Store.modelYukle(file, 'vaka').then(function(adres){ return kaydet(adres, T('firma.model.tamam')); })
+      .catch(function(err){ em.textContent = (err && err.message) || T('firma.model.hata'); yazi.textContent = url ? T('firma.model.degistir') : T('firma.model.yukle'); inp.disabled = false; inp.value = ''; });
+  });
+  if (sil) sil.addEventListener('click', function(){
+    kaydet('', T('firma.model.kalkti')).catch(function(err){ em.textContent = (err && err.message) || T('firma.model.hata'); });
   });
 }
 

@@ -91,14 +91,26 @@ const CASES = [];
 const V01 = { id:'vaka-01', name:T('ud.vaka1.ad'), tag:T('ud.vaka1.etiket'), short:'Vaka 01 · Cıvata', href:'vaka-01/', durum:'acik', adet:1e6 };
 // a case photo: an https address (Supabase Storage) or, in the local preview, a data URL
 const gorselAdresi = u => /^(https:\/\/|data:image\/(jpeg|png|webp);base64,)/i.test(u || '') ? u : '';
+// a 3D model (.glb, supabase/23-model.sql): an https address or, in the local preview, a data URL
+const modelAdresi = u => /^(https:\/\/|data:model\/gltf-binary;base64,)/i.test(u || '') ? u : '';
+// A case's idea period: from its opening (acilis, set when it first goes "Açık") for sure_gun days. null before it
+// opens. Once it has run out the case takes no new ideas (the form closes, openCases() leaves it out) until the
+// admin moves it on or gives it more days; "alırdım" stays open. The same rule on every page and in the admin.
+function vakaSuresi(v){
+  if (!v || !v.acilis || !isFinite(Date.parse(v.acilis))) return null;
+  const bitis = new Date(Date.parse(v.acilis) + (Number(v.sure_gun) || 30) * 864e5), ms = bitis - Date.now();
+  return { bitis, kalanGun: Math.max(0, Math.ceil(ms / 864e5)), doldu: ms <= 0 };
+}
 function caseOf(v){
   // what the case offers (supabase/12-vaka-modeli.sql); older rows and the local seed are partnerships
   const model = { ortaklik: v.ortaklik !== false, odul: Number(v.odul) || 0 };
-  if (v.id === V01.id) return { ...V01, ...model, durum:v.durum, gorsel:gorselAdresi(v.gorsel) };
+  const sure = { acilis:v.acilis || null, sure_gun:Number(v.sure_gun) || 30, kazanan:v.kazanan || null };
+  if (v.id === V01.id) return { ...V01, ...model, ...sure, durum:v.durum, gorsel:gorselAdresi(v.gorsel), model3d:modelAdresi(v.model3d) };
   return { id:v.id, name:v.baslik, tag:v.olcu || v.stok || '', short:String(v.baslik).slice(0, 40), href:'vaka/?id=' + encodeURIComponent(v.id),
-    durum:v.durum, ...model, gorsel:gorselAdresi(v.gorsel), ozet:v.ozet || '', adet:Number(v.adet) || 0, olcu:v.olcu || '', sinif:v.sinif || '' };
+    durum:v.durum, ...model, ...sure, gorsel:gorselAdresi(v.gorsel), model3d:modelAdresi(v.model3d), ozet:v.ozet || '', adet:Number(v.adet) || 0, olcu:v.olcu || '', sinif:v.sinif || '' };
 }
-const openCases = () => CASES.filter(c => c.durum === 'acik');
+// open for ideas: "Açık" and its period not run out
+const openCases = () => CASES.filter(c => c.durum === 'acik' && !(vakaSuresi(c) || {}).doldu);
 // what a case offers, in words: "Sales partnership · 40% of the profit to the idea's owner", "Idea prize · ₺25,000"
 const modelEtiketleri = c => [c.ortaklik !== false ? T('ud.model.ortaklik', { pay:pct(TERMS.caseShare.inventor) }) : null,
   Number(c.odul) > 0 ? T('ud.model.odul', { tutar:tl(c.odul) }) : null].filter(Boolean);
@@ -165,6 +177,50 @@ function sbClient(){
 }
 window.UD_SB = sbClient;
 
+// =========================================================== 3D model
+// <model-viewer> (Google, jsDelivr, fixed version and checksum) turns and zooms the product's .glb; on a phone
+// "AR'da gör" puts it in the room. Loaded only on a page that has a model. The photo is its poster, and stays
+// on its own if the viewer cannot load. Models must not use Draco/KTX2 compression: those decoders come from
+// another host the Content-Security-Policy does not allow (supabase/KURULUM.md §26).
+const MODEL_VIEWER = { src:'https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js',
+  sri:'sha384-sr9b4Ux0WhAUGclJ0ym0FSY2zSOMmNSn0bP/SA0e6bNCrpn/5W3QL8mm+LdlQMKw' };
+let modelViewerP = null;
+function modelViewerYukle(){
+  if (window.customElements && customElements.get('model-viewer')) return Promise.resolve();
+  return modelViewerP || (modelViewerP = new Promise((ok, no) => {
+    const sc = document.createElement('script');
+    sc.type = 'module'; sc.src = MODEL_VIEWER.src; sc.integrity = MODEL_VIEWER.sri; sc.crossOrigin = 'anonymous';
+    sc.onload = () => customElements.whenDefined('model-viewer').then(ok);
+    sc.onerror = () => { modelViewerP = null; no(new Error('model-viewer')); };
+    document.head.append(sc);
+  }));
+}
+// fig: a .foy-gorsel figure (it may already hold the photo). o: { model, poster, alt }
+function model3d(fig, o){
+  const src = modelAdresi(o && o.model);
+  if (!fig || !src) return Promise.resolve(false);
+  return modelViewerYukle().then(() => {
+    const mv = document.createElement('model-viewer');
+    const set = { src, alt:o.alt || T('ud.model.alt'), 'camera-controls':'', 'touch-action':'pan-y', 'shadow-intensity':'0.6',
+      'interaction-prompt':'auto', ar:'', 'ar-modes':'webxr scene-viewer' };
+    if (gorselAdresi(o.poster)) set.poster = o.poster;
+    for (const k in set) mv.setAttribute(k, set[k]);
+    // the AR button only where the phone can do it (model-viewer hides the slot otherwise)
+    const ar = document.createElement('button');
+    ar.type = 'button'; ar.slot = 'ar-button'; ar.className = 'btn alt sm model-ar'; ar.textContent = T('ud.model.ar');
+    mv.append(ar);
+    // a file the viewer cannot read: back to the photo, if there is one
+    mv.addEventListener('error', () => {
+      fig.classList.remove('model3d');
+      if (gorselAdresi(o.poster)) fig.replaceChildren(el('img', { src:o.poster, alt:o.alt || '', decoding:'async' }));
+      else { fig.classList.add('yok'); fig.replaceChildren(el('figcaption', { text:T('ud.model.hata') })); }
+    });
+    fig.classList.remove('yok'); fig.classList.add('model3d');
+    fig.replaceChildren(mv, el('figcaption', { class:'model-ipucu', text:T('ud.model.ipucu') }));
+    return true;
+  }).catch(() => false);   // no viewer: whatever the figure showed (the photo) stays
+}
+
 // =========================================================== error log
 // An uncaught error goes to error_logs (supabase/10-hata.sql, renamed in 20-english-names.sql) so a broken page gets noticed; the admin reads
 // them in yonetim/. Each message once, five per page view at most, never what the visitor typed: the address
@@ -178,7 +234,7 @@ window.UD_SB = sbClient;
   const gonder = (mesaj, kaynak, satir) => {
     mesaj = String(mesaj || '').trim().slice(0, 500); kaynak = String(kaynak || '');
     // a page transition the browser skipped (a fast second click, a hidden tab) rejects a promise; nothing is broken
-    if (/view transition|transition was skipped/i.test(mesaj)) return;
+    if (/view transition|transition was (skipped|aborted)|skipTransition/i.test(mesaj)) return;
     if (!mesaj || mesaj === 'Script error.' || /^(chrome|moz|safari)-extension:/.test(kaynak) || gorulen.has(mesaj) || kalan <= 0) return;
     gorulen.add(mesaj); kalan--;
     // error_logs (assets/ud/db.js: the database's own names)
@@ -289,12 +345,25 @@ function captcha(){
     s.onerror = () => { tsYukle = null; no(new Error(T('ud.captcha.hata'))); };
     document.head.append(s);
   });
+  // Mostly nothing shows. When Cloudflare does want a tick, the page dims and the box sits in the middle with a
+  // line saying why, so a sign-in never seems to hang on a box at the bottom of the screen. Retries are ours:
+  // one more try after an error, then a clear message (Cloudflare's own retry ran into the removed box).
   return tsYukle.then(ts => new Promise((ok, no) => {
-    const kutu = el('div', { class:'ts-kutu' }); document.body.append(kutu);
-    let id = null;
-    const bitir = (f, v) => { try { if (id != null) ts.remove(id); } catch(e){} kutu.remove(); f(v); };
-    const hata = () => bitir(no, Object.assign(new Error(T('ud.captcha.hata')), { code:'captcha' }));
-    id = ts.render(kutu, { sitekey:TURNSTILE, appearance:'interaction-only', language: LANG === 'en' ? 'en' : 'tr',
+    const yer = el('div', { class:'ts-yer' });
+    const vazgec = el('button', { type:'button', class:'btn alt sm', text:T('ud.captcha.vazgec') });
+    const kutu = el('div', { class:'ts-kutu', role:'dialog', 'aria-modal':'true', 'aria-label':T('ud.captcha.baslik') }, [
+      el('div', { class:'ts-kart' }, [el('b', { text:T('ud.captcha.baslik') }), el('p', { text:T('ud.captcha.not') }), yer, vazgec])]);
+    document.body.append(kutu);
+    let id = null, deneme = 0, bitti = false;
+    const bitir = (f, v) => { if (bitti) return; bitti = true; try { if (id != null) ts.remove(id); } catch(e){} kutu.remove(); f(v); };
+    const hata = () => {
+      if (bitti) return;
+      if (deneme++ < 1 && id != null){ try { ts.reset(id); return; } catch(e){} }
+      bitir(no, Object.assign(new Error(T('ud.captcha.hata')), { code:'captcha' }));
+    };
+    vazgec.addEventListener('click', () => bitir(no, Object.assign(new Error(T('ud.captcha.iptal')), { code:'captcha_iptal' })));
+    id = ts.render(yer, { sitekey:TURNSTILE, appearance:'interaction-only', retry:'never', 'refresh-expired':'manual', language: LANG === 'en' ? 'en' : 'tr',
+      'before-interactive-callback': () => { kutu.classList.add('acik'); vazgec.focus(); },
       callback: t => bitir(ok, t), 'error-callback': hata, 'expired-callback': hata, 'timeout-callback': hata });
   }));
 }
@@ -333,5 +402,5 @@ function sortIdeas(list, by){
 const pct = v => LANG === 'en' ? v + '%' : '%' + v;
 const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
 
-window.UD_IC = { alanUyar, modelEtiketleri, captcha, gorselAdresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
+window.UD_IC = { alanUyar, modelEtiketleri, captcha, gorselAdresi, modelAdresi, model3d, vakaSuresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
 })();

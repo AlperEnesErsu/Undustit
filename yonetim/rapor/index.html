@@ -42,15 +42,7 @@
   </div>
 </header>
 <div class="y-govde">
-  <nav class="y-yan" aria-label="Yönetim menüsü">
-    <a href="../">Özet</a>
-    <a href="../#vakalar">Vakalar</a>
-    <a href="../icerik/">İçerik</a>
-    <a href="./" aria-current="page">Rapor</a>
-    <a href="../kaynak/">Ne kadar çalıştı</a>
-    <a href="../vaka/">Yeni vaka</a>
-    <a href="../../">Siteye dön</a>
-  </nav>
+  <nav class="y-yan" aria-label="Yönetim menüsü" data-y-menu="rapor"></nav>
   <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
 </div>
 
@@ -140,6 +132,7 @@ function yukle(){
             (f.talep ? tutar(f.ortFiyat) : '—') + '</td><td class="sayi">' + tutar(f.tutar) + '</td></tr>';
         }).join('') + '</tbody></table></div>'
       : '<p class="lead">Henüz fikir yok.</p>';
+    YON.kartla(ana);
   }).catch(function(err){
     ana.querySelector('#istatlar').innerHTML = '';
     YON.toast(err.message || 'Rapor yüklenemedi.', 'hata');

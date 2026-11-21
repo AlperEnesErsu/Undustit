@@ -51,15 +51,7 @@
   </div>
 </header>
 <div class="y-govde">
-  <nav class="y-yan" aria-label="Yönetim menüsü">
-    <a href="../">Özet</a>
-    <a href="../#vakalar">Vakalar</a>
-    <a href="./" aria-current="page">İçerik</a>
-    <a href="../rapor/">Rapor</a>
-    <a href="../kaynak/">Ne kadar çalıştı</a>
-    <a href="../vaka/">Yeni vaka</a>
-    <a href="../../">Siteye dön</a>
-  </nav>
+  <nav class="y-yan" aria-label="Yönetim menüsü" data-y-menu="icerik"></nav>
   <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
 </div>
 
@@ -141,7 +133,13 @@ function ciz(o, a){
   yukle('fikir'); yukle('yorum'); sozleriYaz();
 }
 
+// case id -> its title, for the "Nerede" column (read once)
+var vakaAdlari = null;
+function vakaAdi(id){ return (vakaAdlari && vakaAdlari[id]) || id; }
 function yukle(t){
+  if (!vakaAdlari) vakaAdlari = Promise.resolve().then(function(){ return UDV.vakalar.liste(); }).then(function(l){
+    vakaAdlari = {}; l.forEach(function(v){ vakaAdlari[v.id] = v.baslik; }); if (veri.fikir) yaz('fikir');
+  }, function(){ vakaAdlari = {}; });
   var tb = ana.querySelector('#' + t + '-tbody');
   tb.innerHTML = '<tr><td>Yükleniyor…</td></tr>';
   return Promise.resolve().then(function(){ return t === 'fikir' ? UDV.icerik.fikirler() : UDV.icerik.yorumlar(); })
@@ -173,6 +171,7 @@ function yaz(t){
     : '<tr><th scope="col">Yorum</th><th scope="col">Fikir</th><th scope="col">Kimden</th><th scope="col">Tarih</th><th scope="col">Sitede</th></tr>';
   if (!liste.length){
     tb.innerHTML = '<tr><td colspan="5" class="bos-satir">' + (veri[t].length ? 'Bu filtrede sonuç yok.' : (t === 'fikir' ? 'Henüz fikir yok.' : 'Henüz yorum yok.')) + '</td></tr>';
+    YON.kartla(tb.closest('table'));
     return;
   }
   tb.innerHTML = liste.map(function(x){
@@ -180,11 +179,12 @@ function yaz(t){
     if (t === 'fikir'){
       var detay = [x.problem, x.cozum].filter(Boolean).join(' · ');
       return '<tr' + sinif + '><td class="metin">' + bag(x.anahtar, x.baslik) + (detay ? '<small>' + esc(detay) + '</small>' : '') + '</td>' +
-        '<td>' + esc(x.ad || '—') + '</td><td>' + esc(x.vakaId || x.kategori || '—') + '</td><td>' + tarih(x.zaman) + '</td><td>' + anahtar(t, x, x.baslik) + '</td></tr>';
+        '<td>' + esc(x.ad || '—') + '</td><td>' + (x.vakaId ? '<a href="../vaka/?id=' + encodeURIComponent(x.vakaId) + '">' + esc(vakaAdi(x.vakaId)) + '</a>' : esc(x.kategori || '—')) + '</td><td>' + tarih(x.zaman) + '</td><td>' + anahtar(t, x, x.baslik) + '</td></tr>';
     }
     return '<tr' + sinif + '><td class="metin">' + esc(x.metin) + '<small>' + esc(TUR[x.tur] || x.tur) + '</small></td>' +
       '<td>' + bag(x.anahtar, x.fikirBaslik || '—') + '</td><td>' + esc(x.ad || '—') + '</td><td>' + tarih(x.zaman) + '</td><td>' + anahtar(t, x, x.metin.slice(0, 60)) + '</td></tr>';
   }).join('');
+  YON.kartla(tb.closest('table'));
 }
 
 // the badge beside the button is repainted only after the database took the change

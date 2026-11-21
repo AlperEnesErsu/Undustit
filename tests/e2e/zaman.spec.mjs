@@ -52,7 +52,8 @@ test('etkinlik sürerken hap ve sayfa "şimdi" der', async ({ page }) => {
 test('yönetici etkinlik ekler, sitede görünür; siler, kaybolur', async ({ page }) => {
   await hazirla(page);
   await yoneticiGiris(page);
-  await page.goto('/yonetim/');
+  await page.goto('/yonetim/ayarlar/');
+  await page.locator('#et-ac summary').click();
   const f = page.locator('#et-form');
   await f.locator('[name=baslik]').fill('Kasım atölyesi');
   await f.locator('[name=baslangic]').fill('2099-11-05T19:00');
@@ -64,7 +65,7 @@ test('yönetici etkinlik ekler, sitede görünür; siler, kaybolur', async ({ pa
   await expect(page.locator('#et-liste')).toContainText('Kasım atölyesi');
   await page.goto('/persembe/');
   await expect(page.locator('#ad')).toHaveText('Kasım atölyesi');
-  await page.goto('/yonetim/');
+  await page.goto('/yonetim/ayarlar/');
   await page.locator('[data-et-sil]').first().click();
   await page.locator('dialog [data-tamam]').click();
   await expect(page.locator('#et-liste')).toContainText('Henüz etkinlik yok');

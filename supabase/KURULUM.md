@@ -185,6 +185,13 @@ yönetici `yonetim/`, firma `firma/`, üye `benim/` sayfasına geçer.
 
 ## 16. Spam koruması (Cloudflare Turnstile)
 
+> **21 Kasım 2026: kapalı.** Yönetici girişte doğrulama kutusunu geçemediği için kapatıldı: `assets/ayar.js` >
+> `turnstile: ''` ve Supabase > Authentication > Attack Protection > **Enable CAPTCHA protection kapalı**.
+> İkisi birlikte kapalı olmalı: Supabase'de açık kalırsa kimse giriş yapamaz, fikir yazamaz ("Güvenlik doğrulaması
+> geçilemedi"). Yerine kalan korumalar: veritabanındaki hız sınırları (kişi başı günlük fikir, bildirim, görsel),
+> küfür ön filtresi, "alırdım"da tarayıcı başına bir oy. Toplu sahte hesap açmak artık daha ucuz; spam görülürse
+> aşağıdaki adımlarla yeniden açılır (site anahtarı yukarıdaki ayar satırının yorumunda).
+
 Sitede her yazma (fikir, "alırdım", yorum, başvuru, mesaj) önce bir oturum açar; anonim ziyaretçi de. Turnstile bu
 oturum açılışlarının ve kayıt, giriş, e-posta bağlantısı, şifre yenileme isteklerinin önünde durur, jetonu Supabase
 kendi tarafında doğrular. Gerçek ziyaretçi çoğu zaman hiçbir şey görmez.
@@ -322,6 +329,46 @@ kaydedince QR'a konacak adres çıkar. Yalnız kayıtlı adlar sayılır.
 
 **Kurulum:** `22-kaynak.sql` dosyasını SQL Editor'da çalıştırın (tekrar çalıştırmak güvenli). `brosur` kaydını kendisi açar.
 Yeni bir broşür ya da afiş kısa adresi (`/brosur` gibi) istenirse `_redirects`'e aynı biçimde bir satır eklenir.
+
+## 26. Ürünün 3D modeli (.glb)
+
+Yönetici (vaka formunda "3D model") ya da vakanın firması (firma paneli > "3D model") ürünün `.glb` dosyasını yükler.
+Vaka sayfasında ve teknik föyde fotoğrafın çerçevesinde döndürülebilir, yakınlaştırılabilir görünüm çıkar; fotoğraf
+poster olarak kalır, telefonda "Odanda gör (AR)" düğmesi görünür (Android'de Scene Viewer, WebXR destekleyen tarayıcılar).
+
+- **Kurulum:** `23-model.sql` dosyasını çalıştırın. `cases.model_url` sütununu, `set_case_model()` fonksiyonunu ve
+  ayrı `modeller` kovasını (herkese açık, yalnız `model/gltf-binary`, en çok 20 MB) açar. Fotoğraf kovası 5 MB'ta kalır.
+- **Görüntüleyici:** Google'ın `<model-viewer>` 4.0.0'ı, jsDelivr'dan, sabit sürüm ve SRI özetiyle
+  (`assets/ud/temel.js` `MODEL_VIEWER`). Yalnız modeli olan sayfada yüklenir. Sürüm değişirse özet de değişmelidir.
+- **Dosya kuralları:** `.glb` (tek dosya), en çok 20 MB, **Draco/KTX2 sıkıştırması olmadan**. Bu sıkıştırmaların
+  çözücüleri Google'ın başka bir adresinden gelir ve sitenin güvenlik politikası (CSP) buna izin vermez; böyle bir
+  model açılmaz, sayfada fotoğraf kalır.
+- **Firmaya rehber:** CAD'den (STEP, STL) gelen dosya Blender ya da gltf.report ile `.glb`'ye çevrilir. Dosyası olmayan
+  telefonla tarayabilir (Polycam, KIRI Engine, iPhone'da Object Capture). Bu metin firma panelinde yazar.
+- **Yerel önizleme** (ayar.js boş) modeli `data:` adresi olarak saklar; görüntüleyici bunu CSP yüzünden açamaz.
+  Gerçek görünüm Supabase'e bağlı localhost'ta ya da canlıda denenir.
+
+## 27. Kâğıda yazılan fikirler
+
+Broşür "fikrini kâğıda yaz, kutuya bırak" diyor. `24-kagit.sql` dosyasını çalıştırın. Yönetim > vaka > **Fikirler** >
+**Kâğıttan fikir ekle**: her kâğıt bir kez girilir. Fikir sitede herkesinki gibi durur ("alırdım" alır, sıralamaya
+girer); kâğıttaki e-posta, LinkedIn ya da telefon `paper_ideas` tablosunda yalnız yöneticiye görünür. Ne kadar
+çalıştı sayfası bunları "Kâğıttan fikir" sütununda kaynağına (broşür) göre sayar. Yönetici girerken günlük 10 fikir
+sınırına takılmaz.
+
+## 28. Vaka adımlarında e-postalar
+
+`25-bildirim.sql` dosyasını çalıştırın ve fonksiyonu yükleyin:
+
+```bash
+supabase functions deploy bildirim --no-verify-jwt --project-ref azjdweynukmwxywdfewb
+```
+
+Giden e-postalar: başvuru gelince firmaya onay ve yöneticilere haber; başvuru "İncelendi" ya da "Ret" olunca firmaya;
+vaka taslaktan "Açık"a geçince firmalarına paylaşılacak bağlantı; kazanan seçilince fikir sahibine (hesabında
+e-posta varsa) ve firmalara. Kâğıttan gelen ya da anonim fikir sahibine e-posta gitmez; yönetici kâğıttaki
+iletişimden ulaşır. Ret e-postasında bir iletişim adresi görünsün isterseniz fonksiyon gizlilerine
+`ILETISIM_EPOSTA` ekleyin. Resend alan adı doğrulanana kadar gönderim sessizce başarısız olur; hiçbir işlemi durdurmaz.
 
 ## Sorun giderme
 

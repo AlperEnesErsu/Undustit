@@ -20,17 +20,20 @@
   const DURUMLAR = ['taslak','acik','degerlendirme','kazanan','uretim','kapali'];
   const DURUM_ADI = { taslak:'Taslak', acik:'Açık', degerlendirme:'Değerlendirmede', kazanan:'Kazanan seçildi', uretim:'Üretimde', kapali:'Kapandı' };
   const GECIS = { taslak:['acik'], acik:['degerlendirme','kapali'], degerlendirme:['kazanan','acik','kapali'], kazanan:['uretim','kapali'], uretim:['kapali'], kapali:[] };
-  const ALANLAR = ['baslik','ozet','aciklama','firma','stok','adet','olcu','sinif','taban_fiyat','deneme_adedi','sure_gun','gorsel','ortaklik','odul'];
+  const ALANLAR = ['baslik','ozet','aciklama','firma','stok','adet','olcu','sinif','taban_fiyat','deneme_adedi','sure_gun','gorsel','model3d','ortaklik','odul'];
   const SAYI = ['adet','taban_fiyat','deneme_adedi','sure_gun','odul'];
-  const VARSAYILAN = { ozet:'', aciklama:'', firma:'', stok:'', adet:0, olcu:'', sinif:'', taban_fiyat:0, deneme_adedi:0, sure_gun:30, gorsel:'', ortaklik:true, odul:0 };
+  const VARSAYILAN = { ozet:'', aciklama:'', firma:'', stok:'', adet:0, olcu:'', sinif:'', taban_fiyat:0, deneme_adedi:0, sure_gun:30, gorsel:'', model3d:'', ortaklik:true, odul:0 };
   const YANLIS = 'E-posta ya da şifre yanlış';   // giriş hatasını ayırt etmeden söyler
   const YETKI = 'Bu işlem için yönetici girişi gerekli';
   const GEREK13 = 'Önce supabase/13-moderasyon.sql çalıştırılmalı.';
   const GEREK16 = 'Önce supabase/16-kullanici-adi.sql çalıştırılmalı.';
   const GEREK22 = 'Önce supabase/22-kaynak.sql çalıştırılmalı.';
+  const GEREK24 = 'Önce supabase/24-kagit.sql çalıştırılmalı.';
   // izlenen bağlantılar: ilki broşürdeki QR (undustit.com/brosur, _redirects)
   const KAYNAK_ILK = [{ id:'brosur', baslik:'Broşür QR', hedef:'/fikir/?vaka=vaka-01', olusturma:'2026-11-21T00:00:00.000Z' }];
   const SITE = 'https://undustit.com';
+  // 3D model (23-model.sql): https in the database; the local preview stores the file itself as a data URL
+  const modelGecerli = u => /^https:\/\//.test(u) || (!SB_URL && /^data:model\/gltf-binary;base64,/.test(u));
   const AD_KURALI = /^[a-z0-9_.]{3,24}$/;
 
   const str = v => v == null ? '' : String(v).trim();
@@ -139,10 +142,22 @@
       Object.values(s.ideas || {}).forEach(doc => (doc && Array.isArray(doc.items) ? doc.items : []).forEach(it => { if (it && it.at) benim.push(it.at); }));
       return liste.map(k => {
         const ilk = z[k.id] || null, fikir = ilk ? benim.filter(at => at >= ilk).length : 0;
-        return { ...k, ziyaretci: ilk ? 1 : 0, yazan: fikir ? 1 : 0, fikir, alici: 0, talep: 0, sonZiyaret: ilk };
+        const kagit = Object.values(d.kagit || {}).filter(x => x.kaynak === k.id).length;
+        return { ...k, ziyaretci: ilk ? 1 : 0, yazan: fikir ? 1 : 0, fikir, alici: 0, talep: 0, sonZiyaret: ilk, kagit };
       });
     },
     kaynakEkle: async k => { const d = oku(); d.kaynaklar = (d.kaynaklar || KAYNAK_ILK.map(x => ({ ...x }))).concat([k]); yaz(d); },
+    kagitEkle: async x => {
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
+      s.ideas = s.ideas || {}; const doc = s.ideas.kagit = s.ideas.kagit || { items:[] };
+      const k = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      doc.items.push({ k, title:x.baslik, cat:x.kategori, caseId:x.vaka || null, problem:x.problem, solution:x.cozum, feats:[], handle:x.ad, at:simdi() });
+      try { localStorage.setItem(SITE_LS, JSON.stringify(s)); } catch(e){}
+      const d = oku(); d.kagit = d.kagit || {}; d.kagit['kagit:' + k] = { iletisim:x.iletisim, kaynak:x.kaynak || null, not:x.not, zaman:simdi() }; yaz(d);
+      return 'kagit:' + k;
+    },
+    kagitlar: async () => Object.assign({}, oku().kagit),
     kaynakSil: async id => { const d = oku(); d.kaynaklar = (d.kaynaklar || KAYNAK_ILK.map(x => ({ ...x }))).filter(k => k.id !== id); yaz(d); },
     // rapor için ham satırlar: bütün fikirler (gizliler dahil) ve bütün "alırdım"lar. Yerelde talebin tarihi yok.
     raporHam: async () => {
@@ -183,6 +198,7 @@
     // giriş bilgisi e-postası: yerel önizleme e-posta göndermez, yalnız zamanı yazar (udv-v1.davetler = { vakaId: { e-posta: zaman } })
     davetler: async vakaId => Object.assign({}, (oku().davetler || {})[vakaId]),
     davet: async (vakaId, eposta) => { const d = oku(); d.davetler = d.davetler || {}; const z = simdi(); (d.davetler[vakaId] = d.davetler[vakaId] || {})[eposta] = z; yaz(d); return { yerel:true, zaman:z }; },
+    firmaModel: async (vakaId, adres) => { const d = oku(); if (!d.vakalar[vakaId]) throw new Error('Vaka bulunamadı'); d.vakalar[vakaId].model3d = adres; d.vakalar[vakaId].guncelleme = simdi(); yaz(d); },
     firmaGorsel: async (vakaId, adres) => { const d = oku(); if (!d.vakalar[vakaId]) throw new Error('Vaka bulunamadı'); d.vakalar[vakaId].gorsel = adres; d.vakalar[vakaId].guncelleme = simdi(); yaz(d); },
     // bir vakanın fikirlerine yazılan fiyatlar (fiyat dağılımı için)
     talepFiyatlari: async vakaId => {
@@ -218,7 +234,7 @@
   async function sorgu(q){ const { data, error } = await q; if (error) throw hata(error); return data; }
   // Ziyaretçinin okuyabildiği sütunlar (8-gizli.sql). firma, taban_fiyat ve olusturan yalnız vaka_tam() ile gelir:
   // yöneticiye hepsi, firmaya kendi vakası. 8-gizli.sql çalışmadan önce (fonksiyon yok) eski yoldan okunur.
-  const ACIK = 'id,baslik,ozet,aciklama,stok,adet,olcu,sinif,deneme_adedi,sure_gun,gorsel,ortaklik,odul,durum,acilis,kapanis,kazanan,olusturma,guncelleme';
+  const ACIK = 'id,baslik,ozet,aciklama,stok,adet,olcu,sinif,deneme_adedi,sure_gun,gorsel,model3d,ortaklik,odul,durum,acilis,kapanis,kazanan,olusturma,guncelleme';
   async function tam(v){
     const r = await DB.rpc(istemci(), 'vaka_tam', v ? { v } : {});
     if (r.error && r.error.code === 'PGRST202') return sorgu(v ? DB.from(istemci(), 'vakalar').select('*').eq('id', v) : DB.from(istemci(), 'vakalar').select('*'));
@@ -281,7 +297,8 @@
       if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK22);
       if (r.error) throw hata(r.error);
       return (r.data || []).map(x => ({ id:x.source_id, baslik:x.title, hedef:x.target, olusturma:x.created_at, ziyaretci:Number(x.visitors) || 0,
-        yazan:Number(x.idea_writers) || 0, fikir:Number(x.ideas) || 0, alici:Number(x.demanders) || 0, talep:Number(x.demands) || 0, sonZiyaret:x.last_visit }));
+        yazan:Number(x.idea_writers) || 0, fikir:Number(x.ideas) || 0, alici:Number(x.demanders) || 0, talep:Number(x.demands) || 0, sonZiyaret:x.last_visit,
+        kagit:Number(x.paper_ideas) || 0 }));
     },
     kaynakEkle: async k => {
       const r = await DB.from(istemci(), 'kaynaklar').insert(k);
@@ -290,6 +307,18 @@
       if (r.error) throw hata(r.error);
     },
     kaynakSil: async id => { await sorgu(DB.from(istemci(), 'kaynaklar').delete().eq('id', id)); },
+    kagitEkle: async x => {
+      const r = await DB.rpc(istemci(), 'kagit_fikir_ekle', x);
+      if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK24);
+      if (r.error) throw hata(r.error);
+      return r.data;
+    },
+    kagitlar: async () => {
+      const r = await DB.from(istemci(), 'kagit_fikirler').select('fikir_id,iletisim,kaynak,not,zaman');
+      if (r.error && (r.error.code === 'PGRST205' || r.error.code === '42P01')) return {};
+      if (r.error) throw hata(r.error);
+      const out = {}; (r.data || []).forEach(x => { out[x.fikir_id] = x; }); return out;
+    },
     raporHam: async () => {
       const [f, t, y] = await Promise.all([
         sorgu(DB.from(istemci(), 'fikirler').select('id,vaka_id,kategori,baslik,sahip,gizli,zaman').limit(20000)),
@@ -335,6 +364,11 @@
       return ids.length ? (await tam()).filter(v => ids.includes(v.id)) : [];
     },
     firmaGorsel: async (vakaId, adres) => { await sorgu(DB.rpc(istemci(), 'firma_gorsel', { v:vakaId, adres })); },
+    firmaModel: async (vakaId, adres) => {
+      const r = await DB.rpc(istemci(), 'firma_model', { v:vakaId, adres });
+      if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error('Önce supabase/23-model.sql çalıştırılmalı.');
+      if (r.error) throw hata(r.error);
+    },
     davetler: async vakaId => {
       const { data, error } = await DB.from(istemci(), 'vaka_firmalari').select('eposta,davet').eq('vaka_id', vakaId);
       if (error && error.code === '42703') return {};   // 19-davet.sql henüz çalışmadı
@@ -436,6 +470,7 @@
     if (v.ortaklik === false && !(v.odul > 0)) throw new Error('Satış ortaklığı ya da fikir ödülünden en az birini seçin');
     // https in the database; the local preview stores the uploaded photo itself as a data URL
     if (v.gorsel && !(/^https:\/\//.test(v.gorsel) || (!SB_URL && /^data:image\/(jpeg|png|webp);base64,/.test(v.gorsel)))) throw new Error('Görsel adresi https ile başlamalı');
+    if (v.model3d && !modelGecerli(v.model3d)) throw new Error('3D model adresi https ile başlamalı');
   }
   // URL'e uygun kimlik: Türkçe harfleri sadeleştir, harf/rakam dışını '-' yap.
   function slug(s){
@@ -493,6 +528,8 @@
         const { data, error } = await istemci().auth.signInWithPassword({ email: str(email), password: String(sifre || ''), options: { captchaToken: await tsJeton() } });
         // an unconfirmed address is the one failure worth naming: the person can ask for the link again
         if (error && error.code === 'email_not_confirmed') throw Object.assign(new Error('E-posta henüz doğrulanmadı'), { code: error.code });
+        // the security check refused (expired or invalid token) is not a wrong password: say so
+        if (error && /captcha/i.test((error.code || '') + ' ' + (error.message || ''))) throw Object.assign(new Error('Güvenlik doğrulaması geçilemedi'), { code:'captcha' });
         if (error || !data.session) throw new Error(YANLIS);
         await oturumYukle(data.session);
         return UDV.oturum();
@@ -555,7 +592,8 @@
         geciseIzin(v.durum, yeniDurum);
         const an = simdi();
         const yama = { durum: yeniDurum, guncelleme: an };
-        if (yeniDurum === 'acik') yama.acilis = an;
+        // the idea period counts from the first opening; reopening after a review does not restart it
+        if (yeniDurum === 'acik' && !v.acilis) yama.acilis = an;
         if (yeniDurum === 'kapali') yama.kapanis = an;
         const yeni = await depo.guncelle(v.id, yama);
         await depo.gecmisEkle(v.id, { durum:yeniDurum, not:str(not), kim:mevcut().email, zaman:an });
@@ -601,6 +639,24 @@
 
     // Moderasyon: sitedeki bütün fikirler ve yorumlar (en yeni önce, gizliler dahil) ve ön filtrenin söz listesi.
     // Fikir gizlemek için UDV.fikirler.gizle; sozler() söz listesi yoksa (yerel mod, migration çalışmadı) null döner.
+    // Kâğıda yazılıp kutuya bırakılan fikirler (24-kagit.sql): yönetici vakaya yazar. Fikir sitede herkesinki gibi
+    // durur; yazanın iletişim bilgisi yalnız yöneticide kalır. liste(): fikir kimliği -> { iletisim, kaynak, not, zaman }.
+    kagit: {
+      async ekle(vakaId, x){
+        yetkiTest();
+        const v = await depo.al(str(vakaId));
+        if (!v) throw new Error('Vaka bulunamadı');
+        const baslik = str(x.baslik);
+        if (baslik.length < 10 || baslik.length > 140) throw new Error('Fikir 10–140 karakter olmalı');
+        const ad = str(x.ad).slice(0, 30), iletisim = str(x.iletisim).slice(0, 200);
+        // the case's own label as its category, as the site's form does (vaka-01 keeps its historic one)
+        const kategori = v.id === 'vaka-01' ? CAT : str(v.baslik).slice(0, 40);
+        return depo.kagitEkle({ vaka:v.id, kategori, baslik, problem:str(x.problem).slice(0, 400), cozum:str(x.cozum).slice(0, 400),
+          ad, iletisim, kaynak:str(x.kaynak) || null, not:str(x.not).slice(0, 500) });
+      },
+      async liste(){ yetkiTest(); return depo.kagitlar(); }
+    },
+
     // "Ne kadar çalıştı?" (yonetim/kaynak/): izlenen her bağlantıdan gelen tarayıcı ve sonra yazdıkları.
     // baglanti: QR'a ya da paylaşıma konacak tam adres (?k=ad).
     kaynak: {
@@ -777,6 +833,11 @@
         if (adres && !(/^https:\/\//.test(adres) || (!SB_URL && /^data:image\/(jpeg|png|webp);base64,/.test(adres)))) throw new Error('Görsel adresi https ile başlamalı');
         if (!benAdmin() && !(await UDV.firma.vakalarim()).some(v => v.id === vakaId)) throw new Error('Bu vakayı değiştirme yetkin yok');
         await depo.firmaGorsel(str(vakaId), str(adres));
+      },
+      async model(vakaId, adres){
+        if (adres && !modelGecerli(adres)) throw new Error('3D model adresi https ile başlamalı');
+        if (!benAdmin() && !(await UDV.firma.vakalarim()).some(v => v.id === vakaId)) throw new Error('Bu vakayı değiştirme yetkin yok');
+        await depo.firmaModel(str(vakaId), str(adres));
       },
       async csv(vakaId){
         const p = await UDV.firma.panel(vakaId);

@@ -523,6 +523,27 @@ function card(i, ix, opts={}){
   if (!i.ex && i.at){ const bar = el('div', { class:'days', 'aria-hidden':'true' }, el('i')); bar.firstChild.style.width = (100 * (TERMS.voteDays - i.left) / TERMS.voteDays) + '%'; body.append(bar); }
   return el('article', { class:'icard' + (ix < 3 && !i.ex && i.buyers ? ' top' : '') }, [el('span', { class:'rank', 'aria-hidden':'true', text: opts.rank === false ? '' : String(ix+1) }), body, buyCtl(i)]);
 }
+// The case's outcome once ideas are closed: during review the ideas with the most demand ("en çok talep gören"),
+// then the winner and the ranking. v: the case (durum, kazanan: the winning idea's id). Live: follows the store.
+function mountSonuc(host, v){
+  if (!host || !v || !['degerlendirme', 'kazanan', 'uretim', 'kapali'].includes(v.durum)) return;
+  const kazananMi = i => !!v.kazanan && (i.key === v.kazanan || i.key.endsWith(':' + v.kazanan));
+  const ciz = () => {
+    const list = sortIdeas(Store.ideas().filter(i => inCase(i, v)), 'demand');
+    const kaz = list.find(kazananMi), ilk = list.filter(i => !kazananMi(i)).slice(0, kaz ? 4 : 5);
+    const satir = (i, n) => `<li><span class="sn-sira">${n}</span><a href="${ideaUrl(i.key)}">${esc(i.title)}</a>` +
+      `<small>${i.handle ? esc(i.handle) + ' · ' : ''}${T('ud.sonuc.talep', { n:i.buyers })}${i.buyers ? ' · ' + T('ud.sonuc.ort', { tutar:tl(i.avg) }) : ''}</small></li>`;
+    const baslik = kaz ? T(v.durum === 'uretim' ? 'ud.sonuc.uretim' : 'ud.sonuc.kazanan') : v.durum === 'degerlendirme' ? T('ud.sonuc.degerlendirme') : T('ud.sonuc.kapandi');
+    host.innerHTML = `<section class="sonuc" aria-label="${esc(baslik)}"><span class="eyebrow">${esc(baslik)}</span>` +
+      (kaz ? `<div class="sn-kazanan"><b><a href="${ideaUrl(kaz.key)}">${esc(kaz.title)}</a></b>` +
+        `<p>${kaz.handle ? T('ud.sonuc.sahibi', { ad:esc(kaz.handle) }) + ' · ' : ''}${T('ud.sonuc.talep', { n:kaz.buyers })}${kaz.buyers ? ' · ' + T('ud.sonuc.ort', { tutar:tl(kaz.avg) }) : ''}</p></div>` :
+        v.durum === 'degerlendirme' ? `<p class="sn-not">${T('ud.sonuc.degerlendirme.not')}</p>` : '') +
+      (ilk.length ? `<p class="sn-alt">${T(kaz ? 'ud.sonuc.siralama' : 'ud.sonuc.en')}</p><ol class="sn-liste" start="${kaz ? 2 : 1}">${ilk.map((i, j) => satir(i, j + (kaz ? 2 : 1))).join('')}</ol>` : '') +
+      `</section>`;
+  };
+  Store.sub(ciz);
+}
+
 function mountBoard(host, opts={}){
   const render = () => {
     let list = Store.ideas();
@@ -652,7 +673,7 @@ function openShared(){
   let tries = 0; const t = setInterval(() => { if (openIdea(f, false) || ++tries > 40) clearInterval(t); }, 250);
 }
 
-Object.assign(window.UD_IC, { YASAL, kvkkLink, langSwitch, mountChrome, kalanMetin, saatMetin, mountThu, ideaUrl, shareCard, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, KAYIT_GEC, kayitAdimi, mountForm, mountNumune, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
+Object.assign(window.UD_IC, { mountSonuc, YASAL, kvkkLink, langSwitch, mountChrome, kalanMetin, saatMetin, mountThu, ideaUrl, shareCard, shareIdea, mailGet, mailSet, haberForm, handleGet, handleSet, feeLine, KAYIT_GEC, kayitAdimi, mountForm, mountNumune, BOLT, PALLET, mountCase, mountStats, hedef, hedefMetni, justBought, nice, quickPrices, buyCtl, card, mountBoard, bildirildi, bildirAcik, NEDENLER, bildirCtl, dlg, openIdea, openShared });
 
 // =========================================================== boot
 applyText();

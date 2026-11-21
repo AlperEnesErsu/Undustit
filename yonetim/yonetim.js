@@ -18,6 +18,13 @@ const tarihSaat = iso => {
   const d = iso ? new Date(iso) : null;
   return d && !isNaN(d) ? d.toLocaleString('tr-TR', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : BOS;
 };
+// "12 gün kaldı · son gün 21 Ara" / "Süre doldu" for an open case; '' otherwise (UD.vakaSuresi, assets/ud/temel.js)
+const sureMetni = v => {
+  const s = v && v.durum === 'acik' && window.UD && UD.vakaSuresi(v);
+  if (!s) return '';
+  return s.doldu ? 'Süre doldu' : s.kalanGun + ' gün kaldı · son gün ' + s.bitis.toLocaleDateString('tr-TR', { day:'numeric', month:'short' });
+};
+const sureDoldu = v => !!(v && v.durum === 'acik' && window.UD && (UD.vakaSuresi(v) || {}).doldu);
 const durumAdi = d => UDV.DURUM_ADI[d] || d || BOS;
 const durumRozeti = d => '<span class="rozet" data-durum="' + esc(d) + '">' + esc(durumAdi(d)) + '</span>';
 
@@ -29,6 +36,19 @@ const durumRozeti = d => '<span class="rozet" data-durum="' + esc(d) + '">' + es
   s.textContent = '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}' +
     '.diyalog .btn[data-tehlike]{background:var(--err);border-color:var(--err);color:#fff}';
   document.head.append(s);
+})();
+
+// ----------------------------------------------------------- menü
+// One menu for every admin page, written here: a page only says which entry it is (<nav data-y-menu="rapor">).
+// The case editor counts as "Vakalar". The site itself is the "Undustit" link in the header.
+const MENU = [['ozet', '', 'Özet'], ['vakalar', '#vakalar', 'Vakalar'], ['icerik', 'icerik/', 'İçerik'], ['rapor', 'rapor/', 'Rapor'],
+  ['kaynak', 'kaynak/', 'Ne kadar çalıştı'], ['ayarlar', 'ayarlar/', 'Ayarlar']];
+(function menuYaz(){
+  const nav = $('nav[data-y-menu]');
+  if (!nav) return;
+  const burada = nav.dataset.yMenu, kok = (document.documentElement.dataset.root || '') + 'yonetim/';
+  nav.innerHTML = MENU.map(([id, yol, ad]) =>
+    '<a href="' + kok + yol + '"' + (id === burada ? ' aria-current="page"' : '') + ' data-menu="' + id + '">' + ad + '</a>').join('');
 })();
 
 // ----------------------------------------------------------- bildirim
@@ -62,7 +82,7 @@ function bekleyenBildirim(){
 }
 
 // ----------------------------------------------------------- onay / not diyalogu
-// onay({ baslik, metin, eylem, tehlike, notAlani, notEtiketi, notIpucu, notZorunlu })
+// onay({ baslik, metin, liste, eylem, tehlike, notAlani, notEtiketi, notIpucu, notZorunlu }); liste: maddeler, metnin altında
 // Vazgeçilirse null, onaylanırsa { not } döner (not alanı yoksa not '').
 function onay(o){
   o = o || {};
@@ -75,6 +95,7 @@ function onay(o){
       '<header><h2 id="' + id + '-b">' + esc(o.baslik || 'Emin misiniz?') + '</h2></header>' +
       '<div class="ic">' +
         (o.metin ? '<p>' + esc(o.metin) + '</p>' : '') +
+        (o.liste && o.liste.length ? '<ul class="onay-liste">' + o.liste.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') +
         (o.notAlani ? '<label class="alan"><span>' + esc(o.notEtiketi || 'Not') +
           (o.notIpucu ? ' <small>' + esc(o.notIpucu) + '</small>' : '') +
           '</span><textarea rows="3" name="not"></textarea><em class="alan-hata" hidden></em></label>' : '') +
@@ -122,10 +143,17 @@ const ALANLAR = {
   sure_gun:     { etiket:'Fikir süresi', tur:'sayi', min:1, max:365, adim:1, ipucu:'Gün' },
   ortaklik:     { etiket:'Satış ortaklığı', tur:'onay', ipucu:'En çok istenen fikirle deneme partisi; kârdan pay (fikir sahibine %40, katkılara %10)' },
   odul:         { etiket:'Fikir ödülü (₺)', tur:'sayi', min:0, adim:'any', ipucu:'Firma seçilen fikre bu tutarı öder; 0 = ödül yok' },
-  gorsel:       { etiket:'Ürün görseli', tur:'gorsel', ipucu:'Teknik föyde görünür. JPEG, PNG ya da WebP; site küçültüp yükler' }
+  gorsel:       { etiket:'Ürün görseli', tur:'gorsel', ipucu:'Teknik föyde görünür. JPEG, PNG ya da WebP; site küçültüp yükler' },
+  model3d:      { etiket:'3D model', tur:'model', ipucu:'İsteğe bağlı. .glb, en çok 20 MB, Draco sıkıştırmasız. Vaka sayfasında fotoğrafın yerine çevrilebilir görünüm çıkar' }
 };
 // satırda yan yana duran alanlar
-const GRUPLAR = [['baslik'], ['ozet'], ['aciklama'], ['firma', 'stok'], ['adet', 'olcu'], ['sinif', 'taban_fiyat'], ['deneme_adedi', 'sure_gun'], ['ortaklik', 'odul'], ['gorsel']];
+// the form in four titled parts, in the order a case is thought through; two fields side by side where they pair
+const BOLUMLER = [
+  ['Vaka sayfası', 'Ziyaretçinin okuduğu', [['baslik'], ['ozet'], ['aciklama']]],
+  ['Stok', 'Firmanın elindeki ürün', [['firma', 'stok'], ['adet', 'olcu'], ['sinif', 'taban_fiyat']]],
+  ['Teklif', 'Fikir sahibine ne sunuluyor', [['deneme_adedi', 'sure_gun'], ['ortaklik', 'odul']]],
+  ['Görsel ve 3D', 'Teknik föyde görünür', [['gorsel', 'model3d']]]
+];
 
 function alanHtml(ad, deger){
   const a = ALANLAR[ad];
@@ -148,6 +176,15 @@ function alanHtml(ad, deger){
       '<button type="button" class="btn alt sm" data-gorsel-sil' + (deg ? '' : ' hidden') + '>Kaldır</button></div></div>' +
       '<em class="alan-hata" id="' + hid + '" hidden></em></div>';
   }
+  if (a.tur === 'model'){
+    // like the photo: the address in a hidden field, upload / remove buttons (modelBagla), a turnable preview
+    return '<div class="alan" role="group" aria-labelledby="' + id + '-e"><span id="' + id + '-e">' + esc(a.etiket) + ' <small>' + esc(a.ipucu) + '</small></span>' +
+      '<div class="gorsel-alan"><figure class="foy-gorsel' + (deg ? '' : ' yok') + '" data-model-onizleme>' + (deg ? '' : '<figcaption>3D model yok</figcaption>') + '</figure>' +
+      '<input type="hidden" name="model3d" value="' + esc(deg) + '">' +
+      '<div class="gorsel-dugme"><label class="btn alt sm"><span data-model-yazi>' + (deg ? 'Değiştir' : '3D model yükle') + '</span><input type="file" accept=".glb,model/gltf-binary" class="sr-only" id="' + id + '" aria-describedby="' + hid + '"></label>' +
+      '<button type="button" class="btn alt sm" data-model-sil' + (deg ? '' : ' hidden') + '>Kaldır</button></div></div>' +
+      '<em class="alan-hata" id="' + hid + '" hidden></em></div>';
+  }
   if (a.tur === 'uzun'){
     kontrol = '<textarea id="' + id + '" name="' + ad + '" rows="' + (a.satir || 3) + '" aria-describedby="' + hid + '">' + esc(deg) + '</textarea>';
   } else {
@@ -162,11 +199,13 @@ function alanHtml(ad, deger){
 // kap: alanların yazılacağı kapsayıcı (form ya da içindeki div). vaka null ise yeni vaka varsayılanları.
 function formCiz(kap, vaka){
   const v = vaka || { sure_gun: 30 };
-  kap.innerHTML = GRUPLAR.map(g => {
-    const html = g.map(ad => alanHtml(ad, v[ad])).join('');
-    return g.length > 1 ? '<div class="alan-iki">' + html + '</div>' : html;
-  }).join('');
+  kap.innerHTML = BOLUMLER.map(([baslik, alt, gruplar]) => '<fieldset class="form-bolum"><legend>' + esc(baslik) + ' <small>' + esc(alt) + '</small></legend>' +
+    gruplar.map(g => {
+      const html = g.map(ad => alanHtml(ad, v[ad])).join('');
+      return g.length > 1 ? '<div class="alan-iki">' + html + '</div>' : html;
+    }).join('') + '</fieldset>').join('');
   gorselBagla(kap);
+  modelBagla(kap);
 }
 
 // the photo field: pick a file, the site shrinks and uploads it (UD.Store.gorselYukle), the preview follows
@@ -176,7 +215,9 @@ function gorselBagla(kap){
   const fig = kap.querySelector('[data-onizleme]'), dosya = kap.querySelector('#f-gorsel'), sil = kap.querySelector('[data-gorsel-sil]');
   const yazi = kap.querySelector('[data-gorsel-yazi]'), em = kap.querySelector('#f-gorsel-h');
   const goster = url => {
+    const degisti = gizli.value !== url;
     gizli.value = url;
+    if (degisti) gizli.dispatchEvent(new Event('change', { bubbles:true }));
     fig.classList.toggle('yok', !url);
     fig.innerHTML = url ? '<img src="' + esc(url) + '" alt="Ürün görseli">' : '<figcaption>Görsel yok</figcaption>';
     sil.hidden = !url; yazi.textContent = url ? 'Değiştir' : 'Görsel yükle';
@@ -188,6 +229,35 @@ function gorselBagla(kap){
     hata(''); yazi.textContent = 'Yükleniyor…'; dosya.disabled = true;
     UD.Store.gorselYukle(f, 'vaka').then(goster)
       .catch(e => { hata((e && e.message) || 'Görsel yüklenemedi.'); goster(gizli.value); })
+      .finally(() => { dosya.disabled = false; dosya.value = ''; });
+  });
+  sil.addEventListener('click', () => { goster(''); dosya.focus(); });
+}
+
+// the 3D field: pick a .glb, it is checked and uploaded as it is (UD.Store.modelYukle), the preview turns.
+// Saved with the case ("Kaydet"), like the photo.
+function modelBagla(kap){
+  const gizli = kap.querySelector('[name="model3d"]');
+  if (!gizli) return;
+  const fig = kap.querySelector('[data-model-onizleme]'), dosya = kap.querySelector('#f-model3d'), sil = kap.querySelector('[data-model-sil]');
+  const yazi = kap.querySelector('[data-model-yazi]'), em = kap.querySelector('#f-model3d-h');
+  const goster = url => {
+    const degisti = gizli.value !== url;
+    gizli.value = url;
+    if (degisti) gizli.dispatchEvent(new Event('change', { bubbles:true }));
+    fig.className = 'foy-gorsel' + (url ? '' : ' yok');
+    fig.innerHTML = url ? '' : '<figcaption>3D model yok</figcaption>';
+    if (url) UD.model3d(fig, { model:url, poster:(kap.querySelector('[name="gorsel"]') || {}).value || '', alt:'3D model' });
+    sil.hidden = !url; yazi.textContent = url ? 'Değiştir' : '3D model yükle';
+  };
+  const hata = m => { em.textContent = m || ''; em.hidden = !m; };
+  if (gizli.value) goster(gizli.value);
+  dosya.addEventListener('change', () => {
+    const f = dosya.files && dosya.files[0];
+    if (!f) return;
+    hata(''); yazi.textContent = 'Yükleniyor…'; dosya.disabled = true;
+    UD.Store.modelYukle(f, 'vaka').then(goster)
+      .catch(e => { hata((e && e.message) || '3D model yüklenemedi.'); yazi.textContent = gizli.value ? 'Değiştir' : '3D model yükle'; })
       .finally(() => { dosya.disabled = false; dosya.value = ''; });
   });
   sil.addEventListener('click', () => { goster(''); dosya.focus(); });
@@ -238,6 +308,30 @@ function formHatalari(form, h){
   if (ilk){ const k = form.querySelector('[name="' + ilk + '"]'); if (k) k.focus(); }
 }
 
+// ----------------------------------------------------------- log
+// The site's error log is not a menu entry: a small "Log" button beside "Çıkış", for admins only, with the number
+// of new errors when there are any ("Log · 2"). It opens yonetim/log/.
+function logBag(o){
+  const admin = !!(o && o.rol === 'admin'), kok = (document.documentElement.dataset.root || '') + 'yonetim/';
+  $$('[data-y-cikis]').forEach(b => {
+    let a = b.parentNode.querySelector('.y-log');
+    if (!a){
+      a = document.createElement('a');
+      a.className = 'btn alt sm y-log'; a.href = kok + 'log/'; a.textContent = 'Log';
+      if ($('nav[data-y-menu="log"]')) a.setAttribute('aria-current', 'page');
+      b.before(a);
+    }
+    a.hidden = !admin;
+  });
+  if (!admin) return;
+  Promise.resolve().then(() => UDV.hatalar.liste()).then(l => {
+    const n = l.filter(x => x.durum === UDV.hatalar.DURUMLAR[0]).length;
+    $$('.y-log').forEach(a => { a.textContent = n ? 'Log · ' + n : 'Log'; a.title = n ? n + ' yeni site hatası' : 'Site hataları'; });
+  }).catch(() => {});
+}
+// the log page tells the button when it changed something
+document.addEventListener('y-log-degisti', () => logBag(UDV.oturum()));
+
 // ----------------------------------------------------------- oturum kapısı
 // guard(ciz): oturum yoksa giriş formu, admin değilse yetkisiz boş durumu, admin ise ciz(oturum, anaAlan).
 function guard(ciz){
@@ -247,6 +341,7 @@ function guard(ciz){
   const kimYaz = o => {
     $$('[data-y-kim]').forEach(n => { n.textContent = o ? (o.email || '') : ''; });
     $$('[data-y-cikis]').forEach(b => { b.hidden = !o; });
+    logBag(o);
   };
   const yonlendir = o => {
     kimYaz(o);
@@ -312,9 +407,30 @@ function yetkisizYaz(ana, o){
     '<a class="btn alt sm" href="../">Siteye dön</a></div>';
 }
 
+// ----------------------------------------------------------- telefonda kart
+// Call after a table is (re)written: every .tablo under kok gets .kart-mobil, each cell its column's name
+// (data-etiket, from the header row; the first column is the card's title) and one wrapper, so a cell with
+// a line break or a badge stays one piece in the card's grid.
+function kartla(kok){
+  if (!kok) return;
+  const tablolar = kok.matches && kok.matches('table') ? [kok] : $$('table.tablo', kok);
+  tablolar.forEach(t => {
+    t.classList.add('kart-mobil');
+    const bas = $$('thead th', t).map(th => th.textContent.trim());
+    $$('tbody tr', t).forEach(tr => Array.from(tr.children).forEach((td, i) => {
+      if (td.colSpan > 1) return;
+      if (i && bas[i]) td.dataset.etiket = bas[i];
+      if (td.childNodes.length === 1 && td.firstChild.nodeName === 'DIV' && td.firstChild.dataset.hucre != null) return;
+      const d = document.createElement('div'); d.dataset.hucre = '';
+      while (td.firstChild) d.append(td.firstChild);
+      td.append(d);
+    }));
+  });
+}
+
 window.YONETIM = {
-  guard, toast, onay, sonrakiBildirim,
-  durumRozeti, durumAdi, tarih, tarihSaat, sayi, tutar, esc,
+  guard, toast, onay, sonrakiBildirim, kartla,
+  durumRozeti, durumAdi, sureMetni, sureDoldu, tarih, tarihSaat, sayi, tutar, esc,
   formCiz, formOku, formDogrula, formHatalari
 };
 })();

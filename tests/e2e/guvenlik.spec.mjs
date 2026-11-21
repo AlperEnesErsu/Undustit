@@ -94,12 +94,15 @@ test('tarayıcı hatası hata kaydına bir kez gider, adresin # kısmı gitmez',
     r.fulfill({ status: q.method() === 'OPTIONS' ? 204 : 201, headers:cors, body:'' });
   });
   await page.goto('/hikaye/?x=1#access_token=gizli');
+  // a page transition the browser gave up (seen live from Android: "Viewport size changed") is not reported
+  await page.evaluate(() => { Promise.reject(new Error('[beklenen] Transition was aborted because of invalid state. Viewport size changed')); });
   const MESAJ = '[beklenen] deneme hatası';
   await page.evaluate(m => { for (let i = 0; i < 3; i++) setTimeout(() => { throw new Error(m); }); }, MESAJ);
   await expect.poll(() => giden.filter(g => g.govde.message === MESAJ).length).toBe(1);
   await page.waitForTimeout(300);
   expect(giden.filter(g => g.govde.message === MESAJ)).toHaveLength(1);
-  const g = giden.find(x => x.govde.message === MESAJ);
+  expect(giden.filter(g => /Transition was aborted/.test(g.govde.message))).toHaveLength(0);
+  const g =giden.find(x => x.govde.message === MESAJ);
   expect(g.govde.page).toBe('/hikaye/?x=1');
   expect(JSON.stringify(g.govde)).not.toContain('gizli');
   // the database's own (English) column names: error_logs, supabase/20-english-names.sql

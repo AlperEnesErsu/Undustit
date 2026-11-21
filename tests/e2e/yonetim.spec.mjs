@@ -280,7 +280,7 @@ test('ürün talebi: vaka sayfasından gönderilir, yönetimde durumuyla görün
 test('yönetici kullanıcı adı oluşturur; e-posta yerine onunla giriş yapar', async ({ page }) => {
   await hazirla(page);
   await yoneticiGiris(page);
-  await page.goto('/yonetim/');
+  await page.goto('/yonetim/ayarlar/');
   await expect(page.locator('#ka-durum')).toContainText('Henüz kullanıcı adın yok');
   await page.locator('#ka-form [name=ad]').fill('Alper.Y');
   await page.locator('#ka-form [type=submit]').click();
@@ -301,5 +301,97 @@ test('yönetici kullanıcı adı oluşturur; e-posta yerine onunla giriş yapar'
   await page.locator('.y-giris [name=email]').fill('alper.y');
   await page.locator('.y-giris [name=sifre]').fill(ADMIN_SIFRE);
   await page.locator('.y-giris [type=submit]').click();
-  await expect(page.locator('#ka-durum')).toContainText(ADMIN);
+  await expect(page.locator('[data-y-kim]')).toContainText(ADMIN);
+  await expect(page.locator('main h1')).toHaveText('Özet');
+});
+
+// the panel's frame: one menu everywhere, empty lists folded into one line, the case form says what is unsaved
+test('menü her sayfada aynı; boş listeler tek satırda; vaka formu kaydedilmemiş değişikliği söyler', async ({ page }) => {
+  await hazirla(page);
+  await yoneticiGiris(page);
+  const menu = ['Özet', 'Vakalar', 'İçerik', 'Rapor', 'Ne kadar çalıştı', 'Ayarlar'];
+  for (const [yol, burada] of [['/yonetim/', 'Özet'], ['/yonetim/vaka/?id=vaka-01', 'Vakalar'], ['/yonetim/ayarlar/', 'Ayarlar']]){
+    await page.goto(yol);
+    await expect(page.locator('.y-yan a')).toHaveText(menu);
+    await expect(page.locator('.y-yan a[aria-current=page]')).toHaveText(burada);
+  }
+  await page.goto('/yonetim/');
+  await expect(page.locator('#bos-liste')).toContainText('bildirilen fikirler');
+  await expect(page.locator('#bildirimler')).toBeHidden();
+  await expect(page.locator('#et-form, #ka-form')).toHaveCount(0);
+  // the status filter is one dropdown
+  await page.locator('#durum-filtre').selectOption('taslak');
+  await expect(page.locator('#tbody')).toContainText('Bu filtrede vaka yok');
+  await page.locator('#durum-filtre').selectOption('');
+  await expect(page.locator('#tbody tr')).toHaveCount(1);
+  // a waiting message: its status and "Kaydet" are on screen, also on a phone (the row is a card there)
+  await page.evaluate(() => localStorage.setItem('udv-iletisim_mesajlari', JSON.stringify({ m1:{ id:'m1', ad:'Ayşe', eposta:'a@b.c', konu:'genel', mesaj:'Merhaba', durum:'yeni', zaman:new Date().toISOString() } })));
+  await page.reload();
+  const kaydet = page.locator('#mesajlar-tbody [data-kaydet]');
+  await kaydet.scrollIntoViewIfNeeded();
+  const k = await kaydet.boundingBox(), vp = page.viewportSize();
+  expect(k.x + k.width).toBeLessThanOrEqual(vp.width);
+
+  // no table needs a sideways scroll on a phone: each row is a card there
+  if (page.viewportSize().width < 640){
+    await page.evaluate(() => {
+      const at = new Date().toISOString();
+      localStorage.setItem('ud-store-v1', JSON.stringify({ ideas:{ 'u-x':{ items:[{ k:'a', title:'Cıvatalı bisiklet askısı', cat:'Vaka 01 · Cıvata', caseId:'vaka-01', problem:'p', solution:'', feats:[], handle:'d', at }] } }, votes:{ v1:{ buy:{ 'u-x:a':250 }, rate:{} } }, notes:{} }));
+    });
+    for (const yol of ['/yonetim/', '/yonetim/icerik/', '/yonetim/rapor/', '/yonetim/kaynak/', '/yonetim/vaka/?id=vaka-01#fikirler']){
+      await page.goto(yol);
+      if (yol.endsWith('#fikirler')) await page.locator('#t-fikirler').click();
+      await expect(page.locator('main .tablo').first()).toBeVisible();
+      const tasan = await page.evaluate(() => Array.from(document.querySelectorAll('main .tablo-kap')).filter(k => k.offsetParent && k.scrollWidth > k.clientWidth + 1).length);
+      expect(tasan, yol).toBe(0);
+    }
+  }
+
+  // case > Fikirler: the idea's state and a verb, saved only by the button
+  await page.goto('/yonetim/vaka/?id=vaka-01');
+  await page.locator('#t-fikirler').click();
+  const satir = page.locator('#fikirler tbody tr').first();
+  if (await satir.count()){
+    await expect(satir.locator('.rozet')).toHaveText('Yayında');
+    await satir.locator('[data-gizle]').click();
+    await expect(satir.locator('.rozet')).toHaveText('Gizli');
+    await satir.locator('[data-gizle]').click();
+    await expect(satir.locator('.rozet')).toHaveText('Yayında');
+  }
+
+  await page.goto('/yonetim/vaka/?id=vaka-01');
+  await expect(page.locator('.form-bolum legend')).toHaveCount(4);
+  const durum = page.locator('#kayit-durum');
+  await expect(durum).toHaveText('Değişiklik yok');
+  await page.locator('#vaka-form [name=ozet]').fill('Yeni kısa açıklama');
+  await expect(durum).toHaveText('Kaydedilmemiş değişiklik var');
+  await page.locator('#vaka-form [type=submit]').click();
+  await expect(durum).toContainText('Kaydedildi');
+  await expect(durum).not.toHaveClass(/degisti/);
+});
+
+// site errors live behind the "Log" button, not on Özet: it shows how many are new, the page solves them
+test('site hataları Özet’te değil, Log düğmesinin arkasında; hepsi çözüldü yapılır', async ({ page }) => {
+  await hazirla(page);
+  await page.evaluate(() => {
+    const at = new Date().toISOString();
+    localStorage.setItem('udv-hata_kayitlari', JSON.stringify({
+      h1:{ id:'h1', sayfa:'/', mesaj:'Bir hata', kaynak:'https://undustit.com/', satir:3, tarayici:'Mozilla/5.0 (Linux; Android 10) Chrome/157.0', durum:'yeni', zaman:at },
+      h2:{ id:'h2', sayfa:'/fikirler/', mesaj:'Başka hata', kaynak:'', satir:null, tarayici:'', durum:'yeni', zaman:at } }));
+  });
+  await yoneticiGiris(page);
+  await page.goto('/yonetim/');
+  await expect(page.locator('#hatalar')).toHaveCount(0);
+  const log = page.locator('.y-log');
+  await expect(log).toHaveText('Log · 2');
+  await log.click();
+  await expect(page).toHaveURL(/\/yonetim\/log\/$/);
+  await expect(page.locator('#tbody tr')).toHaveCount(2);
+  await expect(page.locator('#tbody')).toContainText('Chrome 157 · Android');
+  await page.locator('#hepsini-coz').click();
+  await page.locator('dialog [data-tamam]').click();
+  await expect(page.locator('#tbody')).toContainText('Yeni hata yok');
+  await expect(log).toHaveText('Log');
+  await page.locator('#hepsi').check();
+  await expect(page.locator('#tbody tr.cozuldu')).toHaveCount(2);
 });

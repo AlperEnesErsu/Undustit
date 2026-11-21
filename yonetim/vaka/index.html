@@ -17,6 +17,20 @@
 .y-ust h1{font-size:clamp(28px,3.2vw,40px);line-height:1.08;letter-spacing:-.02em;margin:4px 0 0;overflow-wrap:anywhere}
 .y-eylemler,.y-eylem{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .y-eylem{margin-top:20px}
+.kagit{margin-bottom:16px}
+.kagit summary{cursor:pointer;width:max-content;list-style:none}
+.kagit summary::-webkit-details-marker{display:none}
+.kagit[open] summary{margin-bottom:14px}
+.kagit-form{display:grid;gap:12px;padding:16px;border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--bg-3)}
+.kagit-form .not{margin:0;color:var(--ink-2);font-size:14px}
+.kagit-sayac{color:var(--muted);font-size:14px}
+.kagit-rozet{font-size:10.5px}
+.kagit-iletisim{display:block;color:var(--muted);font-size:12.5px;overflow-wrap:anywhere}
+.v-sure{margin-left:8px;font-size:13.5px;color:var(--ink-2)}
+.v-sure.doldu{color:var(--err);font-weight:500}
+.gorunur{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+/* the save bar sticks to the screen's bottom: its panel must not clip (overflow:hidden stops sticky) */
+#p-bilgiler{overflow:visible}
 .y-eylemler .y-sil{color:var(--err);border-color:var(--err)}
 .y-eylemler [disabled]{opacity:.5;cursor:not-allowed}
 .y-alanlar{display:grid;gap:16px}
@@ -52,15 +66,7 @@
   </div>
 </header>
 <div class="y-govde">
-  <nav class="y-yan" aria-label="Yönetim menüsü">
-    <a href="../">Özet</a>
-    <a href="../#vakalar" data-nav="vakalar">Vakalar</a>
-    <a href="../icerik/">İçerik</a>
-    <a href="../rapor/">Rapor</a>
-    <a href="../kaynak/">Ne kadar çalıştı</a>
-    <a href="./" data-nav="yeni">Yeni vaka</a>
-    <a href="../../">Siteye dön</a>
-  </nav>
+  <nav class="y-yan" aria-label="Yönetim menüsü" data-y-menu="vakalar"></nav>
   <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
 </div>
 
@@ -182,15 +188,16 @@ function kabukCiz(){
     '<section class="panel" role="tabpanel" id="p-bilgiler" data-sekme="bilgiler" aria-labelledby="t-bilgiler">' +
       '<div class="panel-ic"><form id="vaka-form" novalidate>' +
         '<div class="y-alanlar" id="alanlar"></div>' +
-        '<div class="y-eylem"><button class="btn sig" type="submit">Kaydet</button></div>' +
+        '<div class="y-eylem kayit-cubugu"><button class="btn sig" type="submit">Kaydet</button>' +
+          '<span class="kayit-durum" id="kayit-durum" aria-live="polite">Değişiklik yok</span></div>' +
       '</form></div></section>' +
     '<section class="panel" role="tabpanel" id="p-fikirler" data-sekme="fikirler" aria-labelledby="t-fikirler" hidden>' +
-      '<div class="panel-ic" id="fikirler"><p class="lead">Yükleniyor…</p></div></section>' +
+      '<div class="panel-ic"><div id="kagit-kap"></div><div id="fikirler"><p class="lead">Yükleniyor…</p></div></div></section>' +
     '<section class="panel" role="tabpanel" id="p-gecmis" data-sekme="gecmis" aria-labelledby="t-gecmis" hidden>' +
       '<div class="panel-ic" id="gecmis"><p class="lead">Yükleniyor…</p></div></section>' +
     '<section class="panel" role="tabpanel" id="p-firma" data-sekme="firma" aria-labelledby="t-firma" hidden>' +
       '<div class="panel-ic y-firma"><p class="lead">Buraya eklenen e-postayla giren firma, <a class="link" href="../../firma/">firma panelinde</a> bu vakanın fikirlerini, ' +
-        'taleplerini ve fiyat dağılımını görür, ürün fotoğrafını yükleyebilir. Başka hiçbir şeyi değiştiremez.</p>' +
+        'taleplerini ve fiyat dağılımını görür, ürün fotoğrafını ve 3D modelini yükleyebilir. Başka hiçbir şeyi değiştiremez.</p>' +
         '<form id="firma-form" class="y-firma-ekle" novalidate><label class="alan"><span>Firma e-postası</span>' +
           '<input type="email" name="eposta" autocomplete="off" placeholder="satis@firma.com.tr" required></label>' +
           '<button class="btn sig" type="submit">Ekle</button></form>' +
@@ -219,8 +226,14 @@ function kabukCiz(){
   });
 
   $('#vaka-form').addEventListener('submit', kaydet);
+  // any edit lights the save bar; leaving the page with one unsaved asks first
+  ['input', 'change'].forEach(function(t){ $('#vaka-form').addEventListener(t, function(){ kayitDurumu(true); }); });
+  window.addEventListener('beforeunload', function(e){
+    var d = $('#kayit-durum');
+    if (d && d.classList.contains('degisti')){ e.preventDefault(); e.returnValue = ''; }
+  });
   $('#v-eylem').addEventListener('click', eylemTikla);
-  $('#fikirler').addEventListener('change', gizleDegisti);
+  $('#fikirler').addEventListener('click', gizleTikla);
   $('#fikirler').addEventListener('click', kazananTikla);
   $('[data-csv]').addEventListener('click', csvIndir);
   $('#firma-form').addEventListener('submit', firmaEkle);
@@ -322,7 +335,9 @@ function yukle(ilk){
 function ustYaz(){
   document.title = vaka.baslik + ' · Yönetim · Undustit';
   $('#v-baslik').textContent = vaka.baslik;
-  $('#v-durum').innerHTML = YON.durumRozeti(vaka.durum);
+  var sm = YON.sureMetni(vaka);
+  $('#v-durum').innerHTML = YON.durumRozeti(vaka.durum) + (sm ? ' <span class="v-sure' + (YON.sureDoldu(vaka) ? ' doldu' : '') + '">' + esc(sm) +
+    (YON.sureDoldu(vaka) ? ': vaka yeni fikir almıyor. Değerlendirmeye al ya da Bilgiler’den fikir süresini uzat.' : '') + '</span>' : '');
   var gecisler = (UDV.GECIS[vaka.durum] || []).map(function(d){
     var kapali = d === 'kapali';
     var pasif = d === 'kazanan' && !vaka.kazanan;
@@ -342,16 +357,33 @@ function eylemTikla(e){
   if (b.hasAttribute('data-sil')) return sil();
 }
 
+// before a draft goes out: what a visitor or the company would miss (it can still go out)
+function yayinEksikleri(){
+  var l = [];
+  if (!vaka.gorsel && !vaka.model3d) l.push('Ürün fotoğrafı yok: vaka sayfasında görsel olmaz.');
+  if (!String(vaka.ozet || '').trim()) l.push('Kısa açıklama yok: kartlarda ve sayfa başında boş görünür.');
+  if (vaka.ortaklik !== false && !(Number(vaka.deneme_adedi) > 0)) l.push('Deneme partisi adedi yok: ziyaretçi kaç adet üretileceğini göremez.');
+  return Promise.resolve().then(function(){ return UDV.firma.liste(vaka.id); }).then(function(f){
+    if (!f.length) l.push('Firma erişimi yok: firma kendi panelinden talepleri göremez.');
+    return l;
+  }, function(){ return l; });
+}
+
 function gecis(d){
   var ad = UDV.DURUM_ADI[d];
-  YON.onay({
+  var ilkYayin = d === 'acik' && vaka.durum === 'taslak';
+  var tekrar = d === 'acik' && vaka.durum !== 'taslak';
+  var sureNotu = ilkYayin ? ' Fikir süresi (' + (vaka.sure_gun || 30) + ' gün) şimdi başlar.' :
+    tekrar ? ' Fikir süresi baştan başlamaz: ' + (YON.sureMetni(Object.assign({}, vaka, { durum:'acik' })) || '—') + '. Gerekirse Bilgiler’den süreyi uzat.' : '';
+  return (ilkYayin ? yayinEksikleri() : Promise.resolve([])).then(function(eksik){ return YON.onay({
     baslik: GECIS_ETIKET[d] + '?',
-    metin: '“' + vaka.baslik + '” “' + ad + '” durumuna geçecek. Not geçmişte görünür.',
+    metin: '“' + vaka.baslik + '” “' + ad + '” durumuna geçecek.' + sureNotu + (eksik.length ? ' Eksikler (yine de yayına alabilirsin):' : ''),
+    liste: eksik,
     eylem: GECIS_ETIKET[d],
     notAlani: true,
     notEtiketi: 'Not',
-    notIpucu: 'İsteğe bağlı'
-  }).then(function(s){
+    notIpucu: 'İsteğe bağlı; geçmişte görünür'
+  }); }).then(function(s){
     if (!s) return;
     return Promise.resolve(UDV.vakalar.durum(vaka.id, d, s.not)).then(function(){
       YON.toast('Durum “' + ad + '” oldu.', 'ok');
@@ -375,6 +407,14 @@ function sil(){
   }).catch(function(err){ hata(err, 'Vaka silinemedi.'); });
 }
 
+// what the save bar says: whether the form differs from what is saved, and when it was last saved
+function kayitDurumu(degisti, metin){
+  var d = $('#kayit-durum');
+  if (!d) return;
+  d.classList.toggle('degisti', degisti);
+  d.textContent = metin || (degisti ? 'Kaydedilmemiş değişiklik var' : 'Değişiklik yok');
+}
+
 function kaydet(e){
   e.preventDefault();
   var form = e.currentTarget;
@@ -384,6 +424,7 @@ function kaydet(e){
   btn.disabled = true;
   Promise.resolve().then(function(){ return UDV.vakalar.guncelle(vaka.id, v); }).then(function(g){
     vaka = Object.assign({}, vaka, g || {});
+    kayitDurumu(false, 'Kaydedildi · ' + YON.tarihSaat(new Date().toISOString()));
     YON.toast('Kaydedildi.', 'ok');
     ustYaz();
   }).catch(function(err){
@@ -392,9 +433,54 @@ function kaydet(e){
 }
 
 // ----------------------------------------------------------- fikirler
+// ----------------------------------------------------------- kâğıttan fikir
+// The brochure asks people to write their idea on paper and drop it in a box. Each paper is typed in here: it joins
+// the case like any idea (the name is what the site shows), the contact stays in the admin panel only.
+// The form stays open after a save, ready for the next paper; the source is kept.
+var kagitHazir = false;
+function kagitFormu(){
+  var kap = $('#kagit-kap');
+  if (kagitHazir || !kap) return;
+  kagitHazir = true;
+  kap.innerHTML = '<details class="kagit" id="kagit"><summary class="btn alt sm">Kâğıttan fikir ekle</summary>' +
+    '<form id="kagit-form" class="kagit-form" novalidate>' +
+      '<p class="not">Broşürle kâğıda yazılıp kutuya bırakılan fikirleri buraya gir. Fikir sitede herkesinki gibi görünür, ' +
+        '“alırdım” alır ve sıralamaya girer; iletişim bilgisi yalnız burada, yönetimde görünür.</p>' +
+      '<label class="alan"><span>Fikir <small>10–140 karakter, kâğıttaki gibi</small></span><input type="text" name="baslik" maxlength="140" required autocomplete="off"></label>' +
+      '<div class="alan-iki"><label class="alan"><span>Hangi derdi çözüyor <small>isteğe bağlı</small></span><textarea name="problem" rows="2" maxlength="400"></textarea></label>' +
+      '<label class="alan"><span>Nasıl <small>isteğe bağlı; çizim varsa kısaca anlat</small></span><textarea name="cozum" rows="2" maxlength="400"></textarea></label></div>' +
+      '<div class="alan-iki"><label class="alan"><span>Sitede görünen ad <small>ör. Ayşe K.; boş = adsız</small></span><input type="text" name="ad" maxlength="30" autocomplete="off"></label>' +
+      '<label class="alan"><span>İletişim <small>e-posta, LinkedIn ya da telefon; yalnız yönetimde</small></span><input type="text" name="iletisim" maxlength="200" autocomplete="off"></label></div>' +
+      '<div class="alan-iki"><label class="alan"><span>Nereden geldi</span><select name="kaynak"><option value="">Belirtilmedi</option></select></label>' +
+      '<label class="alan"><span>Not <small>isteğe bağlı, yalnız yönetimde</small></span><input type="text" name="not" maxlength="500" autocomplete="off"></label></div>' +
+      '<div class="y-eylem"><button class="btn sig" type="submit">Kaydet, sıradakine geç</button><span class="kagit-sayac" id="kagit-sayac" aria-live="polite"></span></div>' +
+    '</form></details>';
+  var f = $('#kagit-form'), say = 0;
+  // the tracked links (Ne kadar çalıştı); the brochure is chosen when it exists
+  Promise.resolve().then(function(){ return UDV.kaynak.rapor(); }).then(function(l){
+    f.kaynak.innerHTML += l.map(function(k){ return '<option value="' + esc(k.id) + '">' + esc(k.baslik || k.id) + '</option>'; }).join('');
+    if (l.some(function(k){ return k.id === 'brosur'; })) f.kaynak.value = 'brosur';
+  }).catch(function(){});
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var b = f.querySelector('[type=submit]'); b.disabled = true;
+    var x = { baslik:f.baslik.value, problem:f.problem.value, cozum:f.cozum.value, ad:f.ad.value, iletisim:f.iletisim.value, kaynak:f.kaynak.value, not:f.not.value };
+    Promise.resolve().then(function(){ return UDV.kagit.ekle(vaka.id, x); }).then(function(){
+      say++;
+      ['baslik', 'problem', 'cozum', 'ad', 'iletisim', 'not'].forEach(function(n){ f[n].value = ''; });
+      $('#kagit-sayac').textContent = 'Bu oturumda ' + say + ' kâğıt girildi.';
+      YON.toast('Fikir eklendi.', 'ok');
+      f.baslik.focus();
+      return fikirleriYaz();
+    }).catch(function(err){ hata(err, 'Fikir eklenemedi.'); }).then(function(){ b.disabled = false; });
+  });
+}
+
 function fikirleriYaz(){
   var kap = $('#fikirler');
-  return Promise.resolve().then(function(){ return UDV.fikirler.vaka(vaka.id); }).then(function(liste){
+  kagitFormu();
+  return Promise.all([UDV.fikirler.vaka(vaka.id), UDV.kagit.liste().catch(function(){ return {}; })]).then(function(r){
+    var liste = r[0], kagit = r[1] || {};
     fikirListesi = liste;
     if (!liste.length){
       kap.innerHTML = '<div class="bos"><b>Henüz fikir yok</b>' +
@@ -407,38 +493,39 @@ function fikirleriYaz(){
       '<caption class="sr-only">Bu vakaya gelen fikirler</caption>' +
       '<thead><tr><th scope="col">Başlık</th><th scope="col">Ad</th>' +
       '<th scope="col" class="sayi">Alıcı</th><th scope="col" class="sayi">Ort. fiyat</th>' +
-      '<th scope="col" class="sayi">Yorum</th><th scope="col">Gizli</th><th scope="col"><span class="sr-only">İşlem</span></th></tr></thead>' +
+      '<th scope="col" class="sayi">Yorum</th><th scope="col">Sitede</th><th scope="col"><span class="sr-only">İşlem</span></th></tr></thead>' +
       '<tbody>' + liste.map(function(f){
         var kazanan = vaka.kazanan && vaka.kazanan === f.id;
         var islem = kazanan ? '<span class="rozet yesil">Kazanan</span>' :
           (degerlendirme ? '<button type="button" class="btn alt sm" data-kazanan="' + esc(f.id) + '">Kazanan seç</button>' : '');
         return '<tr>' +
-          '<td>' + esc(f.baslik) + '</td>' +
-          '<td>' + esc(f.ad || '—') + '</td>' +
+          '<td>' + esc(f.baslik) + (kagit[f.id] ? ' <span class="rozet kagit-rozet" title="Kâğıda yazılıp kutuya bırakıldı">Kâğıt</span>' : '') + '</td>' +
+          '<td>' + esc(f.ad || '—') + (kagit[f.id] && kagit[f.id].iletisim ? '<small class="kagit-iletisim">' + esc(kagit[f.id].iletisim) + '</small>' : '') + '</td>' +
           '<td class="sayi">' + sayi(f.alici) + '</td>' +
-          '<td class="sayi">' + tutar(f.ortFiyat) + '</td>' +
+          '<td class="sayi">' + (f.alici ? tutar(f.ortFiyat) : '—') + '</td>' +
           '<td class="sayi">' + sayi(f.yorum) + '</td>' +
-          '<td><label class="anahtar"><input type="checkbox" data-gizle="' + esc(f.id) + '" aria-label="' + esc(f.baslik) + ' fikrini gizle"' +
-            (f.gizli ? ' checked' : '') + '><span>Gizli</span></label></td>' +
+          // the idea's real state and one verb; the row is read back after the save
+          '<td><div class="gorunur">' + (f.gizli ? '<span class="rozet kirmizi">Gizli</span>' : '<span class="rozet yesil">Yayında</span>') +
+            '<button type="button" class="btn alt sm" data-gizle="' + esc(f.id) + '" data-yeni="' + (f.gizli ? '0' : '1') + '" aria-label="' + esc(f.baslik) + ': ' + (f.gizli ? 'yayına al' : 'gizle') + '">' +
+            (f.gizli ? 'Yayına al' : 'Gizle') + '</button></div></td>' +
           '<td>' + islem + '</td>' +
         '</tr>';
       }).join('') + '</tbody></table></div>';
+    YON.kartla(kap);
   }).catch(function(err){
     kap.innerHTML = '<p class="lead">Fikirler yüklenemedi.</p>';
     hata(err, 'Fikirler yüklenemedi.');
   });
 }
 
-function gizleDegisti(e){
-  var c = e.target;
-  if (!c.matches || !c.matches('input[data-gizle]')) return;
-  var gizli = c.checked;
-  Promise.resolve().then(function(){ return UDV.fikirler.gizle(c.dataset.gizle, gizli); }).then(function(){
-    YON.toast(gizli ? 'Fikir gizlendi.' : 'Fikir yeniden görünür.', 'ok');
-  }).catch(function(err){
-    c.checked = !gizli;
-    hata(err, 'Güncellenemedi.');
-  });
+function gizleTikla(e){
+  var b = e.target.closest('[data-gizle]');
+  if (!b) return;
+  var gizli = b.dataset.yeni === '1';
+  b.disabled = true; b.textContent = 'Kaydediliyor…';
+  Promise.resolve().then(function(){ return UDV.fikirler.gizle(b.dataset.gizle, gizli); }).then(function(){
+    YON.toast(gizli ? 'Fikir gizlendi.' : 'Fikir yeniden yayında.', 'ok');
+  }, function(err){ hata(err, 'Güncellenemedi.'); }).then(fikirleriYaz);
 }
 
 function kazananTikla(e){

@@ -162,5 +162,5 @@ Object.assign(window.UD_IC, { mountProc, GRIDS, mountMotion });
 
 // =========================================================== boot
 document.addEventListener('DOMContentLoaded', mountMotion);
-window.UD = { mountNumune: window.UD_IC.mountNumune, alanUyar, modelEtiketleri, captcha, kalanMetin, saatMetin, toast, gorselAdresi, vakaOf, katOf, T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountThu, mountProc, openIdea, openShared, olcu, hedef, hedefMetni, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
+window.UD = { mountNumune: window.UD_IC.mountNumune, alanUyar, modelEtiketleri, captcha, kalanMetin, saatMetin, toast, gorselAdresi, modelAdresi: window.UD_IC.modelAdresi, model3d: window.UD_IC.model3d, vakaSuresi: window.UD_IC.vakaSuresi, vakaOf, katOf, T, LANG, LOCALE, pct, tl, catName, applyText, TERMS, CATS, CASES, openCases, inCase, CRIT, Store, mountForm, mountCase, mountStats, mountBoard, mountSonuc: window.UD_IC.mountSonuc, mountThu, mountProc, openIdea, openShared, olcu, hedef, hedefMetni, fmtDay, fmtDate, el, esc, ICON, ROOT, kvkkLink };
 })();

@@ -21,33 +21,19 @@
 .bekleyen a{text-decoration:none}
 .durum-h{display:flex;align-items:center;gap:8px}
 .durum-h select{min-width:0}
-.ka-form{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-.ka-form .alan{flex:1 1 260px;max-width:420px;margin:0}
-.ka-durum{margin:12px 0 0;color:var(--ink-2);font-size:14.5px}
 .y-ara{width:100%}
 .y-ara.arama{flex:1 1 220px}
-.chipler{display:flex;flex-wrap:wrap;gap:6px}
+.y-durum{min-height:44px;padding:8px 12px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--bg-2);font-size:15px}
+.arac-cubugu .sol{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .sayac{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .tablo td a{color:var(--ink);font-weight:500;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2)}
 .tablo td a:hover{text-decoration-color:var(--ink)}
 .tablo td.bosluk{padding:0}
 .tablo .bos{margin:0;border:0}
-.y-etkinlik{display:grid;gap:18px}
-.et-form{display:grid;gap:12px}
-.alan-iki{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.et-liste{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-2)}
-.et-liste li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px}
-.et-liste li + li{border-top:1px solid var(--line)}
-.et-liste li div{display:grid;gap:2px;min-width:0}
-.et-liste small{color:var(--muted);font-size:13px}
-.et-liste li.bitti b{color:var(--muted)}
-.et-liste .bos-satir{color:var(--muted)}
-@media (max-width:640px){.alan-iki{grid-template-columns:1fr}}
-.bos-panel thead{display:none}
-.bos-panel .tablo-kap{border:0;background:transparent;box-shadow:none}
-.bos-panel .tablo{min-width:0}
-.bos-panel .tablo td{padding:2px 0;color:var(--muted)}
-.bos-panel .tablo tbody tr:hover td{background:transparent}
+.bos-liste{margin:16px 0 0;color:var(--muted);font-size:14px}
+.v-sure{display:block;margin-top:4px;font-size:12.5px;color:var(--muted)}
+.v-sure.doldu{color:var(--err);font-weight:500}
+.chip.uyari{border-color:var(--err);color:var(--err)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media (max-width:640px){.y-ust{align-items:stretch}.y-ust .btn{width:100%}}
 </style>
@@ -65,15 +51,7 @@
   </div>
 </header>
 <div class="y-govde">
-  <nav class="y-yan" aria-label="Yönetim menüsü">
-    <a href="./" aria-current="page">Özet</a>
-    <a href="./#vakalar">Vakalar</a>
-    <a href="icerik/">İçerik</a>
-    <a href="rapor/">Rapor</a>
-    <a href="kaynak/">Ne kadar çalıştı</a>
-    <a href="vaka/">Yeni vaka</a>
-    <a href="../">Siteye dön</a>
-  </nav>
+  <nav class="y-yan" aria-label="Yönetim menüsü" data-y-menu="ozet"></nav>
   <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
 </div>
 
@@ -98,8 +76,8 @@ function $(s){ return ana.querySelector(s); }
 
 function ciz(o, a){
   ana = a;
-  var chipler = [['', 'Tümü']].concat(UDV.DURUMLAR.map(function(d){ return [d, UDV.DURUM_ADI[d]]; })).map(function(p){
-    return '<button type="button" class="chip" data-durum="' + esc(p[0]) + '" aria-pressed="' + (filtre.durum === p[0]) + '">' + esc(p[1]) + '</button>';
+  var secenekler = [['', 'Bütün durumlar']].concat(UDV.DURUMLAR.map(function(d){ return [d, UDV.DURUM_ADI[d]]; })).map(function(p){
+    return '<option value="' + esc(p[0]) + '"' + (filtre.durum === p[0] ? ' selected' : '') + '>' + esc(p[1]) + '</option>';
   }).join('');
 
   ana.innerHTML =
@@ -112,11 +90,11 @@ function ciz(o, a){
         '<div class="arac-cubugu">' +
           '<div class="sol">' +
             '<input class="y-ara" type="search" id="ara" placeholder="Başlık, firma, stok" aria-label="Vaka ara" value="' + esc(filtre.ara) + '">' +
-            '<div class="chipler" role="group" aria-label="Duruma göre filtrele">' + chipler + '</div>' +
+            '<select id="durum-filtre" class="y-durum" aria-label="Duruma göre filtrele">' + secenekler + '</select>' +
           '</div>' +
           '<div class="sag"><a class="btn sig sm" href="vaka/">Yeni vaka</a></div>' +
         '</div>' +
-        '<div class="tablo-kap"><table class="tablo">' +
+        '<div class="tablo-kap"><table class="tablo kart-mobil">' +
           '<caption class="sr-only">Vakalar</caption>' +
           '<thead><tr><th scope="col">Başlık</th><th scope="col">Firma</th><th scope="col">Durum</th>' +
           '<th scope="col" class="sayi">Adet</th><th scope="col" class="sayi">Fikir</th>' +
@@ -126,15 +104,8 @@ function ciz(o, a){
       '</div>' +
     '</section>' +
     KAYITLAR.map(panelHtml).join('') +
-    etkinlikHtml() +
-    '<section class="panel" id="hesap" aria-labelledby="hs-b"><header class="panel-bas"><h2 id="hs-b">Giriş bilgileri</h2></header>' +
-      '<div class="panel-ic"><form id="ka-form" class="ka-form" novalidate>' +
-        '<label class="alan"><span>Kullanıcı adı <small>3–24 karakter: küçük harf, rakam, nokta, alt çizgi</small></span>' +
-        '<input type="text" name="ad" maxlength="24" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ör. alper"></label>' +
-        '<button class="btn sig" type="submit">Kaydet</button></form>' +
-      '<p class="ka-durum" id="ka-durum" aria-live="polite"></p></div></section>';
-  hesapBagla(o);
-  etkinlikBagla();
+    // the lists with nothing in them, in one quiet line instead of a panel each
+    '<p class="bos-liste" id="bos-liste" hidden></p>';
 
   // A status is chosen first and written only with "Kaydet". The table is then read back from the database,
   // so what the row shows afterwards is what was really saved.
@@ -158,11 +129,8 @@ function ciz(o, a){
     });
   });
 
-  ana.querySelector('.chipler').addEventListener('click', function(e){
-    var b = e.target.closest('[data-durum]');
-    if (!b) return;
-    filtre.durum = b.dataset.durum;
-    $$chip();
+  $('#durum-filtre').addEventListener('change', function(e){
+    filtre.durum = e.target.value;
     yenile();
   });
   $('#ara').addEventListener('input', function(e){
@@ -174,6 +142,7 @@ function ciz(o, a){
   });
 
   istatYenile();
+  dolanYukle();
   yenile();
   KAYITLAR.forEach(kayitYenile);
 }
@@ -185,7 +154,7 @@ var MODEL = { ortaklik:'Satış ortaklığı', odul:'Fikir ödülü', ikisi:'Ort
 var NEDEN = { spam:'Spam', uygunsuz:'Uygunsuz', kopya:'Kopya', yaniltici:'Yanıltıcı', diger:'Diğer' };
 function posta(e){ return '<a class="link" href="mailto:' + encodeURIComponent(e).replace(/%40/g, '@') + '">' + esc(e) + '</a>'; }
 var KAYITLAR = [
-  { id:'bildirimler', tur:'bildirimler', baslik:'Bildirilen fikirler', ad:'bildirim', bos:'Bildirilen fikir yok.', tamam:'Bildirim kaydedildi.',
+  { id:'bildirimler', tur:'bildirimler', baslik:'Bildirilen fikirler', ad:'bildirim', tamam:'Bildirim kaydedildi.',
     kolon:['Fikir','Sitede','Neden','Açıklama','Tarih'],
     etiket:function(b){ return (b.fikirler && b.fikirler.baslik) || 'Fikir'; },
     // "Sitede" is the idea's real state, read from the idea itself: the proof that hiding worked
@@ -198,13 +167,13 @@ var KAYITLAR = [
     // "Fikri gizle" fikri sitede gizler; başka bir karara dönmek onu yeniden yayına alır
     degisince:function(id, durum, sec){ var fid = sec.dataset.fikir; return fid ? UDV.fikirler.gizle(fid, durum === 'gizlendi') : null; } },
   // "Ürünü görmek istiyorum": a visitor wants to see, try or buy a case's stock itself
-  { id:'numuneler', tur:'numuneler', baslik:'Ürün talepleri', ad:'talep', bos:'Henüz ürün talebi yok.', tamam:'Talep durumu kaydedildi.',
+  { id:'numuneler', tur:'numuneler', baslik:'Ürün talepleri', ad:'talep', tamam:'Talep durumu kaydedildi.',
     kolon:['Kim','İstek','Vaka','Adet','İletişim','Not','Tarih'],
     etiket:function(b){ return b.ad; },
     satir:function(b){ return ['<b>' + esc(b.ad) + '</b><br><small>' + esc(KIMIN[b.tur] || b.tur) + (b.sehir ? ' · ' + esc(b.sehir) : '') + '</small>', esc(AMAC[b.amac] || b.amac),
       '<a href="vaka/?id=' + encodeURIComponent(b.vaka_id) + '">' + esc(b.vaka_id) + '</a>', esc(b.adet || '—'),
       posta(b.eposta) + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : ''), esc(b.notlar || '—'), tarih(b.zaman)]; } },
-  { id:'basvurular', tur:'basvurular', baslik:'Vaka başvuruları', ad:'başvuru', bos:'Henüz başvuru yok.', tamam:'Başvuru durumu kaydedildi.',
+  { id:'basvurular', tur:'basvurular', baslik:'Vaka başvuruları', ad:'başvuru', tamam:'Başvuru durumu kaydedildi.',
     kolon:['Firma','Stok','Adet','Görsel','İletişim','Not','Vaka','Tarih'],
     etiket:function(b){ return b.firma; },
     satir:function(b){ return ['<b>' + esc(b.firma) + '</b>' + (b.kisi ? '<br><small>' + esc(b.kisi) + '</small>' : ''), (b.baslik ? '<b>' + esc(b.baslik) + '</b><br>' : '') + esc(b.stok) + [[b.olcu, b.sinif].filter(Boolean).join(' · '), b.taban_fiyat && 'taban: ' + b.taban_fiyat, MODEL[b.model], b.deneme_adedi && 'deneme: ' + b.deneme_adedi, b.odul && 'ödül: ' + b.odul].filter(Boolean).map(function(x){ return '<br><small>' + esc(x) + '</small>'; }).join(''),
@@ -212,76 +181,11 @@ var KAYITLAR = [
       posta(b.eposta) + (b.telefon ? '<br><small>' + esc(b.telefon) + '</small>' : ''), esc(b.notlar || '—'),
       // one step from an application to its case: the form opens filled in, the company gets its panel access
       b.vaka_id ? '<a href="vaka/?id=' + encodeURIComponent(b.vaka_id) + '">Vakayı aç</a>' : '<a class="btn alt sm" href="vaka/?basvuru=' + encodeURIComponent(b.id) + '">Vaka oluştur</a>', tarih(b.zaman)]; } },
-  { id:'mesajlar', tur:'mesajlar', baslik:'İletişim mesajları', ad:'mesaj', bos:'Henüz mesaj yok.', tamam:'Mesaj durumu kaydedildi.',
+  { id:'mesajlar', tur:'mesajlar', baslik:'İletişim mesajları', ad:'mesaj', tamam:'Mesaj durumu kaydedildi.',
     kolon:['Kimden','Konu','Mesaj','Tarih'],
     etiket:function(b){ return b.eposta; },
-    satir:function(b){ return [(b.ad ? '<b>' + esc(b.ad) + '</b><br>' : '') + posta(b.eposta), esc(KONU[b.konu] || b.konu), esc(b.mesaj), tarih(b.zaman)]; } },
-  // browser errors the site reported (supabase/10-hata.sql); "Çözüldü" once fixed
-  { id:'hatalar', tur:'hatalar', baslik:'Site hataları', ad:'hata', bos:'Kayıtlı hata yok.', tamam:'Hata durumu kaydedildi.',
-    kolon:['Sayfa','Hata','Kaynak','Tarayıcı','Tarih'],
-    etiket:function(b){ return b.mesaj; },
-    satir:function(b){ return ['<code>' + esc(b.sayfa || '/') + '</code>', esc(b.mesaj), '<small>' + esc((b.kaynak || '—') + (b.satir ? ':' + b.satir : '')) + '</small>',
-      '<small>' + esc(tarayiciAdi(b.tarayici)) + '</small>', tarih(b.zaman)]; } }
+    satir:function(b){ return [(b.ad ? '<b>' + esc(b.ad) + '</b><br>' : '') + posta(b.eposta), esc(KONU[b.konu] || b.konu), esc(b.mesaj), tarih(b.zaman)]; } }
 ];
-// "Chrome 130 · Android" instead of the whole user-agent string
-function tarayiciAdi(ua){
-  ua = String(ua || '');
-  var t = (ua.match(/(Edg|OPR|Firefox|CriOS|Chrome|Version)\/(\d+)/) || [])[0] || '';
-  t = t.replace('Edg', 'Edge').replace('OPR', 'Opera').replace('CriOS', 'Chrome').replace('Version', 'Safari').replace('/', ' ');
-  var s = /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : /Windows/.test(ua) ? 'Windows' : /Mac OS/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : '';
-  return [t, s].filter(Boolean).join(' · ') || '—';
-}
-// ----------------------------------------------------------- etkinlikler
-// Yayın, atölye, buluşma: buraya eklenen sıradaki etkinlik sitede sayfaların üstünde geri sayımla görünür.
-function etkinlikHtml(){
-  return '<section class="panel" id="etkinlikler" aria-labelledby="et-b">' +
-    '<header class="panel-bas"><h2 id="et-b">Etkinlikler</h2><span class="sayac" id="et-sayac"></span></header>' +
-    '<div class="panel-ic y-etkinlik">' +
-      '<form id="et-form" class="et-form" novalidate>' +
-        '<label class="alan"><span>Başlık</span><input type="text" name="baslik" maxlength="120" required placeholder="Ör. Ekim değerlendirme yayını"></label>' +
-        '<div class="alan-iki"><label class="alan"><span>Başlangıç</span><input type="datetime-local" name="baslangic" required></label>' +
-          '<label class="alan"><span>Bitiş <small>boşsa 2 saat</small></span><input type="datetime-local" name="bitis"></label></div>' +
-        '<label class="alan"><span>Bağlantı <small>yayın, toplantı ya da kayıt sayfası; https://</small></span><input type="url" name="baglanti" maxlength="500" placeholder="https://"></label>' +
-        '<label class="alan"><span>Açıklama <small>isteğe bağlı, en çok 600 karakter</small></span><textarea name="aciklama" rows="2" maxlength="600"></textarea></label>' +
-        '<div class="y-eylem"><button class="btn sig" type="submit">Etkinlik ekle</button></div>' +
-      '</form>' +
-      '<ul class="et-liste" id="et-liste" aria-live="polite"></ul>' +
-    '</div></section>';
-}
-function etkinlikYenile(){
-  var ul = ana.querySelector('#et-liste'), simdi = Date.now();
-  return UDV.etkinlik.liste().then(function(l){
-    ana.querySelector('#et-sayac').textContent = l.length + ' etkinlik';
-    ul.innerHTML = l.length ? l.map(function(e){
-      var bitti = Date.parse(e.bitis || e.baslangic) + (e.bitis ? 0 : 72e5) < simdi;
-      return '<li' + (bitti ? ' class="bitti"' : '') + '><div><b>' + esc(e.baslik) + '</b><small>' + esc(YON.tarihSaat(e.baslangic)) + (bitti ? ' · geçti' : '') +
-        (e.baglanti ? ' · <a href="' + esc(e.baglanti) + '" target="_blank" rel="noopener">bağlantı</a>' : '') + '</small></div>' +
-        '<button type="button" class="btn alt sm" data-et-sil="' + esc(e.id) + '">Sil</button></li>';
-    }).join('') : '<li class="bos-satir">Henüz etkinlik yok. Eklediğinizde sitede sayfaların üstünde görünür.</li>';
-  }).catch(function(err){ ul.innerHTML = ''; YON.toast(err.message || 'Etkinlikler yüklenemedi.', 'hata'); });
-}
-function etkinlikBagla(){
-  var f = ana.querySelector('#et-form');
-  // datetime-local is the admin's local time; the database keeps an exact instant
-  var an = function(v){ return v ? new Date(v).toISOString() : null; };
-  f.addEventListener('submit', function(e){
-    e.preventDefault();
-    var b = f.querySelector('[type=submit]'); b.disabled = true;
-    UDV.etkinlik.ekle({ baslik:f.baslik.value, baslangic:an(f.baslangic.value), bitis:an(f.bitis.value), baglanti:f.baglanti.value.trim(), aciklama:f.aciklama.value })
-      .then(function(){ f.reset(); YON.toast('Etkinlik eklendi.', 'ok'); return etkinlikYenile(); })
-      .catch(function(err){ YON.toast(err.message || 'Eklenemedi.', 'hata'); })
-      .then(function(){ b.disabled = false; });
-  });
-  ana.querySelector('#et-liste').addEventListener('click', function(e){
-    var s = e.target.closest('[data-et-sil]');
-    if (!s) return;
-    YON.onay({ baslik:'Etkinlik silinsin mi?', metin:'Sitede artık görünmez.', eylem:'Sil', tehlike:true }).then(function(evet){
-      if (!evet) return;
-      return UDV.etkinlik.sil(s.dataset.etSil).then(function(){ YON.toast('Etkinlik silindi.', 'ok'); return etkinlikYenile(); });
-    }).catch(function(err){ YON.toast(err.message || 'Silinemedi.', 'hata'); });
-  });
-  etkinlikYenile();
-}
 // a company's photo: a small preview, opening the full image when it is a web address
 function gorselHucre(u){
   var g = UD.gorselAdresi(u);
@@ -293,7 +197,7 @@ function panelHtml(k){
   var n = k.kolon.length + 1;
   return '<section class="panel" id="' + k.id + '" aria-labelledby="' + k.id + '-b">' +
     '<header class="panel-bas"><h2 id="' + k.id + '-b">' + k.baslik + '</h2><span class="sayac" id="' + k.id + '-sayac"></span></header>' +
-    '<div class="panel-ic"><div class="tablo-kap"><table class="tablo"><caption class="sr-only">' + k.baslik + '</caption>' +
+    '<div class="panel-ic"><div class="tablo-kap"><table class="tablo kart-mobil"><caption class="sr-only">' + k.baslik + '</caption>' +
     '<thead><tr>' + k.kolon.map(function(c){ return '<th scope="col">' + c + '</th>'; }).join('') + '<th scope="col">Durum</th></tr></thead>' +
     '<tbody id="' + k.id + '-tbody" data-n="' + n + '"></tbody></table></div></div></section>';
 }
@@ -305,12 +209,14 @@ function kayitYenile(k){
     k.bekleyen = liste.filter(function(b){ return b.durum === T.DURUMLAR[0]; }).length;
     ana.querySelector('#' + k.id + '-sayac').textContent = liste.length + ' ' + k.ad + (k.bekleyen ? ' · ' + k.bekleyen + ' bekliyor' : '');
     bekleyenYaz();
-    // nothing waiting: the panel shrinks to one quiet line instead of an empty table
-    tb.closest('.panel').classList.toggle('bos-panel', !liste.length);
-    if (!liste.length){ tb.innerHTML = '<tr><td colspan="' + n + '">' + k.bos + '</td></tr>'; return; }
+    // an empty list takes no room: its panel hides and its name joins the quiet line under the others
+    k.bosMu = !liste.length;
+    tb.closest('.panel').hidden = k.bosMu;
+    bosYaz();
+    if (k.bosMu){ tb.innerHTML = ''; return; }
     tb.innerHTML = liste.map(function(b){
-      return '<tr>' + k.satir(b).map(function(h){ return '<td>' + h + '</td>'; }).join('') +
-        '<td><div class="durum-h"><select data-kayit="' + esc(b.id) + '" data-ilk="' + esc(b.durum) + '"' + (b.fikir_id ? ' data-fikir="' + esc(b.fikir_id) + '"' : '') + ' aria-label="' + esc(k.etiket(b)) + ': durum">' +
+      return '<tr>' + k.satir(b).map(function(h, i){ return '<td' + (i ? ' data-etiket="' + esc(k.kolon[i]) + '"' : '') + '><div>' + h + '</div></td>'; }).join('') +
+        '<td data-etiket="Durum"><div class="durum-h"><select data-kayit="' + esc(b.id) + '" data-ilk="' + esc(b.durum) + '"' + (b.fikir_id ? ' data-fikir="' + esc(b.fikir_id) + '"' : '') + ' aria-label="' + esc(k.etiket(b)) + ': durum">' +
           T.DURUMLAR.map(function(d){ return '<option value="' + d + '"' + (d === b.durum ? ' selected' : '') + '>' + T.DURUM_ADI[d] + '</option>'; }).join('') +
         '</select><button type="button" class="btn sig sm" data-kaydet disabled>Kaydet</button></div></td></tr>';
     }).join('');
@@ -319,25 +225,17 @@ function kayitYenile(k){
   });
 }
 
-// The admin's username: an easier thing to type than the address when signing in. The line under the field
-// always says what signs in right now, read back from the database after every save.
-function hesapBagla(o){
-  var f = ana.querySelector('#ka-form'), d = ana.querySelector('#ka-durum');
-  var yaz = function(ad){
-    f.ad.value = ad || '';
-    d.innerHTML = ad
-      ? 'Şu an <b>' + esc(ad) + '</b> kullanıcı adıyla ya da <b>' + esc(o.email) + '</b> adresiyle giriş yapabilirsin. Şifre aynı.'
-      : 'Henüz kullanıcı adın yok: yalnız <b>' + esc(o.email) + '</b> adresiyle giriş yapıyorsun.';
-  };
-  UDV.hesap.kullaniciAdi().then(yaz).catch(function(err){ d.textContent = err.message || 'Kullanıcı adı okunamadı.'; });
-  f.addEventListener('submit', function(e){
-    e.preventDefault();
-    var b = f.querySelector('[type=submit]'); b.disabled = true;
-    UDV.hesap.kullaniciAdiKoy(f.ad.value).then(function(){ return UDV.hesap.kullaniciAdi(); })
-      .then(function(ad){ yaz(ad); YON.toast(ad ? 'Kullanıcı adı kaydedildi.' : 'Kullanıcı adı kaldırıldı.', 'ok'); })
-      .catch(function(err){ YON.toast(err.message || 'Kaydedilemedi.', 'hata'); })
-      .then(function(){ b.disabled = false; });
-  });
+// open cases whose idea period is over: they wait for the admin (review, or more days)
+var dolanlar = [];
+function dolanYukle(){
+  return Promise.resolve().then(function(){ return UDV.vakalar.liste({ durum:'acik' }); })
+    .then(function(l){ dolanlar = l.filter(YON.sureDoldu); bekleyenYaz(); }, function(){});
+}
+
+function bosYaz(){
+  var p = ana.querySelector('#bos-liste'), l = KAYITLAR.filter(function(k){ return k.bosMu; });
+  p.hidden = !l.length;
+  p.textContent = l.length ? 'Boş: ' + l.map(function(k){ return k.baslik.toLocaleLowerCase('tr'); }).join(', ') + '.' : '';
 }
 
 // what still needs a decision, as links to its table
@@ -345,15 +243,10 @@ function bekleyenYaz(){
   var kap = ana.querySelector('#bekleyen');
   if (!kap) return;
   var l = KAYITLAR.filter(function(k){ return k.bekleyen > 0; });
-  kap.innerHTML = '<b>Bekleyen işler</b>' + (l.length
-    ? l.map(function(k){ return '<a class="chip" href="#' + k.id + '">' + k.bekleyen + ' ' + k.ad + '</a>'; }).join('')
+  var dolan = (dolanlar || []).map(function(v){ return '<a class="chip uyari" href="vaka/?id=' + encodeURIComponent(v.id) + '">“' + esc(v.baslik) + '” süresi doldu</a>'; });
+  kap.innerHTML = '<b>Bekleyen işler</b>' + (l.length || dolan.length
+    ? dolan.join('') + l.map(function(k){ return '<a class="chip" href="#' + k.id + '">' + k.bekleyen + ' ' + k.ad + '</a>'; }).join('')
     : '<span>Şu an bekleyen iş yok.</span>');
-}
-
-function $$chip(){
-  ana.querySelectorAll('.chipler .chip').forEach(function(c){
-    c.setAttribute('aria-pressed', String(c.dataset.durum === filtre.durum));
-  });
 }
 
 function istatYenile(){
@@ -391,12 +284,12 @@ function yenile(){
       tb.innerHTML = liste.map(function(v, i){
         return '<tr>' +
           '<td><a href="vaka/?id=' + encodeURIComponent(v.id) + '">' + esc(v.baslik) + '</a></td>' +
-          '<td>' + esc(v.firma || '—') + '</td>' +
-          '<td>' + YON.durumRozeti(v.durum) + '</td>' +
-          '<td class="sayi">' + sayi(v.adet) + '</td>' +
-          '<td class="sayi">' + sayi(sayilar[i]) + '</td>' +
-          '<td>' + tarih(v.acilis) + '</td>' +
-          '<td>' + tarih(v.guncelleme) + '</td>' +
+          '<td data-etiket="Firma">' + '<div>' + esc(v.firma || '—') + '</div>' + '</td>' +
+          '<td data-etiket="Durum">' + '<div>' + YON.durumRozeti(v.durum) + (YON.sureMetni(v) ? '<small class="v-sure' + (YON.sureDoldu(v) ? ' doldu' : '') + '">' + esc(YON.sureMetni(v)) + '</small>' : '') + '</div>' + '</td>' +
+          '<td class="sayi" data-etiket="Adet">' + '<div>' + sayi(v.adet) + '</div>' + '</td>' +
+          '<td class="sayi" data-etiket="Fikir">' + '<div>' + sayi(sayilar[i]) + '</div>' + '</td>' +
+          '<td data-etiket="Açılış">' + '<div>' + tarih(v.acilis) + '</div>' + '</td>' +
+          '<td data-etiket="Güncelleme">' + '<div>' + tarih(v.guncelleme) + '</div>' + '</td>' +
         '</tr>';
       }).join('');
     });

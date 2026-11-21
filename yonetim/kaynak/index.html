@@ -44,15 +44,7 @@
   </div>
 </header>
 <div class="y-govde">
-  <nav class="y-yan" aria-label="Yönetim menüsü">
-    <a href="../">Özet</a>
-    <a href="../#vakalar">Vakalar</a>
-    <a href="../icerik/">İçerik</a>
-    <a href="../rapor/">Rapor</a>
-    <a href="./" aria-current="page">Ne kadar çalıştı</a>
-    <a href="../vaka/">Yeni vaka</a>
-    <a href="../../">Siteye dön</a>
-  </nav>
+  <nav class="y-yan" aria-label="Yönetim menüsü" data-y-menu="kaynak"></nav>
   <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
 </div>
 
@@ -71,7 +63,8 @@ var YON = window.YONETIM;
 var esc = YON.esc, sayi = YON.sayi;
 var ana = null, son = [];
 
-function yuzde(a, b){ return b ? Math.round(a / b * 100) + '%' : '—'; }
+// a share of the visitors, shown only when someone came
+function oran(a, b){ return b ? '<span class="oran">' + Math.round(a / b * 100) + '%</span>' : ''; }
 function zaman(iso){ return iso ? YON.tarihSaat(iso) : '—'; }
 
 function ciz(o, a){
@@ -114,7 +107,7 @@ function yukle(){
     ana.querySelector('#kaynaklar').innerHTML = liste.length
       ? '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">İzlenen bağlantılar ve getirdikleri</caption>' +
         '<thead><tr><th scope="col">Bağlantı</th><th scope="col" class="sayi">Gelen</th><th scope="col" class="sayi">Fikir yazan</th>' +
-        '<th scope="col" class="sayi">Fikir</th><th scope="col" class="sayi">Alırdım diyen</th><th scope="col" class="sayi">Alırdım</th>' +
+        '<th scope="col" class="sayi">Fikir</th><th scope="col" class="sayi">Kâğıttan fikir</th><th scope="col" class="sayi">Alırdım diyen</th><th scope="col" class="sayi">Alırdım</th>' +
         '<th scope="col">Son geliş</th><th scope="col"><span class="sr-only">İşlem</span></th></tr></thead><tbody>' +
         liste.map(function(k){
           var adres = UDV.kaynak.baglanti(k);
@@ -122,14 +115,16 @@ function yukle(){
               '<span class="alt">' + esc(k.id) + ' → ' + esc(k.hedef || '/') + '</span>' +
               '<span class="k-baglanti"><code>' + esc(adres) + '</code><button class="btn alt sm" type="button" data-kopyala>Kopyala</button></span></td>' +
             '<td class="sayi" data-sutun="gelen">' + sayi(k.ziyaretci) + '</td>' +
-            '<td class="sayi" data-sutun="yazan">' + sayi(k.yazan) + '<span class="oran">' + yuzde(k.yazan, k.ziyaretci) + '</span></td>' +
+            '<td class="sayi" data-sutun="yazan">' + sayi(k.yazan) + oran(k.yazan, k.ziyaretci) + '</td>' +
             '<td class="sayi" data-sutun="fikir">' + sayi(k.fikir) + '</td>' +
-            '<td class="sayi">' + sayi(k.alici) + '<span class="oran">' + yuzde(k.alici, k.ziyaretci) + '</span></td>' +
+            '<td class="sayi" data-sutun="kagit">' + sayi(k.kagit || 0) + '</td>' +
+            '<td class="sayi">' + sayi(k.alici) + oran(k.alici, k.ziyaretci) + '</td>' +
             '<td class="sayi">' + sayi(k.talep) + '</td>' +
             '<td>' + esc(zaman(k.sonZiyaret)) + '</td>' +
             '<td><button class="btn alt sm" type="button" data-sil>Sil</button></td></tr>';
         }).join('') + '</tbody></table></div>'
       : '<p class="lead">Henüz izlenen bağlantı yok. Aşağıdan ekleyebilirsin.</p>';
+    YON.kartla(ana.querySelector('#kaynaklar'));
   }).catch(function(err){
     ana.querySelector('#kaynaklar').innerHTML = '<p class="lead">' + esc(err.message || 'Yüklenemedi.') + '</p>';
     YON.toast(err.message || 'Yüklenemedi.', 'hata');

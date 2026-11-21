@@ -539,3 +539,80 @@ dosya çalışmadan önce de sonra da çalışır (fonksiyon yoksa eski yoldan o
 - **Yönetim:** `/yonetim/kaynak/`: bağlantı başına gelen, fikir yazan (oranıyla), fikir, alırdım diyen, son geliş.
   Yeni bağlantı "Kaydet" ile eklenir ve QR'a konacak tam adres gösterilir.
 - KVKK metni artık çerezi anlatıyor ("Undustit çerez kullanmaz" cümlesi `ud_cihaz` geldiğinden beri yanlıştı).
+
+## Ürünün 3D modeli (21 Kasım 2026)
+
+Denetim raporu §4, aşama 1: elinde 3D dosyası olan yükler.
+- **Kim yükler:** yönetici vaka formunda, firma kendi panelinde. `.glb`, en çok 20 MB; dosyanın başı (`glTF`) kontrol edilir.
+  Ayrı `modeller` kovası (`23-model.sql`), fotoğraf kovasının 5 MB sınırı değişmedi.
+- **Nerede görünür:** vaka sayfası ve vaka 01'in teknik föyü. Model fotoğrafın çerçevesine gelir, fotoğraf poster olur;
+  "3D · çevirmek için sürükle" ipucu ve telefonda "Odanda gör (AR)". Görüntüleyici yüklenemezse ya da dosya
+  okunamazsa fotoğraf kalır.
+- **Neden model-viewer:** tek etiket, dokunmatik döndürme, AR ve erişilebilir alt metin hazır; yalnız modeli olan sayfada
+  yüklenir (yaklaşık 250 KB). Draco sıkıştırmalı modeller CSP yüzünden açılmaz, firma rehberinde yazıyor.
+- Aşama 2 (fotoğraflardan 3D üretmek) hâlâ plan: servis ve ücret kararı bekliyor.
+
+## Yönetim sadeleşti (21 Kasım 2026)
+
+- **Tek menü:** altı sayfada elle yazılmış menü yerine `yonetim.js` (`MENU`) her sayfaya aynı menüyü yazar; sayfa
+  yalnız hangi giriş olduğunu söyler (`<nav data-y-menu="rapor">`). Menü: Özet, Vakalar, İçerik, Rapor, Ne kadar
+  çalıştı, Ayarlar. "Yeni vaka" Vakalar panelinde düğme; site başlıktaki "Undustit" bağlantısında.
+- **Özet yalnız iş:** sayılar, bekleyen işler, vakalar, başvuru/mesaj/talep/bildirim/hata tabloları. Boş liste panel
+  açmaz, adı alttaki tek satıra girer ("Boş: bildirilen fikirler, …"). Sayfa yaklaşık yarıya indi.
+- **Ayarlar** (`/yonetim/ayarlar/`): etkinlikler (form "Etkinlik ekle" ile açılır, liste önde) ve giriş bilgileri.
+- **Vaka formu:** dört başlıklı bölüm (Vaka sayfası, Stok, Teklif, Görsel ve 3D); görsel ve 3D yan yana. Kaydet
+  çubuğu ekranın altında kalır ve "Kaydedilmemiş değişiklik var / Kaydedildi · saat" der; kaydedilmemiş
+  değişiklikle sayfadan çıkarken tarayıcı sorar. "Satış ortaklığı" kutusu yazısının yanına geldi.
+- **İçerik:** "Nerede" sütunu vaka kimliği yerine vakanın adını, bağlantısıyla gösterir.
+- **Telefonda kart:** `.tablo.kart-mobil` (bilesen.css) 640 px altında her satırı karta çevirir; her hücre sütun adının
+  (`data-etiket`) yanında. Özet'teki vaka ve kayıt tabloları bunu kullanır; durum ve "Kaydet" artık ekranın dışında kalmaz.
+- **Vaka filtresi:** yedi durum düğmesi yerine tek açılır liste ("Bütün durumlar").
+- **Kart her yerde:** `YON.kartla(kök)` (yonetim.js) bir tablo yazıldıktan sonra çağrılır, sütun adlarını başlık
+  satırından alır. Rapor, İçerik, Ne kadar çalıştı ve vaka > Fikirler telefonda yana kaymaz.
+- **Vaka > Fikirler:** kendi kendine kaydeden "Gizli" anahtarı yerine İçerik'teki gibi durum rozeti ("Yayında / Gizli")
+  ve fiil düğmesi ("Gizle / Yayına al"); satır kayıttan sonra veritabanından yeniden okunur. Alıcısı olmayan fikrin
+  ortalama fiyatı "0 ₺" değil "—".
+
+## Güvenlik doğrulaması görünür oldu (21 Kasım 2026)
+
+Girişte Cloudflare'in "Gerçek kişi olduğunuzu doğrulayın" kutusu sayfanın en altında, açıklamasız çıkıyordu; giriş
+düğmesi takılmış gibi bekliyordu (telefonda kutu çoğu zaman ekranın dışında). Şimdi (`assets/ud/temel.js` captcha):
+- Kutu yalnız Cloudflare işaret istediğinde açılır, sayfa kararır, kutu ortada "Son bir adım" açıklamasıyla durur;
+  "Vazgeç" işlemi durdurur ve bunu söyler.
+- Yeniden deneme bizde: hata olursa bir kez daha, sonra açık bir mesaj (Cloudflare'in kendi denemesi kaldırılmış
+  kutuya çarpıp konsola hata yazıyordu).
+- Supabase doğrulamayı reddederse (süresi geçmiş ya da geçersiz jeton) giriş artık "E-posta ya da şifre yanlış"
+  demez, "Güvenlik doğrulaması geçilemedi" der.
+
+## Log (21 Kasım 2026)
+
+Site hataları Özet'ten çıktı. Başlıkta "Çıkış"ın yanında yalnız yöneticiye görünen **Log** düğmesi var; yeni hata
+varsa sayısını gösterir ("Log · 2"). `/yonetim/log/`: yeni hatalar listesi (telefonda kart), satır başına durum +
+Kaydet, "Hepsini çözüldü yap" (onaylı) ve "Çözülenleri de göster". Kayıtlar silinmez.
+
+## Vaka süreci: süre, yayın kontrolü, davet metni (21 Kasım 2026)
+
+- **Fikir süresi işliyor:** tek kural `UD.vakaSuresi(v)` (assets/ud/temel.js): ilk açılış (`acilis`) + `sure_gun`. Vaka
+  sayfasında ve vaka 01'de "Fikir süresi: 10 gün kaldı · son gün 1 Aralık". Süre dolunca form yerine "Fikir süresi
+  doldu; gelen fikirler değerlendiriliyor" yazar, `openCases()` vakayı dışarıda bırakır (fikir formu vakayı
+  sunmaz; `/fikir/?vaka=` bunu söyler). "Alırdım" açık kalır. Veritabanı süre dolan vakaya fikri hâlâ kabul eder;
+  kural sayfada.
+- **Yönetim:** süresi dolan açık vaka Özet'te bekleyen işlerde kırmızı ("… süresi doldu"), vaka listesinde ve vaka
+  başlığında kalan gün ya da "Süre doldu: değerlendirmeye al ya da süreyi uzat".
+- **Yeniden açmak süreyi baştan başlatmaz:** `acilis` yalnız ilk yayında yazılır; onay penceresi bunu söyler.
+- **Yayın kontrolü:** taslağı yayına alırken onay penceresi eksikleri sayar (fotoğraf/3D, kısa açıklama, deneme
+  partisi, firma erişimi); yine de yayına alınabilir.
+- **Davet e-postası:** vaka taslaksa "vakanızı hazırlıyoruz, yayına alınca haber veririz" der, "açıldı" demez
+  (`firma-davet` yeniden yüklenmeli).
+
+## Kâğıt, sonuç, kazanç payı, e-postalar (21 Kasım 2026)
+
+- **Kâğıttan fikir** (`24-kagit.sql`): yönetim > vaka > Fikirler > "Kâğıttan fikir ekle". Fikir sitede herkesinki gibi;
+  görünen ad isteğe bağlı, iletişim yalnız yönetimde (`paper_ideas`). Form kaydedince açık kalır, kaynak (broşür)
+  korunur, "Bu oturumda N kâğıt girildi". Ne kadar çalıştı'da "Kâğıttan fikir" sütunu. KVKK metni bunu söylüyor.
+- **Sonuç** (`UD.mountSonuc`): vaka değerlendirmeye geçince vaka sayfasında ve vaka 01'de form yerine "Değerlendirmede"
+  ve en çok talep görenler; kazanan seçilince kazanan fikir, sahibi, talebi ve sıralama.
+- **Kazanç payı:** kullanım koşulları §6'ya taslak maddeler (kazananın seçimi, fikir sahibi kim, %40/%10'un neyin
+  üzerinden, süre, ödül, ödeme ve vergi, haklar, ulaşılamazsa); sarı alanlar avukata.
+- **E-postalar** (`25-bildirim.sql`, `functions/bildirim`): başvuru onayı ve yöneticiye haber, İncelendi/Ret,
+  "vakanız yayında", kazanan. Resend doğrulanınca çalışır.

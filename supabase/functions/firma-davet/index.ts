@@ -21,21 +21,24 @@ const CORS = {
 const cevap = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
-export function epostaMetni(o: { firma: string; vaka: string; eposta: string; link: string; giris: string; yeni: boolean }) {
+// taslak: the case was just created from the application and is not on the site yet (the usual case); otherwise it is live
+export function epostaMetni(o: { firma: string; vaka: string; eposta: string; link: string; giris: string; yeni: boolean; taslak?: boolean }) {
   const dugme = (t: string) =>
     `<p><a href="${esc(o.link)}" style="display:inline-block;background:#1F2F86;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:600">${t}</a></p>`;
   return {
-    subject: o.yeni ? 'Başvurunuz kabul edildi: Undustit firma paneli' : 'Undustit firma paneli: yeni vakanız açıldı',
+    subject: o.yeni ? 'Başvurunuz kabul edildi: Undustit firma paneli' : o.taslak ? 'Undustit firma paneli: yeni vakanız hazırlanıyor' : 'Undustit firma paneli: yeni vakanız açıldı',
     html:
       `<p>Merhaba${o.firma ? ' ' + esc(o.firma) : ''},</p>` +
-      `<p><b>${esc(o.vaka)}</b> vakanız Undustit'te açıldı. Firma panelinde bu vakanın fikirlerini, taleplerini ve fiyat dağılımını görebilir, ürün fotoğrafını yükleyebilirsiniz.</p>` +
+      (o.taslak
+        ? `<p>Başvurunuz kabul edildi: <b>${esc(o.vaka)}</b> vakanızı hazırlıyoruz. Yayına aldığımızda sitede görünür ve fikir toplamaya başlar; size ayrıca haber veririz. Bu arada firma panelinde vakanızı görebilir, ürün fotoğrafını ve varsa 3D modelini ekleyebilirsiniz.</p>`
+        : `<p><b>${esc(o.vaka)}</b> vakanız Undustit'te açıldı. Firma panelinde bu vakanın fikirlerini, taleplerini ve fiyat dağılımını görebilir, ürün fotoğrafını ve 3D modelini yükleyebilirsiniz.</p>`) +
       `<p><b>Kullanıcı adınız:</b> ${esc(o.eposta)}</p>` +
       (o.yeni
         ? `<p>Şifrenizi aşağıdaki bağlantıyla siz belirleyin. Bağlantı tek kullanımlıktır ve bir süre sonra geçersiz olur.</p>${dugme('Şifremi belirle')}`
         : `<p>Bu adresle zaten bir hesabınız var: <a href="${esc(o.giris)}">giriş sayfasından</a> mevcut şifrenizle girin. Şifrenizi hatırlamıyorsanız bu bağlantıyla yenisini belirleyin:</p>${dugme('Yeni şifre belirle')}`) +
       `<p>Sonraki girişlerde: <a href="${esc(o.giris)}">${esc(o.giris)}</a>, kullanıcı adı ve şifrenizle.</p>` +
       `<hr style="border:none;border-top:1px solid #ddd;margin:24px 0">` +
-      `<p style="color:#555;font-size:13px">Your case <b>${esc(o.vaka)}</b> is open on Undustit. Username: ${esc(o.eposta)}. ` +
+      `<p style="color:#555;font-size:13px">Your case <b>${esc(o.vaka)}</b> ${o.taslak ? 'is being prepared on Undustit and goes live soon' : 'is open on Undustit'}. Username: ${esc(o.eposta)}. ` +
       `Use the button above to ${o.yeni ? 'set' : 'reset'} your password (one-time link), then sign in at ${esc(o.giris)}.</p>` +
       `<p style="color:#888;font-size:12px">Bu e-postayı Undustit'e yaptığınız vaka başvurusu kabul edildiği için aldınız. Şifrenizi biz bilmiyoruz ve hiçbir zaman sormayız.</p>`,
   };
@@ -61,7 +64,7 @@ if (import.meta.main) Deno.serve(async (req) => {
   // the address must already have access to this case: the function never widens access by itself
   const { data: erisim } = await db.from('case_companies').select('email').eq('case_id', vakaId).eq('email', eposta).maybeSingle();
   if (!erisim) return cevap({ hata: 'erisim-yok' }, 404);
-  const { data: vaka } = await db.from('cases').select('title, company').eq('id', vakaId).maybeSingle();
+  const { data: vaka } = await db.from('cases').select('title, company, status').eq('id', vakaId).maybeSingle();
   if (!vaka) return cevap({ hata: 'vaka-yok' }, 404);
 
   const giris = env('SITE_URL') + 'giris/';
@@ -75,7 +78,7 @@ if (import.meta.main) Deno.serve(async (req) => {
   const link = r.data?.properties?.action_link;
   if (r.error || !link) return cevap({ hata: 'baglanti', mesaj: r.error?.message }, 500);
 
-  const m = epostaMetni({ firma: vaka.company ?? '', vaka: vaka.title ?? vakaId, eposta, link, giris, yeni });
+  const m = epostaMetni({ firma: vaka.company ?? '', vaka: vaka.title ?? vakaId, eposta, link, giris, yeni, taslak: vaka.status === 'taslak' });
   const g = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + env('RESEND_API_KEY'), 'Content-Type': 'application/json' },

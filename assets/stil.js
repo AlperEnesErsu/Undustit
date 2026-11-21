@@ -10,6 +10,12 @@
     location.replace('https://undustit.com/' + location.pathname.replace(/^\/Undustit\/?/, '') + location.search + location.hash);
     return;
   }
+  // Page-to-page transitions (@view-transition in ud.css): the browser may give one up half way (a phone turned, the
+  // screen resized, a fast second tap) and then rejects its promises unhandled. The page is fine; nothing to report.
+  // Caught here in <head>, before the first frame, for the page leaving (pageswap) and the one arriving (pagereveal).
+  var gecisSessiz = function(e){ var t = e.viewTransition; if (t) [t.ready, t.finished, t.updateCallbackDone].forEach(function(p){ if (p) p.catch(function(){}); }); };
+  addEventListener('pageswap', gecisSessiz);
+  addEventListener('pagereveal', gecisSessiz);
   // Oyuncu is the design language (owner's call, 24 Oct 2026); Kâğıt stays as ?stil=kagit
   var LIST = { oyuncu:'Oyuncu', kagit:'Kâğıt' };
   var DEFAULT = 'oyuncu';

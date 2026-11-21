@@ -157,7 +157,7 @@ const Store = (function(){
     let rows = null;
     if (AYAR.supabaseUrl){
       const c = await sbClient();
-      const r = await DB.from(c, 'vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,gorsel,ortaklik,odul,durum,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
+      const r = await DB.from(c, 'vakalar').select('id,baslik,ozet,stok,adet,olcu,sinif,gorsel,model3d,ortaklik,odul,durum,acilis,sure_gun,kazanan,olusturma').neq('durum', 'taslak').order('olusturma', { ascending:false });
       if (!r.error) rows = r.data;
     } else if (!(window.claude && window.claude.use)){
       try { const d = JSON.parse(localStorage.getItem('udv-v1') || 'null'); if (d && d.vakalar) rows = Object.values(d.vakalar).filter(v => v.durum !== 'taslak').sort((a,b) => String(b.olusturma).localeCompare(String(a.olusturma))); } catch(e){}
@@ -413,6 +413,24 @@ const Store = (function(){
       const r = await sb.storage.from('gorseller').upload(yol, blob, { contentType:'image/jpeg', cacheControl:'31536000' });
       if (r.error) throw r.error;
       return sb.storage.from('gorseller').getPublicUrl(yol).data.publicUrl;
+    },
+    // A 3D model (.glb): checked (glTF binary header, 20 MB), then stored as it is in the public "modeller" bucket
+    // under <klasor>/<uid>/ (supabase/23-model.sql). The local preview keeps it as a data URL, so only small ones (3 MB).
+    async modelYukle(file, klasor){
+      if (!file || !/\.glb$/i.test(file.name || '')) throw new Error(T('ud.model.tur'));
+      if (file.size > 20 * 1048576) throw new Error(T('ud.model.buyuk'));
+      const bas = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+      if (String.fromCharCode(...bas) !== 'glTF') throw new Error(T('ud.model.tur'));
+      const blob = new Blob([file], { type:'model/gltf-binary' });
+      if (!AYAR.supabaseUrl){
+        if (file.size > 3 * 1048576) throw new Error(T('ud.model.yerel'));
+        return new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(blob); });
+      }
+      sb = sb || await sbClient();
+      const yol = klasor + '/' + await sbUser() + '/' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) + '.glb';
+      const r = await sb.storage.from('modeller').upload(yol, blob, { contentType:'model/gltf-binary', cacheControl:'31536000' });
+      if (r.error) throw r.error;
+      return sb.storage.from('modeller').getPublicUrl(yol).data.publicUrl;
     },
     basvur(data){ return this.kaydet('vaka_basvurulari', data); },
     // the database wants the idea's own id; the local preview keeps the full key (that is what it hides)

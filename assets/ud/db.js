@@ -32,6 +32,7 @@ const TABLES = {
   vaka_gecmis: ['case_history', { id:'id', vaka_id:'case_id', durum:'status', not:'note', kim:'actor', zaman:'created_at' }],
   etkinlikler: ['events', { id:'id', baslik:'title', aciklama:'description', baslangic:'starts_at', bitis:'ends_at', baglanti:'link', olusturma:'created_at' }],
   yasak_sozler: ['banned_words', { soz:'word', tam:'exact_match', eklenme:'added_at' }],
+  kaynaklar: ['sources', { id:'id', baslik:'title', hedef:'target', olusturma:'created_at' }],
   // views
   fikir_kart: ['idea_cards', { id:'id', sahip:'owner_id', vaka_id:'case_id', baslik:'title', kategori:'category', problem:'problem', cozum:'solution',
     ozellikler:'features', ad:'display_name', zaman:'created_at', alici:'buyers', ort_fiyat:'avg_price', puanci:'raters',
@@ -47,6 +48,8 @@ const RPC = {
   giris_eposta: ['sign_in_email', { ad:'p_username' }],
   kullanici_adi_koy: ['set_username', { ad:'p_username' }],
   vaka_tam: ['cases_full', { v:'p_case_id' }, 'vakalar'],
+  kaynak_ziyaret: ['log_source_visit', { kaynak:'p_source', cihaz:'p_device' }],
+  kaynak_raporu: ['source_report', {}],
   is_admin: ['is_admin', {}]
 };
 

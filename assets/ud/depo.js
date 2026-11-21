@@ -91,20 +91,8 @@ const Store = (function(){
     const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
     return new Promise((ok, no) => c.toBlob(b => b ? ok(b) : no(new Error(T('ud.gorsel.tur'))), 'image/jpeg', .85));
   }
-  // One random id per browser, kept in a cookie and in local storage (either one restores the other). It goes
-  // along with "alırdım" and a new idea, so the database counts one browser once per idea and knows the browser an
-  // idea was written on (supabase/17-oy.sql). It says nothing about the person and is never shown to anyone.
-  function cihazId(){
-    let v = '';
-    try { v = (document.cookie.match(/(?:^|; )ud_cihaz=([a-z0-9]{16,40})/) || [])[1] || localStorage.getItem('ud-cihaz') || ''; } catch(e){}
-    if (!/^[a-z0-9]{16,40}$/.test(v)){
-      const a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a);
-      v = Array.from(a, x => (x % 36).toString(36)).join('') + Date.now().toString(36);
-    }
-    try { localStorage.setItem('ud-cihaz', v); } catch(e){}
-    try { document.cookie = 'ud_cihaz=' + v + '; Max-Age=63072000; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); } catch(e){}
-    return v;
-  }
+  // the browser's random id (assets/ud/temel.js, "browser id")
+  const cihazId = window.UD_CIHAZ;
   // "alırdım" goes through the database's own function only: the table takes no plain insert (supabase/18-talep-kilidi.sql)
   const alirdim = (id, fiyat) => DB.rpc(sb, 'alirdim', { f:id, fiyat, cihaz:cihazId() });
   // nobody votes for, or scores, their own idea: said here at once, enforced by the database as well

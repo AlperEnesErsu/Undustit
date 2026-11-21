@@ -84,7 +84,7 @@ aşağıdaki adımları izleyin.
 
 ## 8. E-posta bildirimleri ("haber ver")
 
-Site e-posta adreslerini `haber_istekleri` tablosuna yazar; göndermeyi bir Edge Function yapar. Bu adım
+Site e-posta adreslerini `notify_requests` tablosuna yazar; göndermeyi bir Edge Function yapar. Bu adım
 yapılmasa da site çalışır, adresler birikir ve sonra gönderilebilir.
 
 1. https://resend.com hesabı açın, kendi alan adınızı doğrulayın ve bir API anahtarı alın.
@@ -95,15 +95,15 @@ yapılmasa da site çalışır, adresler birikir ve sonra gönderilebilir.
    ```
 
 3. **Edge Functions** > **Secrets** altında şunları ekleyin: `RESEND_API_KEY`, `HABER_GONDEREN`
-   (ör. `Undustit <haber@alanadiniz.com>`), `SITE_URL` (`https://undustit.com/`) ve
-   `WEBHOOK_SECRET` (uzun, rastgele bir metin).
-4. **Database** > **Webhooks** > **Create a new hook**: tablo `public.demands` (20'den önce `public.talepler`), olay **Insert**, tür
-   **Supabase Edge Functions**, fonksiyon `haber-gonder`. **HTTP Headers**'a `x-undustit-imza` adıyla
-   3. adımdaki `WEBHOOK_SECRET` değerini ekleyin.
+   (ör. `Undustit <haber@alanadiniz.com>`) ve `SITE_URL` (`https://undustit.com/`).
+4. `supabase/21-haber-webhook.sql` dosyasını çalıştırın. Her yeni "alırdım" bu fonksiyonu çağırır. İmza anahtarı
+   veritabanının içinde, Vault'ta üretilir (`haber_gonder_webhook`). Kimsenin görmesi ya da kopyalaması gerekmez,
+   fonksiyon anahtarı yalnız `service_role`'ün çağırabildiği `haber_webhook_imza()` ile okur. Panelden ayrıca
+   bir Database Webhook kurmayın, aynı e-postayı iki kez tetikler.
 5. Deneme: bir fikre "haber ver" ile kendi adresinizi bırakın, başka bir tarayıcıdan "alırdım" deyin.
-   E-posta gelmeli ve `haber_istekleri.gonderildi` dolmalı. Her fikir için yalnız bir kez yazılır.
+   E-posta gelmeli ve `notify_requests.sent_at` dolmalı. Her fikir için yalnız bir kez yazılır.
 
-"Ön satışa çıkınca haber ver" istekleri (`tur = 'alirdim'`) şimdilik otomatik gönderilmez; ön satış
+"Ön satışa çıkınca haber ver" istekleri (`kind = 'alirdim'`) şimdilik otomatik gönderilmez; ön satış
 başlayınca yönetim tarafından bu listeye yazılır.
 
 ## 9. Ölçüm (Plausible)
@@ -304,7 +304,24 @@ kural ve tetikleyici adları İngilizcedir (`fikirler` → `ideas`, `vakalar.bas
   `gorsel_*` kuralları Supabase'in kendi rollerine aittir, proje rolü adlarını değiştiremez. Çalışmaları etkilenmez:
   tetikleyici `public.create_profile()`'ı, kurallar `public.can_upload_image()` ve `public.is_any_company()`'yi çağırır.
   Görsel kovası `gorseller` adını korur (adı değişirse yüklenmiş fotoğrafların adresleri bozulur).
-- **Webhook:** `haber-gonder` için bir Database Webhook kurduysanız tablosunu `public.demands` olarak seçin.
+- **Webhook:** `haber-gonder` artık `21-haber-webhook.sql` içindeki tetikleyiciyle çağrılır (§8).
+
+## 25. "Ne kadar çalıştı?": broşür QR'ı ve izlenen bağlantılar
+
+Broşürdeki QR `https://undustit.com/brosur` adresine gider. `_redirects` bu adresi
+`/fikir/?vaka=vaka-01&k=brosur`'a yönlendirir (302: basılı kod değişmeden hedef değiştirilebilir). Sayfa:
+
+- gelen kişiye broşürün kendisini kapatılabilir bir pencerede gösterir (`assets/afis/challenge-001.webp`,
+  `assets/ud/temel.js` içinde `AFISLER`),
+- `k`'yı adresten siler (paylaşılan bağlantı broşür sayılmaz),
+- tarayıcının `ud_cihaz` kimliğini `log_source_visit()` ile bir kez kaydeder.
+
+Yönetim > **Ne kadar çalıştı** (`/yonetim/kaynak/`) her bağlantı için gelen tarayıcıyı ve bunlardan kaçının sonra
+fikir yazdığını ya da "alırdım" dediğini gösterir. Burada yeni bağlantı da eklenir (ör. bir afiş için `afis-kampus`);
+kaydedince QR'a konacak adres çıkar. Yalnız kayıtlı adlar sayılır.
+
+**Kurulum:** `22-kaynak.sql` dosyasını SQL Editor'da çalıştırın (tekrar çalıştırmak güvenli). `brosur` kaydını kendisi açar.
+Yeni bir broşür ya da afiş kısa adresi (`/brosur` gibi) istenirse `_redirects`'e aynı biçimde bir satır eklenir.
 
 ## Sorun giderme
 

@@ -3,6 +3,10 @@
 # They answer "not found" like any missing page. tests/sunucu.mjs applies the same rules locally.
 # The project's netlify.app address moves to the domain (www.undustit.com is redirected by Netlify itself).
 https://undustit.netlify.app/*  https://undustit.com/:splat  301!
+# Printed links (QR codes). 302, so where they lead can change without reprinting. The k names the source:
+# the page counts the visit and the admin sees it in /yonetim/kaynak/ (supabase/22-kaynak.sql).
+/brosur       /fikir/?vaka=vaka-01&k=brosur  302!
+/brosur/      /fikir/?vaka=vaka-01&k=brosur  302!
 /docs/*        /404.html  404!
 /supabase/*    /404.html  404!
 /tests/*       /404.html  404!

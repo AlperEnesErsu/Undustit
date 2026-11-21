@@ -22,14 +22,19 @@ for (const l of satirlar('_headers')){
   if (!/^\s/.test(l)) basliklar.push({ re:desen(l.trim()), h:{} });
   else if (basliklar.length){ const i = l.indexOf(':'); basliklar[basliklar.length - 1].h[l.slice(0, i).trim()] = l.slice(i + 1).trim(); }
 }
-// _redirects: only the forced "404!" rules matter here (they hide the working files)
-const gizli = satirlar('_redirects').map(l => l.trim()).filter(l => l && !l.startsWith('#') && /\s404!$/.test(l)).map(l => desen(l.split(/\s+/)[0]));
+// _redirects: the forced "404!" rules (they hide the working files) and the site's own short links
+const kurallar = satirlar('_redirects').map(l => l.trim()).filter(l => l && !l.startsWith('#')).map(l => l.split(/\s+/));
+const gizli = kurallar.filter(k => /^404!?$/.test(k[2])).map(k => desen(k[0]));
+// printed links (/brosur → /fikir/?vaka=…): same-site 301/302 rules, exact paths
+const yonlen = kurallar.filter(k => k[0].startsWith('/') && /^30[12]!?$/.test(k[2]));
 const yerel = (ad, v) => ad === 'Content-Security-Policy'
   ? v.replace(/;\s*upgrade-insecure-requests/, '').replace(/connect-src ([^;]*)/, 'connect-src $1 http://sb.test')
   : v;
 
 http.createServer((req, res) => {
   const yol = decodeURIComponent((req.url || '/').split('?')[0]);
+  const y = yonlen.find(k => k[0] === yol);
+  if (y) { res.writeHead(Number(y[2].slice(0, 3)), { location: y[1], 'cache-control': 'no-store' }); return res.end(); }
   const ek = {};
   for (const b of basliklar) if (b.re.test(yol)) for (const [ad, v] of Object.entries(b.h)) if (ad !== 'Strict-Transport-Security') ek[ad] = yerel(ad, v);
   const clean = path.normalize(yol).replace(/^[/\\]+/, '');

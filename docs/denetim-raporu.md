@@ -14,7 +14,7 @@ Google arama sonucundaki sorun da burada.
 | 5 | Moderasyon ("bildir", kuyruk) | ✅ `13-moderasyon.sql`, yönetim paneli | – |
 | 6 | Firma başvurusu ve iletişim | ✅ Başvuru formu, iletişim sayfası, firma paneli. **Bu tur:** kabul edilen firmaya giriş bilgisi e-postası (§3) | `ayar.js` > `iletisim` adresi boş |
 | 7 | Bildirim e-postaları | 🟡 Yalnız "fikrine ilk alırdım geldi" ve bu turda firma kabul e-postası | Fikre yorum geldi, eşik doldu, perşembe hatırlatması, ön satış başladı. Hepsi koddan yapılabilir, sıradaki iş bu |
-| 8 | Ölçüm ve hata takibi | 🟡 Plausible bağlantısı hazır, site hataları kendi tablosunda (`10-hata.sql`) | `ayar.js` > `analitik` boş. Plausible hesabı açılınca `'undustit.com'` yazılır |
+| 8 | Ölçüm ve hata takibi | 🟡 Kendi sayacımız (`26-olcum.sql`), site hataları kendi tablosunda (`10-hata.sql`) | `26-olcum.sql` Supabase'de çalıştırılınca sayım başlar |
 | 9 | Kendi alan adı | ✅ undustit.com (Netlify). github.io ve netlify.app adresleri yönlendiriliyor | – |
 
 **Özet:** Koddan kapatılabilecek tek büyük madde bildirimler (7). 3 ve 4 dış hesap ve avukat bekliyor, 8 için tek bir

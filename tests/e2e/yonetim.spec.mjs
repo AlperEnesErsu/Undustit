@@ -309,7 +309,7 @@ test('yönetici kullanıcı adı oluşturur; e-posta yerine onunla giriş yapar'
 test('menü her sayfada aynı; boş listeler tek satırda; vaka formu kaydedilmemiş değişikliği söyler', async ({ page }) => {
   await hazirla(page);
   await yoneticiGiris(page);
-  const menu = ['Özet', 'Vakalar', 'İçerik', 'Rapor', 'Ne kadar çalıştı', 'Ayarlar'];
+  const menu = ['Özet', 'Vakalar', 'İçerik', 'Rapor', 'Analiz', 'Ne kadar çalıştı', 'Ayarlar'];
   for (const [yol, burada] of [['/yonetim/', 'Özet'], ['/yonetim/vaka/?id=vaka-01', 'Vakalar'], ['/yonetim/ayarlar/', 'Ayarlar']]){
     await page.goto(yol);
     await expect(page.locator('.y-yan a')).toHaveText(menu);

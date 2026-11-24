@@ -106,12 +106,15 @@ yapılmasa da site çalışır, adresler birikir ve sonra gönderilebilir.
 "Ön satışa çıkınca haber ver" istekleri (`kind = 'alirdim'`) şimdilik otomatik gönderilmez; ön satış
 başlayınca yönetim tarafından bu listeye yazılır.
 
-## 9. Ölçüm (Plausible)
+## 9. Ölçüm ve Analiz (kendi sayacımız)
 
-https://plausible.io'da siteyi ekleyin ve `assets/ayar.js` içindeki `analitik` alanına alan adını yazın
-(`'undustit.com'`). Çerez kullanmaz, KVKK için onay penceresi gerekmez. Özel olaylar
-(Fikir gönderildi, Alırdım, Paylaş, Haber ver, Vaka başvurusu) Plausible'da **Goals** altında aynı
-adlarla eklenmelidir.
+`26-olcum.sql`'i çalıştırın. Site, tarayıcının `ud_cihaz` kimliğiyle her sayfa açılışını, her bağlantı ya da düğme
+tıklamasını (sayfanın hangi bölümünde olduğuyla) ve "Fikir gönderildi", "Alırdım", "Paylaş", "Haber ver" gibi olayları
+`site_events` tablosuna yazar (doğrudan kimse okuyamaz; bir tarayıcı saatte en çok 600 satır yazar).
+Yönetim > **Analiz** son 7/30/90 günü gösterir: ziyaretçi, görüntüleme, günlük grafik, ziyaretten fikre huni,
+tıklanan bölümler, sayfalar, gelinen siteler, olaylar ve ziyaretçi listesi; "Yolculuk" bir tarayıcının sitede
+sırayla ne yaptığını gösterir. Yönetim sayfaları, botlar ve `localhost` sayılmaz (yerelde kayıt tarayıcıda kalır).
+Dış servis ya da hesap gerekmez; 180 günden eski satırlar kendiliğinden silinir.
 
 ## 10. Hesaplar: e-posta bağlama ve giriş ("Benim" sayfası)
 

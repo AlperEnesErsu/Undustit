@@ -371,16 +371,85 @@ function captcha(){
 // A vote is purchase intent, not a like: votes/<uid>.buy maps an idea to the price that person would pay.
 // Anywhere else it keeps the same shape in localStorage so the pages can be tried as a preview.
 // =========================================================== measuring
-// Cookieless page and event counts (Plausible) only once ayar.js names the site's domain; until then
-// nothing loads and olcu() does nothing. Events: idea sent, "alırdım", share, e-mail notice, application.
-const ANALITIK = (window.UD_AYAR || {}).analitik || '';
-if (ANALITIK){
-  window.plausible = window.plausible || function(){ (window.plausible.q = window.plausible.q || []).push(arguments); };
-  const sc = document.createElement('script');
-  sc.defer = true; sc.dataset.domain = ANALITIK; sc.src = 'https://plausible.io/js/script.js';
-  document.head.append(sc);
+// Our own analytics (supabase/26-olcum.sql), each with the browser's random id: every public page once per load (its
+// path, the other site it came from), every link or button pressed (and the part of the page it was in), and the
+// site's moments through olcu() (idea sent, "alırdım", share, e-mail notice…). The admin reads it in /yonetim/analiz/.
+// Admin pages and robots are not counted. Without a database, and on localhost (so trying the site never counts as a
+// visit), it stays in this browser (ud-olcum, the newest 3000), where the local admin reads it.
+const OLCUM = (function(){
+  const A = window.UD_AYAR || {};
+  if (document.documentElement.dataset.page === 'yonetim' || /^\/yonetim(\/|$)/.test(location.pathname)) return null;
+  if (/bot|crawl|spider|slurp|headless|lighthouse/i.test(navigator.userAgent)) return null;
+  const yerel = !A.supabaseUrl || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  return function(fn, govde, satir){
+    if (yerel){
+      try {
+        const l = JSON.parse(localStorage.getItem('ud-olcum') || '[]');
+        const liste = Array.isArray(l) ? l : [];
+        liste.push(Object.assign({ at:new Date().toISOString(), device:cihazId() }, satir));
+        localStorage.setItem('ud-olcum', JSON.stringify(liste.slice(-3000)));
+      } catch(e){}
+      return;
+    }
+    if (!window.fetch) return;
+    fetch(A.supabaseUrl + '/rest/v1/rpc/' + fn, { method:'POST', keepalive:true,
+      headers:{ apikey:A.supabaseAnon, Authorization:'Bearer ' + A.supabaseAnon, 'Content-Type':'application/json' },
+      body:JSON.stringify(Object.assign(govde, { p_device:cihazId() })) }).catch(() => {});
+  };
+})();
+// the page as the database keeps it: lower case, no index.html, the case kept (/fikir/?vaka=vaka-01)
+function olcumYolu(){
+  let yol = location.pathname.toLowerCase().replace(/index\.html$/, '');
+  const vaka = new URLSearchParams(location.search).get('vaka');
+  if (vaka && /^[a-z0-9-]{1,30}$/.test(vaka)) yol += '?vaka=' + vaka;
+  return yol;
 }
-function olcu(ad, props){ if (ANALITIK && window.plausible) window.plausible(ad, props ? { props } : undefined); }
+(function sayfaSay(){
+  if (!OLCUM) return;
+  const yol = olcumYolu();
+  let ref = '';
+  try { const r = document.referrer && new URL(document.referrer); if (r && r.host !== location.host) ref = r.hostname.replace(/^www\./, ''); } catch(e){}
+  OLCUM('log_page_view', { p_path:yol, p_ref:ref }, { kind:'page', path:yol, name:'', detail:ref });
+})();
+// a press: the part of the page is the nearest element with an id (form, case, r1…), or the menu, the footer, a
+// window; what was pressed is a link's page or site, a button's text key, its label, or its first words
+const OLCUM_BOLUM = { HEADER:'ust-menu', NAV:'menu', FOOTER:'alt-bilgi', DIALOG:'pencere' };
+function olcumBolum(el){
+  for (let n = el; n && n !== document.body; n = n.parentElement){
+    if (n.id && n.id !== 'main' && n !== el) return n.id.toLowerCase().replace(/[^a-z0-9_-]+/g, '-').slice(0, 40);
+    if (OLCUM_BOLUM[n.tagName]) return OLCUM_BOLUM[n.tagName];
+  }
+  return 'sayfa';
+}
+function olcumHedef(el){
+  if (el.dataset.t) return el.dataset.t;
+  const href = el.tagName === 'A' && el.getAttribute('href');
+  if (href && !/^(#|javascript:)/i.test(href)){
+    try {
+      const u = new URL(href, location.href);
+      if (u.host !== location.host) return u.hostname.replace(/^www\./, '');
+      const v = u.searchParams.get('vaka');
+      return u.pathname.toLowerCase().replace(/index\.html$/, '') + (v && /^[a-z0-9-]{1,30}$/.test(v) ? '?vaka=' + v : '');
+    } catch(e){}
+  }
+  const t = el.dataset.t || (el.querySelector('[data-t]') || {}).dataset?.t;
+  if (t) return t;
+  return (el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+}
+if (OLCUM) document.addEventListener('click', e => {
+  const el = e.target.closest && e.target.closest('a[href],button,summary,[role="button"],[role="tab"]');
+  if (!el || el.closest('[data-olcum-yok]')) return;
+  const hedef = olcumHedef(el);
+  if (!hedef) return;
+  const yol = olcumYolu(), bolum = olcumBolum(el);
+  OLCUM('log_click', { p_path:yol, p_section:bolum, p_target:hedef }, { kind:'click', path:yol, name:hedef.slice(0, 80), detail:bolum });
+}, true);
+function olcu(ad, props){
+  if (!OLCUM) return;
+  const detay = props ? Object.values(props).filter(v => v != null && v !== '').join(' · ').slice(0, 100) : '';
+  const yol = olcumYolu();
+  OLCUM('log_event', { p_name:ad, p_detail:detay, p_path:yol }, { kind:'event', path:yol, name:ad, detail:detay });
+}
 
 // =========================================================== shared helpers
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -402,5 +471,5 @@ function sortIdeas(list, by){
 const pct = v => LANG === 'en' ? v + '%' : '%' + v;
 const tl = n => LANG === 'en' ? '₺' + Math.round(n).toLocaleString(LOCALE) : Math.round(n).toLocaleString(LOCALE) + ' ₺';
 
-window.UD_IC = { alanUyar, modelEtiketleri, captcha, gorselAdresi, modelAdresi, model3d, vakaSuresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, ANALITIK, olcu, esc, etiket, sortIdeas, pct, tl };
+window.UD_IC = { alanUyar, modelEtiketleri, captcha, gorselAdresi, modelAdresi, model3d, vakaSuresi, vakaOf, katOf, html, ROOT, reduce, METIN, LANG, LOCALE, T, applyText, $, $$, el, ICON, TERMS, CATS, CASES, V01, caseOf, openCases, inCase, catName, CRIT, EXAMPLES, DAY, fmtDate, fmtDay, daysLeft, homeHref, STIL, withStil, toast, yazmaHatasi, uyariEl, veriUyari, sbClient, olcu, esc, etiket, sortIdeas, pct, tl };
 })();

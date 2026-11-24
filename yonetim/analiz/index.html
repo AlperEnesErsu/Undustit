@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="tr" data-root="../../" data-page="yonetim">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FCF9F3">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<title>Analiz · Yönetim · Undustit</title>
+<link rel="stylesheet" href="../../assets/fonts/base.css">
+<link rel="stylesheet" href="../../assets/ud.css">
+<link rel="stylesheet" href="../../assets/bilesen.css">
+<script src="../../assets/stil.js"></script>
+<style>
+/* Analiz: sitenin kendi ölçümü (supabase/26-olcum.sql). Tek seri grafikler, vurgu rengi; bileşenler bilesen.css'ten. */
+.y-ust{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.y-ust h1{font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:8px 0 0}
+.y-ust p{margin:6px 0 0;color:var(--ink-2);font-size:14px;max-width:64ch}
+.y-ust .sag{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.y-ust .sekmeler{border-bottom:0}
+.panel{margin-top:20px}
+.not{color:var(--muted);font-size:13px;margin:10px 0 0;max-width:72ch}
+.oran{display:block;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.alt{display:block;color:var(--muted);font-size:12.5px}
+code{font-size:12.5px;overflow-wrap:anywhere}
+
+/* günlük çubuklar */
+.a-cubuklar{display:flex;align-items:flex-end;gap:2px;height:150px;padding-top:8px;border-bottom:1px solid var(--line-2)}
+.a-cubuk{flex:1 1 0;min-width:0;height:100%;display:flex;align-items:flex-end;position:relative}
+.a-cubuk i{display:block;width:100%;min-height:1px;background:var(--accent);border-radius:4px 4px 0 0;transition:opacity var(--dur-fast) var(--ease-out)}
+.a-cubuk.sifir i{background:var(--line-2)}
+.a-cubuk:hover i,.a-cubuk:focus-visible i{opacity:.75}
+.ipucu{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;padding:6px 10px;border-radius:var(--r-sm);
+  background:var(--ink);color:var(--bg);font-size:12.5px;line-height:1.35;pointer-events:none;opacity:0;transition:opacity var(--dur-fast) var(--ease-out);z-index:2}
+.a-cubuk:hover .ipucu,.a-cubuk:focus-visible .ipucu{opacity:1}
+.a-cubuk:first-child .ipucu{left:0;transform:none}.a-cubuk:last-child .ipucu{left:auto;right:0;transform:none}
+.a-eksen{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
+
+/* yatay çubuklar: huni ve bölümler */
+.yatay{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.yatay li{display:grid;grid-template-columns:minmax(120px,220px) 1fr auto;gap:12px;align-items:center;font-size:14px}
+.yatay .ad{min-width:0;overflow-wrap:anywhere}
+.yatay .ad small{display:block;color:var(--muted);font-size:12px}
+.yatay .iz{height:14px;border-radius:0 4px 4px 0;background:var(--line);overflow:hidden}
+.yatay .iz i{display:block;height:100%;min-width:2px;background:var(--accent);border-radius:0 4px 4px 0}
+.yatay .deger{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.yatay .deger small{color:var(--muted);font-size:12px;margin-left:6px}
+@media (max-width:640px){.yatay li{grid-template-columns:1fr auto}.yatay .iz{grid-column:1 / -1;grid-row:2}}
+
+.a-iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.a-iki h3,.a-tablolar h3{font-size:15px;font-weight:500;margin:0 0 10px}
+.a-tablolar{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+@media (min-width:1000px){.a-tablolar{grid-template-columns:1.5fr 1fr 1fr}}
+.a-tablolar .tablo,.a-iki .tablo{min-width:0}
+
+/* ziyaretçiler ve yolculuk */
+.rozet-k{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:var(--accent-soft);color:var(--ink);margin:2px 4px 2px 0}
+.yolculuk{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.yolculuk li{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.yolculuk li:last-child{border-bottom:0}
+.yolculuk time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}
+.yolculuk .tur{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.yolculuk li.onemli{background:var(--accent-soft);border-radius:var(--r-sm);padding-left:8px;padding-right:8px}
+.yolculuk .gun{grid-column:1 / -1;font-weight:500;padding-top:10px;border:0}
+dialog.diyalog.genis{width:min(640px,calc(100vw - 32px))}
+dialog.diyalog.genis .ic{max-height:min(65vh,560px);overflow:auto}
+@media (prefers-reduced-motion:reduce){.a-cubuk i,.ipucu{transition:none}}
+</style>
+</head>
+<body class="yonetim">
+<a class="skip" href="#main">İçeriğe geç</a>
+<header class="y-bas">
+  <div class="y-kimlik" style="display:flex;align-items:center;gap:12px;min-width:0">
+    <a class="link" href="../../" style="font-weight:500;color:var(--ink);text-decoration:none">Undustit</a>
+    <span style="color:var(--muted);font-size:14px">Yönetim</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;min-width:0">
+    <span data-y-kim style="font-size:14px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44vw"></span>
+    <button type="button" class="btn alt sm" data-y-cikis hidden>Çıkış</button>
+  </div>
+</header>
+<div class="y-govde">
+  <nav class="y-yan" aria-label="Yönetim menüsü" data-y-menu="analiz"></nav>
+  <main id="main" class="y-ana" tabindex="-1"><p class="lead">Yükleniyor…</p></main>
+</div>
+
+<script src="../../assets/ayar.js"></script>
+<script src="../../assets/ud/db.js"></script>
+<script src="../../assets/ud/temel.js"></script>
+<script src="../../assets/ud/depo.js"></script>
+<script src="../../assets/ud/arayuz.js"></script>
+<script src="../../assets/ud/hareket.js"></script>
+<script src="../../assets/veri.js"></script>
+<script src="../yonetim.js"></script>
+<script>
+(function(){
+'use strict';
+var YON = window.YONETIM;
+var esc = YON.esc, sayi = YON.sayi;
+var ana = null, gun = 30, ziyaretciler = [];
+var AYLAR = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+function gunAdi(g){ var p = String(g).slice(0, 10).split('-'); return Number(p[2]) + ' ' + AYLAR[Number(p[1]) - 1]; }
+function saat(iso){ return new Date(iso).toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Istanbul' }); }
+function gunOf(iso){ return new Date(iso).toLocaleDateString('sv', { timeZone:'Europe/Istanbul' }); }
+function yuzde(a, b){ return b ? Math.round(a / b * 100) + '%' : '—'; }
+
+// what the database keeps, in words: pages, parts of a page, pressed things (a text key of the site becomes its text)
+var SAYFALAR = { '/':'Ana sayfa', '/fikir/':'Fikir yaz', '/fikirler/':'Fikirler', '/vakalar/':'Vakalar', '/vaka/':'Vaka', '/vaka-01/':'Vaka 01',
+  '/nasil/':'Nasıl işler', '/hikaye/':'Hikâye', '/persembe/':'Perşembe', '/benim/':'Benim', '/giris/':'Giriş', '/iletisim/':'İletişim',
+  '/kvkk/':'KVKK', '/kosullar/':'Koşullar', '/firma/':'Firma paneli', '/brosur':'Broşür', '/404.html':'Bulunamadı' };
+var BOLUMLER = { form:'Fikir formu', 'case':'Açık vaka', proc:'Süreç animasyonu', sayilar:'Canlı sayılar', thu:'Perşembe şeridi',
+  r1:'Talep topluyor', r2:'En çok istenen beş', 'ust-menu':'Üst menü', menu:'Menü', 'alt-bilgi':'Alt bilgi', pencere:'Pencere', sayfa:'Sayfanın geri kalanı' };
+function sayfaAdi(yol){
+  var p = String(yol || ''), q = p.indexOf('?'), kok = q < 0 ? p : p.slice(0, q);
+  var ad = SAYFALAR[kok] || kok;
+  return q < 0 ? ad : ad + ' · ' + p.slice(q + 6);
+}
+function bolumAdi(b){ return BOLUMLER[b] || b; }
+function metinAdi(h){
+  var M = window.UD_METIN, v = M && /^[a-z0-9_.-]+$/i.test(h) && h.indexOf('.') > 0 ? M.al(h) : null;
+  if (v != null){ var d = document.createElement('div'); d.innerHTML = v; return d.textContent.trim().slice(0, 60) || h; }
+  if (/^\//.test(h)) return sayfaAdi(h);
+  return h;
+}
+
+function kucukTablo(baslik, sutunlar, satirlar, bos){
+  return '<div><h3>' + baslik + '</h3>' + (satirlar.length
+    ? '<div class="tablo-kap"><table class="tablo"><thead><tr>' + sutunlar.map(function(s, i){
+        return '<th scope="col"' + (i ? ' class="sayi"' : '') + '>' + s + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      satirlar.map(function(r){ return '<tr>' + r.map(function(h, i){ return '<td' + (i ? ' class="sayi"' : '') + '>' + h + '</td>'; }).join('') + '</tr>'; }).join('') +
+      '</tbody></table></div>'
+    : '<p class="not" style="margin:0">' + bos + '</p>') + '</div>';
+}
+// a horizontal bar per row, longest = full width; the value and its share beside it
+function yatay(satirlar, etiket){
+  var enCok = Math.max.apply(null, satirlar.map(function(s){ return s.deger; }).concat([1]));
+  return '<ul class="yatay" aria-label="' + esc(etiket) + '">' + satirlar.map(function(s){
+    return '<li><span class="ad">' + s.ad + '</span><span class="iz" aria-hidden="true"><i style="width:' + (s.deger ? Math.max(1, s.deger / enCok * 100) : 0) + '%"></i></span>' +
+      '<span class="deger">' + sayi(s.deger) + (s.alt ? '<small>' + s.alt + '</small>' : '') + '</span></li>';
+  }).join('') + '</ul>';
+}
+
+function ciz(o, a){
+  ana = a;
+  ana.innerHTML =
+    '<div class="y-ust"><div><span class="eyebrow">Yönetim</span><h1>Analiz</h1>' +
+      '<p>Siteye kim geldi, nerelere baktı, nelere tıkladı; gelenlerden kaçı fikir yazdı ya da “alırdım” dedi. ' +
+      'Ziyaretçi bir tarayıcıdır, kişi değil: kim olduğunu bilmeyiz, aynı tarayıcının ne yaptığını görürüz.</p></div>' +
+      '<div class="sag"><div class="sekmeler" role="tablist" aria-label="Dönem">' +
+        [7, 30, 90].map(function(g){ return '<button class="sekme" type="button" role="tab" data-gun="' + g + '" aria-selected="' + (g === gun) + '">Son ' + g + ' gün</button>'; }).join('') +
+      '</div><button class="btn alt sm" type="button" data-yenile>Yenile</button></div></div>' +
+    '<div class="istatlar" id="a-sayilar" aria-live="polite"></div>' +
+    '<section class="panel" aria-labelledby="a-g"><header class="panel-bas"><h2 id="a-g">Günlük ziyaretçi</h2><span class="sayac" id="a-aralik"></span></header>' +
+      '<div class="panel-ic" id="a-gunler"><p class="lead">Yükleniyor…</p></div></section>' +
+    '<section class="panel" aria-labelledby="a-h"><header class="panel-bas"><h2 id="a-h">Ziyaretten fikre</h2></header>' +
+      '<div class="panel-ic" id="a-huni"></div></section>' +
+    '<section class="panel" aria-labelledby="a-t"><header class="panel-bas"><h2 id="a-t">Nereye tıkladılar</h2></header>' +
+      '<div class="panel-ic" id="a-tik"></div></section>' +
+    '<section class="panel" aria-labelledby="a-s"><header class="panel-bas"><h2 id="a-s">Sayfalar, gelinen yerler, olaylar</h2></header>' +
+      '<div class="panel-ic a-tablolar" id="a-tablolar"></div></section>' +
+    '<section class="panel" aria-labelledby="a-z"><header class="panel-bas"><h2 id="a-z">Ziyaretçiler</h2><span class="sayac" id="a-z-sayac"></span></header>' +
+      '<div class="panel-ic"><div id="a-ziyaretciler" aria-live="polite"><p class="lead">Yükleniyor…</p></div>' +
+      '<p class="not">Her satır bir tarayıcı. “Yolculuk” o tarayıcının sayfalarını, tıkladıklarını, yazdığı fikirleri ve “alırdım”larını sırasıyla gösterir. ' +
+        'Kimlik, ud_cihaz çerezindeki rastgele kimliğin ilk harfleridir; ad, e-posta ya da IP tutulmaz. Kayıtlar 180 gün sonra silinir.</p></div></section>';
+  ana.querySelector('[data-yenile]').addEventListener('click', yukle);
+  ana.querySelector('.y-ust .sekmeler').addEventListener('click', function(e){
+    var b = e.target.closest('[data-gun]'); if (!b) return;
+    gun = Number(b.dataset.gun);
+    ana.querySelectorAll('.y-ust [data-gun]').forEach(function(x){ x.setAttribute('aria-selected', String(x === b)); });
+    yukle();
+  });
+  ana.querySelector('#a-ziyaretciler').addEventListener('click', function(e){
+    var b = e.target.closest('[data-yolculuk]'); if (b) yolculukAc(b.dataset.yolculuk);
+  });
+  yukle();
+}
+
+function yukle(){
+  var istenen = gun;
+  Promise.all([UDV.analiz.rapor(istenen), UDV.analiz.ziyaretciler(istenen)]).then(function(s){
+    if (istenen !== gun) return;   // a newer period was picked meanwhile
+    raporCiz(s[0]); ziyaretciCiz(s[1]);
+  }).catch(function(err){
+    if (istenen !== gun) return;
+    ana.querySelector('#a-gunler').innerHTML = '<p class="lead">' + esc(err.message || 'Yüklenemedi.') + '</p>';
+    ana.querySelector('#a-ziyaretciler').innerHTML = '';
+    YON.toast(err.message || 'Yüklenemedi.', 'hata');
+  });
+}
+
+function raporCiz(r){
+  var h = r.huni;
+  ana.querySelector('#a-aralik').textContent = gunAdi(r.ilk) + ' – ' + gunAdi(r.son);
+  ana.querySelector('#a-sayilar').innerHTML =
+    '<div class="istat"><span>Ziyaretçi</span><b data-a="ziyaretci">' + sayi(r.ziyaretci) + '</b><small>farklı tarayıcı</small></div>' +
+    '<div class="istat"><span>Sayfa görüntüleme</span><b data-a="goruntuleme">' + sayi(r.goruntuleme) + '</b>' +
+      '<small>' + (r.ziyaretci ? 'ziyaretçi başına ' + (r.goruntuleme / r.ziyaretci).toLocaleString('tr-TR', { maximumFractionDigits:1 }) : '—') + '</small></div>' +
+    '<div class="istat"><span>Fikir yazan</span><b data-a="yazan">' + sayi(h.yazan) + '</b><small>gelenlerin ' + yuzde(h.yazan, h.ziyaretci) + '’i</small></div>' +
+    '<div class="istat"><span>Alırdım diyen</span><b data-a="alici">' + sayi(h.alici) + '</b><small>gelenlerin ' + yuzde(h.alici, h.ziyaretci) + '’i</small></div>';
+
+  var enCok = Math.max.apply(null, r.gunler.map(function(g){ return g.ziyaretci; }).concat([1]));
+  ana.querySelector('#a-gunler').innerHTML =
+    '<div class="a-cubuklar" role="img" aria-label="Günlük ziyaretçi, ' + esc(gunAdi(r.ilk)) + ' – ' + esc(gunAdi(r.son)) + ', en çok ' + sayi(enCok) + '">' +
+      r.gunler.map(function(g){
+        var y = g.ziyaretci ? Math.max(2, Math.round(g.ziyaretci / enCok * 100)) : 1;
+        return '<span class="a-cubuk' + (g.ziyaretci ? '' : ' sifir') + '" tabindex="0">' +
+          '<i style="height:' + y + '%"></i><span class="ipucu"><b>' + esc(gunAdi(g.gun)) + '</b> · ' + sayi(g.ziyaretci) + ' ziyaretçi · ' + sayi(g.goruntuleme) + ' görüntüleme</span></span>';
+      }).join('') + '</div>' +
+    '<div class="a-eksen"><span>' + esc(gunAdi(r.ilk)) + '</span><span>en çok ' + sayi(enCok) + ' ziyaretçi</span><span>' + esc(gunAdi(r.son)) + '</span></div>';
+
+  ana.querySelector('#a-huni').innerHTML = yatay([
+    { ad:'Siteye geldi', deger:h.ziyaretci },
+    { ad:'En az iki sayfa gezdi', deger:h.gezen, alt:yuzde(h.gezen, h.ziyaretci) },
+    { ad:'Bir şeye tıkladı', deger:h.tiklayan, alt:yuzde(h.tiklayan, h.ziyaretci) },
+    { ad:'Fikir yazdı', deger:h.yazan, alt:yuzde(h.yazan, h.ziyaretci) },
+    { ad:'“Alırdım” dedi', deger:h.alici, alt:yuzde(h.alici, h.ziyaretci) }
+  ], 'Ziyaretten fikre, tarayıcı sayısı') +
+    '<p class="not">Yüzdeler, bu dönemde gelen tarayıcılara göre. Fikir ve “alırdım”, o tarayıcıdan yazılan ve hâlâ duranlardır; gizlenen fikirler sayılmaz.</p>';
+
+  ana.querySelector('#a-tik').innerHTML = r.bolumler.length
+    ? '<div class="a-iki"><div><h3>Bölümler</h3>' + yatay(r.bolumler.map(function(b){
+        return { ad:esc(bolumAdi(b.bolum)), deger:b.tik, alt:sayi(b.ziyaretci) + ' ziyaretçi' }; }), 'Bölümlere göre tıklama') + '</div>' +
+      kucukTablo('En çok tıklananlar', ['Tıklanan', 'Tık', 'Ziyaretçi'], r.hedefler.slice(0, 12).map(function(t){
+        return [esc(metinAdi(t.hedef)) + '<span class="alt">' + esc(sayfaAdi(t.yol)) + ' › ' + esc(bolumAdi(t.bolum)) + '</span>', sayi(t.tik), sayi(t.ziyaretci)];
+      }), '') + '</div>'
+    : '<p class="not" style="margin:0">Bu dönemde tıklama yok.</p>';
+
+  ana.querySelector('#a-tablolar').innerHTML =
+    kucukTablo('Sayfalar', ['Sayfa', 'Görüntüleme', 'Ziyaretçi'],
+      r.sayfalar.map(function(p){ return [esc(sayfaAdi(p.yol)) + '<span class="alt"><code>' + esc(p.yol) + '</code></span>', sayi(p.goruntuleme), sayi(p.ziyaretci)]; }), 'Bu dönemde ziyaret yok.') +
+    kucukTablo('Nereden geldiler', ['Site', 'Ziyaretçi'],
+      r.siteler.map(function(s){ return [esc(s.site), sayi(s.ziyaretci)]; }), 'Başka bir siteden gelen yok; gelenler adresi yazdı, QR okuttu ya da uygulamadan açtı.') +
+    kucukTablo('Olaylar', ['Olay', 'Kaç kez', 'Tarayıcı'],
+      r.olaylar.map(function(o){ return [esc(o.ad), sayi(o.adet), sayi(o.cihaz)]; }), 'Bu dönemde fikir gönderme, alırdım, paylaşma gibi bir olay yok.');
+}
+
+function ziyaretciCiz(liste){
+  ziyaretciler = liste;
+  ana.querySelector('#a-z-sayac').textContent = sayi(liste.length) + ' tarayıcı';
+  var kutu = ana.querySelector('#a-ziyaretciler');
+  kutu.innerHTML = liste.length
+    ? '<div class="tablo-kap"><table class="tablo"><caption class="sr-only">Ziyaretçiler, en son gelen üstte</caption><thead><tr>' +
+        '<th scope="col">Ziyaretçi</th><th scope="col">Son görülme</th><th scope="col">İlk geldiği</th><th scope="col">Nereden</th>' +
+        '<th scope="col" class="sayi">Sayfa</th><th scope="col" class="sayi">Tık</th><th scope="col">Yaptığı</th><th scope="col"><span class="sr-only">İşlem</span></th></tr></thead><tbody>' +
+      liste.map(function(v){
+        var yaptigi = (v.fikir ? '<span class="rozet-k">' + sayi(v.fikir) + ' fikir</span>' : '') + (v.talep ? '<span class="rozet-k">' + sayi(v.talep) + ' alırdım</span>' : '');
+        return '<tr data-cihaz="' + esc(v.cihaz) + '"><td><b>#' + esc(v.cihaz.slice(0, 6)) + '</b><span class="alt">ilk: ' + esc(YON.tarihSaat(v.ilk)) + '</span></td>' +
+          '<td>' + esc(YON.tarihSaat(v.son)) + '</td>' +
+          '<td>' + esc(v.giris ? sayfaAdi(v.giris) : '—') + '</td>' +
+          '<td>' + esc(v.kaynak ? 'QR · ' + v.kaynak : (v.site || 'doğrudan')) + '</td>' +
+          '<td class="sayi">' + sayi(v.sayfa) + '</td><td class="sayi">' + sayi(v.tik) + '</td>' +
+          '<td>' + (yaptigi || '<span class="alt">gezdi</span>') + '</td>' +
+          '<td><button class="btn alt sm" type="button" data-yolculuk="' + esc(v.cihaz) + '">Yolculuk</button></td></tr>';
+      }).join('') + '</tbody></table></div>'
+    : '<p class="lead">Bu dönemde gelen yok.</p>';
+  YON.kartla(kutu);
+}
+
+// one browser's way through the site, oldest first, grouped by day
+var TURLER = { page:'Sayfa', click:'Tık', event:'Olay', idea:'Fikir', demand:'Alırdım' };
+function adim(x){
+  if (x.tur === 'page') return 'Açtı: <b>' + esc(sayfaAdi(x.yol)) + '</b>' + (x.detay ? ' <span class="alt">' + esc(x.detay) + ' üzerinden</span>' : '');
+  if (x.tur === 'click') return 'Tıkladı: <b>' + esc(metinAdi(x.ad)) + '</b><span class="alt">' + esc(sayfaAdi(x.yol)) + ' › ' + esc(bolumAdi(x.detay)) + '</span>';
+  if (x.tur === 'event') return esc(x.ad) + (x.detay ? ' <span class="alt">' + esc(x.detay) + '</span>' : '');
+  if (x.tur === 'idea') return 'Fikir yazdı: <b>' + esc(x.ad) + '</b>';
+  if (x.tur === 'demand') return '“Alırdım” dedi: <b>' + esc(x.ad) + '</b>';
+  return esc(x.ad || x.tur);
+}
+function yolculukAc(cihaz){
+  var v = ziyaretciler.find(function(x){ return x.cihaz === cihaz; }) || { cihaz:cihaz };
+  var d = document.createElement('dialog');
+  d.className = 'diyalog genis';
+  d.setAttribute('aria-labelledby', 'yl-b');
+  d.innerHTML = '<header><h2 id="yl-b">Ziyaretçi #' + esc(cihaz.slice(0, 6)) + '</h2></header><div class="ic"><p class="lead">Yükleniyor…</p></div>' +
+    '<footer><button type="button" class="btn alt" data-kapat>Kapat</button></footer>';
+  d.querySelector('[data-kapat]').addEventListener('click', function(){ d.close(); });
+  d.addEventListener('click', function(e){ if (e.target === d) d.close(); });
+  d.addEventListener('close', function(){ d.remove(); });
+  document.body.append(d);
+  d.showModal();
+  UDV.analiz.yolculuk(cihaz).then(function(adimlar){
+    var onceki = '';
+    d.querySelector('.ic').innerHTML = (v.sayfa != null ? '<p class="not" style="margin-top:0">' + sayi(v.sayfa) + ' sayfa, ' + sayi(v.tik) + ' tık' +
+        (v.kaynak ? ', QR (' + esc(v.kaynak) + ') ile geldi' : v.site ? ', ' + esc(v.site) + ' üzerinden geldi' : '') + '.</p>' : '') +
+      (adimlar.length ? '<ol class="yolculuk">' + adimlar.map(function(x){
+        var g = gunOf(x.zaman), bas = g !== onceki ? '<li class="gun">' + esc(gunAdi(g)) + '</li>' : '';
+        onceki = g;
+        return bas + '<li' + (x.tur === 'idea' || x.tur === 'demand' ? ' class="onemli"' : '') + '><time datetime="' + esc(x.zaman) + '">' + esc(saat(x.zaman)) + '</time>' +
+          '<div><span class="tur">' + esc(TURLER[x.tur] || x.tur) + '</span>' + adim(x) + '</div></li>';
+      }).join('') + '</ol>' : '<p class="lead">Kayıt yok.</p>');
+  }).catch(function(err){ d.querySelector('.ic').innerHTML = '<p class="lead">' + esc(err.message || 'Yüklenemedi.') + '</p>'; });
+}
+
+YON.guard(ciz);
+})();
+</script>
+</body>
+</html>

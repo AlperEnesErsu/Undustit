@@ -81,7 +81,6 @@ yerel deneme şifresiyle girilir (`assets/veri.js`). Doluysa Supabase'e bağlan�
 |---|---|
 | `supabaseUrl`, `supabaseAnon` | Supabase projesi. Anon anahtar herkese açık olabilir; veriyi RLS kuralları korur. **service_role asla buraya girmez.** |
 | `adminler` | Yönetim paneline girebilecek e-postalar (Supabase'de ayrıca `profiller.rol = 'admin'`) |
-| `analitik` | Plausible alan adı; boşken ölçüm yüklenmez |
 | `iletisim` | Herkese açık iletişim e-postası; boşken yalnız form |
 | `yasal` | `true` olunca KVKK ve koşullar alt bilgide ve formlarda görünür |
 | `yayin` | Perşembe yayınının adresi; doluyken "Yayına git" çıkar |

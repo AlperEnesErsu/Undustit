@@ -135,7 +135,7 @@ küçük bir espri; rakamlar, oranlar ve kurallar hiç değişmedi.
 5. Moderasyon: uygunsuz, kopya ya da spam fikir için "bildir" ve yönetici paneli.
 6. İletişim ve fabrika tarafı: vaka açmak isteyen firma için başvuru formu ve iletişim adresi.
 7. Bildirim: perşembe yayını, fikre yorum, eşik doldu gibi anlar için e-posta.
-8. Ölçüm: çerezsiz analitik (Plausible gibi) ve hata takibi.
+8. Ölçüm: kendi sayacımız (Supabase, `26-olcum.sql`) ve hata takibi.
 9. Kendi alan adı: `robots.txt` GitHub Pages alt klasöründe arama motorlarınca okunmaz; alan adına
    geçince canonical, og ve sitemap adresleri tek yerden güncellenmeli.
 
@@ -326,8 +326,8 @@ vardı. Oyuncu korunarak her renge tek görev verildi:
 - **Haber ver:** isteğe bağlı tek e-posta alanı: fikir gönderince ("ilk alırdım gelince") ve "alırdım"
   denmiş fikrin penceresinde ("ön satışa çıkınca"). Adres tarayıcıda hatırlanır; veritabanında yalnız
   sahibi ve yönetici görür. Gönderim `supabase/functions/haber-gonder` (Resend, talepler webhook'u).
-- **Ölçüm:** Plausible, `ayar.js` `analitik` boşken hiç yüklenmez. Olaylar: Fikir gönderildi, Alırdım,
-  Paylaş, Haber ver, Vaka başvurusu.
+- **Ölçüm:** kendi sayacımız (`supabase/26-olcum.sql`, `temel.js` `olcu()` ve tıklama dinleyicisi): sayfa, tıklama (bölümüyle), gelinen site ve
+  olaylar (Fikir gönderildi, Alırdım, Paylaş, Haber ver, Numune…) `ud_cihaz` kimliğiyle; yönetimde "Analiz" (huni, bölümler, ziyaretçi yolculuğu).
 - **İçerik kuralı:** açılış fikirleri gerçek kişilerden, kendi adlarıyla (`docs/acilis-icerik.md`).
 
 ## Faz 1: "gerçek şirket" görünümü (26 Ekim 2026)
@@ -616,3 +616,27 @@ Kaydet, "Hepsini çözüldü yap" (onaylı) ve "Çözülenleri de göster". Kay�
   üzerinden, süre, ödül, ödeme ve vergi, haklar, ulaşılamazsa); sarı alanlar avukata.
 - **E-postalar** (`25-bildirim.sql`, `functions/bildirim`): başvuru onayı ve yöneticiye haber, İncelendi/Ret,
   "vakanız yayında", kazanan. Resend doğrulanınca çalışır.
+
+## Analiz (24 Kasım 2026)
+
+- **Kayıt** (`26-olcum.sql`, `site_events`): sayfa açılışı, tıklama ve olay; her satır `ud_cihaz` kimliği ve zamanla.
+  Tıklamada "bölüm" en yakın `id`'li ata (form, case, r2…) ya da üst menü / menü / alt bilgi / pencere; "tıklanan" bir
+  bağlantının sayfası ya da sitesi, düğmenin metin anahtarı (`data-t`) ya da ilk kelimeleri. `data-olcum-yok` taşıyan
+  bir alan hiç sayılmaz. Yönetim, botlar ve localhost sayılmaz; saatte en çok 600 satır; 180 gün saklama.
+- **Yönetim > Analiz** (`yonetim/analiz/`): dönem 7/30/90 gün; dört sayı, günlük ziyaretçi çubukları, ziyaretten fikre
+  huni (geldi → iki sayfa → tıkladı → fikir yazdı → alırdım), bölümler ve en çok tıklananlar, sayfalar / siteler /
+  olaylar, ziyaretçi listesi ve her ziyaretçinin "Yolculuk"u. Fikir ve alırdım `device_marks`'tan gelir.
+- Ziyaretçi bir tarayıcıdır, kişi değil; ad, e-posta, IP tutulmaz. KVKK metni bunu ve tıklama kaydını söylüyor.
+
+## Arama sonucu: logo, site adı, dil (24 Kasım 2026)
+
+- **Logo:** favicon artık kökte gerçek dosyalar (`favicon.ico` 16/32/48, `favicon.svg`, `apple-touch-icon.png`,
+  `assets/ikon/`, `site.webmanifest`); Google gömülü `data:` ikonunu okumuyordu, sonuçta boş küre çıkıyordu. Ikonlar
+  `tools/ikon.mjs` ile "it" işaretinden çizilir. Her sayfa aynı dört etiketi taşır.
+- **Site adı:** ana sayfada WebSite + Organization JSON-LD (ad "Undustit", logo `assets/ikon/logo-512.png`).
+- **Dil:** `netlify/edge-functions/dil.js` `?dil=en` sayfasının başını sunucuda İngilizce yazar (lang, canonical ve og:url
+  `?dil=en`, og:locale, başlık ve açıklamalar `en.js`'ten). Önceden İngilizce sayfanın ham HTML'i canonical olarak Türkçe
+  adresi gösteriyordu; Google ikisini birleştirip Türkçe arayana İngilizce metni gösterebiliyordu. `sitemap.xml` her
+  sayfanın iki dilini hreflang ile söyler.
+- Sitelinks (sonucun altındaki alt bağlantılar) Google'ın kararıdır; açık site adı, düzenli menü ve site haritası
+  yalnız olasılığı artırır.

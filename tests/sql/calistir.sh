@@ -24,3 +24,7 @@ run supabase/16-kullanici-adi.sql
 run supabase/17-oy.sql
 run supabase/18-talep-kilidi.sql
 run tests/sql/kontrol.sql
+# 26 stands on its own (is_admin(), auth.uid()), so it is checked here although 19 to 25 are not run
+run supabase/26-olcum.sql
+run supabase/26-olcum.sql
+run tests/sql/olcum.sql

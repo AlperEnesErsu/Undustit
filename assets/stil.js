@@ -26,7 +26,7 @@
   // language without ?dil: the visitor's last choice, else the browser's language (Turkish browser → tr, any
   // other → en). Crawlers keep Turkish, so the plain address stays the Turkish page hreflang points at.
   var LANG_KEY = 'ud-dil';
-  var BOT = /bot|crawl|spider|slurp|lighthouse|facebookexternalhit|embedly|preview/i.test(navigator.userAgent || '');
+  var BOT = /bot|crawl|spider|slurp|lighthouse|facebookexternalhit|embedly|preview|google-inspectiontool|googleother|yandex|baidu/i.test(navigator.userAgent || '');
   function stored(){ try { var v = localStorage.getItem(LANG_KEY); return LANGS[v] ? v : null; } catch(e){ return null; } }
   function browserLang(){
     var l = (navigator.languages && navigator.languages[0]) || navigator.language || '';

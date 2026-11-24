@@ -8,7 +8,7 @@ olmazsa ön satış eşiği de anlamını yitirir.
 ## 1. Açılıştan önce (1 gün)
 
 - [ ] `supabase/4-acilis.sql` SQL Editor'da çalıştı.
-- [ ] Plausible'da site eklendi, `assets/ayar.js` içinde `analitik` dolu.
+- [ ] `supabase/26-olcum.sql` çalıştırıldı; Yönetim > Analiz sayıyor.
 - [ ] E-posta bildirimi kuruldu (`supabase/KURULUM.md` → "E-posta bildirimleri") ya da bilerek sonraya bırakıldı.
 - [ ] Boltun sayfası telefonda açılıp bir deneme fikri gönderildi, sonra fikir penceresinden geri alındı.
 
@@ -40,15 +40,15 @@ Fikir gönderilince çıkan "Paylaş, alıcı bul" düğmesi bağlantıyı hazı
 **X / Instagram hikâyesi**
 > 1.000.000 cıvata. Tek soru: başka ne olabilir? Fikrin seçilirse kârın %40'ı senin. [bağlantı]
 
-## 4. İlk hafta neye bakılır (Plausible)
+## 4. İlk hafta neye bakılır (Yönetim > Analiz)
 
 | Ölçü | Nereden | İyi işaret |
 |---|---|---|
 | Boltun sayfasına gelen | Sayfalar | Paylaşılan her bağlantıdan en az birkaç ziyaret |
-| Fikir gönderildi / ziyaret | Özel olay "Fikir gönderildi" | %3 ve üstü |
-| Alırdım / fikir penceresi | "Alırdım" | Fikir başına en az 3 farklı kişi |
-| Paylaş | "Paylaş" | Gönderenlerin yarısı paylaşıyorsa döngü çalışıyor |
-| Haber ver | "Haber ver" | Fikir sahiplerinin çoğu e-posta bırakıyor |
+| Fikir gönderildi / ziyaret | Olaylar > "Fikir gönderildi" | %3 ve üstü |
+| Alırdım / fikir penceresi | Olaylar > "Alırdım" | Fikir başına en az 3 farklı kişi |
+| Paylaş | Olaylar > "Paylaş" | Gönderenlerin yarısı paylaşıyorsa döngü çalışıyor |
+| Haber ver | Olaylar > "Haber ver" | Fikir sahiplerinin çoğu e-posta bırakıyor |
 
 Perşembe 20.00 yayınından önce yönetim panelinde Boltun'un fikir listesi CSV olarak alınır; en çok talep
 gören beş fikir yayında konuşulur.

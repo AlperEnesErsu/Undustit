@@ -42,7 +42,7 @@ const durumRozeti = d => '<span class="rozet" data-durum="' + esc(d) + '">' + es
 // One menu for every admin page, written here: a page only says which entry it is (<nav data-y-menu="rapor">).
 // The case editor counts as "Vakalar". The site itself is the "Undustit" link in the header.
 const MENU = [['ozet', '', 'Özet'], ['vakalar', '#vakalar', 'Vakalar'], ['icerik', 'icerik/', 'İçerik'], ['rapor', 'rapor/', 'Rapor'],
-  ['kaynak', 'kaynak/', 'Ne kadar çalıştı'], ['ayarlar', 'ayarlar/', 'Ayarlar']];
+  ['analiz', 'analiz/', 'Analiz'], ['kaynak', 'kaynak/', 'Ne kadar çalıştı'], ['ayarlar', 'ayarlar/', 'Ayarlar']];
 (function menuYaz(){
   const nav = $('nav[data-y-menu]');
   if (!nav) return;

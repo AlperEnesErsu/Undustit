@@ -1,12 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://undustit.com/</loc></url>
-  <url><loc>https://undustit.com/fikir/</loc></url>
-  <url><loc>https://undustit.com/fikirler/</loc></url>
-  <url><loc>https://undustit.com/nasil/</loc></url>
-  <url><loc>https://undustit.com/vakalar/</loc></url>
-  <url><loc>https://undustit.com/vaka-01/</loc></url>
-  <url><loc>https://undustit.com/hikaye/</loc></url>
-  <url><loc>https://undustit.com/persembe/</loc></url>
-  <url><loc>https://undustit.com/iletisim/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://undustit.com/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/fikir/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/fikir/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/fikir/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/fikir/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/fikir/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/fikir/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/fikir/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/fikir/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/fikirler/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/fikirler/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/fikirler/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/fikirler/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/fikirler/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/fikirler/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/fikirler/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/fikirler/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/nasil/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/nasil/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/nasil/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/nasil/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/nasil/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/nasil/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/nasil/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/nasil/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/vakalar/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/vakalar/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/vakalar/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/vakalar/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/vakalar/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/vakalar/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/vakalar/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/vakalar/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/vaka-01/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/vaka-01/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/vaka-01/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/vaka-01/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/vaka-01/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/vaka-01/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/vaka-01/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/vaka-01/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/hikaye/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/hikaye/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/hikaye/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/hikaye/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/hikaye/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/hikaye/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/hikaye/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/hikaye/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/persembe/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/persembe/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/persembe/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/persembe/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/persembe/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/persembe/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/persembe/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/persembe/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/iletisim/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/iletisim/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/iletisim/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/iletisim/"/>
+  </url>
+  <url>
+    <loc>https://undustit.com/iletisim/?dil=en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://undustit.com/iletisim/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://undustit.com/iletisim/?dil=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://undustit.com/iletisim/"/>
+  </url>
 </urlset>

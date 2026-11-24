@@ -12,7 +12,7 @@ devir adım adım nasıl yapılır. Rakamlar ve fiyatlar yaklaşıktır; devir g
 | Veritabanı, kimlik, fonksiyonlar | Supabase projesi `azjdweynukmwxywdfewb` | Projeyi alıcının organizasyonuna aktarma | Hazır |
 | Alan adı | Kayıt firması | Aktarma kodu (EPP) ya da firma içi devir | Alındı, bağlanmadı |
 | E-posta gönderimi | Resend | Hesap ya da alan adı doğrulaması alıcıya | Kurulacak |
-| Ölçüm | Plausible | Site sahipliği aktarma | Kurulacak |
+| Ölçüm | Kendi sayacımız (Supabase) | Veritabanıyla birlikte gelir | Kuruldu |
 | İçerik ve marka | "Undustit" adı, logo, metinler, çizimler | Satış sözleşmesinde fikri mülkiyet maddesi | Sözleşmede |
 | Topluluk verisi | Fikirler, talepler, yorumlar, e-postalar | KVKK'ya uygun devir (aydınlatmada belirtilmeli) | Avukat |
 
@@ -36,7 +36,6 @@ bağlı değilken (yerel önizleme) geçerlidir.
 | GitHub + Pages | Ücretsiz | Ücretsiz |
 | Supabase | Ücretsiz katman | Pro plan (aylık sabit + kullanım) |
 | Resend | Ücretsiz katman (aylık birkaç bin e-posta) | Ücretli plan |
-| Plausible | Deneme / en küçük plan | Trafiğe göre |
 | Alan adı | Yıllık yenileme | Yıllık yenileme |
 
 ## 4. Devir adımları
@@ -52,7 +51,7 @@ bağlı değilken (yerel önizleme) geçerlidir.
    update public.profiller set rol = 'uye'   where email = 'eski@satici.com';
    ```
    `assets/ayar.js` içindeki `adminler` listesi de güncellenir.
-5. **E-posta ve ölçüm:** Resend ve Plausible alıcının alan adı ve hesabıyla yeniden bağlanır (KURULUM §8–10).
+5. **E-posta:** Resend alıcının alan adı ve hesabıyla yeniden bağlanır (KURULUM §8, §10). Ölçüm veritabanıyla gelir.
 6. **Alan adı:** aktarılır; canonical, og ve `sitemap.xml` adresleri yeni alan adına çevrilir.
 7. **Son kontrol:** canlıda bir fikir, bir "alırdım", bir başvuru; yönetim panelinde görünmeli.
 

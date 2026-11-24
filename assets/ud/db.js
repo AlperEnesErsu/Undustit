@@ -52,6 +52,12 @@ const RPC = {
   vaka_tam: ['cases_full', { v:'p_case_id' }, 'vakalar'],
   kaynak_ziyaret: ['log_source_visit', { kaynak:'p_source', cihaz:'p_device' }],
   kaynak_raporu: ['source_report', {}],
+  sayfa_ziyaret: ['log_page_view', { yol:'p_path', site:'p_ref', cihaz:'p_device' }],
+  tik_kaydet: ['log_click', { yol:'p_path', bolum:'p_section', hedef:'p_target', cihaz:'p_device' }],
+  olay_kaydet: ['log_event', { ad:'p_name', detay:'p_detail', yol:'p_path', cihaz:'p_device' }],
+  olcum_raporu: ['site_report', { gun:'p_days' }],
+  olcum_ziyaretciler: ['site_visitors', { gun:'p_days', sinir:'p_limit' }],
+  olcum_yolculuk: ['site_journey', { cihaz:'p_device' }],
   kagit_fikir_ekle: ['add_paper_idea', { vaka:'p_case_id', kategori:'p_category', baslik:'p_title', problem:'p_problem', cozum:'p_solution',
     ad:'p_display_name', iletisim:'p_contact', kaynak:'p_source', not:'p_note' }],
   is_admin: ['is_admin', {}]

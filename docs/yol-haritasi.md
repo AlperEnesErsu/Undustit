@@ -18,8 +18,8 @@ testler) ve bunları kimin nasıl yönettiği. "Basit görünüyor" hissinin as�
 
 ## Faz 0: Sizin tarafınız (1–2 gün, kodsuz)
 - `supabase/4-acilis.sql` çalıştırılır (konsoldaki 404'ler ve "boş liste" görünümü biter).
-- Plausible açılır; `docs/acilis-icerik.md` ile ilk 10–15 gerçek fikir ve gerçek "alırdım" toplanır.
-- Alan adı alınır (ör. undustit.com). Kurumsal e-posta ve hesaplar (Supabase, Resend, Plausible) bu alan
+- `26-olcum.sql` çalıştırılır (Analiz); `docs/acilis-icerik.md` ile ilk 10–15 gerçek fikir ve gerçek "alırdım" toplanır.
+- Alan adı alınır (ör. undustit.com). Kurumsal e-posta ve hesaplar (Supabase, Resend) bu alan
   adına bağlanır. Devirde hepsi tek pakette verilir.
 
 ## Faz 1: "Gerçek şirket" görünümü (yaklaşık 1 hafta)

@@ -533,12 +533,12 @@ function mountSonuc(host, v){
     const kaz = list.find(kazananMi), ilk = list.filter(i => !kazananMi(i)).slice(0, kaz ? 4 : 5);
     const satir = (i, n) => `<li><span class="sn-sira">${n}</span><a href="${ideaUrl(i.key)}">${esc(i.title)}</a>` +
       `<small>${i.handle ? esc(i.handle) + ' · ' : ''}${T('ud.sonuc.talep', { n:i.buyers })}${i.buyers ? ' · ' + T('ud.sonuc.ort', { tutar:tl(i.avg) }) : ''}</small></li>`;
-    const baslik = kaz ? T(v.durum === 'uretim' ? 'ud.sonuc.uretim' : 'ud.sonuc.kazanan') : v.durum === 'degerlendirme' ? T('ud.sonuc.degerlendirme') : T('ud.sonuc.kapandi');
+    const baslik = kaz ? (v.durum === 'uretim' ? T('ud.sonuc.uretim') : T('ud.sonuc.kazanan')) : v.durum === 'degerlendirme' ? T('ud.sonuc.degerlendirme') : T('ud.sonuc.kapandi');
     host.innerHTML = `<section class="sonuc" aria-label="${esc(baslik)}"><span class="eyebrow">${esc(baslik)}</span>` +
       (kaz ? `<div class="sn-kazanan"><b><a href="${ideaUrl(kaz.key)}">${esc(kaz.title)}</a></b>` +
         `<p>${kaz.handle ? T('ud.sonuc.sahibi', { ad:esc(kaz.handle) }) + ' · ' : ''}${T('ud.sonuc.talep', { n:kaz.buyers })}${kaz.buyers ? ' · ' + T('ud.sonuc.ort', { tutar:tl(kaz.avg) }) : ''}</p></div>` :
         v.durum === 'degerlendirme' ? `<p class="sn-not">${T('ud.sonuc.degerlendirme.not')}</p>` : '') +
-      (ilk.length ? `<p class="sn-alt">${T(kaz ? 'ud.sonuc.siralama' : 'ud.sonuc.en')}</p><ol class="sn-liste" start="${kaz ? 2 : 1}">${ilk.map((i, j) => satir(i, j + (kaz ? 2 : 1))).join('')}</ol>` : '') +
+      (ilk.length ? `<p class="sn-alt">${kaz ? T('ud.sonuc.siralama') : T('ud.sonuc.en')}</p><ol class="sn-liste" start="${kaz ? 2 : 1}">${ilk.map((i, j) => satir(i, j + (kaz ? 2 : 1))).join('')}</ol>` : '') +
       `</section>`;
   };
   Store.sub(ciz);

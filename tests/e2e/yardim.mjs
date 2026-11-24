@@ -1,10 +1,9 @@
-// Shared setup: every page runs in local mode (ayar.js replaced in the browser, no network to Supabase or
-// Plausible), and any JS error fails the test. Helpers seed the local preview store the way the site writes it.
+// Shared setup: every page runs in local mode (ayar.js replaced in the browser, no network to Supabase), and any JS error fails the test. Helpers seed the local preview store the way the site writes it.
 import { test as base, expect } from '@playwright/test';
 
 export const ADMIN = 'test@undustit.local';
 export const ADMIN_SIFRE = 'undustit';   // the local preview's admin password (assets/veri.js), never a real one
-const AYAR = `window.UD_AYAR = { supabaseUrl:'', supabaseAnon:'', adminler:['${ADMIN}'], analitik:'', iletisim:'', yasal:false, yayin:'' };`;
+const AYAR = `window.UD_AYAR = { supabaseUrl:'', supabaseAnon:'', adminler:['${ADMIN}'], iletisim:'', yasal:false, yayin:'' };`;
 
 export const test = base.extend({
   page: async ({ page }, use) => {

@@ -8,6 +8,10 @@
 <!-- taslak: hukuki kontrol ve şirket bilgileri gelene kadar arama motorlarına kapalı, hiçbir yerden bağlantı verilmez -->
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#FCF9F3">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="stylesheet" href="../assets/fonts/base.css">
 <link rel="stylesheet" href="../assets/ud.css">
 <script src="../assets/stil.js"></script>
@@ -42,9 +46,9 @@
       <li><b>Teknik tanımlayıcılar:</b> tarayıcına atanan anonim kullanıcı kimliği ve oturum bilgisi; altyapı sağlayıcısının tuttuğu teknik kayıtlar (IP adresi, tarih ve saat).</li>
       <li><b>İletişim verileri:</b> "haber ver" için bıraktığın e-posta adresi; iletişim formundaki ad, e-posta ve mesaj; vaka başvurusundaki firma adı, yetkili adı, e-posta, telefon ve stok bilgileri.</li>
       <li><b>Kâğıda yazılan fikirler:</b> broşürle kâğıda yazıp kutuya bıraktığın fikir, isteğe bağlı görünen adınla sitede herkese açık yayımlanır. Kâğıda yazdığın e-posta, LinkedIn adresi ya da telefon numarası yalnız fikrin ve sonuçlar hakkında sana ulaşmak için yönetim panelinde saklanır; sitede hiçbir yerde görünmez.</li>
-      <li><b>Ölçüm:</b> kişiyi tanımlamayan, çerezsiz sayfa ve olay sayıları.</li>
+      <li><b>Ölçüm:</b> sitede hangi sayfaları açtığın, hangi bağlantı ve düğmelere tıkladığın (sayfanın hangi bölümünde), geldiğin başka sitenin adı (ör. google.com) ve fikir gönderme, “alırdım”, paylaşma gibi adımlar; zamanıyla ve aşağıdaki <code>ud_cihaz</code> kimliğiyle, kendi veritabanımızda. Amaç sitenin nasıl kullanıldığını görüp geliştirmektir. Adın, e-postan, IP adresin ya da yazdığın metinler bu kayda girmez; kayıtlar 180 gün sonra silinir.</li>
     </ul>
-    <p>Undustit tek bir çerez kullanır: <code>ud_cihaz</code>, tarayıcına atanan rastgele bir kimlik. İki işi vardır: aynı tarayıcıdan bir fikre birden fazla “alırdım” denmesini önlemek ve broşür gibi basılı bir bağlantıyla (QR kodu) gelenleri bir kez saymak. Adını, e-postanı ya da başka bir kişisel bilgini taşımaz; reklam ya da başka sitelerde izleme için kullanılmaz; iki yıl sonra kendiliğinden silinir. Tarayıcının yerel deposunda ayrıca yalnız tercihlerin (dil, görünüm), görünen adın, e-posta adresin (bir sonraki formda hazır gelsin diye) ve oturum bilgisi tutulur.</p>
+    <p>Undustit tek bir çerez kullanır: <code>ud_cihaz</code>, tarayıcına atanan rastgele bir kimlik. Üç işi vardır: aynı tarayıcıdan bir fikre birden fazla “alırdım” denmesini önlemek, broşür gibi basılı bir bağlantıyla (QR kodu) gelenleri bir kez saymak ve siteye kaç farklı kişinin gelip neler yaptığını (yukarıdaki ölçüm) saymak. Adını, e-postanı ya da başka bir kişisel bilgini taşımaz; reklam ya da başka sitelerde izleme için kullanılmaz; iki yıl sonra kendiliğinden silinir. Tarayıcının yerel deposunda ayrıca yalnız tercihlerin (dil, görünüm), görünen adın, e-posta adresin (bir sonraki formda hazır gelsin diye) ve oturum bilgisi tutulur.</p>
 
     <h2>3. İşleme amaçları</h2>
     <ul>
@@ -58,7 +62,7 @@
     <p>Kişisel veriler KVKK'nın 5. maddesinin 2. fıkrasındaki şu sebeplere dayanılarak işlenir: bir sözleşmenin kurulması ve ifası (c), hukuki yükümlülük (ç), veri sorumlusunun meşru menfaati (f). Formlardaki onay kutusu, bu metni okuduğunu ve verinin yukarıdaki amaçlarla işlenmesini kabul ettiğini gösterir. <span class="doldur">[AVUKAT: açık rıza gerektiren işlemler varsa ayrıca belirtilecek]</span></p>
 
     <h2>5. Aktarım</h2>
-    <p>Veriler, hizmeti sunmak için çalışılan altyapı sağlayıcılarına aktarılır: Supabase (veritabanı ve kimlik), Resend (e-posta gönderimi), Plausible (çerezsiz ölçüm), GitHub Pages (barındırma). Bu sağlayıcıların sunucuları yurt dışında olabilir; aktarım KVKK'nın 9. maddesine uygun olarak yapılır. <span class="doldur">[AVUKAT: standart sözleşme / açık rıza / bildirim yöntemi]</span> Yasal zorunluluk hâlinde yetkili kurum ve kuruluşlarla paylaşılabilir.</p>
+    <p>Veriler, hizmeti sunmak için çalışılan altyapı sağlayıcılarına aktarılır: Supabase (veritabanı ve kimlik), Resend (e-posta gönderimi), GitHub Pages (barındırma). Bu sağlayıcıların sunucuları yurt dışında olabilir; aktarım KVKK'nın 9. maddesine uygun olarak yapılır. <span class="doldur">[AVUKAT: standart sözleşme / açık rıza / bildirim yöntemi]</span> Yasal zorunluluk hâlinde yetkili kurum ve kuruluşlarla paylaşılabilir.</p>
 
     <h2>6. Saklama süresi</h2>
     <ul>

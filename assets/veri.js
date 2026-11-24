@@ -29,6 +29,7 @@
   const GEREK16 = 'Önce supabase/16-kullanici-adi.sql çalıştırılmalı.';
   const GEREK22 = 'Önce supabase/22-kaynak.sql çalıştırılmalı.';
   const GEREK24 = 'Önce supabase/24-kagit.sql çalıştırılmalı.';
+  const GEREK26 = 'Önce supabase/26-olcum.sql çalıştırılmalı.';
   // izlenen bağlantılar: ilki broşürdeki QR (undustit.com/brosur, _redirects)
   const KAYNAK_ILK = [{ id:'brosur', baslik:'Broşür QR', hedef:'/fikir/?vaka=vaka-01', olusturma:'2026-11-21T00:00:00.000Z' }];
   const SITE = 'https://undustit.com';
@@ -94,6 +95,17 @@
   }
   // sitenin yalnız yöneticiye giden kayıtları (başvuru, mesaj, bildirim) yerelde udv-<tablo> altında (assets/ud/depo.js Store.kaydet)
   function kayitOku(tablo){ try { return JSON.parse(localStorage.getItem('udv-' + tablo) || '{}') || {}; } catch(e){ return {}; } }
+  // analiz (26-olcum.sql), yerel: ud-olcum satırlarından dönemin satırları ve günleri
+  function yerelOlcum(gunSayisi){
+    let l = [];
+    try { l = JSON.parse(localStorage.getItem('ud-olcum') || '[]'); } catch(e){}
+    const son = new Date().toLocaleDateString('sv', { timeZone:'Europe/Istanbul' });
+    const gunler = [];
+    for (let i = gunSayisi - 1; i >= 0; i--) gunler.push(new Date(Date.parse(son + 'T12:00:00Z') - i * 864e5).toISOString().slice(0, 10));
+    const gunOf = at => new Date(at).toLocaleDateString('sv', { timeZone:'Europe/Istanbul' });
+    const satir = (Array.isArray(l) ? l : []).filter(x => x && x.at && gunOf(x.at) >= gunler[0]).map(x => ({ ...x, gun:gunOf(x.at) }));
+    return { satir, gunler, son };
+  }
   const yerel = {
     liste: async () => Object.values(oku().vakalar),
     al: async id => oku().vakalar[id] || null,
@@ -147,6 +159,46 @@
       });
     },
     kaynakEkle: async k => { const d = oku(); d.kaynaklar = (d.kaynaklar || KAYNAK_ILK.map(x => ({ ...x }))).concat([k]); yaz(d); },
+    // analiz (26-olcum.sql): yerelde yalnız bu tarayıcı; ud-olcum'da { at, device, kind, path, name, detail } satırları
+    olcumRaporu: async gunSayisi => {
+      const { satir, gunler, son } = yerelOlcum(gunSayisi);
+      const say = (liste, f) => { const m = new Map(); liste.forEach(x => { const k = f(x); const o = m.get(k) || { n:0, c:new Set() }; o.n++; o.c.add(x.device); m.set(k, o); }); return [...m.entries()]; };
+      const tek = liste => new Set(liste.map(x => x.device)).size;
+      const s = satir.filter(x => x.kind === 'page'), k = satir.filter(x => x.kind === 'click'), e = satir.filter(x => x.kind === 'event');
+      const cihazlar = new Set(s.map(x => x.device));
+      const sayfaSay = {}; s.forEach(x => { sayfaSay[x.device] = (sayfaSay[x.device] || 0) + 1; });
+      const olayli = ad => new Set(e.filter(x => x.name === ad && cihazlar.has(x.device)).map(x => x.device)).size;
+      return {
+        ilk:gunler[0], son, goruntuleme:s.length, ziyaretci:cihazlar.size,
+        huni:{ ziyaretci:cihazlar.size, gezen:Object.values(sayfaSay).filter(n => n >= 2).length, tiklayan:tek(k),
+               yazan:olayli('Fikir gönderildi'), alici:olayli('Alırdım') },
+        gunler:gunler.map(g => { const d = s.filter(x => x.gun === g); return { gun:g, goruntuleme:d.length, ziyaretci:tek(d) }; }),
+        sayfalar:say(s, x => x.path).sort((a, b) => b[1].n - a[1].n).slice(0, 20).map(([yol, o]) => ({ yol, goruntuleme:o.n, ziyaretci:o.c.size })),
+        siteler:say(s.filter(x => x.detail), x => x.detail).sort((a, b) => b[1].c.size - a[1].c.size).map(([site, o]) => ({ site, ziyaretci:o.c.size })),
+        bolumler:say(k, x => x.detail).sort((a, b) => b[1].n - a[1].n).slice(0, 12).map(([bolum, o]) => ({ bolum, tik:o.n, ziyaretci:o.c.size })),
+        hedefler:say(k, x => x.path + '|' + x.detail + '|' + x.name).sort((a, b) => b[1].n - a[1].n).slice(0, 25)
+          .map(([key, o]) => { const [yol, bolum, ...h] = key.split('|'); return { yol, bolum, hedef:h.join('|'), tik:o.n, ziyaretci:o.c.size }; }),
+        olaylar:say(e, x => x.name).sort((a, b) => b[1].n - a[1].n).map(([ad, o]) => ({ ad, adet:o.n, cihaz:o.c.size }))
+      };
+    },
+    ziyaretciler: async gunSayisi => {
+      const { satir } = yerelOlcum(gunSayisi);
+      const m = new Map();
+      satir.forEach(x => { const l = m.get(x.device) || []; l.push(x); m.set(x.device, l); });
+      return [...m.entries()].map(([cihaz, l]) => {
+        l.sort((a, b) => a.at.localeCompare(b.at));
+        const ilkSayfa = l.find(x => x.kind === 'page') || {};
+        return { cihaz, ilk:l[0].at, son:l[l.length - 1].at, sayfa:l.filter(x => x.kind === 'page').length, tik:l.filter(x => x.kind === 'click').length,
+          site:ilkSayfa.detail || '', giris:ilkSayfa.path || '', kaynak:null,
+          fikir:l.filter(x => x.kind === 'event' && x.name === 'Fikir gönderildi').length, talep:l.filter(x => x.kind === 'event' && x.name === 'Alırdım').length };
+      }).sort((a, b) => b.son.localeCompare(a.son));
+    },
+    yolculuk: async cihaz => {
+      let l = [];
+      try { l = JSON.parse(localStorage.getItem('ud-olcum') || '[]'); } catch(e){}
+      return (Array.isArray(l) ? l : []).filter(x => x && x.device === cihaz).sort((a, b) => a.at.localeCompare(b.at))
+        .map(x => ({ zaman:x.at, tur:x.kind, yol:x.path, ad:x.name, detay:x.detail }));
+    },
     kagitEkle: async x => {
       let s = {};
       try { s = JSON.parse(localStorage.getItem(SITE_LS) || '{}') || {}; } catch(e){}
@@ -307,6 +359,36 @@
       if (r.error) throw hata(r.error);
     },
     kaynakSil: async id => { await sorgu(DB.from(istemci(), 'kaynaklar').delete().eq('id', id)); },
+    olcumRaporu: async gunSayisi => {
+      const r = await DB.rpc(istemci(), 'olcum_raporu', { gun:gunSayisi });
+      if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK26);
+      if (r.error) throw hata(r.error);
+      const x = r.data || {}, n = v => Number(v) || 0, h = x.funnel || {};
+      return {
+        ilk:x.from, son:x.to, goruntuleme:n(x.views), ziyaretci:n(x.visitors),
+        huni:{ ziyaretci:n(h.visitors), gezen:n(h.browsed), tiklayan:n(h.clicked), yazan:n(h.wrote), alici:n(h.demanded) },
+        gunler:(x.days || []).map(g => ({ gun:g.day, goruntuleme:n(g.views), ziyaretci:n(g.visitors) })),
+        sayfalar:(x.pages || []).map(p => ({ yol:p.path, goruntuleme:n(p.views), ziyaretci:n(p.visitors) })),
+        siteler:(x.referrers || []).map(s => ({ site:s.site, ziyaretci:n(s.visitors) })),
+        bolumler:(x.sections || []).map(b => ({ bolum:b.section, tik:n(b.clicks), ziyaretci:n(b.visitors) })),
+        hedefler:(x.targets || []).map(t => ({ yol:t.path, bolum:t.section, hedef:t.target, tik:n(t.clicks), ziyaretci:n(t.visitors) })),
+        olaylar:(x.events || []).map(e => ({ ad:e.name, adet:n(e.hits), cihaz:n(e.devices) }))
+      };
+    },
+    ziyaretciler: async gunSayisi => {
+      const r = await DB.rpc(istemci(), 'olcum_ziyaretciler', { gun:gunSayisi, sinir:200 });
+      if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK26);
+      if (r.error) throw hata(r.error);
+      const n = v => Number(v) || 0;
+      return (r.data || []).map(v => ({ cihaz:v.device, ilk:v.first, son:v.last, sayfa:n(v.pages), tik:n(v.clicks), site:v.referrer || '',
+        giris:v.landing || '', kaynak:v.source || null, fikir:n(v.ideas), talep:n(v.demands) }));
+    },
+    yolculuk: async cihaz => {
+      const r = await DB.rpc(istemci(), 'olcum_yolculuk', { cihaz });
+      if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK26);
+      if (r.error) throw hata(r.error);
+      return (r.data || []).map(x => ({ zaman:x.at, tur:x.kind, yol:x.path, ad:x.name, detay:x.detail }));
+    },
     kagitEkle: async x => {
       const r = await DB.rpc(istemci(), 'kagit_fikir_ekle', x);
       if (r.error && (r.error.code === 'PGRST202' || r.error.code === '42883')) throw new Error(GEREK24);
@@ -674,6 +756,18 @@
         await depo.kaynakEkle({ id, baslik, hedef });
       },
       async sil(id){ yetkiTest(); await depo.kaynakSil(str(id)); }
+    },
+
+    // Analiz (yonetim/analiz/, 26-olcum.sql): son gunSayisi gün, bugün dahil. Ziyaretçi = tarayıcı (ud_cihaz), kişi değil.
+    analiz: {
+      gun(g){ return Math.max(1, Math.min(180, Math.round(Number(g) || 30))); },
+      async rapor(g){ yetkiTest(); return depo.olcumRaporu(this.gun(g)); },
+      async ziyaretciler(g){ yetkiTest(); return depo.ziyaretciler(this.gun(g)); },
+      async yolculuk(cihaz){
+        yetkiTest();
+        if (!/^[a-z0-9]{16,40}$/.test(str(cihaz))) throw new Error('Geçersiz ziyaretçi');
+        return depo.yolculuk(str(cihaz));
+      }
     },
 
     icerik: {
